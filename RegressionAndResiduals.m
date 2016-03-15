@@ -77,7 +77,7 @@ mfiExp = [temp2 temp2 temp2 temp2 temp2 temp2 temp2 temp2];
 %Therefore, the the difference in mfiExp and mfiAdj is as follows; let this
 %matrix be called mfiDiff:
 
-mfiDiff = mfiExp - mfiAdj;
+mfiDiff = mfiExp - mfiAdjMean;
 
 %Saving this matrix as a .csv file
 xlswrite('MFIResiduals.csv',mfiDiff)
