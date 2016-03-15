@@ -9,11 +9,9 @@ clc; clear;
 %MATLAB function fmincon to find the value of R, a six-dimensional vector, 
 %which yields the minimum value of Error
 
-R = fmincon(@(x) Error(x),ones(6,1),[],[],[],[],zeros(6,1),(1e6*ones(6,1)))
+optFun = @(x) Error(x, mfiAdjMean, boundExp);
 
-%Saving R for use in later weeks:
-
-%save R
+R = fmincon(optFun,ones(6,1),[],[],[],[],zeros(6,1),(1e6*ones(6,1)));
 
 %R is approximately equal to:
 %
@@ -32,11 +30,25 @@ R = fmincon(@(x) Error(x),ones(6,1),[],[],[],[],zeros(6,1),(1e6*ones(6,1)))
 %matrix be called mfiDiff:
 
 mfiDiff = bndCalc - mfiAdjMean;
+mfiDiff(:,5:end) = [];
 
 %Saving this matrix as a .csv file
 %csvwrite('MFIResiduals.csv',mfiDiff)
 
 %See a bar graph of the elements of mfiDiff against their indices:
 
-bar3(mfiDiff)
-title('Residuals of MFI from Luxs Data Against Our Model')
+%bar(mfiDiff)
+%title('Residuals of MFI from Luxs Data Against Our Model')
+
+
+%%%%%% Aaron diagnosis
+
+
+kdV = reshape(kd,1,[]);
+
+
+
+
+
+
+
