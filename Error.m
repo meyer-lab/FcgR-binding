@@ -7,25 +7,7 @@ function J = Error( R )
 %please skip through the file until you reach the creation of the vector
 %"error"
 
-    %Load the Kd values we found in the literature
-    load kd.mat
-
-    %Create a matrix of MFIs per receptor flavor per immunoglobulin flavor per
-    %replicate minus background MFI per flavor of immunoglobulin flavor per
-    %replicate
-    mfiAdj = zeros(24,8);
-    for j = 1:6
-        for k= 1:4
-            mfiAdj((4*(j-1)+k),:) = mfi((5*j-4+k),:) - mfi((5*j-4),:);
-        end
-    end
-
-    %Normalize the adjusted MFIs along the replicates (along the columns)
-    mfiAdjMean = zeros(24,8);
-    temp = nanmean(mfiAdj);
-    for j = 1:8
-        mfiAdjMean(:,j) = mfiAdj(:,j) / temp(j);
-    end
+    [mfiAdjMean, kd] = loadData();
 
     %Create a figure for the molarity of TNP-X-BSA in the solution into which 
     %the CHO cells were placed (see Lux et al. 2013, Figure 2). The molecular
