@@ -19,6 +19,8 @@ function [J, bndCalc, error]  = Error( R )
         end
     end
     
-    error = (bndCalc - mfiAdjMean).^2;
+    
+    % Only calculating error for TNP-4-BSA
+    error = (bndCalc(:,1:4) - mfiAdjMean(:,1:4)).^2;
     J = nansum(nansum(error));
 end
