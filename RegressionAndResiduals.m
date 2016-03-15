@@ -38,5 +38,5 @@ mfiDiff = bndCalc - mfiAdjMean;
 
 %See a bar graph of the elements of mfiDiff against their indices:
 
-bar3(mfiDiff)
+bar(mfiDiff)
 title('Residuals of MFI from Luxs Data Against Our Model')
