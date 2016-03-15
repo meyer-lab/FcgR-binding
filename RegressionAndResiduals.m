@@ -24,7 +24,7 @@ R = fmincon(optFun,ones(6,1),[],[],[],[],zeros(6,1),(1e6*ones(6,1)));
 %Using this estimate R, the MFI we would expect per flavor of receptor per
 %flavor of immunoglobulin per replicate (mfiExp) is as follows:
 
-[~, bndCalc]  = Error( R );
+[~, bndCalc]  = optFun( R );
 
 %Therefore, the the difference in mfiExp and mfiAdj is as follows; let this
 %matrix be called mfiDiff:
