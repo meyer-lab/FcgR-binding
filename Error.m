@@ -31,14 +31,12 @@ function J = Error( R )
     end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    error = zeros(1,192);
+    error = zeros(size(mfiAdjMean));
     
     for j = 1:6
         for k = 1:4
-            for l = 1:8
-                error(32*(j-1) + 8*(k-1) + l) = (R(j)*boundExp(j,k) - mfiAdjMean((4*(j-1)+k),l))^2;
-            end
+            error(4*(j-1)+k,:) = (R(j)*boundExp(j,k) - mfiAdjMean(4*(j-1)+k,:)).^2;
         end
     end
-    J = nansum(error);
+    J = nansum(nansum(error));
 end
