@@ -1,4 +1,4 @@
-function [mfiAdjMean, kd] = loadData ()
+function [mfiAdjMean, kd, tnpbsa, boundExp] = loadData ()
     mfi = csvread('Luxetal2013-Fig2B.csv',2,2);
     mfi(29,1) = nan;
 
@@ -18,5 +18,26 @@ function [mfiAdjMean, kd] = loadData ()
     mfiAdjMean = zeros(24,8);
     for j = 1:8
         mfiAdjMean(:,j) = mfiAdj(:,j) / nanmean(mfiAdj(:,j));
-    end    
+    end
+    
+    %Create a figure for the molarity of TNP-X-BSA in the solution into which 
+    %the CHO cells were placed (see Lux et al. 2013, Figure 2). The molecular
+    %weight of bovine serum albumin is 66463 Da, and the contration of
+    %TNP-X-BSA in the solution described in Figure 2 is 5 micrograms per
+    %milliliter
+    tnpbsa = 1/66463 * 1e-6 * 5 * 1e3;
+
+    %Using a highly simplified model of receptor binding of the form
+    %                   
+    %                     C = R*L_0/(L_0 + K_D),
+    %
+    %granted the Kd values we have compiled, the expected number of bound
+    %immune complexes per receptor for each flavor of receptor for each flavor 
+    %of immunoglobulin should be as follows:
+    boundExp = zeros(6,4);
+    for j = 1:6
+        for k = 1:4
+            boundExp(j,k) = tnpbsa / (tnpbsa + kd(j,k));
+        end
+    end
 end
