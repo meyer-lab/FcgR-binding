@@ -1,6 +1,7 @@
 clc; clear;
 
 %Load the mean fluorecent intensities provided by Lux's lab and affinities
+<<<<<<< HEAD
 [kd, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData();
 
 %Create a figure for the molarity of TNP-X-BSA in the solution into which 
@@ -39,6 +40,19 @@ R2 = fmincon(@(x) Error26(x),ones(7,1),[],[],[],[],zeros(7,1),(1e6*ones(7,1)));
 
 %Saving R1 and R2 for use in later weeks:
 %save R1; save R2
+=======
+[mfiAdjMean, kd, tnpbsa, boundExp] = loadData();
+
+%Finding receptor expression by means of minimizing an error function. The
+%error function we desire is too complex to write in as an anonymous
+%function in MATLAB; therefore, I wrote it in the file Error.m. We use the 
+%MATLAB function fmincon to find the value of R, a six-dimensional vector, 
+%which yields the minimum value of Error
+
+optFun = @(x) Error(x, mfiAdjMean, boundExp);
+
+R = fmincon(optFun,ones(6,1),[],[],[],[],zeros(6,1),(1e6*ones(6,1)));
+>>>>>>> 15975d1ad7ef19e4b174dacac2ab1a51e6548b92
 
 %[R1 R2] is approximately equal to:
 %
@@ -56,6 +70,7 @@ R2 = fmincon(@(x) Error26(x),ones(7,1),[],[],[],[],zeros(7,1),(1e6*ones(7,1)));
 %flavor of receptor per flavor of immunoglobulin per replicate per (mfiExp)
 %is as follows:
 
+<<<<<<< HEAD
 %For TNP-4-BSA:
 mfiExp4 = zeros(24,4);
 tempSub = zeros(1,4);
@@ -69,6 +84,9 @@ for j = 1:6
         end
     end
 end
+=======
+[~, bndCalc]  = optFun( R );
+>>>>>>> 15975d1ad7ef19e4b174dacac2ab1a51e6548b92
 
 %For TNP-26-BSA:
 mfiExp26 = zeros(24,4);
@@ -84,9 +102,14 @@ for j = 1:6
     end
 end
 
+<<<<<<< HEAD
 %Residuals:
 mfiDiff4 = mfiExp4 - mfiAdjMean4;
 mfiDiff26 = mfiExp26 - mfiAdjMean26;
+=======
+mfiDiff = bndCalc - mfiAdjMean;
+mfiDiff(:,5:end) = [];
+>>>>>>> 15975d1ad7ef19e4b174dacac2ab1a51e6548b92
 
 %Saving these matrices as .csv files
 %csvwrite('MFIResiduals4.csv',mfiDiff4)
@@ -94,9 +117,27 @@ mfiDiff26 = mfiExp26 - mfiAdjMean26;
 
 %See a bar graph of the elements of mfiDiff against their indices:
 
+<<<<<<< HEAD
 %bar3(mfiDiff4)
 %title('MFI Residuals TNP-4-BSA')
 %hold on
 %figure
 %bar3(mfiDiff26)
 %title('MFI Residuals TNP-26-BSA')
+=======
+%bar(mfiDiff)
+%title('Residuals of MFI from Luxs Data Against Our Model')
+
+
+%%%%%% Aaron diagnosis
+
+
+kdV = reshape(kd,1,[]);
+
+
+
+
+
+
+
+>>>>>>> 15975d1ad7ef19e4b174dacac2ab1a51e6548b92
