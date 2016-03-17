@@ -1,7 +1,7 @@
 clc; clear;
 
 %Load the mean fluorecent intensities provided by Lux's lab and affinities
-[mfiAdjMean, kd] = loadData();
+[kd, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData();
 
 %Create a figure for the molarity of TNP-X-BSA in the solution into which 
 %the CHO cells were placed (see Lux et al. 2013, Figure 2). The molecular
@@ -10,61 +10,93 @@ clc; clear;
 %milliliter
 tnpbsa = 1/66463 * 1e-6 * 5 * 1e3;
 
-%Using a highly simplified model of receptor binding of the form
+%Let use a model for receptor binding of the form:
 %                   
-%                     C = R*L_0/(L_0 + K_D),
+% [C_i] = v!/((v - i)! * i!) * (K_x)^(i-1) * [L]_0/K_d * [R]^i 
+% (Stone et al.)
 %
-%granted the Kd values we have compiled, the expected number of bound
-%immune complexes per receptor for each flavor of receptor for each flavor 
-%of immunoglobulin should be as follows:
-boundExp = zeros(6,4);
+%"v" is the valency of the TNP-X-BSA, and we are going to assume the
+%valency is 10 for both TNP-4-BSA and TNP-26-BSA. "i" ranges from 1 to 4,
+%and "K_d" is the element of matrix kd that is pertinent to the
+%combination of receptor flavor and IgG flavor.
+%
+%Finding receptor expression and "K_x" by means of minimizing error 
+%functions. I have created Error and Error2 as error 
+%functions for this model against data in mfiAdjMean4 and 
+%mfiAdjMean26, respectively. The error functions we desire are too complex
+%to write in as anonymous functions in MATLAB; therefore, I wrote them in
+%the files Error.m and Error2.m.
+%We use the MATLAB function fmincon to find the values of R, a six-
+%dimensional vector, and kx, a seventh element appended to the six-
+%dimensional vector R, which yield the minimum value of Error. Essentially,
+%fmincon returns a 7-dimensional vector R, the first six elements being the 
+%calculated expression levels of FcgRIA, FcgRIIA-Arg, FcgRIIA-His, FcgRIIB,
+%FcgRIIIA-Phe, and FcgRIIIA-Val and the last element being a constant kx
+%s.t. 10^kx = K_x yields the best fit to the data using this model.
+
+R1 = fmincon(@(x) Error4(x),ones(7,1),[],[],[],[],zeros(7,1),(1e6*ones(7,1)));
+R2 = fmincon(@(x) Error26(x),ones(7,1),[],[],[],[],zeros(7,1),(1e6*ones(7,1)));
+
+%Saving R1 and R2 for use in later weeks:
+%save R1; save R2
+
+%[R1 R2] is approximately equal to:
+%
+%       [0.0018    0.0009
+%        0.2987    0.3411
+%        0.3362    0.3469
+%        0.3783    0.4602
+%        0.2597    0.2863
+%        0.0258    0.0225
+%        0.2504    0.2510]
+%
+%Remember that R1(7) and R2(7) are kx s.t. K_x = 10^kx.
+
+%Using these estimates R1 and R2, the MFI we would expect per TNP-X-BSA per
+%flavor of receptor per flavor of immunoglobulin per replicate per (mfiExp)
+%is as follows:
+
+%For TNP-4-BSA:
+mfiExp4 = zeros(24,4);
+tempSub = zeros(1,4);
 for j = 1:6
     for k = 1:4
-        boundExp(j,k) = tnpbsa / (tnpbsa + kd(j,k));
+        for l = 1:4
+            for m = 1:4
+                tempSub(m) = nchoosek(10,m)*10^(R1(7)*(m-1))*(tnpbsa/kd(j,k))*R1(j)^m;
+            end
+            mfiExp4((4*(j)+k-4),l) = nansum(tempSub);
+        end
     end
 end
 
-%Finding receptor expression by means of minimizing an error function. The
-%error function we desire is too complex to write in as an anonymous
-%function in MATLAB; therefore, I wrote it in the file Error.m. We use the 
-%MATLAB function fmincon to find the value of R, a six-dimensional vector, 
-%which yields the minimum value of Error
-
-R = fmincon(@(x) Error(x),ones(6,1),[],[],[],[],zeros(6,1),(1e6*ones(6,1)))
-
-%Saving R for use in later weeks:
-
-%save R
-
-%R is approximately equal to:
-%
-%   [1.5278 ; 12.9234 ; 15.9374 ; 35.4406 ; 9.6195 ; 1.7717]
-%
-%R(1) is the estimate of the expression level for FcgRIA, R(2) the estimate
-%of the expression level of FcgRIIA-Arg, etc. conflated with the coversion
-%factor from MFI to quantity of receptors
-
-%Using this estimate R, the MFI we would expect per flavor of receptor per
-%flavor of immunoglobulin per replicate (mfiExp) is as follows:
-
-temp = zeros(6,4);
+%For TNP-26-BSA:
+mfiExp26 = zeros(24,4);
+tempSub = zeros(1,4);
 for j = 1:6
     for k = 1:4
-        temp(j,k) = R(j) * boundExp(j,k);
+        for l = 1:4
+            for m = 1:4
+                tempSub(m) = nchoosek(10,m)*10^(R2(7)*(m-1))*(tnpbsa/kd(j,k))*R2(j)^m;
+            end
+            mfiExp26((4*(j)+k-4),l) = nansum(tempSub);
+        end
     end
 end
-temp2 = reshape(temp',24,1);
-mfiExp = [temp2 temp2 temp2 temp2 temp2 temp2 temp2 temp2];
 
-%Therefore, the the difference in mfiExp and mfiAdj is as follows; let this
-%matrix be called mfiDiff:
+%Residuals:
+mfiDiff4 = mfiExp4 - mfiAdjMean4;
+mfiDiff26 = mfiExp26 - mfiAdjMean26;
 
-mfiDiff = mfiExp - mfiAdjMean;
-
-%Saving this matrix as a .csv file
-%csvwrite('MFIResiduals.csv',mfiDiff)
+%Saving these matrices as .csv files
+%csvwrite('MFIResiduals4.csv',mfiDiff4)
+%csvwrite('MIFResiduals26.csv',mfiDiff26)
 
 %See a bar graph of the elements of mfiDiff against their indices:
 
-bar3(mfiDiff)
-title('Residuals of MFI from Luxs Data Against Our Model')
+%bar3(mfiDiff4)
+%title('MFI Residuals TNP-4-BSA')
+%hold on
+%figure
+%bar3(mfiDiff26)
+%title('MFI Residuals TNP-26-BSA')
