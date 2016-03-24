@@ -9,7 +9,7 @@ function [ C ] = Bound( r, kx, kd_spec, tnpbsa, v )
     
     for j = 1:v
         if j == 1
-            C = nchoosek(v,1)*(tnpbsa/kd_spec)*r;
+            C = v*(tnpbsa/kd_spec)*r;
         else
             C = C + nchoosek(v,j)*10^(kx*(j-1))*(tnpbsa/kd_spec)*r^j;
         end
