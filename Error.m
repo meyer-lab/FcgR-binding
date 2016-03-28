@@ -9,19 +9,14 @@ function [J] = Error( R, kd, tnpbsa, mfiAdjMean, v )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    temp1 = zeros(1,96);
+    temp1 = zeros(1,24);
     for j = 1:6
         for k = 1:4
-            temp2 = Bound(R(j),R(7),kd(j,k),tnpbsa,v);
-            temp1((16*(j-1)+4*(k-1)+1):(16*(j-1)+4*(k-1)+4)) = temp2*ones(1,4);
+            temp1(4*(j-1)+k) = Bound(R(j),R(7),kd(j,k),tnpbsa,v);
         end
     end
-    
-    error = zeros(1,96);
-    temp3 = mfiAdjMean';
-    for j = 1:96
-        error(j) = (temp1(j) - temp3(j))^2;
-    end
-    
-    J = nansum(error);
+    temp2 = [temp1;temp1;temp1;temp1]';
+    error = (temp2 - mfiAdjMean).^2;
+        
+    J = nansum(nansum(error));
 end
