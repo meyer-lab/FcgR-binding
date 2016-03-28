@@ -7,11 +7,10 @@ function [ C ] = Bound( r, kx, kd_spec, tnpbsa, v )
     %
     %   The sum from 1 to v of C_i = v!/((v-i)!*i!)*10^(kx*(i-1))*(tnpbsa/kd_spec)*r^i
     
-    for j = 1:v
-        if j == 1
-            C = nchoosek(v,1)*(tnpbsa/kd_spec)*r;
-        else
-            C = C + nchoosek(v,j)*10^(kx*(j-1))*(tnpbsa/kd_spec)*r^j;
-        end
+    % j = 1
+    C = v*(tnpbsa/kd_spec)*r;
+    
+    for j = 2:v
+        C = C + nchoosek(v,j)*10^(kx*(j-1))*(tnpbsa/kd_spec)*r^j;
     end
 end
