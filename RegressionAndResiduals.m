@@ -68,7 +68,7 @@ linConstraintA = [-1 0 0 0 0 0 0;
                   0 0 0 0 0 0 -1;
                   1 1 1 1 1 1 1];
               
-linConstraintb = [0; 0; 0; 0; 0; 0; 0; 10];
+linConstraintb = [0; 0; 0; 0; 0; 0; 0; 25];
 
 %Set up parameters for GlobalSearch and fmincon
 opts = optimoptions(@fmincon);
@@ -92,7 +92,7 @@ for j = 1:2
     end
     for k = 1:10
         problem = createOptimProblem('fmincon','objective',...
-        @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat),'x0',ones(7,1),'Aineq',linConstraintA,'bineq',linConstraintb,'lb',zeros(7,1),'ub',(10*ones(7,1)),'options',opts);
+        @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat),'x0',ones(7,1),'Aineq',linConstraintA,'bineq',linConstraintb,'lb',zeros(7,1),'ub',(100*ones(7,1)),'options',opts);
         Rx = run(gs,problem) %Not suppressed to allow for observation while running
         if k == 1
             Rc = [Rx; 1];
