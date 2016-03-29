@@ -73,11 +73,11 @@ for j = 1:2
     else
         mfiAdjMean = mfiAdjMean26;
     end
-    parfor k = 1:size(Rc,2)
+    for k = 1:size(Rc,2)
         problem = createOptimProblem('fmincon','objective',...
         @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat),'x0',ones(7,1),...
             'lb',[0 0 0 0 0 0 -100],'ub',(100*ones(7,1)),'options',opts);
-        [Rx, RcFit(k)] = run(gs,problem) %Not suppressed to allow for observation while running
+        [Rx, RcFit(k)] = run(gs,problem); %Not suppressed to allow for observation while running
         
         Rc(:,k) = [Rx; k];
     end
@@ -86,20 +86,6 @@ for j = 1:2
     %corresponding vector R which yield the least summed squared error
     [~, IDX] = min(RcFit);
     best = Rc(:,IDX);
-    
-    %Calculate the expression levels per receptor flavor per valency for both
-    %TNP-4-BSA and TNP-26-BSA data
-
-    %The following matrix bestCoefMat is only made to pass into the
-    %function Bound, and it passes information regarding the value of kx
-    %which yields the best fit into the function (to see how this matrix is
-    %used in the function Bound, please see its code)
-    bestCoefMat = biCoefMat;
-    for k = 1:10
-        for l = 1:10
-            bestCoefMat(k,l) = biCoefMat(k,l) * 10^(best(7)+k-1)*tnpbsa;
-        end
-    end
     
     %Results for MFI per flavor of receptor per flavor of immunoglobulin
     %that we would expect based on our optimization
