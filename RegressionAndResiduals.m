@@ -53,9 +53,7 @@ end
 
 %Set up parameters for GlobalSearch and fmincon
 opts = optimoptions(@fmincon);
-gs = GlobalSearch;
-gs.StartPointsToRun = 'bounds-ineqs';
-gs.Display = 'final';
+gs = GlobalSearch('StartPointsToRun','bounds-ineqs','Display','final');
 
 %Begin optimization:
 % > Rx is the vector R which yields the minimum value of Error for a
@@ -65,62 +63,33 @@ gs.Display = 'final';
 % > best is the column of Rc which yields the minimum value of Error.
 % > best4 and best26 yield the minimum values of Error for the TNP-4-BSA
 %   data and the TNP-26-BSA data, respectively.
+
+Rc = zeros(8, 10);
+RcFit = zeros(1,size(Rc,2));
+
 for j = 1:2
     if j == 1
         mfiAdjMean = mfiAdjMean4;
     else
         mfiAdjMean = mfiAdjMean26;
     end
-    for k = 1:10
+    parfor k = 1:size(Rc,2)
         problem = createOptimProblem('fmincon','objective',...
-        @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat),'x0',ones(7,1),'lb',zeros(7,1),'ub',(100*ones(7,1)),'options',opts);
-        Rx = run(gs,problem) %Not suppressed to allow for observation while running
-        if k == 1
-            Rc = [Rx; 1];
-        else
-            Rc = [Rc [Rx; k]];
-        end
-    end
-    
-    %Lists values of R which best fit the model for valency v for all
-    %integers v from 1 to 10. The value of v is appended as an eighth
-    %element of R. After running RegressionAndResiduals, type "Rc4" and
-    %"Rc26" to view the best fits for all values of v for TNP-4-BSA and
-    %TNP-26-BSA, respectively
-    if j == 1
-        Rc4 = Rc;
-    else
-        Rc26 = Rc;
+        @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat),'x0',ones(7,1),...
+            'lb',[0 0 0 0 0 0 -100],'ub',(100*ones(7,1)),'options',opts);
+        [Rx, RcFit(k)] = run(gs,problem) %Not suppressed to allow for observation while running
+        
+        Rc(:,k) = [Rx; k];
     end
     
     %From all best fits from v = 1 to v = 10, find the value of v and its
     %corresponding vector R which yield the least summed squared error
-    best = Rc(:,1);
-    for k = 2:10
-        if Error(best(1:7),kdBruhns,tnpbsa,mfiAdjMean,best(8),biCoefMat) > Error(Rc(1:7,k),kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat)
-            best = Rc(:,k);
-        end
-    end
+    [~, IDX] = min(RcFit);
+    best = Rc(:,IDX);
     
-    %Type "best4" and "best26" to find the values of R (and, appended to R
-    %as an eighth element, the valency v) which yield the least summed
-    %squared errors for TNP-4-BSA and TNP-26-BSA, respectively
-    if j == 1
-        best4 = best;
-    else
-        best26 = best;
-    end
-end
+    %Calculate the expression levels per receptor flavor per valency for both
+    %TNP-4-BSA and TNP-26-BSA data
 
-%Calculate the expression levels per receptor flavor per valency for both
-%TNP-4-BSA and TNP-26-BSA data
-for j = 1:2
-    if j == 1
-        best = best4;
-    else
-        best = best26;
-    end
-    
     %The following matrix bestCoefMat is only made to pass into the
     %function Bound, and it passes information regarding the value of kx
     %which yields the best fit into the function (to see how this matrix is
@@ -134,17 +103,26 @@ for j = 1:2
     
     %Results for MFI per flavor of receptor per flavor of immunoglobulin
     %that we would expect based on our optimization
-    mfiExp = zeros(24,4);
-    for k = 1:6
-        for l = 1:4
-            mfiExp((4*(k-1)+l),:) = ones(1,4)*Bound(best(k),kdBruhns(k,l),best(8),bestCoefMat);
-        end
-    end
+    [~, mfiExp] = Error(best,kdBruhns,tnpbsa,mfiAdjMean,best(8),biCoefMat);
     
+    %Lists values of R which best fit the model for valency v for all
+    %integers v from 1 to 10. The value of v is appended as an eighth
+    %element of R. After running RegressionAndResiduals, type "Rc4" and
+    %"Rc26" to view the best fits for all values of v for TNP-4-BSA and
+    %TNP-26-BSA, respectively
+    %Type "best4" and "best26" to find the values of R (and, appended to R
+    %as an eighth element, the valency v) which yield the least summed
+    %squared errors for TNP-4-BSA and TNP-26-BSA, respectively
     if j == 1
         mfiExp4 = mfiExp;
+        Rc4 = Rc;
+        RcFit4 = RcFit;
+        best4 = best;
     else
         mfiExp26 = mfiExp;
+        Rc26 = Rc;
+        RcFit26 = RcFit;
+        best26 = best;
     end
 end
 
@@ -167,9 +145,9 @@ mfiDiff26 = mfiExp26 - mfiAdjMean26;
 %2.000 in each case being the best-fitting valency.
 
 %Graphically display residuals:
-bar3(mfiDiff4)
-title('Residuals for TNP-4-BSA')
-hold on
-figure
-bar3(mfiDiff26)
-title('Residuals for TNP-26-BSA')
+%bar3(mfiDiff4)
+%title('Residuals for TNP-4-BSA')
+%hold on
+%figure
+%bar3(mfiDiff26)
+%title('Residuals for TNP-26-BSA')
