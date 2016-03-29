@@ -9,13 +9,7 @@ function [ C ] = Bound( r, kd_spec, v, CoefMat )
     %
     %   The sum from 1 to v of C_i = v!/((v-i)!*i!)*10^(kx*(i-1))*(tnpbsa/kd_spec)*r^i
     
-    rKdVec = zeros(1,10);
-    for j = 1:10
-        rKdVec(j) = r^j;
-    end
-    rKdVec = rKdVec/kd_spec;
-    
-    CoefVec = CoefMat(:,v);
+    rKdVec = (r.^(1:v))/kd_spec;
 
-    C = rKdVec*CoefVec;
+    C = rKdVec*CoefMat(1:v,v);
 end
