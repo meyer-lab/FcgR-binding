@@ -1,4 +1,4 @@
-function [ C ] = Bound( r, kd_spec, tnpbsa, v, CoefMat )
+function [ C ] = Bound( r, kd_spec, v, CoefMat )
     %Granted a receptor expression level r, the specific Kd
     %value of the pertinent receptor-immunoglobulin combination kd_spec,
     %the molarity of TNP-X-BSA used by Lux et al. (see Figure 2), valency v,

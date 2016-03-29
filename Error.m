@@ -24,7 +24,7 @@ function [J] = Error( R, kd, tnpbsa, mfiAdjMean, v, biCoefMat )
     temp1 = zeros(1,24);
     for j = 1:6
         for k = 1:4
-            temp1(4*(j-1)+k) = Bound(R(j),kd(j,k),tnpbsa,v,CoefMat);
+            temp1(4*(j-1)+k) = Bound(R(j),kd(j,k),v,CoefMat);
         end
     end
     temp2 = [temp1;temp1;temp1;temp1]';

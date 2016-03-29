@@ -137,7 +137,7 @@ for j = 1:2
     mfiExp = zeros(24,4);
     for k = 1:6
         for l = 1:4
-            mfiExp((4*(k-1)+l),:) = ones(1,4)*Bound(best(k),kdBruhns(k,l),tnpbsa,best(8),bestCoefMat);
+            mfiExp((4*(k-1)+l),:) = ones(1,4)*Bound(best(k),kdBruhns(k,l),best(8),bestCoefMat);
         end
     end
     
