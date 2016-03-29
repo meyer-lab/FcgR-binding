@@ -53,7 +53,7 @@ end
 
 %Set up parameters for GlobalSearch and fmincon
 opts = optimoptions(@fmincon);
-gs = GlobalSearch('StartPointsToRun','bounds-ineqs','Display','final');
+gs = GlobalSearch('StartPointsToRun','all','Display','final');
 
 %Begin optimization:
 % > Rx is the vector R which yields the minimum value of Error for a
@@ -73,10 +73,10 @@ for j = 1:2
     else
         mfiAdjMean = mfiAdjMean26;
     end
-    for k = 1:size(Rc,2)
+    parfor k = 1:size(Rc,2)
         problem = createOptimProblem('fmincon','objective',...
         @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat),'x0',ones(7,1),...
-            'lb',[0 0 0 0 0 0 -100],'ub',(100*ones(7,1)),'options',opts);
+            'lb',-10*ones(7,1),'ub',10*ones(7,1),'options',opts);
         [Rx, RcFit(k)] = run(gs,problem); %Not suppressed to allow for observation while running
         
         Rc(:,k) = [Rx; k];

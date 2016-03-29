@@ -1,5 +1,6 @@
 function [J, mfiExp] = Error( R, kd, tnpbsa, mfiAdjMean, v, biCoefMat )
-
+    R = 10.^R;
+    
 %   R is a seven-dimensional vector whose first six elements are
 %   expression levels of FcgRIA, FcgRIIA-Arg, etc. and whose seventh
 %   element is kx (see RegressionAndResiduals.m). kd is a 6 X 4
@@ -13,7 +14,7 @@ function [J, mfiExp] = Error( R, kd, tnpbsa, mfiAdjMean, v, biCoefMat )
     %v!/((v-i)!*i!)*10^(kx+i-1)*tnpbsa
     %for all i from 1 to v for all v from 1 to 10, using the value of kx at
     %which the model outputs a minimum error
-    CoefMat = biCoefMat(1:v,v) .* 10.^(R(7)+(1:v)'-1)*tnpbsa;
+    CoefMat = biCoefMat(1:v,v) .* (R(7).^((1:v)'-1))*tnpbsa;
 
     %Sum up squared errors
     mfiExp = zeros(24,4);
