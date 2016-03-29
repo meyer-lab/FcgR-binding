@@ -46,7 +46,7 @@ clc; clear;
 %all i from 1 to v for all v from 1 to 10
 biCoefMat = zeros(10,10);
 for k = 1:10
-    for j = k:10
+    for j = 1:k
         biCoefMat(j,k) = nchoosek(k,j);
     end
 end
