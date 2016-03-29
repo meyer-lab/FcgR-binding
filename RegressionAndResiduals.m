@@ -45,11 +45,9 @@ clc; clear;
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
 %all i from 1 to v for all v from 1 to 10
 biCoefMat = zeros(10,10);
-for j = 1:10
-    for k = 1:10
-        if k >= j
-            biCoefMat(j,k) = nchoosek(k,j);
-        end
+for k = 1:10
+    for j = k:10
+        biCoefMat(j,k) = nchoosek(k,j);
     end
 end
 
