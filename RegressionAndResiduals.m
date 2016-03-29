@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%IMPORTANT NOTE: THIS PROGRAM TAKES ABOUT 15 MINUTES TO RUN
+%IMPORTANT NOTE: THIS PROGRAM TAKES ABOUT 3 MINUTES TO RUN
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Let us use a model for binding of the form:
@@ -15,9 +15,9 @@
 %the binding of the receptor with the pertinent flavor of immunoglobulin.
 %
 %In this program, we will be using Kd values derived exclusively from
-%Bruhns et al.z
+%Bruhns et al.
 %
-%Finding receptor expression, kx and v by means of minimizing an error 
+%Finding receptor expression, kx, and v by means of minimizing an error 
 %function. I have created the function Error for this purpose, which is used 
 %to fit curves for both the TNP-4-BSA and TNP-26-BSA data (see Error.m).
 %
@@ -42,12 +42,23 @@ clc; clear;
 %Lux, and the Kd values exclusively from Bruhns
 [kd, tnpbsa, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData();
 
+%Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
+%all i from 1 to v for all v from 1 to 10
+biCoefMat = zeros(10,10);
+for j = 1:10
+    for k = 1:10
+        if k >= j
+            biCoefMat(j,k) = nchoosek(k,j);
+        end
+    end
+end
+
 %Set up a system of linear equations expressing parameters of the
-%elements of R, to be used later with fmincon. This system establishes that
-%all elements of R are positive and that the sum of these elements is not
-%to exceed 25 (I assumed the last constraint would not be a problem, since
-%our most accurate models prior procured values for the elements of R much
-%less than 5).
+%elements of R, to be used later with fmincon within GolbalSearch. This 
+%system establishes that all elements of R are positive and that the sum of
+%these elements is not to exceed 10 (I assumed the last constraint would not
+%be a problem, since our most accurate models prior procured values for the
+%elements of R much less than 5).
 linConstraintA = [-1 0 0 0 0 0 0;
                   0 -1 0 0 0 0 0;
                   0 0 -1 0 0 0 0;
@@ -57,7 +68,7 @@ linConstraintA = [-1 0 0 0 0 0 0;
                   0 0 0 0 0 0 -1;
                   1 1 1 1 1 1 1];
               
-linConstraintb = [0; 0; 0; 0; 0; 0; 0; 25];
+linConstraintb = [0; 0; 0; 0; 0; 0; 0; 10];
 
 %Set up parameters for GlobalSearch and fmincon
 opts = optimoptions(@fmincon);
@@ -81,7 +92,7 @@ for j = 1:2
     end
     for k = 1:10
         problem = createOptimProblem('fmincon','objective',...
-        @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k),'x0',ones(7,1),'Aineq',linConstraintA,'bineq',linConstraintb,'lb',zeros(7,1),'ub',(100*ones(7,1)),'options',opts);
+        @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat),'x0',ones(7,1),'Aineq',linConstraintA,'bineq',linConstraintb,'lb',zeros(7,1),'ub',(10*ones(7,1)),'options',opts);
         Rx = run(gs,problem) %Not suppressed to allow for observation while running
         if k == 1
             Rc = [Rx; 1];
@@ -90,12 +101,29 @@ for j = 1:2
         end
     end
     
+    %Lists values of R which best fit the model for valency v for all
+    %integers v from 1 to 10. The value of v is appended as an eighth
+    %element of R. After running RegressionAndResiduals, type "Rc4" and
+    %"Rc26" to view the best fits for all values of v for TNP-4-BSA and
+    %TNP-26-BSA, respectively
+    if j == 1
+        Rc4 = Rc;
+    else
+        Rc26 = Rc;
+    end
+    
+    %From all best fits from v = 1 to v = 10, find the value of v and its
+    %corresponding vector R which yield the least summed squared error
     best = Rc(:,1);
     for k = 2:10
-        if Error(best(1:7),kdBruhns,tnpbsa,mfiAdjMean,best(8)) > Error(Rc(1:7,k),kdBruhns,tnpbsa,mfiAdjMean,k)
+        if Error(best(1:7),kdBruhns,tnpbsa,mfiAdjMean,best(8),biCoefMat) > Error(Rc(1:7,k),kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat)
             best = Rc(:,k);
         end
     end
+    
+    %Type "best4" and "best26" to find the values of R (and, appended to R
+    %as an eighth element, the valency v) which yield the least summed
+    %squared errors for TNP-4-BSA and TNP-26-BSA, respectively
     if j == 1
         best4 = best;
     else
@@ -111,12 +139,27 @@ for j = 1:2
     else
         best = best26;
     end
+    
+    %The following matrix bestCoefMat is only made to pass into the
+    %function Bound, and it passes information regarding the value of kx
+    %which yields the best fit into the function (to see how this matrix is
+    %used in the function Bound, please see its code)
+    bestCoefMat = biCoefMat;
+    for k = 1:10
+        for l = 1:10
+            bestCoefMat(k,l) = biCoefMat(k,l) * 10^(best(7)+k-1)*tnpbsa;
+        end
+    end
+    
+    %Results for MFI per flavor of receptor per flavor of immunoglobulin
+    %that we would expect based on our optimization
     mfiExp = zeros(24,4);
     for k = 1:6
         for l = 1:4
-            mfiExp((4*(k-1)+l),:) = ones(1,4)*Bound(best(k),best(7),kdBruhns(k,l),tnpbsa,best(8));
+            mfiExp((4*(k-1)+l),:) = ones(1,4)*Bound(best(k),kdBruhns(k,l),tnpbsa,best(8),bestCoefMat);
         end
     end
+    
     if j == 1
         mfiExp4 = mfiExp;
     else
@@ -131,16 +174,16 @@ mfiDiff26 = mfiExp26 - mfiAdjMean26;
 
 %Lux's data and the model should yield that [best1 best2] equals:
 %
-%   [0.0345    0.0189
-%    0.1154    0.1495
-%    0.1684    0.1767
-%    0.3181    0.3950
-%    0.1859    0.2092
-%    0.2106    0.1909
-%    0.1484    0.1451
-%   10.0000   10.0000]
+%    [0.1050    0.0605
+%     0.3415    0.4570
+%     0.5322    0.5618
+%     1.3456    1.9610
+%     0.6046    0.7034
+%     0.7153    0.6214
+%     0.1294    0.1304
+%     2.0000    2.0000]
 %
-%10.000 in each case being the best-fitting valency.
+%2.000 in each case being the best-fitting valency.
 
 %Graphically display residuals:
 bar3(mfiDiff4)
