@@ -1,15 +1,24 @@
-function [J, mfiExpPre] = Error( Rtot, kd, mfiAdjMean, v, biCoefMat,opts)
+function [J, mfiExpPre] = Error3( Rtot, kd, mfiAdjMean, v, biCoefMat,opts)
     Rtot = 10.^Rtot;
     
-    RtotMat = zeros(6,4);
-    for j = 1:4
-        RtotMat(:,j) = Rtot(1:6);
+    L = Rtot(8);
+    kx = Rtot(7);
+
+    Req = zeros(6,4);
+    z = [10, 1, 0.1, 0.01, 0.001, 0.0001];
+    for j = 1:6
+        for k = 1:4
+            troll = Req(j,k);
+            for l = 1:size(z,2);
+                x = z(l);
+                while troll*(1+v*L/kd(j,k)*(1+kx*troll)^(v-1)) < Rtot(j)
+                    troll = troll+x;
+                end
+                troll = troll - x;
+            end
+            Req(j,k) = troll;
+        end
     end
-    
-    opts.Display = 'iter';
-    opts.Algorithm = 'interior-point';
-    opts.MaxFunEvals = 10000;
-    Req = fmincon(@(x) Error2(RtotMat, x, Rtot(8), Rtot(7), v, kd),ones(6,4),[],[],[],[],zeros(6,4),10*ones(6,4),[],opts);
     
 %   R is a seven-dimensional vector whose first six elements are
 %   expression levels of FcgRIA, FcgRIIA-Arg, etc. and whose seventh

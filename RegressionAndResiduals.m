@@ -34,7 +34,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 clc; clear;
 
 %Load the Kd values from Mimoto and Bruhns, the molarity of TNP-X-BSA used
@@ -52,7 +51,7 @@ for k = 1:10
 end
 
 %Set up parameters for GlobalSearch and fmincon
-opts = optimoptions(@fmincon);
+opts = optimoptions(@fmincon,'Algorithm','interior-point');
 gs = GlobalSearch('StartPointsToRun','all','Display','final');
 
 %Begin optimization:
@@ -64,7 +63,7 @@ gs = GlobalSearch('StartPointsToRun','all','Display','final');
 % > best4 and best26 yield the minimum values of Error for the TNP-4-BSA
 %   data and the TNP-26-BSA data, respectively.
 
-Rc = zeros(8, 10);
+Rc = zeros(9, 10);
 RcFit = zeros(1,size(Rc,2));
 
 for j = 1:2
@@ -73,13 +72,14 @@ for j = 1:2
     else
         mfiAdjMean = mfiAdjMean26;
     end
-    parfor k = 1:size(Rc,2)
+    for k = 1:size(Rc,2)
         problem = createOptimProblem('fmincon','objective',...
-        @(x) Error(x,kdBruhns,tnpbsa,mfiAdjMean,k,biCoefMat),'x0',ones(7,1),...
-            'lb',-10*ones(7,1),'ub',10*ones(7,1),'options',opts);
+        @(x) Error3(x,kdBruhns,mfiAdjMean,k,biCoefMat,opts),'x0',ones(8,1),...
+            'lb',(-10*ones(8,1)),'ub',10*ones(8,1),'options',opts);
         [Rx, RcFit(k)] = run(gs,problem); %Not suppressed to allow for observation while running
         
         Rc(:,k) = [Rx; k];
+        disp(1)
     end
     
     %From all best fits from v = 1 to v = 10, find the value of v and its
@@ -89,7 +89,7 @@ for j = 1:2
     
     %Results for MFI per flavor of receptor per flavor of immunoglobulin
     %that we would expect based on our optimization
-    [~, mfiExp] = Error(best,kdBruhns,tnpbsa,mfiAdjMean,best(8),biCoefMat);
+    [~, mfiExp] = Error(best(1:size(best,1)-1),kdBruhns,mfiAdjMean,best(9),biCoefMat);
     
     %Lists values of R which best fit the model for valency v for all
     %integers v from 1 to 10. The value of v is appended as an eighth
