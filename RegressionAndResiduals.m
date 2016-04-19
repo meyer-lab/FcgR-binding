@@ -66,7 +66,7 @@ gs = GlobalSearch('StartPointsToRun','all','Display','final');
 Rc = zeros(9, 10);
 RcFit = zeros(1,size(Rc,2));
 
-for j = 1:2
+parfor j = 1:2
     if j == 1
         mfiAdjMean = mfiAdjMean4;
     else
