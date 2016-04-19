@@ -1,4 +1,4 @@
-function [J, mfiExpPre] = Error( Rtot, kd, mfiAdjMean, v, biCoefMat,opts)
+function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean, v, biCoefMat,opts)
     Rtot = 10.^Rtot;
     
     RtotMat = zeros(6,4);

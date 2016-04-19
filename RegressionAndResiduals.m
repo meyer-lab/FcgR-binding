@@ -52,7 +52,7 @@ end
 
 %Set up parameters for GlobalSearch and fmincon
 opts = optimoptions(@fmincon,'Algorithm','interior-point','Display','off');
-gs = GlobalSearch('StartPointsToRun','all','Display','final');
+gs = GlobalSearch('StartPointsToRun','all','Display','off');
 
 %Begin optimization:
 % > Rx is the vector R which yields the minimum value of Error for a
@@ -66,7 +66,7 @@ gs = GlobalSearch('StartPointsToRun','all','Display','final');
 Rc = zeros(9, 10);
 RcFit = zeros(1,size(Rc,2));
 
-parfor j = 1:2
+for j = 1:2
     if j == 1
         mfiAdjMean = mfiAdjMean4;
     else
