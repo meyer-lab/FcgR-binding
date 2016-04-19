@@ -6,11 +6,11 @@ function [J, mfiExpPre] = Error( Rtot, kd, mfiAdjMean, v, biCoefMat,opts)
         RtotMat(:,j) = Rtot(1:6);
     end
     
-    opts.Display = 'iter';
+    opts.Display = 'off';
     opts.Algorithm = 'interior-point';
     opts.MaxFunEvals = 10000;
-    Req = fmincon(@(x) Error2(RtotMat, x, Rtot(8), Rtot(7), v, kd),ones(6,4),[],[],[],[],zeros(6,4),10*ones(6,4),[],opts);
-    
+    Req = fmincon(@(x) Error2(RtotMat, x, Rtot(8), Rtot(7), v, kd),ones(24,1),[],[],[],[],zeros(24,1),10*ones(24,1),[],opts);
+    Req = reshape(Req,6,4);
 %   R is a seven-dimensional vector whose first six elements are
 %   expression levels of FcgRIA, FcgRIIA-Arg, etc. and whose seventh
 %   element is kx (see RegressionAndResiduals.m). kd is a 6 X 4

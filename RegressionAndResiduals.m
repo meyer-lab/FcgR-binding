@@ -51,7 +51,7 @@ for k = 1:10
 end
 
 %Set up parameters for GlobalSearch and fmincon
-opts = optimoptions(@fmincon,'Algorithm','interior-point');
+opts = optimoptions(@fmincon,'Algorithm','interior-point','Display','off');
 gs = GlobalSearch('StartPointsToRun','all','Display','final');
 
 %Begin optimization:
@@ -74,12 +74,11 @@ for j = 1:2
     end
     for k = 1:size(Rc,2)
         problem = createOptimProblem('fmincon','objective',...
-        @(x) Error3(x,kdBruhns,mfiAdjMean,k,biCoefMat,opts),'x0',ones(8,1),...
+        @(x) Error(x,kdBruhns,mfiAdjMean,k,biCoefMat,opts),'x0',ones(8,1),...
             'lb',(-10*ones(8,1)),'ub',10*ones(8,1),'options',opts);
         [Rx, RcFit(k)] = run(gs,problem); %Not suppressed to allow for observation while running
         
         Rc(:,k) = [Rx; k];
-        disp(1)
     end
     
     %From all best fits from v = 1 to v = 10, find the value of v and its
