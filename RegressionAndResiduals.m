@@ -51,8 +51,6 @@ for k = 1:10
 end
 
 %Set up parameters for GlobalSearch and fmincon
-opts = optimoptions(@fmincon,'Algorithm','interior-point','Display','off');
-gs = GlobalSearch('StartPointsToRun','all','Display','off');
 
 %Begin optimization:
 % > Rx is the vector R which yields the minimum value of Error for a
@@ -66,6 +64,9 @@ gs = GlobalSearch('StartPointsToRun','all','Display','off');
 Rc = zeros(9, 10);
 RcFit = zeros(1,size(Rc,2));
 
+opts = psoptimset('Display','iter','UseParallel',false,...
+    'CompleteSearch','on','CompletePoll','on');
+
 for j = 1:2
     if j == 1
         mfiAdjMean = mfiAdjMean4;
@@ -73,10 +74,9 @@ for j = 1:2
         mfiAdjMean = mfiAdjMean26;
     end
     for k = 1:size(Rc,2)
-        problem = createOptimProblem('fmincon','objective',...
-        @(x) Error(x,kdBruhns,mfiAdjMean,k,biCoefMat,opts),'x0',ones(8,1),...
-            'lb',(-10*ones(8,1)),'ub',10*ones(8,1),'options',opts);
-        [Rx, RcFit(k)] = run(gs,problem); %Not suppressed to allow for observation while running
+        [Rx, RcFit(k)] = patternsearch(@(x) Error(x,kdBruhns,mfiAdjMean,k,biCoefMat),...
+            ones(8,1), [], [], [], [], -10*ones(8,1), 10*ones(8,1), [], opts);
+        
         
         Rc(:,k) = [Rx; k];
     end
