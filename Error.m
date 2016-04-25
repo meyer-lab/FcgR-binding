@@ -1,14 +1,20 @@
 function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean, v, biCoefMat)
     Rtot = 10.^Rtot;
+    kx = Rtot(7);
+    L = Rtot(8);
     
     Req = zeros(6,4);
     
-    options = optimset('Display','off','FunValCheck','off');
+    ReqFunc = @(Reqi, R, kdi) R - Reqi*(1+v*L/kdi*(1+kx*Reqi)^(v-1));
+    
     for j = 1:6
         for k = 1:4
-            Req(j,k) = fminsearch(@(x) Error2(Rtot(j),x,Rtot(8),Rtot(7),v,kd(j,k)),1e-6);
+            Req(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k)), -1);
         end
     end
+    
+    Req = 10.^Req;
+    
 %   R is a seven-dimensional vector whose first six elements are
 %   expression levels of FcgRIA, FcgRIIA-Arg, etc. and whose seventh
 %   element is kx (see RegressionAndResiduals.m). kd is a 6 X 4
@@ -40,8 +46,4 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean, v, biCoefMat)
     end
     
     J = nansum(nansum((mfiExp - mfiAdjMean).^2));
-end
-
-function [ error ] = Error2(R, Req, L, kx, v, kd)
-    error = (R - Req*(1+v*L/kd*(1+kx*Req)^(v-1)))^2;
 end
