@@ -1,4 +1,4 @@
-function [kd, tnpbsa, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData ()
+function [kd, tnpbsa4, tnpbsa26 mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData ()
     mfi = csvread('Luxetal2013-Fig2B.csv',2,2);
     mfi(29,1) = nan;
 
@@ -7,7 +7,8 @@ function [kd, tnpbsa, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData ()
     %weight of bovine serum albumin is 66463 Da, and the contration of
     %TNP-X-BSA in the solution described in Figure 2 is 5 micrograms per
     %milliliter
-    tnpbsa = 1/66463 * 1e-6 * 5 * 1e3;
+    tnpbsa4 = 1/67311 * 1e-3 * 5;
+    tnpbsa26 = 1/71975 * 1e-3 * 5;
     
     %Load the Kd values we found in the literature
     kd = csvread('FcR-Kd.csv',1,1);
