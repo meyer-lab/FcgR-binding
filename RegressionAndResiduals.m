@@ -5,66 +5,39 @@ clc; clear;
 %Lux, and the Kd values exclusively from Bruhns
 [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData();
 
+tnpbsa = [tnpbsa4; tnpbsa26];
+
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
 %all i from 1 to v for all v from 1 to 10
 biCoefMat = zeros(10,10);
-for k = 1:10
-    for j = 1:k
-        biCoefMat(j,k) = nchoosek(k,j);
+for j = 1:10
+    for k = 1:j
+        biCoefMat(k,j) = nchoosek(j,k);
     end
 end
 
 %Set up parameters for GlobalSearch and fmincon
 
-Rc = zeros(9, 10);
+Rc = zeros(7, 10);
 RcFit = zeros(1,size(Rc,2));
 
 opts = optimoptions(@fmincon,'Algorithm','interior-point','Display','off');
 gs = GlobalSearch('StartPointsToRun','bounds','Display','iter');
 
-for j = 1:2
-    if j == 1
-        mfiAdjMean = mfiAdjMean4;
-    else
-        mfiAdjMean = mfiAdjMean26;
-    end
+for j = 1:10
     
-    for k = 1:size(Rc,2)
-        problem = createOptimProblem('fmincon','objective',...
-        @(x) Error(x,kdBruhns,mfiAdjMean,k,biCoefMat),'x0',ones(8,1),...
-            'lb',(-10*ones(8,1)),'ub',10*ones(8,1),'options',opts);
-        [solOne{k}, solTwo{k}] = run(gs,problem);
-    end
-    
-    for k = 1:size(Rc,2)
-        Rc(1:8,k) = solOne{k};
-        RcFit(k) = solTwo{k};
-        Rc(9,k) = k;
-    end
-    
+    problem = createOptimProblem('fmincon','objective',...
+    @(x) Error(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,j,biCoefMat,tnpbsa),'x0',zeros(7,1),...
+        'lb',(-10*ones(7,1)),'ub',10*ones(7,1),'options',opts);
+    [Rc(:,j), RcFit(j)] = run(gs,problem);
+        
     %From all best fits from v = 1 to v = 10, find the value of v and its
     %corresponding vector R which yield the least summed squared error
     [~, IDX] = min(RcFit);
-    best = Rc(:,IDX);
+    best = [Rc(:,IDX);IDX];
     
     %Results for MFI per flavor of receptor per flavor of immunoglobulin
     %that we would expect based on our optimization
-    [~, mfiExp] = Error(best(1:size(best,1)-1),kdBruhns,mfiAdjMean,best(9),biCoefMat);
-
-    if j == 1
-        mfiExp4 = mfiExp;
-        Rc4 = Rc;
-        RcFit4 = RcFit;
-        best4 = best;
-    else
-        mfiExp26 = mfiExp;
-        Rc26 = Rc;
-        RcFit26 = RcFit;
-        best26 = best;
-    end
+    [~, mfiExp] = Error(best(1:size(best,1)-1),kdBruhns,mfiAdjMean4,mfiAdjMean26,best(8),biCoefMat,tnpbsa);
 end
-
-%Calculate the residuals against the model for both the TNP-4-BSA data and
-%the TNP-26-BSA data
-mfiDiff4 = mfiExp4 - mfiAdjMean4;
-mfiDiff26 = mfiExp26 - mfiAdjMean26;
+mfiDiff = [mfiExp(:,1:4) - mfiAdjMean4, mfiExp(:,5:8) - mfiAdjMean26];
