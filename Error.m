@@ -6,12 +6,12 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
     Req4 = zeros(6,4);
     Req26 = zeros(6,4);
     
-    ReqFunc = @(Reqi, R, kdi, Li) R - Reqi*(1+v*Li/kdi*(1+kx*Reqi)^(v-1));
+    ReqFunc = @(Reqi, R, kdi, Li, vi) R - Reqi*(1+vi*Li/kdi*(1+kx*Reqi)^(vi-1));
     
     for j = 1:6
         for k = 1:4
-            Req4(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1)), -1);
-            Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2)), -1);
+            Req4(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1)), -1);
+            Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)), -1);
         end
     end
     
@@ -32,13 +32,14 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
     %for all i from 1 to v for all v from 1 to 10, using the value of kx at
     %which the model outputs a minimum error
     
-    CoefVec = biCoefMat(1:v,v) .* Rtot(size(Rtot,1)-1).^((1:v)'-1)*Rtot(size(Rtot,1));
+    CoefVec4 = biCoefMat(1:v(1),v(1)) .* Rtot(size(Rtot,1)-1).^((1:v(1))'-1)*Rtot(size(Rtot,1));
+    CoefVec26 = biCoefMat(1:v(2),v(2)) .* Rtot(size(Rtot,1)-1).^((1:v(2))'-1)*Rtot(size(Rtot,1));
     mfiExpPre4 = zeros(6,4);
     mfiExpPre26 = zeros(6,4);
     for j = 1:6
         for k = 1:4
-            mfiExpPre4(j,k) = nansum(CoefVec.*Req4(j,k).^(1:v)');
-            mfiExpPre26(j,k) = nansum(CoefVec.*Req26(j,k).^(1:v)');
+            mfiExpPre4(j,k) = nansum(CoefVec4.*Req4(j,k).^(1:v(1))');
+            mfiExpPre26(j,k) = nansum(CoefVec26.*Req26(j,k).^(1:v(2))');
         end
     end
     mfiExpPre4 = mfiExpPre4./kd;

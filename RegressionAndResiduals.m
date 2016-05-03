@@ -7,10 +7,12 @@ clc; clear;
 
 tnpbsa = [tnpbsa4; tnpbsa26];
 
+v = [4; 26];
+
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
 %all i from 1 to v for all v from 1 to 10
 biCoefMat = zeros(10,10);
-for j = 1:10
+for j = 1:26
     for k = 1:j
         biCoefMat(k,j) = nchoosek(j,k);
     end
@@ -27,7 +29,7 @@ gs = GlobalSearch('StartPointsToRun','bounds','Display','iter');
 for j = 1:10
     
     problem = createOptimProblem('fmincon','objective',...
-    @(x) Error(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,j,biCoefMat,tnpbsa),'x0',zeros(7,1),...
+    @(x) Error(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa),'x0',zeros(7,1),...
         'lb',(-10*ones(7,1)),'ub',10*ones(7,1),'options',opts);
     [Rc(:,j), RcFit(j)] = run(gs,problem);
         
