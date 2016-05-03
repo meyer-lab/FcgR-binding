@@ -8,11 +8,19 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
     
     ReqFunc = @(Reqi, R, kdi, Li, vi) R - Reqi*(1+vi*Li/kdi*(1+kx*Reqi)^(vi-1));
     
+    fzeroOpt = optimset('Display','off');
+    
     for j = 1:6
         for k = 1:4
-            Req4(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1)), -1);
-            Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)), -1);
+            Req4(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1)), -1, fzeroOpt);
+            Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)), -1, fzeroOpt);
         end
+    end
+    
+    if max(max(isnan(Req4))) || max(max(isnan(Req26)))
+        J = 1E6;
+        mfiExp = [];
+        return;
     end
     
     Req4 = 10.^Req4;
