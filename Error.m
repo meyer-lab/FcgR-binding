@@ -3,6 +3,8 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
     kx = Rtot(7);
     L = tnpbsa;
     
+    %Preallocating space for the Req values (according to Stone et al.) for
+    %each combination of IgG and FcgR per flavor of TNP-X-BSA.
     Req4 = zeros(6,4);
     Req26 = zeros(6,4);
     
@@ -16,7 +18,8 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
             Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)), -1, fzeroOpt);
         end
     end
-    
+    %Preventing errors in global optimization due to failure of the
+    %above local solver
     if max(max(isnan(Req4))) || max(max(isnan(Req26)))
         J = 1E6;
         mfiExp = [];
@@ -37,11 +40,12 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
 
     %Create a matrix of coefficients of the form:
     %v!/((v-i)!*i!)*10^(kx+i-1)*tnpbsa
-    %for all i from 1 to v for all v from 1 to 10, using the value of kx at
-    %which the model outputs a minimum error
+    %for all i from 1 to v for all v from 1 to 10
     
     CoefVec4 = biCoefMat(1:v(1),v(1)) .* Rtot(size(Rtot,1)-1).^((1:v(1))'-1)*Rtot(size(Rtot,1));
     CoefVec26 = biCoefMat(1:v(2),v(2)) .* Rtot(size(Rtot,1)-1).^((1:v(2))'-1)*Rtot(size(Rtot,1));
+    
+    %Creating matrix of expected MFIs; takes a few steps to do so
     mfiExpPre4 = zeros(6,4);
     mfiExpPre26 = zeros(6,4);
     for j = 1:6
@@ -61,7 +65,9 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
             mfiExp26((4*(j-1)+k),:) = mfiExpPre26(j,k)*ones(1,4);
         end
     end
+    %Expected MFIs
     mfiExp = [mfiExp4, mfiExp26];
     
+    %Error
     J = nansum(nansum([(mfiExp4 - mfiAdjMean4).^2, (mfiExp26 - mfiAdjMean26).^2]));
 end

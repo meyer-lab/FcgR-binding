@@ -4,11 +4,11 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData
 
     %Create a figure for the molarity of TNP-X-BSA in the solution into which 
     %the CHO cells were placed (see Lux et al. 2013, Figure 2). The molecular
-    %weight of bovine serum albumin is 66463 Da, and the contration of
-    %TNP-X-BSA in the solution described in Figure 2 is 5 micrograms per
-    %milliliter
+    %weight of bovine serum albumin is 66463 Da, and the molecular weight of 
+    %TNP is about 212.1 Da. The contration of TNP-X-BSA in the solution 
+    %described in Figure 2 is 5 micrograms per milliliter. 
     tnpbsa4 = 1/67311 * 1e-3 * 5;
-    tnpbsa26 = 1/71975 * 1e-3 * 5;
+    tnpbsa26 = 1/71978 * 1e-3 * 5;
     
     %Load the Kd values we found in the literature
     kd = csvread('FcR-Kd.csv',1,1);
