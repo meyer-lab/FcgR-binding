@@ -1,4 +1,4 @@
-function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData ()
+function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData()
     mfi = csvread('Luxetal2013-Fig2B.csv',2,2);
     mfi(29,1) = nan;
 

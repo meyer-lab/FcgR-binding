@@ -11,7 +11,7 @@ v = [4; 26];
 
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
 %all i from 1 to v for all v from 1 to 10
-biCoefMat = zeros(10,10);
+biCoefMat = zeros(26,26);
 for j = 1:26
     for k = 1:j
         biCoefMat(k,j) = nchoosek(j,k);
@@ -29,37 +29,37 @@ gs = GlobalSearch('StartPointsToRun','bounds','Display','iter');
 problem = createOptimProblem('fmincon','objective',...
 @(x) Error(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa),'x0',zeros(7,1),...
     'lb',(-10*ones(7,1)),'ub',10*ones(7,1),'options',opts);
-[best, bsetFit, mfiExp] = run(gs,problem);
+[best, bestFit] = run(gs,problem);
+
+[~,mfiExp] = Error(best,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa);
 
 %Create residuals
 mfiDiff = mfiExp - [mfiAdjMean4, mfiAdjMean26];
 
 %Plotting the residuals: colored by FcgR, shape by IgG
-for j = 1:6
+for j = 1:2
     for k = 1:4
         if j == 1
-            shape = 'b';
-        elseif j == 2
-            shape = 'g';
-        elseif j == 3
-            shape = 'r';
-        elseif j == 4
-            shape = 'c';
-        elseif j == 5
-            shape = 'm';
+            color = 'b';
         else
-            shape = 'k';
+            color = 'r';
         end
         if k == 1
-            color = 'o';
+            shape = 'o';
         elseif k == 2
-            color = 'x';
+            shape = 's';
         elseif k == 3
-            color = 's';
+            shape = 'v';
         else
-            color = 'd';
+            shape = '^';
         end
-        plot(((4*(j-1))+k)*ones(8,1),mfiDiff((4*(j-1))+k,:),[shape,color])
-        hold on
+        for l = 1:6
+            plot((4*(l-1)+k)*ones(4,1),mfiDiff((4*(l-1))+k,(4*(j-1)+1):(4*j)),[shape,color])
+            hold on
+        end
     end
+end
+for j = 1:5
+    plot((4*j+0.5)*ones(2,1),[-2.5,1],'k-')
+    hold on
 end
