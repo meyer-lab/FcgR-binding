@@ -9,6 +9,18 @@ tnpbsa = [tnpbsa4; tnpbsa26];
 %Valency vector
 v = [4; 26];
 
+%Changing negative background-adjusted MFIs to zeros
+for j = 1:24
+    for k = 1:4
+        if mfiAdjMean4(j,k) < 0
+            mfiAdjMean4(j,k) = 0;
+        end
+        if mfiAdjMean26(j,k) < 0
+            mfiAdjMean26(j,k) = 0;
+        end
+    end
+end
+
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
 %all i from 1 to v for all v from 1 to 10
 biCoefMat = zeros(26,26);
