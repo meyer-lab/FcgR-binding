@@ -1,4 +1,4 @@
-function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData()
+function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx] = loadData()
     mfi = csvread('Luxetal2013-Fig2B.csv',2,2);
     mfi(29,1) = nan;
 
@@ -36,5 +36,10 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData
     
     %Load the Kd values found exclusively from Bruhns et al. (2009)
     kdBruhns = csvread('FcR-Kd-2.csv');
+    
+    %An arbitrary value for Kx, based on the output of
+    %RegressionAndResiduals as of June 6th 2016, that can be used in
+    %certain instances of modelling.
+    load('TempKx.mat');
     
 end

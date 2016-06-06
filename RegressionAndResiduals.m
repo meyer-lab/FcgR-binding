@@ -1,9 +1,9 @@
-clc; clear;
+%clc; clear;
 
 %Load the Kd values from Mimoto and Bruhns, the molarity of TNP-X-BSA used
 %by Lux (see Figure 2), the normalized, background-MFI-adjusted MFIs from
 %Lux for both TNP-X-BSAs, and the Kd values exclusively from Bruhns
-[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData();
+[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx] = loadData();
 %TNP-X-BSA vector
 tnpbsa = [tnpbsa4; tnpbsa26];
 %Valency vector
@@ -22,7 +22,7 @@ for j = 1:24
 end
 
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
-%all i from 1 to v for all v from 1 to 10
+%all i from 1 to v for all v from 1 to 26
 biCoefMat = zeros(26,26);
 for j = 1:26
     for k = 1:j
@@ -36,7 +36,7 @@ end
 %universally-applied Kx, as described in Stone et al. All of these elements
 %are such that, for any element x, 10^x equals the value it represents.
 opts = optimoptions(@fmincon,'Algorithm','interior-point','Display','off');
-gs = GlobalSearch('StartPointsToRun','bounds','Display','iter');
+gs = GlobalSearch('StartPointsToRun','bounds','Display','off');
 
 problem = createOptimProblem('fmincon','objective',...
 @(x) Error(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa),'x0',zeros(7,1),...
@@ -47,6 +47,8 @@ problem = createOptimProblem('fmincon','objective',...
 
 %Create residuals
 mfiDiff = mfiExp - [mfiAdjMean4, mfiAdjMean26];
+
+CoefDet = 1 - nansum(nansum(mfiDiff.^2))/(nansum(nansum([mfiAdjMean4 mfiAdjMean26]))/191);
 
 %Plotting the residuals: colored by FcgR, shape by IgG
 for j = 1:2
