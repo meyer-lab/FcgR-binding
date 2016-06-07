@@ -1,6 +1,6 @@
 function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa)
     Rtot = 10.^Rtot;
-    kx = Rtot(7);
+    kx = Rtot(2);
     L = tnpbsa;
     
     %Preallocating space for the Req values (according to Stone et al.) for
@@ -14,8 +14,8 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
     
     for j = 1:6
         for k = 1:4
-            Req4(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1)), -1, fzeroOpt);
-            Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)), -1, fzeroOpt);
+            Req4(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(1),kd(j,k),L(1),v(1)), -1, fzeroOpt);
+            Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(1),kd(j,k),L(2),v(2)), -1, fzeroOpt);
         end
     end
     %Preventing errors in global optimization due to failure of the

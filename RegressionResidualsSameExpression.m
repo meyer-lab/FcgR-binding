@@ -3,7 +3,7 @@
 %Load the Kd values from Mimoto and Bruhns, the molarity of TNP-X-BSA used
 %by Lux (see Figure 2), the normalized, background-MFI-adjusted MFIs from
 %Lux for both TNP-X-BSAs, and the Kd values exclusively from Bruhns
-[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx,bestHomogeneicFit,bestHomogeneicKx] = loadData();
+[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, bestHomogeneicFit, bestHomogeneicKx] = loadData();
 %TNP-X-BSA vector
 tnpbsa = [tnpbsa4; tnpbsa26];
 %Valency vector
@@ -39,11 +39,11 @@ opts = optimoptions(@fmincon,'Algorithm','interior-point','Display','off');
 gs = GlobalSearch('StartPointsToRun','bounds','Display','off');
 
 problem = createOptimProblem('fmincon','objective',...
-@(x) Error(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa),'x0',zeros(7,1),...
-    'lb',(-10*ones(7,1)),'ub',10*ones(7,1),'options',opts);
+@(x) ErrorSameExpression(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa),'x0',zeros(2,1),...
+    'lb',(-10*ones(2,1)),'ub',10*ones(2,1),'options',opts);
 [best, bestFit] = run(gs,problem);
 
-[~,mfiExp] = Error(best,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa);
+[~,mfiExp] = ErrorSameExpression(best,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa);
 
 %Create residuals
 mfiDiff = mfiExp - [mfiAdjMean4, mfiAdjMean26];
