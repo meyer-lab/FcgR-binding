@@ -19,7 +19,7 @@ for j = 1:2
 
     %Kx arbitrarily set as the value of Kx which led to the best fit in
     %RegressionAndResiduals
-    Kx = TempKx;
+    Kx = bestHomogeneicKx;
 
     %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
     %all i from 1 to v for all v from 1 to 26
