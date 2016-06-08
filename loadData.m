@@ -1,4 +1,7 @@
-function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, bestHomogeneicFit, bestHomogeneicKx] = loadData()
+function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, bestHomogeneicFit, bestHomogeneicKx, mfiAdjMean] = loadData()
+    %Clear workspace and command window
+    clear; clc;
+
     mfi = csvread('Luxetal2013-Fig2B.csv',2,2);
     mfi(29,1) = nan;
 
@@ -18,8 +21,14 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, be
     %replicate minus background MFI per flavor of immunoglobulin flavor per
     %replicate
     mfiAdj = zeros(size(mfi));
-    for j = 1:8
-        mfiAdj(:,j) = mfi(:,j) - mean(mfi(1:5:end,j));
+%     for j = 1:8
+%         mfiAdj(:,j) = mfi(:,j) - mean(mfi(1:5:end,j));
+%     end
+
+    for j = 1:6
+        for k = 1:8
+            mfiAdj(5*(j-1)+2:5*j,k) = mfi(5*(j-1)+2:5*j,k) - mfi(5*(j-1)+1,k);
+        end
     end
     mfiAdj(1:5:end,:) = [];
 
@@ -27,7 +36,7 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, be
     mfiAdjMean = zeros(24,8);
     for j = 1:8
         mfiAdjMean(:,j) = mfiAdj(:,j) / nanmean(mfiAdj(:,j));
-    end    
+    end
     
     %Separate the MFIs from TNP-4-BSA trials from those from TNP-26-BSA
     %trials
