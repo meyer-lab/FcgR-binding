@@ -21,9 +21,6 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomoge
     %replicate minus background MFI per flavor of immunoglobulin flavor per
     %replicate
     mfiAdj = zeros(size(mfi));
-%     for j = 1:8
-%         mfiAdj(:,j) = mfi(:,j) - mean(mfi(1:5:end,j));
-%     end
 
     for j = 1:6
         for k = 1:8
@@ -32,9 +29,11 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomoge
     end
     mfiAdj(1:5:end,:) = [];
 
-    %Normalize the adjusted MFIs along the replicates (along the columns)
+    %Normalize the adjusted MFIs along each replicate
     mfiAdjMean = zeros(24,8);
     for j = 1:8
+%         mfiAdjMean(:,j) = mfiAdj(:,j) / nanmean([mfiAdj(:,j); mfiAdj(:,j+4)]);
+%         mfiAdjMean(:,j+4) = mfiAdj(:,j+4) / nanmean([mfiAdj(:,j); mfiAdj(:,j+4)]);
         mfiAdjMean(:,j) = mfiAdj(:,j) / nanmean(mfiAdj(:,j));
     end
     
