@@ -1,5 +1,5 @@
 %load parameters
-[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, bestHomogeneicFit, bestHomogeneicKx] = loadData();
+[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomogeneicFit, bestHomogeneicKx] = loadData();
 
 for j = 1:2
     %1000 is an arbitrarily-chosen number of receptors expressed, which seems
