@@ -1,4 +1,4 @@
-[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, bestHomogeneicFit, bestHomogeneicKx] = loadData();
+[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomogeneicFit, bestHomogeneicKx] = loadData();
 
 %Establishing key parameters. bestHomogeneicFit and bestHomogeneicKx are,
 %respectively, the receptor expression level and Kx value which yield the 

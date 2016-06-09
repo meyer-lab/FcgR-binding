@@ -1,4 +1,4 @@
-function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, bestHomogeneicFit, bestHomogeneicKx, mfiAdjMean] = loadData()
+function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomogeneicFit, bestHomogeneicKx] = loadData()
     %Clear workspace and command window
     clear; clc;
 
@@ -46,14 +46,13 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, TempKx, be
     %Load the Kd values found exclusively from Bruhns et al. (2009)
     kdBruhns = csvread('FcR-Kd-2.csv');
     
-    %An arbitrary value for Kx, based on the output of
+    %TempKx is an arbitrary value for Kx, based on the output of
     %RegressionAndResiduals as of June 6th 2016, that can be used in
     %certain instances of modelling.
-    load('TempKx.mat');
-    
-    %The values for receptor expression and Kx (respectively) which best 
-    %fit the model granted all recptors have the same expression level
-    load('bestHomogeneicFit.mat');
-    load('bestHomogeneicKx.mat');
+    %bestHomogeneicFit and bestHomogeneicKx are the values for receptor 
+    %expression and Kx (respectively) which best fit the model granted all 
+    %receptors have the same expression level.
+    %The file parameterFits.mat stores all of these files.
+    load('parameterFits.mat')
     
 end
