@@ -1,4 +1,4 @@
-%clc; clear;
+clc; clear;
 
 %Load the Kd values from Mimoto and Bruhns, the molarity of TNP-X-BSA used
 %by Lux (see Figure 2), the normalized, background-MFI-adjusted MFIs from
