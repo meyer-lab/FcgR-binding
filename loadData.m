@@ -1,4 +1,4 @@
-function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomogeneicFit, bestHomogeneicKx] = loadData()
+function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomogeneicFit, bestHomogeneicKx, best] = loadData()
     %Clear workspace and command window
     clear; clc;
 
@@ -31,10 +31,9 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomoge
 
     %Normalize the adjusted MFIs along each replicate
     mfiAdjMean = zeros(24,8);
-    for j = 1:8
-%         mfiAdjMean(:,j) = mfiAdj(:,j) / nanmean([mfiAdj(:,j); mfiAdj(:,j+4)]);
-%         mfiAdjMean(:,j+4) = mfiAdj(:,j+4) / nanmean([mfiAdj(:,j); mfiAdj(:,j+4)]);
-        mfiAdjMean(:,j) = mfiAdj(:,j) / nanmean(mfiAdj(:,j));
+    for j = 1:4
+        mfiAdjMean(:,j) = mfiAdj(:,j) / nanmean([mfiAdj(:,j); mfiAdj(:,j+4)]);
+        mfiAdjMean(:,j+4) = mfiAdj(:,j+4) / nanmean([mfiAdj(:,j); mfiAdj(:,j+4)]);
     end
     
     %Separate the MFIs from TNP-4-BSA trials from those from TNP-26-BSA
@@ -54,4 +53,6 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomoge
     %The file parameterFits.mat stores all of these files.
     load('parameterFits.mat')
     
+    %Load other important fit information
+    load('paramCompare.mat')
 end
