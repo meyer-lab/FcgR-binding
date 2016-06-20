@@ -23,7 +23,7 @@ end
 %%%Note carefully that start is a row vector that must be transposed to be
 %%%put into Error
 start = best';
-nsamples = 100;
+nsamples = 1000;
 proppdf = @(x,y) PROPPDF(x,y);
 proprnd = @(x) PROPRND(x);
 pdf = @(x) PDF(x, kdBruhns, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa);
