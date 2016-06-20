@@ -7,5 +7,5 @@ function [output] = proprnd(x)
 %     output = log10(temp);
 
 %     output = log10(mod(10.^x + normrnd(0,0.1,1,7),10));
-    output = x + normrnd(0,0.5,1,7);
+    output = x + normrnd(0,0.2,1,7);
 end
