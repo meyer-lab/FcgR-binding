@@ -18,10 +18,21 @@ for j = 1:26
 end
 
 %%%Do MHC
-start = best;
+start = best';
 %See hmc.m documentation to see why options vector was chosen in these
 %ways.
-options = [1,0,0,0,0,0,20,0,1,0,0,0,0,100,0,0,1,1/20];
-[samples,energies,diag] = hmc(@(x) 191*log(Error(x,kdBruhns,mfiAdjMean4, ...
+
+%Error in grad estimation
+epsilon = 1e8;
+%Options
+options = [1,0,0,0,0,0,10,0,0,0,0,0,0,50,0,0,0.2,1/20];
+[samples,energies,diag] = hmc(@(x) 191*log(Error(x',kdBruhns,mfiAdjMean4, ...
     mfiAdjMean26, v, biCoefMat, tnpbsa)/191)*2*(9*(9+1))/(191-9-1), ... 
-    start,options,@(x) gradest(@(y)Error(y,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa),x));
+    start,options,@(x) gradest(@(y)191*log(Error(y',kdBruhns,mfiAdjMean4, ... 
+    mfiAdjMean26,v,biCoefMat,tnpbsa)/191)*2*(9*(9+1))/(191-9-1),x));
+
+%Potential energy function
+% efun = @(x) 191*log(Error(x',kdBruhns,mfiAdjMean4, ...
+%     mfiAdjMean26, v, biCoefMat, tnpbsa)/191)*2*(9*(9+1))/(191-9-1);
+% 
+% [samples,energies,diag] = hmc(efun, start,options,@(x) derpgrad(@(y)efun(y),x,epsilon));
