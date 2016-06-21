@@ -37,7 +37,7 @@ end
 %%%put into Error
 start = best';
 %Number of samples for MCMC
-nsamples = 1000000;
+nsamples = 100;
 %Log probability proposal distribution
 proppdf = @(x,y) 0;
 %Pseudo-random generator of new points to test
@@ -46,7 +46,7 @@ proprnd = @(x) x+normrnd(0,0.1,1,7);
 pdf = @(x) PDF(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa,meanPerCond,stdPerCond);
 
 %Run Metropolis-Hastings algorithm
-[sample,accept] = mhsample(start,nsamples,'logpdf',pdf,'logproppdf',proppdf,'proprnd',proprnd,'symmetric',0);
+[sample,accept] = mhsample(start,nsamples,'logpdf',pdf,'logproppdf',proppdf,'proprnd',proprnd,'symmetric',1);
 
 %Collect the errors for each element in the chain. Also, collect the list
 %of all displacements in log space and "standard" space from the best fit
