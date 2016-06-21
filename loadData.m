@@ -1,4 +1,5 @@
-function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomogeneicFit, bestHomogeneicKx, best] = loadData()
+function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, ... 
+    bestHomogeneicFit, bestHomogeneicKx, best, meanPerCond, stdPerCond] = loadData()
     %Clear workspace and command window
     clear; clc;
 
@@ -55,4 +56,18 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, bestHomoge
     
     %Load other important fit information
     load('paramCompare.mat')
+    
+    %From mfiAdjMean, create matrices which hold the adjusted expression
+    %level mean and expression level standard deviation for each condition
+    %(i.e. FcgR with IgG1, valency 4)
+    mfiAdjMean = [mfiAdjMean4 mfiAdjMean26];
+    meanPerCond = zeros(24,2);
+    stdPerCond = zeros(24,2);
+    for j = 1:24
+        for k = 1:2
+            meanPerCond(j,k) = nanmean(mfiAdjMean(j,4*(k-1)+1:4*k));
+            stdPerCond(j,k) = std(mfiAdjMean(j,4*(k-1)+1:4*k),0,2,'omitnan');
+        end
+    end
+    
 end
