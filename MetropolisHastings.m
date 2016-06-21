@@ -1,11 +1,8 @@
-clear;clc;
-
-%Load best fit from normalizing the data by CHO line, not assuming
-%receptor expression is equal
-load('paramCompare.mat')
+% clear;clc;
 
 %Loading basic parameters
-[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData;
+[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, ~, ~, best, ...
+    meanPerCond, stdPerCond] = loadData;
 
 %Set valencies
 v = [4;26];
@@ -17,19 +14,6 @@ biCoefMat = zeros(26,26);
 for j = 1:26
     for k = 1:j
         biCoefMat(k,j) = nchoosek(j,k);
-    end
-end
-
-%From mfiAdjMean, create matrices which hold the adjusted expression
-%level mean and expression level standard deviation for each condition
-%(i.e. FcgR with IgG1, valency 4)
-mfiAdjMean = [mfiAdjMean4 mfiAdjMean26];
-meanPerCond = zeros(24,2);
-stdPerCond = zeros(24,2);
-for j = 1:24
-    for k = 1:2
-        meanPerCond(j,k) = nanmean(mfiAdjMean(j,4*(k-1)+1:4*k));
-        stdPerCond(j,k) = std(mfiAdjMean(j,4*(k-1)+1:4*k),0,2,'omitnan');
     end
 end
 
