@@ -1,4 +1,5 @@
 function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa)
+
     Rtot = 10.^Rtot;
     kx = Rtot(7);
     L = tnpbsa;
@@ -8,13 +9,15 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, 
     Req4 = zeros(6,4);
     Req26 = zeros(6,4);
 
-    ReqFunc = @(Reqi, R, kdi, Li, vi) R - Reqi*(1+vi*Li/kdi*(1+kx*Reqi)^(vi-1));
+%     ReqFunc = @(Reqi, R, kdi, Li, vi) R - Reqi*(1+vi*Li/kdi*(1+kx*Reqi)^(vi-1));
 
     %Finding Req values by means of bisection algorithm
     for j = 1:6
         for k = 1:4
-            Req4(j,k) = bisection(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1)),-5,5,1e-10);
-            Req26(j,k) = bisection(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)),-5,5,1e-10);
+%             Req4(j,k) = bisection(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1),kx),-5,5,1e-10);
+%             Req26(j,k) = bisection(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2),kx),-5,5,1e-10);
+            Req4(j,k) = ReqFuncSolver(Rtot(j), kd(j,k), L(1), v(1), kx, 1e-5, 1e5, 1e-10);
+            Req26(j,k) = ReqFuncSolver(Rtot(j), kd(j,k), L(2), v(2), kx, 1e-5, 1e5, 1e-10);
             if isnan(Req4(j,k))
                 Req4(j,k) = -Inf;
             end
@@ -25,10 +28,11 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, 
     end
     %Preventing errors in global optimization due to failure of the
     %above local solver
-    if max(max(isnan(Req4))) || max(max(isnan(Req26)))
+    if max(max(isnan(Req4))) || max(max(isnan(Req26))) || max(max(~isreal(Req4))) || max(max(~isreal(Req4)))
         J = 1E6;
         mfiExp = [];
-        [mfiExpPre4,mfiExpPre26] = [[],[]];
+        mfiExpPre = [];
+        ErrorStruct = struct('J',J,'mfiExp',mfiExp,'mfiExpPre',mfiExpPre);
         return;
     end
     
@@ -77,4 +81,6 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, 
     
     %Error
     J = nansum(nansum([(mfiExp4 - mfiAdjMean4).^2, (mfiExp26 - mfiAdjMean26).^2]));
+    %%%REMOVE
+    ErrorStruct = struct('J',J,'mfiExp',mfiExp,'mfiExpPre',mfiExpPre);
 end
