@@ -40,7 +40,7 @@ gs = GlobalSearch('StartPointsToRun','bounds','Display','off');
 
 problem = createOptimProblem('fmincon','objective',...
 @(x) Error(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa),'x0',zeros(7,1),...
-    'lb',(-10*ones(7,1)),'ub',10*ones(7,1),'options',opts);
+    'lb',(-5*ones(7,1)),'ub',5*ones(7,1),'options',opts);
 [best, bestFit] = run(gs,problem);
 
 [~,mfiExp] = Error(best,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa);

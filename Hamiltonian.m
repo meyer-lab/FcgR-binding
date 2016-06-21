@@ -31,6 +31,8 @@ options = [1,0,0,0,0,0,10,0,0,0,0,0,0,50,0,0,0.2,1/20];
     start,options,@(x) gradest(@(y)191*log(Error(y',kdBruhns,mfiAdjMean4, ... 
     mfiAdjMean26,v,biCoefMat,tnpbsa)/191)*2*(9*(9+1))/(191-9-1),x));
 
+
+%%%%%%%%CODE NOT YET FINISHED
 %Potential energy function
 % efun = @(x) 191*log(Error(x',kdBruhns,mfiAdjMean4, ...
 %     mfiAdjMean26, v, biCoefMat, tnpbsa)/191)*2*(9*(9+1))/(191-9-1);
