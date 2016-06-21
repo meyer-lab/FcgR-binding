@@ -1,4 +1,4 @@
-function [J, mfiExp] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa)
+function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa)
     Rtot = 10.^Rtot;
     kx = Rtot(7);
     L = tnpbsa;
@@ -7,31 +7,25 @@ function [J, mfiExp] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, 
     %each combination of IgG and FcgR per flavor of TNP-X-BSA.
     Req4 = zeros(6,4);
     Req26 = zeros(6,4);
-%----------------------------------------------------------------
-    function reqfunc = ReqFunc(Reqi, R, kdi, Li, vi)
-        reqfunc = R - Reqi*(1+vi*Li/kdi*(1+kx*Reqi)^(vi-1));
-        if isinf(reqfunc) | isnan(reqfunc)
-            reqfunc = 1e6;
-        end
-    end
-%-----------------------------------------------------------------
+
+    ReqFunc = @(Reqi, R, kdi, Li, vi) R - Reqi*(1+vi*Li/kdi*(1+kx*Reqi)^(vi-1));
+
     fzeroOpt = optimset('Display','off');
     
     for j = 1:6
         for k = 1:4
             Req4(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1)), -1, fzeroOpt);
             Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)), -1, fzeroOpt);
-%             Req4(j,k) = bisection(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1)),-12,10);
-%             Req26(j,k) = bisection(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)),-12,10);
         end
     end
     %Preventing errors in global optimization due to failure of the
     %above local solver
-%     if max(max(isnan(Req4))) || max(max(isnan(Req26))) == 1e6
-%         mfiExp = [];
-%         J = 1e99;
-%         return;
-%     end
+    if max(max(isnan(Req4))) || max(max(isnan(Req26)))
+        J = 1E6;
+        mfiExp = [];
+        [mfiExpPre4,mfiExpPre26] = [[],[]];
+        return;
+    end
     
     Req4 = 10.^Req4;
     Req26 = 10.^Req26;
@@ -63,6 +57,7 @@ function [J, mfiExp] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, 
     end
     mfiExpPre4 = mfiExpPre4./kd;
     mfiExpPre26 = mfiExpPre26./kd;
+    mfiExpPre = [mfiExpPre4 mfiExpPre26];
         
     mfiExp4 = zeros(24,4);
     mfiExp26 = zeros(24,4);
