@@ -10,12 +10,17 @@ function [J, mfiExp] = Error( Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat,
     
     ReqFunc = @(Reqi, R, kdi, Li, vi) R - Reqi*(1+vi*Li/kdi*(1+kx*Reqi)^(vi-1));
     
-    fzeroOpt = optimset('Display','off');
-    
+    %Finding Req values by means of bisection algorithm
     for j = 1:6
         for k = 1:4
-            Req4(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(1),kd(j,k),L(1),v(1)), -1, fzeroOpt);
-            Req26(j,k) = fzero(@(x) ReqFunc(10^x,Rtot(1),kd(j,k),L(2),v(2)), -1, fzeroOpt);
+            Req4(j,k) = bisection(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(1),v(1)),-5,5,1e-10);
+            Req26(j,k) = bisection(@(x) ReqFunc(10^x,Rtot(j),kd(j,k),L(2),v(2)),-5,5,1e-10);
+            if isnan(Req4(j,k))
+                Req4(j,k) = -Inf;
+            end
+            if isnan(Req26(j,k))
+                Req26(j,k) = -Inf;
+            end
         end
     end
     %Preventing errors in global optimization due to failure of the
