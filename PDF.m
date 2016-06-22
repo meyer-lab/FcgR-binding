@@ -24,6 +24,7 @@ function [logprob] = PDF(x, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa,
             for l = 1:2
                  logprob = logprob + normlike([meanPerCond(4*(j-1)+k,l), ... 
                      stdPerCond(4*(j-1)+k,l)],mfiExpPre(j,4*(l-1)+k));
+                 logprob = logprob;
             end
         end
     end

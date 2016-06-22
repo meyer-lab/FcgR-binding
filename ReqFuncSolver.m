@@ -4,19 +4,19 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     %%%in the algorithm is a distance 1e-12 apart.
     
     a = -20;
-    b = 9;
+    b = 20;
     
     bVal = fun(b, R, kdi, Li, vi, kx);
     cVal = fun(a, R, kdi, Li, vi, kx);
     
     % Is there no root within the interval?
     if bVal*cVal > 0
-        c = 10;
+        c = 1000;
         return;
     end
     
     %Commence algorithm
-    while b - a > 1e-8
+    while b - a > 1e-6
         c = (a+b)/2;
         cVal = fun(c, R, kdi, Li, vi, kx);
         
