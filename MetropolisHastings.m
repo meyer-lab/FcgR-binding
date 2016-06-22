@@ -1,4 +1,4 @@
-% clear;clc;
+clear;clc;
 
 %Loading basic parameters
 [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, ~, ~, best, ...
@@ -19,13 +19,13 @@ end
 
 %%%Note carefully that start is a row vector that must be transposed to be
 %%%put into Error
-start = best';
+start = [0.1 0.1 0.1 0.1 0.1 0.1 0.1];%  best';
 %Number of samples for MCMC
 nsamples = 3000;
 %Log probability proposal distribution
 proppdf = @(x,y) 0;
 %Pseudo-random generator of new points to test
-proprnd = @(x) x+normrnd(0,0.3,1,7);
+proprnd = @(x) x+normrnd(0,0.1,1,7);
 %Probability distribution of interest
 pdf = @(x) PDF(x',kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa,meanPerCond,stdPerCond);
 

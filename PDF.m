@@ -10,7 +10,7 @@ function [logprob] = PDF(x, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa,
     
     %Check to see that for the parameter fit there exist expected values
     %for the data (see Error.m lines 23 through 28)
-    if isempty(mfiExpPre)
+    if isempty(mfiExpPre) || max(x) > 8
         logprob = -Inf;
         return
     end
@@ -22,11 +22,9 @@ function [logprob] = PDF(x, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa,
     for j = 1:6
         for k = 1:4
             for l = 1:2
-                 logprob = logprob + normlike([meanPerCond(4*(j-1)+k,l), ... 
-                     stdPerCond(4*(j-1)+k,l)],mfiExpPre(j,4*(l-1)+k));
-                 logprob = logprob;
+                 logprob = logprob + log(normpdf(mfiExpPre(j,4*(l-1)+k), ...
+                     meanPerCond(4*(j-1)+k,l), stdPerCond(4*(j-1)+k,l)));
             end
         end
     end
-    
 end
