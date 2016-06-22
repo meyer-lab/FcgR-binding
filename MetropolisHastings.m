@@ -21,11 +21,11 @@ end
 %%%put into Error
 start = best';
 %Number of samples for MCMC
-nsamples = 1000;
+nsamples = 3000;
 %Log probability proposal distribution
 proppdf = @(x,y) 0;
 %Pseudo-random generator of new points to test
-proprnd = @(x) x+normrnd(0,0.2,1,7);
+proprnd = @(x) x+normrnd(0,0.3,1,7);
 %Probability distribution of interest
 pdf = @(x) PDF(x',kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa,meanPerCond,stdPerCond);
 

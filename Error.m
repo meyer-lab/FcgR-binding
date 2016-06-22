@@ -24,7 +24,7 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, 
     end
     %Preventing errors in global optimization due to failure of the
     %above local solver
-    if max(max(Req4 == 10)) || max(max(Req26 == 10))
+    if max(max(Req4 == 1000)) || max(max(Req26 == 1000))
         J = 1E8;
         mfiExpPre = [];
         mfiExp = [];
