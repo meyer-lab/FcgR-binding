@@ -16,7 +16,7 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     end
     
     %Commence algorithm
-    while b - a > 1e-6
+    while b - a > 1e-4 || abs(cVal) > 1E-4
         c = (a+b)/2;
         cVal = fun(c, R, kdi, Li, vi, kx);
         
