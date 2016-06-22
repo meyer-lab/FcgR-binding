@@ -1,25 +1,20 @@
-function x = ReqFuncSolver(R, kdi, Li, vi, kx, a, b, error)
-    %%%This function uses the bisection algorithm so solve the equation
-    %%%represented by the anonymous function ReqFunc in Error.
+function x = ReqFuncSolver(R, kdi, Li, vi, kx)
+    %%%This function returns the point at which function fun equals zero
+    %%%using the bisection algorithm. The closest a and b will converge to
+    %%%in the algorithm is a distance 1e-12 apart.
     
-    %Check that the first point on the interval is less than the second, 
-    %that fun(a)*fun(b) is negative, and that error is positive. If not, 
-    %return an imaginary number.
-    if a >= b || (R - a*(1+vi*Li/kdi*(1+kx*a)^(vi-1)))*(R - b*(1+vi*Li/kdi*(1+kx*b)^(vi-1))) >= 0 ...
-            || error <= 0
-        x = i;
-        return
-    end
+    a = -5;
+    b = 5;
+    error = -10;
     
     %Commence algorithm
-    condition = 0;
-    while condition == 0
+    while 1
         c = (a+b)/2;
-        if abs(R - c*(1+vi*Li/kdi*(1+kx*c)^(vi-1))) < error
-            condition = 1;
+        if abs(fun(c, R, kdi, Li, vi, kx)) < error
             x = c;
+            return;
         end
-        if (R - c*(1+vi*Li/kdi*(1+kx*c)^(vi-1)))*(R - b*(1+vi*Li/kdi*(1+kx*b)^(vi-1))) >= 0
+        if fun(c, R, kdi, Li, vi, kx)*fun(b, R, kdi, Li, vi, kx) >= 0
             b = c;
         else
             a = c;
@@ -27,8 +22,12 @@ function x = ReqFuncSolver(R, kdi, Li, vi, kx, a, b, error)
         %Returns a NaN if a and b come with 1e-12 of each other before
         %convergence
         if b-a < 1e-12
-            x = i;
+            x = 6;
             return
         end
     end
+end
+%-------------------------------------------------------------------------
+function diff = fun(x, R, kdi, Li, vi, kx)
+    diff = R - 10^x*(1+vi*Li/kdi*(1+kx*10^x)^(vi-1));
 end
