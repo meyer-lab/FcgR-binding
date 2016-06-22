@@ -4,7 +4,7 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     %%%in the algorithm is a distance 1e-12 apart.
     
     a = -20;
-    b = 20;
+    b = log10(R);
     
     bVal = fun(b, R, kdi, Li, vi, kx);
     cVal = fun(a, R, kdi, Li, vi, kx);
