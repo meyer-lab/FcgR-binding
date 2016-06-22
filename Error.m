@@ -14,19 +14,12 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, 
         for k = 1:4
             Req4(j,k) = ReqFuncSolver(Rtot(j), kd(j,k), L(1), v(1), kx);
             Req26(j,k) = ReqFuncSolver(Rtot(j), kd(j,k), L(2), v(2), kx);
-            if isnan(Req4(j,k))
-                Req4(j,k) = -Inf;
-            end
-            if isnan(Req26(j,k))
-                Req26(j,k) = -Inf;
-            end
         end
     end
     %Preventing errors in global optimization due to failure of the
     %above local solver
-    if max(max(isnan(Req4))) || max(max(isnan(Req26))) || max(max(~isreal(Req4))) || max(max(~isreal(Req4)))
-        J = 1E6;
-        mfiExp = [];
+    if max(max(Req4 == 10)) || max(max(Req26 == 10))
+        J = 1E8;
         mfiExpPre = [];
         return;
     end

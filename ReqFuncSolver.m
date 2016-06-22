@@ -5,7 +5,7 @@ function x = ReqFuncSolver(R, kdi, Li, vi, kx)
     
     a = -5;
     b = 5;
-    error = -10;
+    error = 10;
     
     %Commence algorithm
     while 1
