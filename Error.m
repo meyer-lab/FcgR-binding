@@ -1,5 +1,11 @@
 function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa)
-
+    
+    % If error is called with Rtot being a single value, assume we want to
+    % have constant expression across all the receptors
+    if numel(Rtot) == 1
+        Rtot = Rtot * ones(1,7);
+    end
+    
     Rtot = 10.^Rtot;
     kx = Rtot(7);
     L = tnpbsa;
@@ -28,7 +34,7 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, 
     Req4 = 10.^Req4;
     Req26 = 10.^Req26;
     
-%   R is a seven-dimensional vector whose first six elements are
+%   R is a one-dimensional vector whose first six elements are
 %   expression levels of FcgRIA, FcgRIIA-Arg, etc. and whose seventh
 %   element is kx (see RegressionAndResiduals.m). kd is a 6 X 4
 %   matrix whose elements represent the Kd values associated with each
