@@ -21,6 +21,7 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, 
     if max(max(Req4 == 10)) || max(max(Req26 == 10))
         J = 1E8;
         mfiExpPre = [];
+        mfiExp = [];
         return;
     end
     
