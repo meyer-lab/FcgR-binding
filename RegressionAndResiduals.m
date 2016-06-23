@@ -3,23 +3,12 @@ clc; clear;
 %Load the Kd values from Mimoto and Bruhns, the molarity of TNP-X-BSA used
 %by Lux (see Figure 2), the normalized, background-MFI-adjusted MFIs from
 %Lux for both TNP-X-BSAs, and the Kd values exclusively from Bruhns
-[kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns] = loadData();
-%TNP-X-BSA vector
-tnpbsa = [tnpbsa4; tnpbsa26];
+[kd, tnpbsa, mfiAdjMean, kdBruhns] = loadData();
 %Valency vector
 v = [4; 26];
-
-%Changing negative background-adjusted MFIs to zeros
-for j = 1:24
-    for k = 1:4
-        if mfiAdjMean4(j,k) < 0
-            mfiAdjMean4(j,k) = 0;
-        end
-        if mfiAdjMean26(j,k) < 0
-            mfiAdjMean26(j,k) = 0;
-        end
-    end
-end
+%Separate mean-adjusted MFIs into TNP-4-BSA data and TNP-26-BSA data
+mfiAdjMean4 = mfiAdjMean(:,1:4);
+mfiAdjMean26 = mfiAdjMean(:,5:8);
 
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
 %all i from 1 to v for all v from 1 to 26
@@ -39,14 +28,14 @@ opts = optimoptions(@fmincon,'Algorithm','interior-point','Display','off');
 gs = GlobalSearch('StartPointsToRun','bounds','Display','off');
 
 problem = createOptimProblem('fmincon','objective',...
-@(x) Error(x,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa),'x0',zeros(7,1),...
-    'lb',(-5*ones(7,1)),'ub',5*ones(7,1),'options',opts);
+@(x) Error(x,kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa),'x0',zeros(7,1),...
+    'lb',(-20*ones(7,1)),'ub',5*ones(7,1),'options',opts);
 [best, bestFit] = run(gs,problem);
 
-[~,mfiExp] = Error(best,kdBruhns,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa);
+[~,mfiExp] = Error(best,kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa);
 
 %Create residuals
-mfiDiff = mfiExp - [mfiAdjMean4, mfiAdjMean26];
+mfiDiff = mfiExp - mfiAdjMean;
 
 %Calculating coefficients of determination for TNP-4-BSA and TNP-26-BSA.
 %Note that all negative values in mfiAdjMean4 and mfiAdjMean26 were changed
