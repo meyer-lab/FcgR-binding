@@ -5,7 +5,7 @@
  * File: power.h
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 22-Jun-2016 09:56:36
+ * C/C++ source code generated on  : 23-Jun-2016 16:03:51
  */
 
 #ifndef __POWER_H__
@@ -21,10 +21,8 @@
 #include "PDF_types.h"
 
 /* Function Declarations */
-extern void b_power(const double b[24], double y[24]);
-extern void c_power(double a, const emxArray_real_T *b, emxArray_real_T *y);
-extern void d_power(double a, const emxArray_real_T *b, emxArray_real_T *y);
-extern void power(const double b[7], double y[7]);
+extern void power(double a, const double b_data[], const int b_size[2], double
+                  y_data[], int y_size[2]);
 
 #endif
 

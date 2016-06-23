@@ -5,13 +5,14 @@
  * File: PDF.c
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 22-Jun-2016 09:56:36
+ * C/C++ source code generated on  : 23-Jun-2016 16:03:51
  */
 
 /* Include Files */
 #include "rt_nonfinite.h"
 #include "PDF.h"
-#include "Error.h"
+#include "StoneSolver.h"
+#include "PDF_rtwutil.h"
 
 /* Function Definitions */
 
@@ -19,8 +20,7 @@
  * Find residuals for the model granted current parameters
  * Arguments    : const double x[7]
  *                const double kd[24]
- *                const double mfiAdjMean4[96]
- *                const double mfiAdjMean26[96]
+ *                const double mfiAdjMean[192]
  *                const double v[2]
  *                const double biCoefMat[676]
  *                const double tnpbsa[2]
@@ -28,89 +28,141 @@
  *                const double stdPerCond[48]
  * Return Type  : double
  */
-double PDF(const double x[7], const double kd[24], const double mfiAdjMean4[96],
-           const double mfiAdjMean26[96], const double v[2], const double
-           biCoefMat[676], const double tnpbsa[2], const double meanPerCond[48],
-           const double stdPerCond[48])
+double PDF(const double x[7], const double kd[24], const double mfiAdjMean[192],
+           const double v[2], const double biCoefMat[676], const double tnpbsa[2],
+           const double meanPerCond[48], const double stdPerCond[48])
 {
   double logprob;
-  double b_x[7];
-  int ixstart;
-  int mfiExpPre_size[2];
-  double mfiExpPre_data[48];
-  int mfiExp_size[2];
-  double mfiExp_data[192];
-  double s;
-  double logprobMat[48];
+  double Rtot[7];
+  int k;
+  double Kx;
+  double mfiExpPre[48];
   int j;
+  boolean_T varargin_1[48];
+  boolean_T maxval[8];
+  boolean_T mtmp;
+  boolean_T guard1 = false;
+  int ixstart;
+  double b_mtmp;
+  boolean_T exitg1;
   int l;
-  double y[8];
-  int ix;
-  int iy;
-  int i;
+  (void)mfiAdjMean;
 
   /* mfiExpPre is a 6x8 matrix which includes the predicted value by the */
   /* given parameter fit for each combination of FcgR, IgG, and valency. It */
   /* is the concatenation of matrices mfiExpPre4 and mfiExpPre26; see */
   /* Error.m for their definiton */
-  for (ixstart = 0; ixstart < 7; ixstart++) {
-    b_x[ixstart] = x[ixstart];
+  /*  If error is called with Rtot being a single value, assume we want to */
+  /*  have constant expression across all the receptors */
+  /* Convert from log scale */
+  for (k = 0; k < 7; k++) {
+    Rtot[k] = rt_powd_snf(10.0, x[k]);
   }
 
-  Error(b_x, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa, &s,
-        mfiExp_data, mfiExp_size, mfiExpPre_data, mfiExpPre_size);
+  Kx = Rtot[6];
+
+  /* Get expected value of MFIs from Equation 7 from Stone */
+  memset(&mfiExpPre[0], 0, 48U * sizeof(double));
+  for (j = 0; j < 6; j++) {
+    for (k = 0; k < 4; k++) {
+      mfiExpPre[j + 6 * k] = StoneSolver(Rtot[j], Kx, v[0], kd[j + 6 * k],
+        tnpbsa[0], biCoefMat);
+      mfiExpPre[j + 6 * (4 + k)] = StoneSolver(Rtot[j], Kx, v[1], kd[j + 6 * k],
+        tnpbsa[1], biCoefMat);
+    }
+  }
+
+  /* Check for undefined values (errors from ReqFuncSolver) */
+  for (k = 0; k < 48; k++) {
+    varargin_1[k] = (mfiExpPre[k] == -1.0);
+  }
+
+  for (j = 0; j < 8; j++) {
+    maxval[j] = varargin_1[6 * j];
+    for (k = 0; k < 5; k++) {
+      mtmp = maxval[j];
+      if ((int)varargin_1[(k + 6 * j) + 1] > (int)maxval[j]) {
+        mtmp = varargin_1[(k + 6 * j) + 1];
+      }
+
+      maxval[j] = mtmp;
+    }
+  }
+
+  mtmp = maxval[0];
+  for (k = 0; k < 7; k++) {
+    if ((int)maxval[k + 1] > (int)mtmp) {
+      mtmp = maxval[k + 1];
+    }
+  }
+
+  if (mtmp) {
+    for (k = 0; k < 48; k++) {
+      mfiExpPre[k] = -1.0;
+    }
+  } else {
+    /* Create array of expected values to calculate residuals */
+    /* Error */
+  }
 
   /* Check to see that for the parameter fit there exist expected values */
   /* for the data (see Error.m lines 23 through 28) */
-  if ((mfiExpPre_size[0] == 0) || (mfiExpPre_size[1] == 0)) {
-    logprob = rtMinusInf;
+  guard1 = false;
+  if (mfiExpPre[0] == -1.0) {
+    guard1 = true;
   } else {
-    /* Create a matrix which includes the log probability of the model being */
-    /* chosen for each combination of data from one FcgR, one IgG, and one */
-    /* valency */
-    memset(&logprobMat[0], 0, 48U * sizeof(double));
-    for (j = 0; j < 6; j++) {
-      for (ixstart = 0; ixstart < 4; ixstart++) {
-        for (l = 0; l < 2; l++) {
-          /*                  logprobMat(j,4*(l-1)+k) = normlike([meanPerCond(4*(j-1)+k,l), ...  */
-          /*                      stdPerCond(4*(j-1)+k,l)],mfiExpPre(j,4*(l-1)+k)); */
-          if (stdPerCond[((j << 2) + ixstart) + 24 * l] > 0.0) {
-            s = (mfiExpPre_data[j + mfiExpPre_size[0] * ((l << 2) + ixstart)] -
-                 meanPerCond[((j << 2) + ixstart) + 24 * l]) / stdPerCond[((j <<
-              2) + ixstart) + 24 * l];
-            s = exp(-0.5 * s * s) / (2.5066282746310002 * stdPerCond[((j << 2) +
-              ixstart) + 24 * l]);
-          } else {
-            s = rtNaN;
-          }
-
-          logprobMat[j + 6 * ((l << 2) + ixstart)] = s;
+    ixstart = 1;
+    b_mtmp = x[0];
+    if (rtIsNaN(x[0])) {
+      k = 2;
+      exitg1 = false;
+      while ((!exitg1) && (k < 8)) {
+        ixstart = k;
+        if (!rtIsNaN(x[k - 1])) {
+          b_mtmp = x[k - 1];
+          exitg1 = true;
+        } else {
+          k++;
         }
       }
     }
 
-    /* Sum up negative log probabilities and negate */
-    ix = 0;
-    iy = -1;
-    for (i = 0; i < 8; i++) {
-      ixstart = ix;
-      ix++;
-      s = logprobMat[ixstart];
-      for (ixstart = 0; ixstart < 5; ixstart++) {
-        ix++;
-        s += logprobMat[ix - 1];
+    if (ixstart < 7) {
+      while (ixstart + 1 < 8) {
+        if (x[ixstart] > b_mtmp) {
+          b_mtmp = x[ixstart];
+        }
+
+        ixstart++;
       }
-
-      iy++;
-      y[iy] = s;
     }
 
-    s = y[0];
-    for (ixstart = 0; ixstart < 7; ixstart++) {
-      s += y[ixstart + 1];
+    if (b_mtmp > 8.0) {
+      guard1 = true;
+    } else {
+      /* Create a matrix which includes the log probability of the model being */
+      /* chosen for each combination of data from one FcgR, one IgG, and one */
+      /* valency */
+      logprob = 0.0;
+      for (j = 0; j < 6; j++) {
+        for (k = 0; k < 4; k++) {
+          for (l = 0; l < 2; l++) {
+            /* To replace normlike in the function PDF; while normlike returns */
+            /* negated log probabilities, this function returns log probabilities as */
+            /* they are. */
+            /* -------------------------------------------------------------------------- */
+            logprob += -0.5 * rt_powd_snf((mfiExpPre[j + 6 * ((l << 2) + k)] -
+              meanPerCond[((j << 2) + k) + 24 * l]) / stdPerCond[((j << 2) + k)
+              + 24 * l], 2.0) - log(2.5066282746310002 * stdPerCond[((j << 2) +
+              k) + 24 * l]);
+          }
+        }
+      }
     }
+  }
 
-    logprob = -s;
+  if (guard1) {
+    logprob = rtMinusInf;
   }
 
   return logprob;

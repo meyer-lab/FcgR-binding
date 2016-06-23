@@ -13,14 +13,12 @@ SRC_FILES =  \
 	PDF.c \
 	Error.c \
 	power.c \
-	eml_int_forloop_overflow_check.c \
 	scalexpAlloc.c \
-	rdivide.c \
-	nansum.c \
+	error1.c \
+	StoneSolver.c \
 	_coder_PDF_info.c \
 	_coder_PDF_api.c \
-	_coder_PDF_mex.c \
-	PDF_emxutil.c
+	_coder_PDF_mex.c
 
 MEX_FILE_NAME_WO_EXT = PDF_mex
 MEX_FILE_NAME = $(MEX_FILE_NAME_WO_EXT).mexw64

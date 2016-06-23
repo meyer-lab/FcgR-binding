@@ -26,10 +26,8 @@
 #include "PDF_types.h"
 
 /* Function Declarations */
-extern boolean_T b_dimagree(const emxArray_real_T *z, const emxArray_real_T
-  *varargin_2);
-extern boolean_T dimagree(const emxArray_real_T *z, const emxArray_real_T
-  *varargin_2);
+extern boolean_T dimagree(const int32_T z_size[2], const int32_T
+  varargin_2_size[2]);
 
 #endif
 

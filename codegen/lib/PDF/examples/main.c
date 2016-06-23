@@ -5,7 +5,7 @@
  * File: main.c
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 22-Jun-2016 09:56:36
+ * C/C++ source code generated on  : 23-Jun-2016 16:03:51
  */
 
 /*************************************************************************/
@@ -41,7 +41,7 @@
 
 /* Function Declarations */
 static void argInit_24x2_real_T(double result[48]);
-static void argInit_24x4_real_T(double result[96]);
+static void argInit_24x8_real_T(double result[192]);
 static void argInit_26x26_real_T(double result[676]);
 static void argInit_2x1_real_T(double result[2]);
 static void argInit_6x4_real_T(double result[24]);
@@ -71,17 +71,17 @@ static void argInit_24x2_real_T(double result[48])
 }
 
 /*
- * Arguments    : double result[96]
+ * Arguments    : double result[192]
  * Return Type  : void
  */
-static void argInit_24x4_real_T(double result[96])
+static void argInit_24x8_real_T(double result[192])
 {
   int idx0;
   int idx1;
 
   /* Loop over the array to initialize each element. */
   for (idx0 = 0; idx0 < 24; idx0++) {
-    for (idx1 = 0; idx1 < 4; idx1++) {
+    for (idx1 = 0; idx1 < 8; idx1++) {
       /* Set the value of the array element.
          Change this value to the value that the application requires. */
       result[idx0 + 24 * idx1] = argInit_real_T();
@@ -176,20 +176,18 @@ static void main_PDF(void)
 {
   double dv0[7];
   double dv1[24];
-  double dv2[96];
-  double dv3[96];
-  double dv4[2];
-  double dv5[676];
-  double dv6[2];
+  double dv2[192];
+  double dv3[2];
+  double dv4[676];
+  double dv5[2];
+  double dv6[48];
   double dv7[48];
-  double dv8[48];
   double logprob;
 
   /* Initialize function 'PDF' input arguments. */
   /* Initialize function input argument 'x'. */
   /* Initialize function input argument 'kd'. */
-  /* Initialize function input argument 'mfiAdjMean4'. */
-  /* Initialize function input argument 'mfiAdjMean26'. */
+  /* Initialize function input argument 'mfiAdjMean'. */
   /* Initialize function input argument 'v'. */
   /* Initialize function input argument 'biCoefMat'. */
   /* Initialize function input argument 'tnpbsa'. */
@@ -198,14 +196,13 @@ static void main_PDF(void)
   /* Call the entry-point 'PDF'. */
   argInit_7x1_real_T(dv0);
   argInit_6x4_real_T(dv1);
-  argInit_24x4_real_T(dv2);
-  argInit_24x4_real_T(dv3);
-  argInit_2x1_real_T(dv4);
-  argInit_26x26_real_T(dv5);
-  argInit_2x1_real_T(dv6);
+  argInit_24x8_real_T(dv2);
+  argInit_2x1_real_T(dv3);
+  argInit_26x26_real_T(dv4);
+  argInit_2x1_real_T(dv5);
+  argInit_24x2_real_T(dv6);
   argInit_24x2_real_T(dv7);
-  argInit_24x2_real_T(dv8);
-  logprob = PDF(dv0, dv1, dv2, dv3, dv4, dv5, dv6, dv7, dv8);
+  logprob = PDF(dv0, dv1, dv2, dv3, dv4, dv5, dv6, dv7);
 }
 
 /*
