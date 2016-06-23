@@ -16,8 +16,7 @@ end
 
 %%%Note carefully that start is a row vector that must be transposed to be
 %%%put into Error
-start = [0.1 0.1 0.1 0.1 0.1 0.1 0.1];
-% start = best';
+start = best';
 %Number of samples for MCMC
 nsamples = 3000;
 %Log probability proposal distribution
