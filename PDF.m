@@ -1,11 +1,11 @@
-function [logprob] = PDF(x, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa, meanPerCond, stdPerCond)
+function [logprob] = PDF(x, kd, mfiAdjMean, v, biCoefMat, tnpbsa, meanPerCond, stdPerCond)
     %Find residuals for the model granted current parameters
     
     %mfiExpPre is a 6x8 matrix which includes the predicted value by the
     %given parameter fit for each combination of FcgR, IgG, and valency. It
     %is the concatenation of matrices mfiExpPre4 and mfiExpPre26; see
     %Error.m for their definiton
-    [~,~,mfiExpPre] = Error(x',kd,mfiAdjMean4,mfiAdjMean26,v,biCoefMat,tnpbsa);
+    [~,~,mfiExpPre] = Error(x',kd,mfiAdjMean,v,biCoefMat,tnpbsa);
 
     
     %Check to see that for the parameter fit there exist expected values
