@@ -20,8 +20,8 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, Kd, mfiAdjMean, v, biCoefMat, tnpb
     %Check for undefined values (errors from ReqFuncSolver)
     if max(max(mfiExpPre == -1))
         J = 1e8;
-        mfiExpPre = [];
-        mfiExp = [];
+        mfiExpPre = -ones(6,8);
+        mfiExp = -ones(6,8);
         return
     end
     

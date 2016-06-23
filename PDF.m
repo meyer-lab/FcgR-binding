@@ -5,12 +5,11 @@ function [logprob] = PDF(x, kd, mfiAdjMean, v, biCoefMat, tnpbsa, meanPerCond, s
     %given parameter fit for each combination of FcgR, IgG, and valency. It
     %is the concatenation of matrices mfiExpPre4 and mfiExpPre26; see
     %Error.m for their definiton
-    [J,mfiExp,mfiExpPre] = Error(x',kd,mfiAdjMean,v,biCoefMat,tnpbsa);
-
+    [~,~,mfiExpPre] = Error(x',kd,mfiAdjMean,v,biCoefMat,tnpbsa);
     
     %Check to see that for the parameter fit there exist expected values
     %for the data (see Error.m lines 23 through 28)
-    if isempty(mfiExpPre) || max(x) > 8
+    if mfiExpPre(1,1) == -1 || max(x) > 8
         logprob = -Inf;
         return
     end
@@ -22,9 +21,17 @@ function [logprob] = PDF(x, kd, mfiAdjMean, v, biCoefMat, tnpbsa, meanPerCond, s
     for j = 1:6
         for k = 1:4
             for l = 1:2
-                 logprob = logprob - normlike([meanPerCond(4*(j-1)+k,l), ...
-                     stdPerCond(4*(j-1)+k,l)],mfiExpPre(j,4*(l-1)+k));
+                 logprob = logprob + pseudoNormlike(mfiExpPre(j,4*(l-1)+k), ...
+                     meanPerCond(4*(j-1)+k,l),stdPerCond(4*(j-1)+k,l));
             end
         end
     end
+end
+%--------------------------------------------------------------------------
+function logprob = pseudoNormlike(x,mu,sigma)
+    %To replace normlike in the function PDF; while normlike returns
+    %negated log probabilities, this function returns log probabilities as
+    %they are.
+    z = (x - mu) / sigma;
+    logprob = -.5 * z^2 - log(sqrt(2.*pi).*sigma);
 end

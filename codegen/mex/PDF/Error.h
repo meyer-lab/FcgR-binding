@@ -26,12 +26,10 @@
 #include "PDF_types.h"
 
 /* Function Declarations */
-extern void Error(const emlrtStack *sp, real_T Rtot[7], const real_T kd[24],
-                  const real_T mfiAdjMean4[96], const real_T mfiAdjMean26[96],
-                  const real_T v[2], const real_T biCoefMat[676], const real_T
-                  tnpbsa[2], real_T *J, real_T mfiExp_data[], int32_T
-                  mfiExp_size[2], real_T mfiExpPre_data[], int32_T
-                  mfiExpPre_size[2]);
+extern void Error(const emlrtStack *sp, real_T Rtot[7], const real_T Kd[24],
+                  const real_T mfiAdjMean[192], const real_T v[2], const real_T
+                  biCoefMat[676], const real_T tnpbsa[2], real_T *J, real_T
+                  mfiExp_data[], int32_T mfiExp_size[2], real_T mfiExpPre[48]);
 
 #endif
 

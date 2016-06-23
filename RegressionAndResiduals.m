@@ -1,4 +1,4 @@
-clc; clear;
+clear;clc;
 
 %Load the Kd values from Mimoto and Bruhns, the molarity of TNP-X-BSA used
 %by Lux (see Figure 2), the normalized, background-MFI-adjusted MFIs from
@@ -30,7 +30,7 @@ gs = GlobalSearch('StartPointsToRun','bounds','Display','off');
 problem = createOptimProblem('fmincon','objective',...
 @(x) Error(x,kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa),'x0',zeros(7,1),...
     'lb',(-20*ones(7,1)),'ub',5*ones(7,1),'options',opts);
-[best, bestFit] = run(gs,problem);
+[best, bestFit,exitflag] = run(gs,problem);
 
 [~,mfiExp] = Error(best,kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa);
 

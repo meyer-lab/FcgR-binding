@@ -5,7 +5,7 @@
  * File: _coder_PDF_api.h
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 22-Jun-2016 09:56:36
+ * C/C++ source code generated on  : 23-Jun-2016 16:03:51
  */
 
 #ifndef ___CODER_PDF_API_H__
@@ -24,10 +24,10 @@ extern emlrtCTX emlrtRootTLSGlobal;
 extern emlrtContext emlrtContextGlobal;
 
 /* Function Declarations */
-extern real_T PDF(real_T x[7], real_T kd[24], real_T mfiAdjMean4[96], real_T
-                  mfiAdjMean26[96], real_T v[2], real_T biCoefMat[676], real_T
-                  tnpbsa[2], real_T meanPerCond[48], real_T stdPerCond[48]);
-extern void PDF_api(const mxArray *prhs[9], const mxArray *plhs[1]);
+extern real_T PDF(real_T x[7], real_T kd[24], real_T mfiAdjMean[192], real_T v[2],
+                  real_T biCoefMat[676], real_T tnpbsa[2], real_T meanPerCond[48],
+                  real_T stdPerCond[48]);
+extern void PDF_api(const mxArray *prhs[8], const mxArray *plhs[1]);
 extern void PDF_atexit(void);
 extern void PDF_initialize(void);
 extern void PDF_terminate(void);

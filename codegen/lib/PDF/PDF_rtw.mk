@@ -2,7 +2,7 @@
 ## Makefile generated for MATLAB file/project 'PDF'. 
 ## 
 ## Makefile     : PDF_rtw.mk
-## Generated on : Wed Jun 22 09:56:45 2016
+## Generated on : Thu Jun 23 16:04:01 2016
 ## MATLAB Coder version: 3.0 (R2015b)
 ## 
 ## Build Info:
@@ -168,7 +168,7 @@ DEFINES = $(DEFINES_STANDARD)
 ## SOURCE FILES
 ###########################################################################
 
-SRCS = $(START_DIR)/codegen/lib/PDF/PDF_rtwutil.c $(START_DIR)/codegen/lib/PDF/PDF_initialize.c $(START_DIR)/codegen/lib/PDF/PDF_terminate.c $(START_DIR)/codegen/lib/PDF/PDF.c $(START_DIR)/codegen/lib/PDF/Error.c $(START_DIR)/codegen/lib/PDF/power.c $(START_DIR)/codegen/lib/PDF/nansum.c $(START_DIR)/codegen/lib/PDF/PDF_emxutil.c $(START_DIR)/codegen/lib/PDF/rt_nonfinite.c $(START_DIR)/codegen/lib/PDF/rtGetNaN.c $(START_DIR)/codegen/lib/PDF/rtGetInf.c
+SRCS = $(START_DIR)/codegen/lib/PDF/PDF_rtwutil.c $(START_DIR)/codegen/lib/PDF/PDF_initialize.c $(START_DIR)/codegen/lib/PDF/PDF_terminate.c $(START_DIR)/codegen/lib/PDF/PDF.c $(START_DIR)/codegen/lib/PDF/power.c $(START_DIR)/codegen/lib/PDF/StoneSolver.c $(START_DIR)/codegen/lib/PDF/rt_nonfinite.c $(START_DIR)/codegen/lib/PDF/rtGetNaN.c $(START_DIR)/codegen/lib/PDF/rtGetInf.c
 
 ALL_SRCS = $(SRCS)
 
@@ -176,7 +176,7 @@ ALL_SRCS = $(SRCS)
 ## OBJECTS
 ###########################################################################
 
-OBJS = PDF_rtwutil.obj PDF_initialize.obj PDF_terminate.obj PDF.obj Error.obj power.obj nansum.obj PDF_emxutil.obj rt_nonfinite.obj rtGetNaN.obj rtGetInf.obj
+OBJS = PDF_rtwutil.obj PDF_initialize.obj PDF_terminate.obj PDF.obj power.obj StoneSolver.obj rt_nonfinite.obj rtGetNaN.obj rtGetInf.obj
 
 ALL_OBJS = $(OBJS)
 
