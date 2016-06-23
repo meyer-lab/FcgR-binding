@@ -26,7 +26,7 @@
 #include "PDF_types.h"
 
 /* Function Declarations */
-extern void PDF_api(const mxArray * const prhs[9], const mxArray *plhs[1]);
+extern void PDF_api(const mxArray * const prhs[8], const mxArray *plhs[1]);
 
 #endif
 

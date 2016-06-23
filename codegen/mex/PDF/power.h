@@ -26,13 +26,8 @@
 #include "PDF_types.h"
 
 /* Function Declarations */
-extern void b_power(const real_T b[24], real_T y[24]);
-extern void c_power(const emlrtStack *sp, real_T a, const emxArray_real_T *b,
-                    emxArray_real_T *y);
-extern void d_power(const emlrtStack *sp, real_T a, const emxArray_real_T *b,
-                    emxArray_real_T *y);
-extern void e_power(const real_T a[96], real_T y[96]);
-extern void power(const real_T b[7], real_T y[7]);
+extern void power(const emlrtStack *sp, real_T a, const real_T b_data[], const
+                  int32_T b_size[2], real_T y_data[], int32_T y_size[2]);
 
 #endif
 

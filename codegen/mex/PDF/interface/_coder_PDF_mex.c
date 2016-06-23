@@ -19,14 +19,14 @@
 
 /* Function Declarations */
 static void PDF_mexFunction(int32_T nlhs, mxArray *plhs[1], int32_T nrhs, const
-  mxArray *prhs[9]);
+  mxArray *prhs[8]);
 
 /* Function Definitions */
 static void PDF_mexFunction(int32_T nlhs, mxArray *plhs[1], int32_T nrhs, const
-  mxArray *prhs[9])
+  mxArray *prhs[8])
 {
   int32_T n;
-  const mxArray *inputs[9];
+  const mxArray *inputs[8];
   const mxArray *outputs[1];
   int32_T b_nlhs;
   emlrtStack st = { NULL, NULL, NULL };
@@ -34,8 +34,8 @@ static void PDF_mexFunction(int32_T nlhs, mxArray *plhs[1], int32_T nrhs, const
   st.tls = emlrtRootTLSGlobal;
 
   /* Check for proper number of arguments. */
-  if (nrhs != 9) {
-    emlrtErrMsgIdAndTxt(&st, "EMLRT:runTime:WrongNumberOfInputs", 5, 12, 9, 4, 3,
+  if (nrhs != 8) {
+    emlrtErrMsgIdAndTxt(&st, "EMLRT:runTime:WrongNumberOfInputs", 5, 12, 8, 4, 3,
                         "PDF");
   }
 

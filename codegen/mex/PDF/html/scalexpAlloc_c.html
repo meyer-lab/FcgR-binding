@@ -27,7 +27,7 @@
 <a name="15"><font color="#888888 "><i>   15   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;scalexpAlloc.h&quot;</font>
 <a name="16"><font color="#888888 "><i>   16   </i></font></a>
 <a name="17"><font color="#888888 "><i>   17   </i></font></a><font color="#117755"><i>/* Function Definitions */</i></font>
-<a name="18"><font color="#888888 "><i>   18   </i></font></a>boolean_T <a name="fcn_b_dimagree">b_dimagree</a>(<font color="#112266"><b>const</b></font> <a href="PDF_types_h.html#type_emxArray_real_T" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'type_emxArray_real_T');" target="_self"><font color="#1122aa">emxArray_real_T</font></a> *z, <font color="#112266"><b>const</b></font> <a href="PDF_types_h.html#type_emxArray_real_T" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'type_emxArray_real_T');" target="_self"><font color="#1122aa">emxArray_real_T</font></a> *varargin_2)
+<a name="18"><font color="#888888 "><i>   18   </i></font></a>boolean_T <a name="fcn_dimagree">dimagree</a>(<font color="#112266"><b>const</b></font> int32_T z_size[2], <font color="#112266"><b>const</b></font> int32_T varargin_2_size[2])
 <a name="19"><font color="#888888 "><i>   19   </i></font></a><b>{</b>
 <a name="20"><font color="#888888 "><i>   20   </i></font></a>  boolean_T p;
 <a name="21"><font color="#888888 "><i>   21   </i></font></a>  boolean_T b_p;
@@ -38,7 +38,7 @@
 <a name="26"><font color="#888888 "><i>   26   </i></font></a>  k = 0;
 <a name="27"><font color="#888888 "><i>   27   </i></font></a>  exitg1 = false;
 <a name="28"><font color="#888888 "><i>   28   </i></font></a>  <font color="#112266"><b>while</b></font> ((!exitg1) &amp;&amp; (k + 1 &lt; 3)) <b>{</b>
-<a name="29"><font color="#888888 "><i>   29   </i></font></a>    <font color="#112266"><b>if</b></font> (z-&gt;size[k] != varargin_2-&gt;size[k]) <b>{</b>
+<a name="29"><font color="#888888 "><i>   29   </i></font></a>    <font color="#112266"><b>if</b></font> (z_size[k] != varargin_2_size[k]) <b>{</b>
 <a name="30"><font color="#888888 "><i>   30   </i></font></a>      b_p = false;
 <a name="31"><font color="#888888 "><i>   31   </i></font></a>      exitg1 = true;
 <a name="32"><font color="#888888 "><i>   32   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
@@ -54,49 +54,8 @@
 <a name="42"><font color="#888888 "><i>   42   </i></font></a>  <font color="#112266"><b>return</b></font> p;
 <a name="43"><font color="#888888 "><i>   43   </i></font></a><b>}</b>
 <a name="44"><font color="#888888 "><i>   44   </i></font></a>
-<a name="45"><font color="#888888 "><i>   45   </i></font></a>boolean_T <a name="fcn_dimagree">dimagree</a>(<font color="#112266"><b>const</b></font> <a href="PDF_types_h.html#type_emxArray_real_T" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'type_emxArray_real_T');" target="_self"><font color="#1122aa">emxArray_real_T</font></a> *z, <font color="#112266"><b>const</b></font> <a href="PDF_types_h.html#type_emxArray_real_T" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'type_emxArray_real_T');" target="_self"><font color="#1122aa">emxArray_real_T</font></a> *varargin_2)
-<a name="46"><font color="#888888 "><i>   46   </i></font></a><b>{</b>
-<a name="47"><font color="#888888 "><i>   47   </i></font></a>  boolean_T p;
-<a name="48"><font color="#888888 "><i>   48   </i></font></a>  boolean_T b_p;
-<a name="49"><font color="#888888 "><i>   49   </i></font></a>  int32_T k;
-<a name="50"><font color="#888888 "><i>   50   </i></font></a>  boolean_T exitg1;
-<a name="51"><font color="#888888 "><i>   51   </i></font></a>  int32_T i0;
-<a name="52"><font color="#888888 "><i>   52   </i></font></a>  int32_T i1;
-<a name="53"><font color="#888888 "><i>   53   </i></font></a>  p = true;
-<a name="54"><font color="#888888 "><i>   54   </i></font></a>  b_p = true;
-<a name="55"><font color="#888888 "><i>   55   </i></font></a>  k = 1;
-<a name="56"><font color="#888888 "><i>   56   </i></font></a>  exitg1 = false;
-<a name="57"><font color="#888888 "><i>   57   </i></font></a>  <font color="#112266"><b>while</b></font> ((!exitg1) &amp;&amp; (k &lt; 3)) <b>{</b>
-<a name="58"><font color="#888888 "><i>   58   </i></font></a>    <font color="#112266"><b>if</b></font> (k &lt;= 1) <b>{</b>
-<a name="59"><font color="#888888 "><i>   59   </i></font></a>      i0 = z-&gt;size[0];
-<a name="60"><font color="#888888 "><i>   60   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
-<a name="61"><font color="#888888 "><i>   61   </i></font></a>      i0 = 1;
-<a name="62"><font color="#888888 "><i>   62   </i></font></a>    <b>}</b>
-<a name="63"><font color="#888888 "><i>   63   </i></font></a>
-<a name="64"><font color="#888888 "><i>   64   </i></font></a>    <font color="#112266"><b>if</b></font> (k &lt;= 1) <b>{</b>
-<a name="65"><font color="#888888 "><i>   65   </i></font></a>      i1 = varargin_2-&gt;size[0];
-<a name="66"><font color="#888888 "><i>   66   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
-<a name="67"><font color="#888888 "><i>   67   </i></font></a>      i1 = 1;
-<a name="68"><font color="#888888 "><i>   68   </i></font></a>    <b>}</b>
-<a name="69"><font color="#888888 "><i>   69   </i></font></a>
-<a name="70"><font color="#888888 "><i>   70   </i></font></a>    <font color="#112266"><b>if</b></font> (i0 != i1) <b>{</b>
-<a name="71"><font color="#888888 "><i>   71   </i></font></a>      b_p = false;
-<a name="72"><font color="#888888 "><i>   72   </i></font></a>      exitg1 = true;
-<a name="73"><font color="#888888 "><i>   73   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
-<a name="74"><font color="#888888 "><i>   74   </i></font></a>      k++;
-<a name="75"><font color="#888888 "><i>   75   </i></font></a>    <b>}</b>
-<a name="76"><font color="#888888 "><i>   76   </i></font></a>  <b>}</b>
-<a name="77"><font color="#888888 "><i>   77   </i></font></a>
-<a name="78"><font color="#888888 "><i>   78   </i></font></a>  <font color="#112266"><b>if</b></font> (b_p) <b>{</b>
-<a name="79"><font color="#888888 "><i>   79   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
-<a name="80"><font color="#888888 "><i>   80   </i></font></a>    p = false;
-<a name="81"><font color="#888888 "><i>   81   </i></font></a>  <b>}</b>
-<a name="82"><font color="#888888 "><i>   82   </i></font></a>
-<a name="83"><font color="#888888 "><i>   83   </i></font></a>  <font color="#112266"><b>return</b></font> p;
-<a name="84"><font color="#888888 "><i>   84   </i></font></a><b>}</b>
-<a name="85"><font color="#888888 "><i>   85   </i></font></a>
-<a name="86"><font color="#888888 "><i>   86   </i></font></a><font color="#117755"><i>/* End of code generation (scalexpAlloc.c) */</i></font>
-<a name="87"><font color="#888888 "><i>   87   </i></font></a></pre>
+<a name="45"><font color="#888888 "><i>   45   </i></font></a><font color="#117755"><i>/* End of code generation (scalexpAlloc.c) */</i></font>
+<a name="46"><font color="#888888 "><i>   46   </i></font></a></pre>
 </td></tr></table>
 </p>
 </body>
