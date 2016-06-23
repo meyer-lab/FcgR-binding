@@ -1,5 +1,4 @@
-function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, ... 
-    bestHomogeneicFit, bestHomogeneicKx, best, meanPerCond, stdPerCond] = loadData()
+function [kd, tnpbsa, mfiAdjMean, kdBruhns, best, meanPerCond, stdPerCond] = loadData()
     %Clear workspace and command window
     clear; clc;
 
@@ -14,6 +13,7 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, ...
     %weights found from Wikipedia.
     tnpbsa4 = 1/67379 * 1e-3 * 5;
     tnpbsa26 = 1/72420 * 1e-3 * 5;
+    tnpbsa = [tnpbsa4;tnpbsa26];
     
     %Load the Kd values we found in the literature
     kd = csvread('FcR-Kd.csv',1,1);
@@ -37,30 +37,15 @@ function [kd, tnpbsa4, tnpbsa26, mfiAdjMean4, mfiAdjMean26, kdBruhns, ...
         mfiAdjMean(:,j+4) = mfiAdj(:,j+4) / nanmean([mfiAdj(:,j); mfiAdj(:,j+4)]);
     end
     
-    %Separate the MFIs from TNP-4-BSA trials from those from TNP-26-BSA
-    %trials
-    mfiAdjMean4 = mfiAdjMean(:,1:4);
-    mfiAdjMean26 = mfiAdjMean(:,5:8);
-    
     %Load the Kd values found exclusively from Bruhns et al. (2009)
     kdBruhns = csvread('FcR-Kd-2.csv');
     
-    %TempKx is an arbitrary value for Kx, based on the output of
-    %RegressionAndResiduals as of June 6th 2016, that can be used in
-    %certain instances of modelling.
-    %bestHomogeneicFit and bestHomogeneicKx are the values for receptor 
-    %expression and Kx (respectively) which best fit the model granted all 
-    %receptors have the same expression level.
-    %The file parameterFits.mat stores all of these files.
-    load('parameterFits.mat')
-    
-    %Load other important fit information
-    load('paramCompare.mat')
+    %Load the point which yields the best fit
+    load('best.mat')
     
     %From mfiAdjMean, create matrices which hold the adjusted expression
     %level mean and expression level standard deviation for each condition
     %(i.e. FcgR with IgG1, valency 4)
-    mfiAdjMean = [mfiAdjMean4 mfiAdjMean26];
     meanPerCond = zeros(24,2);
     stdPerCond = zeros(24,2);
     for j = 1:24
