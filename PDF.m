@@ -5,7 +5,7 @@ function [logprob] = PDF(x, kd, mfiAdjMean, v, biCoefMat, tnpbsa, meanPerCond, s
     %given parameter fit for each combination of FcgR, IgG, and valency. It
     %is the concatenation of matrices mfiExpPre4 and mfiExpPre26; see
     %Error.m for their definiton
-    [~,~,mfiExpPre] = Error(x',kd,mfiAdjMean,v,biCoefMat,tnpbsa);
+    [J,mfiExp,mfiExpPre] = Error(x',kd,mfiAdjMean,v,biCoefMat,tnpbsa);
 
     
     %Check to see that for the parameter fit there exist expected values
@@ -22,8 +22,8 @@ function [logprob] = PDF(x, kd, mfiAdjMean, v, biCoefMat, tnpbsa, meanPerCond, s
     for j = 1:6
         for k = 1:4
             for l = 1:2
-                 logprob = logprob + log(normpdf(mfiExpPre(j,4*(l-1)+k), ...
-                     meanPerCond(4*(j-1)+k,l), stdPerCond(4*(j-1)+k,l)));
+                 logprob = logprob - normlike([meanPerCond(4*(j-1)+k,l), ...
+                     stdPerCond(4*(j-1)+k,l)],mfiExpPre(j,4*(l-1)+k));
             end
         end
     end
