@@ -1,78 +1,39 @@
-function [J, mfiExp, mfiExpPre] = Error(Rtot, kd, mfiAdjMean4, mfiAdjMean26, v, biCoefMat, tnpbsa)
-    
+function [J, mfiExp, mfiExpPre] = Error(Rtot, Kd, mfiAdjMean, v, biCoefMat, tnpbsa)
     % If error is called with Rtot being a single value, assume we want to
     % have constant expression across all the receptors
-    if numel(Rtot) == 1
-        Rtot = Rtot * ones(1,7);
+    if numel(Rtot) == 2
+        Rtot = [Rtot(1) * ones(6,1); Rtot(2)];
     end
-    
+    %Convert from log scale
     Rtot = 10.^Rtot;
-    kx = Rtot(7);
-    L = tnpbsa;
+    Kx = Rtot(7);
     
-    %Preallocating space for the Req values (according to Stone et al.) for
-    %each combination of IgG and FcgR per flavor of TNP-X-BSA.
-    Req4 = zeros(6,4);
-    Req26 = zeros(6,4);
-
-    %Finding Req values by means of bisection algorithm
+    %Get expected value of MFIs from Equation 7 from Stone
+    mfiExpPre = zeros(6,8);
     for j = 1:6
         for k = 1:4
-            Req4(j,k) = ReqFuncSolver(Rtot(j), kd(j,k), L(1), v(1), kx);
-            Req26(j,k) = ReqFuncSolver(Rtot(j), kd(j,k), L(2), v(2), kx);
+            mfiExpPre(j,k) = StoneSolver(Rtot(j),Kx,v(1),Kd(j,k),tnpbsa(1),biCoefMat);
+            mfiExpPre(j,k+4) = StoneSolver(Rtot(j),Kx,v(2),Kd(j,k),tnpbsa(2),biCoefMat);
         end
     end
-    %Preventing errors in global optimization due to failure of the
-    %above local solver
-    if max(max(Req4 == 1000)) || max(max(Req26 == 1000))
-        J = 1E8;
+    
+    %Check for undefined values (errors from ReqFuncSolver)
+    if max(max(mfiExpPre == -1))
+        J = 1e8;
         mfiExpPre = [];
         mfiExp = [];
-        return;
+        return
     end
     
-    Req4 = 10.^Req4;
-    Req26 = 10.^Req26;
-    
-%   R is a one-dimensional vector whose first six elements are
-%   expression levels of FcgRIA, FcgRIIA-Arg, etc. and whose seventh
-%   element is kx (see RegressionAndResiduals.m). kd is a 6 X 4
-%   matrix whose elements represent the Kd values associated with each
-%   flavor of immunoglobulin per flavor of receptor. tnpbsa is derived in
-%   loadData.m, as is mfiAdjMean; v is the valency of the TNP-X-BSA.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    %Create a matrix of coefficients of the form:
-    %v!/((v-i)!*i!)*10^(kx+i-1)*tnpbsa
-    %for all i from 1 to v for all v from 1 to 10
-    CoefVec4 = biCoefMat(1:v(1),v(1)) .* Rtot(size(Rtot,1)).^((1:v(1))'-1)*L(1);
-    CoefVec26 = biCoefMat(1:v(2),v(2)) .* Rtot(size(Rtot,1)).^((1:v(2))'-1)*L(2);
-    
-    %Creating matrix of expected MFIs; takes a few steps to do so
-    mfiExpPre4 = zeros(6,4);
-    mfiExpPre26 = zeros(6,4);
+    %Create array of expected values to calculate residuals
+    mfiExp = zeros(24,8);
     for j = 1:6
         for k = 1:4
-            mfiExpPre4(j,k) = nansum(CoefVec4.*Req4(j,k).^(1:v(1))');
-            mfiExpPre26(j,k) = nansum(CoefVec26.*Req26(j,k).^(1:v(2))');
+            mfiExp((4*(j-1)+k),1:4) = mfiExpPre(j,k)*ones(1,4);
+            mfiExp((4*(j-1)+k),5:8) = mfiExpPre(j,k+4)*ones(1,4);
         end
     end
-    mfiExpPre4 = mfiExpPre4./kd;
-    mfiExpPre26 = mfiExpPre26./kd;
-    mfiExpPre = [mfiExpPre4 mfiExpPre26];
-        
-    mfiExp4 = zeros(24,4);
-    mfiExp26 = zeros(24,4);
-    for j = 1:6
-        for k = 1:4
-            mfiExp4((4*(j-1)+k),:) = mfiExpPre4(j,k)*ones(1,4);
-            mfiExp26((4*(j-1)+k),:) = mfiExpPre26(j,k)*ones(1,4);
-        end
-    end
-    %Expected MFIs
-    mfiExp = [mfiExp4, mfiExp26];
     
     %Error
-    J = nansum(nansum([(mfiExp4 - mfiAdjMean4).^2, (mfiExp26 - mfiAdjMean26).^2]));
+    J = nansum(nansum((mfiExp-mfiAdjMean).^2));
 end
