@@ -24,7 +24,7 @@ proppdf = @(x,y) 0;
 %Pseudo-random generator of new points to test
 proprnd = @(x) x+normrnd(0,0.01,1,7);
 %Probability distribution of interest
-pdf = @(x) PDF(x',kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa,meanPerCond,stdPerCond);
+pdf = @(x) PDF_mex(x',kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa,meanPerCond,stdPerCond);
 
 %Run Metropolis-Hastings algorithm
 [sample,accept] = mhsample(start,nsamples,'logpdf',pdf,'logproppdf',proppdf,'proprnd',proprnd,'symmetric',1);
