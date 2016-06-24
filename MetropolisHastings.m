@@ -18,30 +18,31 @@ end
 %%%put into Error
 start = best';
 %Number of samples for MCMC
-nsamples = 3000;
+nsamples = 100000;
 %Log probability proposal distribution
 proppdf = @(x,y) 0;
 %Pseudo-random generator of new points to test
-proprnd = @(x) x+normrnd(0,0.01,1,7);
+proprnd = @(x) x+normrnd(0,0.039,1,7);
 %Probability distribution of interest
 pdf = @(x) PDF_mex(x',kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa,meanPerCond,stdPerCond);
 
 %Run Metropolis-Hastings algorithm
-[sample,accept] = mhsample(start,nsamples,'logpdf',pdf,'logproppdf',proppdf,'proprnd',proprnd,'symmetric',1);
+[sample,accept] = mhsample(start,nsamples,'logpdf',pdf,'logproppdf',proppdf, ...
+    'proprnd',proprnd,'symmetric',1,'burnin',200);
 
 %Collect the errors for each element in the chain. Also, collect the list
 %of all displacements in log space and "standard" space from the best fit
 %point. From these displacements, find the distances in log space and in
 %standard space.
 errors = zeros(nsamples,1);
-dispFromBest = zeros(size(sample));
-distFromBest = zeros(nsamples,1);
-rdispFromBest = zeros(size(sample));
-rdistFromBest = zeros(nsamples,1);
+% dispFromBest = zeros(size(sample));
+% distFromBest = zeros(nsamples,1);
+% rdispFromBest = zeros(size(sample));
+% rdistFromBest = zeros(nsamples,1);
 for j = 1:nsamples
     errors(j) = Error(sample(j,:)', kdBruhns, mfiAdjMean, v, biCoefMat, tnpbsa);
-    dispFromBest(j,:) = best' - sample(j,:);
-    distFromBest(j) = sqrt(nansum(dispFromBest(j,:).^2));
-    rdispFromBest(j,:) = 10.^best' - 10.^sample(j,:);
-    rdistFromBest(j) = sqrt(nansum(rdispFromBest(j,:).^2));
+%     dispFromBest(j,:) = best' - sample(j,:);
+%     distFromBest(j) = sqrt(nansum(dispFromBest(j,:).^2));
+%     rdispFromBest(j,:) = 10.^best' - 10.^sample(j,:);
+%     rdistFromBest(j) = sqrt(nansum(rdispFromBest(j,:).^2));
 end
