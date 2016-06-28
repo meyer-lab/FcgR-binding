@@ -18,23 +18,23 @@
 #include "PDF_data.h"
 
 /* Variable Definitions */
-static emlrtRSInfo f_emlrtRSI = { 6, "StoneSolver",
+static emlrtRSInfo g_emlrtRSI = { 6, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m" };
 
-static emlrtRSInfo g_emlrtRSI = { 15, "StoneSolver",
+static emlrtRSInfo h_emlrtRSI = { 15, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m" };
 
-static emlrtRSInfo h_emlrtRSI = { 24, "StoneSolver",
+static emlrtRSInfo i_emlrtRSI = { 24, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m" };
 
-static emlrtRSInfo i_emlrtRSI = { 13, "log10",
+static emlrtRSInfo j_emlrtRSI = { 13, "log10",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\elfun\\log10.m"
 };
 
-static emlrtRSInfo j_emlrtRSI = { 21, "colon",
+static emlrtRSInfo k_emlrtRSI = { 21, "colon",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\colon.m" };
 
-static emlrtRSInfo p_emlrtRSI = { 13, "sum",
+static emlrtRSInfo q_emlrtRSI = { 13, "sum",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\datafun\\sum.m"
 };
 
@@ -121,16 +121,16 @@ real_T StoneSolver(const emlrtStack *sp, real_T Rtot, real_T Kx, real_T v,
   /* Using the information given, finds the sum L presented in Equation 7 */
   /* in Stone. In this context, all inputs save biCoefMat are scalars. */
   /* Solve for Req, as described in Equation 2 in Stone */
-  st.site = &f_emlrtRSI;
+  st.site = &g_emlrtRSI;
 
   /* -------------------------------------------------------------------------- */
   /* %%This function returns the point at which function fun equals zero */
   /* %%using the bisection algorithm. The closest a and b will converge to */
   /* %%in the algorithm is a distance 1e-12 apart. */
   a = -20.0;
-  b_st.site = &h_emlrtRSI;
+  b_st.site = &i_emlrtRSI;
   if (Rtot < 0.0) {
-    c_st.site = &i_emlrtRSI;
+    c_st.site = &j_emlrtRSI;
     error(&c_st);
   }
 
@@ -206,8 +206,8 @@ real_T StoneSolver(const emlrtStack *sp, real_T Rtot, real_T Kx, real_T v,
       x_data[cdiff] = biCoefMat[cdiff + 26 * ((int32_T)v - 1)];
     }
 
-    st.site = &g_emlrtRSI;
-    b_st.site = &j_emlrtRSI;
+    st.site = &h_emlrtRSI;
+    b_st.site = &k_emlrtRSI;
     ndbl = (int32_T)muDoubleScalarFloor((v - 1.0) + 0.5);
     apnd = ndbl + 1;
     cdiff = (ndbl - (int32_T)v) + 1;
@@ -247,7 +247,7 @@ real_T StoneSolver(const emlrtStack *sp, real_T Rtot, real_T Kx, real_T v,
       b_y_data[cdiff] = y_data[cdiff] - 1.0;
     }
 
-    st.site = &g_emlrtRSI;
+    st.site = &h_emlrtRSI;
     power(&st, Kx, b_y_data, y_size, y_data, b_y_size);
     for (cdiff = 0; cdiff < 2; cdiff++) {
       x[cdiff] = x_size[cdiff];
@@ -264,8 +264,8 @@ real_T StoneSolver(const emlrtStack *sp, real_T Rtot, real_T Kx, real_T v,
       x_data[cdiff] = b_y * (x_data[cdiff] * y_data[cdiff]);
     }
 
-    st.site = &g_emlrtRSI;
-    b_st.site = &j_emlrtRSI;
+    st.site = &h_emlrtRSI;
+    b_st.site = &k_emlrtRSI;
     ndbl = (int32_T)muDoubleScalarFloor((v - 1.0) + 0.5);
     apnd = ndbl + 1;
     cdiff = (ndbl - (int32_T)v) + 1;
@@ -301,7 +301,7 @@ real_T StoneSolver(const emlrtStack *sp, real_T Rtot, real_T Kx, real_T v,
       }
     }
 
-    st.site = &g_emlrtRSI;
+    st.site = &h_emlrtRSI;
     power(&st, Req, y_data, b_y_size, b_y_data, y_size);
     for (cdiff = 0; cdiff < 2; cdiff++) {
       b_x[cdiff] = x_size[cdiff];
@@ -312,13 +312,13 @@ real_T StoneSolver(const emlrtStack *sp, real_T Rtot, real_T Kx, real_T v,
       emlrtSizeEqCheckNDR2012b(&b_x[0], &iv0[0], &b_emlrtECI, sp);
     }
 
-    st.site = &g_emlrtRSI;
+    st.site = &h_emlrtRSI;
     x_size[0] = 1;
     for (cdiff = 0; cdiff < loop_ub; cdiff++) {
       x_data[cdiff] *= b_y_data[cdiff];
     }
 
-    b_st.site = &p_emlrtRSI;
+    b_st.site = &q_emlrtRSI;
     if ((loop_ub == 1) || (loop_ub != 1)) {
       p = true;
     } else {

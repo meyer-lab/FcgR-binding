@@ -8,4 +8,4 @@ for j = 1:26
 end
 
 v = [4;26];
-PDF(best,kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa,meanPerCond,stdPerCond)
+PDF(ones(1,11),kdBruhns,mfiAdjMean,biCoefMat,tnpbsa,meanPerCond,stdPerCond)

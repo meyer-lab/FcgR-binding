@@ -3,8 +3,6 @@ clear;clc;
 %Loading basic parameters
 [kd, tnpbsa, mfiAdjMean, kdBruhns, best, meanPerCond, stdPerCond] = loadData;
 
-%Set valencies
-v = [4;26];
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
 %all i from 1 to v for all v from 1 to 26
 biCoefMat = zeros(26,26);
@@ -14,21 +12,28 @@ for j = 1:26
     end
 end
 
+%Get probabilities of poission random variable for values 1 to 25 to reduce
+%runtime. This vector is passed into PROPRND
+x = 0:25;
+poissVec = poisspdf(x,1);
+
 %%%Note carefully that start is a row vector that must be transposed to be
 %%%put into Error
-start = best';
+start = ones(1,11);
+start(1:9) = -10*ones(1,9);
 %Number of samples for MCMC
-nsamples = 100000;
+nsamples = 10000;
 %Log probability proposal distribution
-proppdf = @(x,y) 0;
-%Pseudo-random generator of new points to test
-proprnd = @(x) x+normrnd(0,0.039,1,7);
+proppdf = @(x,y) -sum((x(1:9)-y(1:9)).^2);
+%Pseudo-random generator of new points to test; 0.039 gives accept of about
+%0.23
+proprnd = @(x) PROPRND(x);
 %Probability distribution of interest
-pdf = @(x) PDF_mex(x',kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa,meanPerCond,stdPerCond);
+pdf = @(x) PDF_mex(x,kdBruhns,mfiAdjMean,biCoefMat,tnpbsa,meanPerCond,stdPerCond);
 
 %Run Metropolis-Hastings algorithm
 [sample,accept] = mhsample(start,nsamples,'logpdf',pdf,'logproppdf',proppdf, ...
-    'proprnd',proprnd,'symmetric',1,'burnin',200);
+    'proprnd',proprnd,'symmetric',0,'burnin',0);
 
 %Collect the errors for each element in the chain. Also, collect the list
 %of all displacements in log space and "standard" space from the best fit
@@ -40,7 +45,7 @@ errors = zeros(nsamples,1);
 % rdispFromBest = zeros(size(sample));
 % rdistFromBest = zeros(nsamples,1);
 for j = 1:nsamples
-    errors(j) = Error(sample(j,:)', kdBruhns, mfiAdjMean, v, biCoefMat, tnpbsa);
+    errors(j) = ErrorAvidityChange(sample(j,:)', kdBruhns, mfiAdjMean, biCoefMat, tnpbsa);
 %     dispFromBest(j,:) = best' - sample(j,:);
 %     distFromBest(j) = sqrt(nansum(dispFromBest(j,:).^2));
 %     rdispFromBest(j,:) = 10.^best' - 10.^sample(j,:);
