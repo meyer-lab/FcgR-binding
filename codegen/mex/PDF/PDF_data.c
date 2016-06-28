@@ -20,16 +20,16 @@ const volatile char_T *emlrtBreakCheckR2012bFlagVar = NULL;
 emlrtContext emlrtContextGlobal = { true, false, 131419U, NULL, "PDF", NULL,
   false, { 2433290357U, 2237796540U, 4066813863U, 833189415U }, NULL };
 
-emlrtRSInfo k_emlrtRSI = { 79, "colon",
+emlrtRSInfo l_emlrtRSI = { 79, "colon",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\colon.m" };
 
-emlrtRSInfo l_emlrtRSI = { 283, "colon",
+emlrtRSInfo m_emlrtRSI = { 283, "colon",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\colon.m" };
 
-emlrtRSInfo m_emlrtRSI = { 49, "power",
+emlrtRSInfo n_emlrtRSI = { 49, "power",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\power.m" };
 
-emlrtRSInfo s_emlrtRSI = { 37, "mpower",
+emlrtRSInfo t_emlrtRSI = { 37, "mpower",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\mpower.m"
 };
 
