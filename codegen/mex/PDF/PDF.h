@@ -26,10 +26,10 @@
 #include "PDF_types.h"
 
 /* Function Declarations */
-extern real_T PDF(const emlrtStack *sp, const real_T x[7], const real_T kd[24],
-                  const real_T mfiAdjMean[192], const real_T v[2], const real_T
-                  biCoefMat[676], const real_T tnpbsa[2], const real_T
-                  meanPerCond[48], const real_T stdPerCond[48]);
+extern real_T PDF(const emlrtStack *sp, const real_T x[11], const real_T kd[24],
+                  const real_T mfiAdjMean[192], const real_T biCoefMat[676],
+                  const real_T tnpbsa[2], const real_T meanPerCond[48], const
+                  real_T stdPerCond[48]);
 
 #ifdef __WATCOMC__
 

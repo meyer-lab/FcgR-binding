@@ -29,10 +29,10 @@
 <a name="17"><font color="#888888 "><i>   17   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;PDF_data.h&quot;</font>
 <a name="18"><font color="#888888 "><i>   18   </i></font></a>
 <a name="19"><font color="#888888 "><i>   19   </i></font></a><font color="#117755"><i>/* Variable Definitions */</i></font>
-<a name="20"><font color="#888888 "><i>   20   </i></font></a><font color="#112266"><b>static</b></font> emlrtRSInfo <a name="var_n_emlrtRSI">n_emlrtRSI</a> = <b>{</b> 58, <font color="#1122ff">&quot;power&quot;</font>,
+<a name="20"><font color="#888888 "><i>   20   </i></font></a><font color="#112266"><b>static</b></font> emlrtRSInfo <a name="var_o_emlrtRSI">o_emlrtRSI</a> = <b>{</b> 58, <font color="#1122ff">&quot;power&quot;</font>,
 <a name="21"><font color="#888888 "><i>   21   </i></font></a>  <font color="#1122ff">&quot;C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\power.m&quot;</font> <b>}</b>;
 <a name="22"><font color="#888888 "><i>   22   </i></font></a>
-<a name="23"><font color="#888888 "><i>   23   </i></font></a><font color="#112266"><b>static</b></font> emlrtRSInfo <a name="var_o_emlrtRSI">o_emlrtRSI</a> = <b>{</b> 73, <font color="#1122ff">&quot;applyScalarFunction&quot;</font>,
+<a name="23"><font color="#888888 "><i>   23   </i></font></a><font color="#112266"><b>static</b></font> emlrtRSInfo <a name="var_p_emlrtRSI">p_emlrtRSI</a> = <b>{</b> 73, <font color="#1122ff">&quot;applyScalarFunction&quot;</font>,
 <a name="24"><font color="#888888 "><i>   24   </i></font></a>  <font color="#1122ff">&quot;C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\eml\\+coder\\+internal\\applyScalarFunction.m&quot;</font>
 <a name="25"><font color="#888888 "><i>   25   </i></font></a><b>}</b>;
 <a name="26"><font color="#888888 "><i>   26   </i></font></a>
@@ -50,13 +50,13 @@
 <a name="38"><font color="#888888 "><i>   38   </i></font></a>  emlrtStack c_st;
 <a name="39"><font color="#888888 "><i>   39   </i></font></a>  st.prev = sp;
 <a name="40"><font color="#888888 "><i>   40   </i></font></a>  st.tls = sp-&gt;tls;
-<a name="41"><font color="#888888 "><i>   41   </i></font></a>  st.site = &amp;<a href="PDF_data_c.html#var_m_emlrtRSI" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_m_emlrtRSI');" target="_self"><font color="#1122aa">m_emlrtRSI</font></a>;
+<a name="41"><font color="#888888 "><i>   41   </i></font></a>  st.site = &amp;<a href="PDF_data_c.html#var_n_emlrtRSI" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_n_emlrtRSI');" target="_self"><font color="#1122aa">n_emlrtRSI</font></a>;
 <a name="42"><font color="#888888 "><i>   42   </i></font></a>  b_st.prev = &amp;st;
 <a name="43"><font color="#888888 "><i>   43   </i></font></a>  b_st.tls = st.tls;
 <a name="44"><font color="#888888 "><i>   44   </i></font></a>  c_st.prev = &amp;b_st;
 <a name="45"><font color="#888888 "><i>   45   </i></font></a>  c_st.tls = b_st.tls;
-<a name="46"><font color="#888888 "><i>   46   </i></font></a>  b_st.site = &amp;<a href="#var_n_emlrtRSI" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_n_emlrtRSI');" target="_self"><font color="#1122aa">n_emlrtRSI</font></a>;
-<a name="47"><font color="#888888 "><i>   47   </i></font></a>  c_st.site = &amp;<a href="#var_o_emlrtRSI" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_o_emlrtRSI');" target="_self"><font color="#1122aa">o_emlrtRSI</font></a>;
+<a name="46"><font color="#888888 "><i>   46   </i></font></a>  b_st.site = &amp;<a href="#var_o_emlrtRSI" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_o_emlrtRSI');" target="_self"><font color="#1122aa">o_emlrtRSI</font></a>;
+<a name="47"><font color="#888888 "><i>   47   </i></font></a>  c_st.site = &amp;<a href="#var_p_emlrtRSI" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_p_emlrtRSI');" target="_self"><font color="#1122aa">p_emlrtRSI</font></a>;
 <a name="48"><font color="#888888 "><i>   48   </i></font></a>  y_size[0] = 1;
 <a name="49"><font color="#888888 "><i>   49   </i></font></a>  y_size[1] = (int8_T)b_size[1];
 <a name="50"><font color="#888888 "><i>   50   </i></font></a>  <font color="#112266"><b>if</b></font> (<a href="scalexpAlloc_c.html#fcn_dimagree" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_dimagree');" target="_self"><font color="#1122aa">dimagree</font></a>(y_size, b_size)) <b>{</b>
