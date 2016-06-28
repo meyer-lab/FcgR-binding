@@ -3,30 +3,33 @@
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
  *
- * Error.c
+ * ErrorAvidityChange.c
  *
- * Code generation for function 'Error'
+ * Code generation for function 'ErrorAvidityChange'
  *
  */
 
 /* Include files */
 #include "rt_nonfinite.h"
 #include "PDF.h"
-#include "Error.h"
+#include "ErrorAvidityChange.h"
 #include "StoneSolver.h"
 #include "PDF_data.h"
 
 /* Variable Definitions */
-static emlrtRSInfo c_emlrtRSI = { 15, "Error",
-  "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\Error.m" };
+static emlrtRSInfo c_emlrtRSI = { 9, "ErrorAvidityChange",
+  "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\ErrorAvidityChange.m" };
 
 static emlrtRSInfo d_emlrtRSI = { 16, "Error",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\Error.m" };
 
-static emlrtRSInfo e_emlrtRSI = { 38, "Error",
+static emlrtRSInfo e_emlrtRSI = { 18, "Error",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\Error.m" };
 
-static emlrtRSInfo q_emlrtRSI = { 7, "nansum",
+static emlrtRSInfo f_emlrtRSI = { 45, "Error",
+  "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\Error.m" };
+
+static emlrtRSInfo r_emlrtRSI = { 7, "nansum",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\stats\\eml\\nansum.m" };
 
 static emlrtBCInfo emlrtBCI = { 1, 8, 128, 13, "", "nan_sum_or_mean",
@@ -42,67 +45,87 @@ static emlrtBCInfo c_emlrtBCI = { 1, 192, 100, 23, "", "nan_sum_or_mean",
   0 };
 
 /* Function Definitions */
-void Error(const emlrtStack *sp, real_T Rtot[7], const real_T Kd[24], const
-           real_T mfiAdjMean[192], const real_T v[2], const real_T biCoefMat[676],
-           const real_T tnpbsa[2], real_T *J, real_T mfiExp_data[], int32_T
-           mfiExp_size[2], real_T mfiExpPre[48])
+void ErrorAvidityChange(const emlrtStack *sp, const real_T RtotTrue[11], const
+  real_T Kd[24], const real_T mfiAdjMean[192], const real_T biCoefMat[676],
+  const real_T tnpbsa[2], real_T *J, real_T mfiExp_data[], int32_T mfiExp_size[2],
+  real_T mfiExpPre[48])
 {
-  real_T y[7];
-  int32_T ixstart;
+  real_T Rtot[9];
   int32_T k;
   real_T Kx;
+  real_T mfiExpPrePre[48];
   int32_T j;
+  int32_T ixstart;
+  int32_T ix;
   boolean_T varargin_1[48];
   boolean_T maxval[8];
   int32_T i;
   boolean_T mtmp;
-  int32_T ix;
   real_T a[192];
   real_T b_varargin_1[192];
-  real_T b_y[8];
+  real_T y[8];
   int32_T iy;
   real_T s;
   emlrtStack st;
   emlrtStack b_st;
+  emlrtStack c_st;
   st.prev = sp;
   st.tls = sp->tls;
   b_st.prev = &st;
   b_st.tls = st.tls;
+  c_st.prev = &b_st;
+  c_st.tls = b_st.tls;
+
+  /* Treats the last two elements of RtotTrue as the effective avidities of */
+  /* TNP-4-BSA and TNP-26-BSA respectively (as of June 27, 2016, these are */
+  /* elements 10 and 11). Runs Error.m inputting these two avidities as a */
+  /* two-dimensional column vector which is passed into Error as the vector */
+  /* v. */
+  st.site = &c_emlrtRSI;
 
   /*  If error is called with Rtot being a single value, assume we want to */
   /*  have constant expression across all the receptors */
   /* Convert from log scale */
-  for (ixstart = 0; ixstart < 7; ixstart++) {
-    y[ixstart] = Rtot[ixstart];
-  }
-
-  for (k = 0; k < 7; k++) {
-    Rtot[k] = muDoubleScalarPower(10.0, y[k]);
+  for (k = 0; k < 9; k++) {
+    Rtot[k] = muDoubleScalarPower(10.0, RtotTrue[k]);
   }
 
   Kx = Rtot[6];
 
-  /* Get expected value of MFIs from Equation 7 from Stone */
-  memset(&mfiExpPre[0], 0, 48U * sizeof(real_T));
+  /* Get expected value of MFIs (before conversion factors) from Equation 7 */
+  /* from Stone */
+  memset(&mfiExpPrePre[0], 0, 48U * sizeof(real_T));
   j = 0;
   while (j < 6) {
     k = 0;
     while (k < 4) {
-      st.site = &c_emlrtRSI;
-      mfiExpPre[j + 6 * k] = StoneSolver(&st, Rtot[j], Kx, v[0], Kd[j + 6 * k],
-        tnpbsa[0], biCoefMat);
-      st.site = &d_emlrtRSI;
-      mfiExpPre[j + 6 * (4 + k)] = StoneSolver(&st, Rtot[j], Kx, v[1], Kd[j + 6 *
-        k], tnpbsa[1], biCoefMat);
+      b_st.site = &d_emlrtRSI;
+      mfiExpPrePre[j + 6 * k] = StoneSolver(&b_st, Rtot[j], Kx, RtotTrue[9],
+        Kd[j + 6 * k], tnpbsa[0], biCoefMat);
+      b_st.site = &e_emlrtRSI;
+      mfiExpPrePre[j + 6 * (4 + k)] = StoneSolver(&b_st, Rtot[j], Kx, RtotTrue
+        [10], Kd[j + 6 * k], tnpbsa[1], biCoefMat);
       k++;
       if (*emlrtBreakCheckR2012bFlagVar != 0) {
-        emlrtBreakCheckR2012b(sp);
+        emlrtBreakCheckR2012b(&st);
       }
     }
 
     j++;
     if (*emlrtBreakCheckR2012bFlagVar != 0) {
-      emlrtBreakCheckR2012b(sp);
+      emlrtBreakCheckR2012b(&st);
+    }
+  }
+
+  /* Multiply by conversion factors */
+  for (ixstart = 0; ixstart < 48; ixstart++) {
+    mfiExpPre[ixstart] = Rtot[7] * mfiExpPrePre[ixstart];
+  }
+
+  for (ixstart = 0; ixstart < 4; ixstart++) {
+    for (ix = 0; ix < 6; ix++) {
+      mfiExpPre[ix + 6 * (4 + ixstart)] = Rtot[8] * mfiExpPrePre[ix + 6 * (4 +
+        ixstart)];
     }
   }
 
@@ -159,36 +182,36 @@ void Error(const emlrtStack *sp, real_T Rtot[7], const real_T Kd[24], const
 
         k++;
         if (*emlrtBreakCheckR2012bFlagVar != 0) {
-          emlrtBreakCheckR2012b(sp);
+          emlrtBreakCheckR2012b(&st);
         }
       }
 
       j++;
       if (*emlrtBreakCheckR2012bFlagVar != 0) {
-        emlrtBreakCheckR2012b(sp);
+        emlrtBreakCheckR2012b(&st);
       }
     }
 
     /* Error */
-    st.site = &e_emlrtRSI;
+    b_st.site = &f_emlrtRSI;
     for (ixstart = 0; ixstart < 192; ixstart++) {
       a[ixstart] = mfiExp_data[ixstart] - mfiAdjMean[ixstart];
     }
 
-    b_st.site = &m_emlrtRSI;
+    c_st.site = &n_emlrtRSI;
     for (k = 0; k < 192; k++) {
       b_varargin_1[k] = muDoubleScalarPower(a[k], 2.0);
     }
 
-    st.site = &e_emlrtRSI;
-    b_st.site = &q_emlrtRSI;
+    b_st.site = &f_emlrtRSI;
+    c_st.site = &r_emlrtRSI;
     ix = 0;
     iy = 0;
     for (i = 0; i < 8; i++) {
       ixstart = ix;
       ix++;
       if (!((ixstart + 1 >= 1) && (ixstart + 1 <= 192))) {
-        emlrtDynamicBoundsCheckR2012b(ixstart + 1, 1, 192, &c_emlrtBCI, &b_st);
+        emlrtDynamicBoundsCheckR2012b(ixstart + 1, 1, 192, &c_emlrtBCI, &c_st);
       }
 
       if (!muDoubleScalarIsNaN(b_varargin_1[ixstart])) {
@@ -200,7 +223,7 @@ void Error(const emlrtStack *sp, real_T Rtot[7], const real_T Kd[24], const
       for (k = 0; k < 23; k++) {
         ix++;
         if (!((ix >= 1) && (ix <= 192))) {
-          emlrtDynamicBoundsCheckR2012b(ix, 1, 192, &b_emlrtBCI, &b_st);
+          emlrtDynamicBoundsCheckR2012b(ix, 1, 192, &b_emlrtBCI, &c_st);
         }
 
         if (!muDoubleScalarIsNaN(b_varargin_1[ix - 1])) {
@@ -210,19 +233,19 @@ void Error(const emlrtStack *sp, real_T Rtot[7], const real_T Kd[24], const
 
       iy++;
       if (!((iy >= 1) && (iy <= 8))) {
-        emlrtDynamicBoundsCheckR2012b(iy, 1, 8, &emlrtBCI, &b_st);
+        emlrtDynamicBoundsCheckR2012b(iy, 1, 8, &emlrtBCI, &c_st);
       }
 
-      b_y[iy - 1] = s;
+      y[iy - 1] = s;
     }
 
     *J = 0.0;
     for (k = 0; k < 8; k++) {
-      if (!muDoubleScalarIsNaN(b_y[k])) {
-        *J += b_y[k];
+      if (!muDoubleScalarIsNaN(y[k])) {
+        *J += y[k];
       }
     }
   }
 }
 
-/* End of code generation (Error.c) */
+/* End of code generation (ErrorAvidityChange.c) */
