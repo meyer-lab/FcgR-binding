@@ -1,9 +1,4 @@
 function [J, mfiExp, mfiExpPre] = Error(Rtot, Kd, mfiAdjMean, v, biCoefMat, tnpbsa)
-    % If error is called with Rtot being a single value, assume we want to
-    % have constant expression across all the receptors
-    if numel(Rtot) == 4
-        Rtot = [Rtot(1) * ones(6,1); Rtot(2:4)];
-    end
     %Convert from log scale
     Rtot = 10.^Rtot;
     Kx = Rtot(7);
