@@ -3,7 +3,7 @@ clear;clc;
 %Load the Kd values from Mimoto and Bruhns, the molarity of TNP-X-BSA used
 %by Lux (see Figure 2), the normalized, background-MFI-adjusted MFIs from
 %Lux for both TNP-X-BSAs, and the Kd values exclusively from Bruhns
-[kd, tnpbsa, mfiAdjMean, kdBruhns] = loadData();
+[kd, tnpbsa, mfiAdjMean, kdBruhns, ~, meanPerCond, stdPerCond] = loadData();
 %Valency vector
 v = [4; 26];
 %Separate mean-adjusted MFIs into TNP-4-BSA data and TNP-26-BSA data
@@ -28,8 +28,8 @@ opts = optimoptions(@fmincon,'Algorithm','interior-point','Display','off');
 gs = GlobalSearch('StartPointsToRun','bounds','Display','off');
 
 problem = createOptimProblem('fmincon','objective',...
-@(x) Error(x,kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa),'x0',zeros(8,1),...
-    'lb',(-20*ones(8,1)),'ub',5*ones(8,1),'options',opts);
+@(x) Error(x,kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa),'x0',zeros(9,1),...
+    'lb',(-20*ones(9,1)),'ub',5*ones(9,1),'options',opts);
 [best, bestFit,exitflag] = run(gs,problem);
 
 [~,mfiExp] = Error(best,kdBruhns,mfiAdjMean,v,biCoefMat,tnpbsa);
