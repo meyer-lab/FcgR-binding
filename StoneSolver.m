@@ -20,11 +20,13 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     %%%using the bisection algorithm. The closest a and b will converge to
     %%%in the algorithm is a distance 1e-12 apart.
     
+    viLikdi = vi*Li/kdi;
+    
     a = -20;
     b = log10(R);
     
-    bVal = fun(b, R, kdi, Li, vi, kx);
-    cVal = fun(a, R, kdi, Li, vi, kx);
+    bVal = fun(b, R, vi, kx, viLikdi);
+    cVal = fun(a, R, vi, kx, viLikdi);
     
     % Is there no root within the interval?
     if bVal*cVal > 0
@@ -38,7 +40,7 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     %Commence algorithm
     while b - a > 1e-4 || abs(cVal) > 1e-4
         c = (a+b)/2;
-        cVal = fun(c, R, kdi, Li, vi, kx);
+        cVal = fun(c, R, vi, kx, viLikdi);
         
         if cVal*bVal >= 0
             b = c;
@@ -49,6 +51,7 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     end
 end
 %--------------------------------------------------------------------------
-function diff = fun(x, R, kdi, Li, vi, kx)
-    diff = R - 10^x*(1+vi*Li/kdi*(1+kx*10^x)^(vi-1));
+function diff = fun(x, R, vi, kx, viLikdi)
+    x = 10.^x;
+    diff = R - x*(1+viLikdi*(1+kx*x)^(vi-1));
 end
