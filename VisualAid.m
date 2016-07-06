@@ -12,36 +12,27 @@ for j = 1:26
     end
 end
 
-%Load aicbest; this is the point which yields the lowest AIC with both
-%simulated annealing and MATLAB's genetic algorithm. This is to get the
-%best fits for the TNP-BSA-to-MFI conversion factors
-load('aicbest.mat')
-%Common logs of TNP-BSA-to-MFI conversion factors
-convfac = aicbest(8:9)';
+%Set up options for simulated annealing
+options = saoptimset('display','off');
 
-%Dimensions correspond to IgG, IgG (the repeat is intentional; see below),
-%FcgR, TNP-BSA avidity, and Kx, respectively. The script will pore through 
-%Kx values by integer order of magnitude ranging from -10 to -3.
-utilTens = zeros(4,4,6,26,8);
-
-%Vector representing Kx orders of magnitude
-ordmagKx = [-10:-3];
-
-%Iterate through TNP-4-BSA avidities, TNP-26-BSA avidities, and Kx orders
-%of magnitude
-for j = 1:26
-    for k = 1:8
-        x = [3*ones(6,1);ordmagKx(k);convfac;1;j];
-        [~,~,mfiExpPre] = ErrorAvidityChange(x,kdBruhns,...
-            mfiAdjMean,biCoefMat,tnpbsa);
-        for l = 1:6
-            tempMat = zeros(4);
-            for m = 1:4
-                for n = 1:4
-                    tempMat(m,n) = mfiExpPre(l,m+4) - mfiExpPre(l,n+4);
-                end
-            end
-            utilTens(:,:,l,j,k) = tempMat;
+%Run simulated annealing for each pair of FcgRs
+bigDiff = zeros(3,6,6);
+Diff = zeros(6,6);
+check = zeros(6,6);
+for j = 1:6
+    for k = 1:6
+        if j == k
+            bigDiff(:,j,k) = NaN*ones(3,1);
+            Diff(j,k) = NaN;
+        else
+            [x,fval,exitflag,output] = simulannealbnd(@(x) -playSimAnneal(x,...
+                kdBruhns,mfiAdjMean,biCoefMat,tnpbsa,j,k),[4,26,5],...
+                [1,1,-20],[4,26,5],options);
+            bigDiff(:,j,k) = x;
+            Diff(j,k) = fval;
+            check(j,k) = exitflag;
         end
     end
 end
+figure
+bar3(-Diff)
