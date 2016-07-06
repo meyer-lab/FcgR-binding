@@ -5,7 +5,7 @@
  * File: ErrorAvidityChange.c
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 27-Jun-2016 22:01:50
+ * C/C++ source code generated on  : 30-Jun-2016 10:18:23
  */
 
 /* Include Files */
@@ -38,8 +38,9 @@ void ErrorAvidityChange(const double RtotTrue[11], const double Kd[24], const
   double mfiAdjMean[192], const double biCoefMat[676], const double tnpbsa[2],
   double *J, double mfiExp_data[], int mfiExp_size[2], double mfiExpPre[48])
 {
-  double Rtot[9];
+  double x[2];
   int k;
+  double Rtot[9];
   double Kx;
   double mfiExpPrePre[48];
   int j;
@@ -56,6 +57,10 @@ void ErrorAvidityChange(const double RtotTrue[11], const double Kd[24], const
 
   /*  If error is called with Rtot being a single value, assume we want to */
   /*  have constant expression across all the receptors */
+  for (k = 0; k < 2; k++) {
+    x[k] = ceil(RtotTrue[k + 9]);
+  }
+
   /* Convert from log scale */
   for (k = 0; k < 9; k++) {
     Rtot[k] = rt_powd_snf(10.0, RtotTrue[k]);
@@ -68,10 +73,10 @@ void ErrorAvidityChange(const double RtotTrue[11], const double Kd[24], const
   memset(&mfiExpPrePre[0], 0, 48U * sizeof(double));
   for (j = 0; j < 6; j++) {
     for (k = 0; k < 4; k++) {
-      mfiExpPrePre[j + 6 * k] = StoneSolver(Rtot[j], Kx, RtotTrue[9], Kd[j + 6 *
-        k], tnpbsa[0], biCoefMat);
-      mfiExpPrePre[j + 6 * (4 + k)] = StoneSolver(Rtot[j], Kx, RtotTrue[10],
-        Kd[j + 6 * k], tnpbsa[1], biCoefMat);
+      mfiExpPrePre[j + 6 * k] = StoneSolver(Rtot[j], Kx, x[0], Kd[j + 6 * k],
+        tnpbsa[0], biCoefMat);
+      mfiExpPrePre[j + 6 * (4 + k)] = StoneSolver(Rtot[j], Kx, x[1], Kd[j + 6 *
+        k], tnpbsa[1], biCoefMat);
     }
   }
 

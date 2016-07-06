@@ -12,6 +12,7 @@ function L = StoneSolver(Rtot,Kx,v,Kd,L0,biCoefMat)
     %Convert from logarithmic scale
     Req = 10^Req;
     
+    v = v;
     L = sum(L0/Kd*(biCoefMat(1:v,v)'.*(Kx.^([1:v]-1))).*Req.^[1:v]);
 end
 %--------------------------------------------------------------------------
