@@ -22,7 +22,7 @@ end
 start = y;
 % start(1:9) = -10*ones(1,9);
 %Number of samples for MCMC
-nsamples = 100000;
+nsamples = 10000;
 %Log probability proposal distribution
 proppdf = @(x,y) -sum((x(1:9)-y(1:9)).^2);
 %Pseudo-random generator of new points to test; 0.039 gives accept of about
@@ -33,7 +33,7 @@ pdf = @(x) PDF_mex(x,kdBruhns,mfiAdjMean,biCoefMat,tnpbsa,meanPerCond,stdPerCond
 
 %Run Metropolis-Hastings algorithm
 [sample,accept] = mhsample(start,nsamples,'logpdf',pdf,'logproppdf',proppdf, ...
-    'proprnd',proprnd,'symmetric',0,'burnin',0);
+    'proprnd',proprnd,'symmetric',0,'burnin',1000);
 
 %Collect the errors for each element in the chain. Also, collect the list
 %of all displacements in log space and "standard" space from the best fit

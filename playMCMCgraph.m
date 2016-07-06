@@ -23,5 +23,12 @@ function z = playMCMCgraph(sample,arg)
 %         covariance(:,7) = nan*ones(7,1);
         bar3(covariance)
         title('Covariance')
+    elseif arg == 3
+        for j = 1:11
+            plot(sample(:,j));
+            pause
+        end
+    else
+        error('Insert integer argument 0 through 3');
     end
 end

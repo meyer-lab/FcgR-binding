@@ -7,8 +7,10 @@ function next = PROPRND(current)
     
     while next(10) < 1 || 4 < next(10) 
         next(10) = v4+randi(3)-2;
+%         next(10) = v4+(2*(randi(2)-1)-1)*exprnd(1);
     end
     while next(11) < 1 || 26 < next(11)
         next(11) = v26+randi(3)-2;
+%         next(11) = v26+(2*(randi(2)-1)-1)*exprnd(1);
     end
 end
