@@ -11,7 +11,7 @@ SRC_FILES =  \
 	PDF_initialize.c \
 	PDF_terminate.c \
 	PDF.c \
-	ErrorAvidityChange.c \
+	Error.c \
 	power.c \
 	scalexpAlloc.c \
 	error1.c \

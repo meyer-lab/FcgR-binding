@@ -5,7 +5,7 @@
  * File: StoneSolver.c
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 27-Jun-2016 22:01:50
+ * C/C++ source code generated on  : 30-Jun-2016 10:18:23
  */
 
 /* Include Files */
@@ -32,8 +32,10 @@ double StoneSolver(double Rtot, double Kx, double v, double Kd, double L0, const
                    double biCoefMat[676])
 {
   double L;
+  double viLikdi;
   double a;
   double b;
+  double x;
   double bVal;
   double cVal;
   double Req;
@@ -47,7 +49,6 @@ double StoneSolver(double Rtot, double Kx, double v, double Kd, double L0, const
   int y_size[2];
   int tmp_size[2];
   double tmp_data[26];
-  double y;
   int b_y_size[2];
 
   /* Solve for Req, as described in Equation 2 in Stone */
@@ -55,16 +56,17 @@ double StoneSolver(double Rtot, double Kx, double v, double Kd, double L0, const
   /* %%using the bisection algorithm. The closest a and b will converge to */
   /* %%in the algorithm is a distance 1e-12 apart. */
   /* -------------------------------------------------------------------------- */
+  viLikdi = v * L0 / Kd;
   a = -20.0;
   b = log10(Rtot);
 
   /* -------------------------------------------------------------------------- */
-  bVal = Rtot - rt_powd_snf(10.0, b) * (1.0 + v * L0 / Kd * rt_powd_snf(1.0 + Kx
-    * rt_powd_snf(10.0, b), v - 1.0));
+  x = rt_powd_snf(10.0, b);
+  bVal = Rtot - x * (1.0 + viLikdi * rt_powd_snf(1.0 + Kx * x, v - 1.0));
 
   /* -------------------------------------------------------------------------- */
-  cVal = Rtot - 1.0000000000000001E-20 * (1.0 + v * L0 / Kd * rt_powd_snf(1.0 +
-    Kx * 1.0000000000000001E-20, v - 1.0));
+  cVal = Rtot - 1.0000000000000001E-20 * (1.0 + viLikdi * rt_powd_snf(1.0 + Kx *
+    1.0000000000000001E-20, v - 1.0));
 
   /*  Is there no root within the interval? */
   if (bVal * cVal > 0.0) {
@@ -79,8 +81,8 @@ double StoneSolver(double Rtot, double Kx, double v, double Kd, double L0, const
       Req = (a + b) / 2.0;
 
       /* -------------------------------------------------------------------------- */
-      cVal = Rtot - rt_powd_snf(10.0, Req) * (1.0 + v * L0 / Kd * rt_powd_snf
-        (1.0 + Kx * rt_powd_snf(10.0, Req), v - 1.0));
+      x = rt_powd_snf(10.0, Req);
+      cVal = Rtot - x * (1.0 + viLikdi * rt_powd_snf(1.0 + Kx * x, v - 1.0));
       if (cVal * bVal >= 0.0) {
         b = Req;
         bVal = cVal;
@@ -141,7 +143,7 @@ double StoneSolver(double Rtot, double Kx, double v, double Kd, double L0, const
     }
 
     power(Kx, b_y_data, y_size, tmp_data, tmp_size);
-    y = L0 / Kd;
+    x = L0 / Kd;
     ndbl = (int)floor((v - 1.0) + 0.5);
     apnd = ndbl + 1;
     cdiff = (ndbl - (int)v) + 1;
@@ -178,7 +180,7 @@ double StoneSolver(double Rtot, double Kx, double v, double Kd, double L0, const
 
     power(Req, y_data, b_y_size, b_y_data, y_size);
     for (cdiff = 0; cdiff < loop_ub; cdiff++) {
-      y_data[cdiff] = y * (biCoefMat[cdiff + 26 * ((int)v - 1)] *
+      y_data[cdiff] = x * (biCoefMat[cdiff + 26 * ((int)v - 1)] *
                            tmp_data[tmp_size[0] * cdiff]) * b_y_data[y_size[0] *
         cdiff];
     }
