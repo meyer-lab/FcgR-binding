@@ -6,7 +6,8 @@ clear;clc;
 %Loading basic parameters
 [kd, tnpbsa, mfiAdjMean, kdBruhns, best, meanPerCond, stdPerCond] = loadData;
 
-%Load y
+%Load x and y
+load('x.mat')
 load('y.mat')
 
 %Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
