@@ -9,9 +9,9 @@ function [J, mfiExp, mfiExpPre] = Error(Rtot, Kd, mfiAdjMean, v, biCoefMat, tnpb
     for j = 1:6
         for k = 1:4
             mfiExpPrePre(j,k) = StoneSolver(Rtot(j),Kx,v(1),Kd(j,k), ...
-                tnpbsa(1),biCoefMat);
+                tnpbsa,biCoefMat);
             mfiExpPrePre(j,k+4) = StoneSolver(Rtot(j),Kx,v(2),Kd(j,k), ...
-                tnpbsa(2),biCoefMat);
+                tnpbsa,biCoefMat);
         end
     end
     

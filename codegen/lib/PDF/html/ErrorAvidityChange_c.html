@@ -17,7 +17,7 @@
 <a name="5"><font color="#888888 "><i>    5   </i></font></a><font color="#117755"><I> * File: ErrorAvidityChange.c</i></font>
 <a name="6"><font color="#888888 "><i>    6   </i></font></a><font color="#117755"><I> *</i></font>
 <a name="7"><font color="#888888 "><i>    7   </i></font></a><font color="#117755"><I> * MATLAB Coder version            : 3.0</i></font>
-<a name="8"><font color="#888888 "><i>    8   </i></font></a><font color="#117755"><I> * C/C++ source code generated on  : 30-Jun-2016 10:18:23</i></font>
+<a name="8"><font color="#888888 "><i>    8   </i></font></a><font color="#117755"><I> * C/C++ source code generated on  : 07-Jul-2016 12:53:52</i></font>
 <a name="9"><font color="#888888 "><i>    9   </i></font></a><font color="#117755"><I> */</i></font>
 <a name="10"><font color="#888888 "><i>   10   </i></font></a>
 <a name="11"><font color="#888888 "><i>   11   </i></font></a><font color="#117755"><i>/* Include Files */</i></font>
@@ -36,19 +36,19 @@
 <a name="24"><font color="#888888 "><i>   24   </i></font></a><font color="#117755"><I> * two-dimensional column vector which is passed into Error as the vector</i></font>
 <a name="25"><font color="#888888 "><i>   25   </i></font></a><font color="#117755"><I> * v.</i></font>
 <a name="26"><font color="#888888 "><i>   26   </i></font></a><font color="#117755"><I> * Arguments    : const double RtotTrue[11]</i></font>
-<a name="27"><font color="#888888 "><i>   27   </i></font></a><font color="#117755"><I> *                const double Kd[24]</i></font>
+<a name="27"><font color="#888888 "><i>   27   </i></font></a><font color="#117755"><I> *                const double Kd[60]</i></font>
 <a name="28"><font color="#888888 "><i>   28   </i></font></a><font color="#117755"><I> *                const double mfiAdjMean[192]</i></font>
 <a name="29"><font color="#888888 "><i>   29   </i></font></a><font color="#117755"><I> *                const double biCoefMat[676]</i></font>
-<a name="30"><font color="#888888 "><i>   30   </i></font></a><font color="#117755"><I> *                const double tnpbsa[2]</i></font>
+<a name="30"><font color="#888888 "><i>   30   </i></font></a><font color="#117755"><I> *                double tnpbsa</i></font>
 <a name="31"><font color="#888888 "><i>   31   </i></font></a><font color="#117755"><I> *                double *J</i></font>
 <a name="32"><font color="#888888 "><i>   32   </i></font></a><font color="#117755"><I> *                double mfiExp_data[]</i></font>
 <a name="33"><font color="#888888 "><i>   33   </i></font></a><font color="#117755"><I> *                int mfiExp_size[2]</i></font>
 <a name="34"><font color="#888888 "><i>   34   </i></font></a><font color="#117755"><I> *                double mfiExpPre[48]</i></font>
 <a name="35"><font color="#888888 "><i>   35   </i></font></a><font color="#117755"><I> * Return Type  : void</i></font>
 <a name="36"><font color="#888888 "><i>   36   </i></font></a><font color="#117755"><I> */</i></font>
-<a name="37"><font color="#888888 "><i>   37   </i></font></a><font color="#112266"><b>void</b></font> <a name="fcn_ErrorAvidityChange">ErrorAvidityChange</a>(<font color="#112266"><b>const</b></font> <font color="#112266"><b>double</b></font> RtotTrue[11], <font color="#112266"><b>const</b></font> <font color="#112266"><b>double</b></font> Kd[24], <font color="#112266"><b>const</b></font>
-<a name="38"><font color="#888888 "><i>   38   </i></font></a>  <font color="#112266"><b>double</b></font> mfiAdjMean[192], <font color="#112266"><b>const</b></font> <font color="#112266"><b>double</b></font> biCoefMat[676], <font color="#112266"><b>const</b></font> <font color="#112266"><b>double</b></font> tnpbsa[2],
-<a name="39"><font color="#888888 "><i>   39   </i></font></a>  <font color="#112266"><b>double</b></font> *J, <font color="#112266"><b>double</b></font> mfiExp_data[], <font color="#112266"><b>int</b></font> mfiExp_size[2], <font color="#112266"><b>double</b></font> mfiExpPre[48])
+<a name="37"><font color="#888888 "><i>   37   </i></font></a><font color="#112266"><b>void</b></font> <a name="fcn_ErrorAvidityChange">ErrorAvidityChange</a>(<font color="#112266"><b>const</b></font> <font color="#112266"><b>double</b></font> RtotTrue[11], <font color="#112266"><b>const</b></font> <font color="#112266"><b>double</b></font> Kd[60], <font color="#112266"><b>const</b></font>
+<a name="38"><font color="#888888 "><i>   38   </i></font></a>  <font color="#112266"><b>double</b></font> mfiAdjMean[192], <font color="#112266"><b>const</b></font> <font color="#112266"><b>double</b></font> biCoefMat[676], <font color="#112266"><b>double</b></font> tnpbsa, <font color="#112266"><b>double</b></font> *J,
+<a name="39"><font color="#888888 "><i>   39   </i></font></a>  <font color="#112266"><b>double</b></font> mfiExp_data[], <font color="#112266"><b>int</b></font> mfiExp_size[2], <font color="#112266"><b>double</b></font> mfiExpPre[48])
 <a name="40"><font color="#888888 "><i>   40   </i></font></a><b>{</b>
 <a name="41"><font color="#888888 "><i>   41   </i></font></a>  <font color="#112266"><b>double</b></font> x[2];
 <a name="42"><font color="#888888 "><i>   42   </i></font></a>  <font color="#112266"><b>int</b></font> k;
@@ -86,9 +86,9 @@
 <a name="74"><font color="#888888 "><i>   74   </i></font></a>  <font color="#112266"><b>for</b></font> (j = 0; j &lt; 6; j++) <b>{</b>
 <a name="75"><font color="#888888 "><i>   75   </i></font></a>    <font color="#112266"><b>for</b></font> (k = 0; k &lt; 4; k++) <b>{</b>
 <a name="76"><font color="#888888 "><i>   76   </i></font></a>      mfiExpPrePre[j + 6 * k] = <a href="StoneSolver_c.html#fcn_StoneSolver" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_StoneSolver');" target="_self"><font color="#1122aa">StoneSolver</font></a>(Rtot[j], Kx, x[0], Kd[j + 6 * k],
-<a name="77"><font color="#888888 "><i>   77   </i></font></a>        tnpbsa[0], biCoefMat);
+<a name="77"><font color="#888888 "><i>   77   </i></font></a>        tnpbsa, biCoefMat);
 <a name="78"><font color="#888888 "><i>   78   </i></font></a>      mfiExpPrePre[j + 6 * (4 + k)] = <a href="StoneSolver_c.html#fcn_StoneSolver" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_StoneSolver');" target="_self"><font color="#1122aa">StoneSolver</font></a>(Rtot[j], Kx, x[1], Kd[j + 6 *
-<a name="79"><font color="#888888 "><i>   79   </i></font></a>        k], tnpbsa[1], biCoefMat);
+<a name="79"><font color="#888888 "><i>   79   </i></font></a>        k], tnpbsa, biCoefMat);
 <a name="80"><font color="#888888 "><i>   80   </i></font></a>    <b>}</b>
 <a name="81"><font color="#888888 "><i>   81   </i></font></a>  <b>}</b>
 <a name="82"><font color="#888888 "><i>   82   </i></font></a>

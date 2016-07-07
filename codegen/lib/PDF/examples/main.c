@@ -5,7 +5,7 @@
  * File: main.c
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 30-Jun-2016 10:18:23
+ * C/C++ source code generated on  : 07-Jul-2016 12:53:52
  */
 
 /*************************************************************************/
@@ -44,8 +44,7 @@ static void argInit_1x11_real_T(double result[11]);
 static void argInit_24x2_real_T(double result[48]);
 static void argInit_24x8_real_T(double result[192]);
 static void argInit_26x26_real_T(double result[676]);
-static void argInit_2x1_real_T(double result[2]);
-static void argInit_6x4_real_T(double result[24]);
+static void argInit_6x10_real_T(double result[60]);
 static double argInit_real_T(void);
 static void main_PDF(void);
 
@@ -125,33 +124,17 @@ static void argInit_26x26_real_T(double result[676])
 }
 
 /*
- * Arguments    : double result[2]
+ * Arguments    : double result[60]
  * Return Type  : void
  */
-static void argInit_2x1_real_T(double result[2])
-{
-  int idx0;
-
-  /* Loop over the array to initialize each element. */
-  for (idx0 = 0; idx0 < 2; idx0++) {
-    /* Set the value of the array element.
-       Change this value to the value that the application requires. */
-    result[idx0] = argInit_real_T();
-  }
-}
-
-/*
- * Arguments    : double result[24]
- * Return Type  : void
- */
-static void argInit_6x4_real_T(double result[24])
+static void argInit_6x10_real_T(double result[60])
 {
   int idx0;
   int idx1;
 
   /* Loop over the array to initialize each element. */
   for (idx0 = 0; idx0 < 6; idx0++) {
-    for (idx1 = 0; idx1 < 4; idx1++) {
+    for (idx1 = 0; idx1 < 10; idx1++) {
       /* Set the value of the array element.
          Change this value to the value that the application requires. */
       result[idx0 + 6 * idx1] = argInit_real_T();
@@ -175,12 +158,11 @@ static double argInit_real_T(void)
 static void main_PDF(void)
 {
   double dv0[11];
-  double dv1[24];
+  double dv1[60];
   double dv2[192];
   double dv3[676];
-  double dv4[2];
+  double dv4[48];
   double dv5[48];
-  double dv6[48];
   double logprob;
 
   /* Initialize function 'PDF' input arguments. */
@@ -188,18 +170,16 @@ static void main_PDF(void)
   /* Initialize function input argument 'kd'. */
   /* Initialize function input argument 'mfiAdjMean'. */
   /* Initialize function input argument 'biCoefMat'. */
-  /* Initialize function input argument 'tnpbsa'. */
   /* Initialize function input argument 'meanPerCond'. */
   /* Initialize function input argument 'stdPerCond'. */
   /* Call the entry-point 'PDF'. */
   argInit_1x11_real_T(dv0);
-  argInit_6x4_real_T(dv1);
+  argInit_6x10_real_T(dv1);
   argInit_24x8_real_T(dv2);
   argInit_26x26_real_T(dv3);
-  argInit_2x1_real_T(dv4);
+  argInit_24x2_real_T(dv4);
   argInit_24x2_real_T(dv5);
-  argInit_24x2_real_T(dv6);
-  logprob = PDF(dv0, dv1, dv2, dv3, dv4, dv5, dv6);
+  logprob = PDF(dv0, dv1, dv2, dv3, argInit_real_T(), dv4, dv5);
 }
 
 /*
