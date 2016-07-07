@@ -5,7 +5,7 @@
  * File: ErrorAvidityChange.c
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 30-Jun-2016 10:18:23
+ * C/C++ source code generated on  : 07-Jul-2016 12:53:52
  */
 
 /* Include Files */
@@ -24,19 +24,19 @@
  * two-dimensional column vector which is passed into Error as the vector
  * v.
  * Arguments    : const double RtotTrue[11]
- *                const double Kd[24]
+ *                const double Kd[60]
  *                const double mfiAdjMean[192]
  *                const double biCoefMat[676]
- *                const double tnpbsa[2]
+ *                double tnpbsa
  *                double *J
  *                double mfiExp_data[]
  *                int mfiExp_size[2]
  *                double mfiExpPre[48]
  * Return Type  : void
  */
-void ErrorAvidityChange(const double RtotTrue[11], const double Kd[24], const
-  double mfiAdjMean[192], const double biCoefMat[676], const double tnpbsa[2],
-  double *J, double mfiExp_data[], int mfiExp_size[2], double mfiExpPre[48])
+void ErrorAvidityChange(const double RtotTrue[11], const double Kd[60], const
+  double mfiAdjMean[192], const double biCoefMat[676], double tnpbsa, double *J,
+  double mfiExp_data[], int mfiExp_size[2], double mfiExpPre[48])
 {
   double x[2];
   int k;
@@ -74,9 +74,9 @@ void ErrorAvidityChange(const double RtotTrue[11], const double Kd[24], const
   for (j = 0; j < 6; j++) {
     for (k = 0; k < 4; k++) {
       mfiExpPrePre[j + 6 * k] = StoneSolver(Rtot[j], Kx, x[0], Kd[j + 6 * k],
-        tnpbsa[0], biCoefMat);
+        tnpbsa, biCoefMat);
       mfiExpPrePre[j + 6 * (4 + k)] = StoneSolver(Rtot[j], Kx, x[1], Kd[j + 6 *
-        k], tnpbsa[1], biCoefMat);
+        k], tnpbsa, biCoefMat);
     }
   }
 

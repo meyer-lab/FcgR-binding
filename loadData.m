@@ -11,9 +11,7 @@ function [kd, tnpbsa, mfiAdjMean, kdBruhns, best, meanPerCond, stdPerCond] = loa
     %TNP is about 229.1 Da. The contration of TNP-X-BSA in the solution 
     %described in Figure 2 is 5 micrograms per milliliter. Molecular
     %weights found from Wikipedia.
-    tnpbsa4 = 1/67379 * 1e-3 * 5;
-    tnpbsa26 = 1/72420 * 1e-3 * 5;
-    tnpbsa = [tnpbsa4;tnpbsa26];
+    tnpbsa = 1/66463*5*10^(-3);
     
     %Load the Kd values we found in the literature
     kd = csvread('FcR-Kd.csv',1,1);

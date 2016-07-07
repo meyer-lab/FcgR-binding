@@ -36,9 +36,9 @@ static emlrtECInfo emlrtECI = { 2, 18, 15, "ErrorAvidityChange",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\ErrorAvidityChange.m" };
 
 /* Function Definitions */
-real_T PDF(const emlrtStack *sp, const real_T x[11], const real_T kd[24], const
-           real_T mfiAdjMean[192], const real_T biCoefMat[676], const real_T
-           tnpbsa[2], const real_T meanPerCond[48], const real_T stdPerCond[48])
+real_T PDF(const emlrtStack *sp, const real_T x[11], const real_T kd[60], const
+           real_T mfiAdjMean[192], const real_T biCoefMat[676], real_T tnpbsa,
+           const real_T meanPerCond[48], const real_T stdPerCond[48])
 {
   real_T logprob;
   real_T dv0[2];
