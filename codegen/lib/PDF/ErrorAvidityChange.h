@@ -5,7 +5,7 @@
  * File: ErrorAvidityChange.h
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 30-Jun-2016 10:18:23
+ * C/C++ source code generated on  : 07-Jul-2016 12:53:52
  */
 
 #ifndef __ERRORAVIDITYCHANGE_H__
@@ -21,10 +21,9 @@
 #include "PDF_types.h"
 
 /* Function Declarations */
-extern void ErrorAvidityChange(const double RtotTrue[11], const double Kd[24],
-  const double mfiAdjMean[192], const double biCoefMat[676], const double
-  tnpbsa[2], double *J, double mfiExp_data[], int mfiExp_size[2], double
-  mfiExpPre[48]);
+extern void ErrorAvidityChange(const double RtotTrue[11], const double Kd[60],
+  const double mfiAdjMean[192], const double biCoefMat[676], double tnpbsa,
+  double *J, double mfiExp_data[], int mfiExp_size[2], double mfiExpPre[48]);
 
 #endif
 
