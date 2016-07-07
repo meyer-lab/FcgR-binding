@@ -10,9 +10,10 @@ function [DimerMat] = DimerFinder(Rtot, Kd, mfiAdjMean, biCoefMat, tnpbsa)
     for j = 1:6
         for k = 1:4
             DimerMat(j,k) = DimerSolver(Rtot(j),Kx,v(1),Kd(j,k), ...
-                tnpbsa,biCoefMat);
+                tnpbsa(1),biCoefMat);
             DimerMat(j,k+4) = DimerSolver(Rtot(j),Kx,v(2),Kd(j,k), ...
-                tnpbsa,biCoefMat);
+                tnpbsa(2),biCoefMat);
+            DimerMat = DimerMat;
         end
     end
 end

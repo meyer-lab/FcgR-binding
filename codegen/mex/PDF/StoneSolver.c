@@ -21,10 +21,10 @@
 static emlrtRSInfo g_emlrtRSI = { 6, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m" };
 
-static emlrtRSInfo h_emlrtRSI = { 16, "StoneSolver",
+static emlrtRSInfo h_emlrtRSI = { 15, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m" };
 
-static emlrtRSInfo i_emlrtRSI = { 27, "StoneSolver",
+static emlrtRSInfo i_emlrtRSI = { 26, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m" };
 
 static emlrtRSInfo j_emlrtRSI = { 13, "log10",
@@ -38,22 +38,22 @@ static emlrtRSInfo q_emlrtRSI = { 13, "sum",
   "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\datafun\\sum.m"
 };
 
-static emlrtDCInfo emlrtDCI = { 16, 30, "StoneSolver",
+static emlrtDCInfo emlrtDCI = { 15, 30, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m", 1 };
 
-static emlrtBCInfo d_emlrtBCI = { 1, 26, 16, 30, "biCoefMat", "StoneSolver",
+static emlrtBCInfo d_emlrtBCI = { 1, 26, 15, 30, "biCoefMat", "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m", 0 };
 
-static emlrtDCInfo b_emlrtDCI = { 16, 34, "StoneSolver",
+static emlrtDCInfo b_emlrtDCI = { 15, 34, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m", 1 };
 
-static emlrtBCInfo e_emlrtBCI = { 1, 26, 16, 34, "biCoefMat", "StoneSolver",
+static emlrtBCInfo e_emlrtBCI = { 1, 26, 15, 34, "biCoefMat", "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m", 0 };
 
-static emlrtECInfo b_emlrtECI = { 2, 16, 20, "StoneSolver",
+static emlrtECInfo b_emlrtECI = { 2, 15, 20, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m" };
 
-static emlrtECInfo c_emlrtECI = { 2, 16, 13, "StoneSolver",
+static emlrtECInfo c_emlrtECI = { 2, 15, 13, "StoneSolver",
   "C:\\Users\\ryan\\Documents\\GitHub\\recepnum1\\StoneSolver.m" };
 
 static emlrtRTEInfo b_emlrtRTEI = { 19, 15, "sumprod",
