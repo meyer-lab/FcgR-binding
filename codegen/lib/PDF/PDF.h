@@ -5,7 +5,7 @@
  * File: PDF.h
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 07-Jul-2016 12:53:52
+ * C/C++ source code generated on  : 30-Jun-2016 10:18:23
  */
 
 #ifndef __PDF_H__
@@ -21,9 +21,10 @@
 #include "PDF_types.h"
 
 /* Function Declarations */
-extern double PDF(const double x[11], const double kd[60], const double
-                  mfiAdjMean[192], const double biCoefMat[676], double tnpbsa,
-                  const double meanPerCond[48], const double stdPerCond[48]);
+extern double PDF(const double x[11], const double kd[24], const double
+                  mfiAdjMean[192], const double biCoefMat[676], const double
+                  tnpbsa[2], const double meanPerCond[48], const double
+                  stdPerCond[48]);
 
 #endif
 
