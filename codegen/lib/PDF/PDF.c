@@ -5,7 +5,7 @@
  * File: PDF.c
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 30-Jun-2016 10:18:23
+ * C/C++ source code generated on  : 07-Jul-2016 12:53:52
  */
 
 /* Include Files */
@@ -19,17 +19,17 @@
 /*
  * Find residuals for the model granted current parameters
  * Arguments    : const double x[11]
- *                const double kd[24]
+ *                const double kd[60]
  *                const double mfiAdjMean[192]
  *                const double biCoefMat[676]
- *                const double tnpbsa[2]
+ *                double tnpbsa
  *                const double meanPerCond[48]
  *                const double stdPerCond[48]
  * Return Type  : double
  */
-double PDF(const double x[11], const double kd[24], const double mfiAdjMean[192],
-           const double biCoefMat[676], const double tnpbsa[2], const double
-           meanPerCond[48], const double stdPerCond[48])
+double PDF(const double x[11], const double kd[60], const double mfiAdjMean[192],
+           const double biCoefMat[676], double tnpbsa, const double meanPerCond
+           [48], const double stdPerCond[48])
 {
   double logprob;
   double mfiExpPre[48];

@@ -42,10 +42,10 @@ static emlrtBCInfo c_emlrtBCI = { 1, 192, 100, 23, "", "nan_sum_or_mean",
   0 };
 
 /* Function Definitions */
-void Error(const emlrtStack *sp, real_T Rtot[9], const real_T Kd[24], const
+void Error(const emlrtStack *sp, real_T Rtot[9], const real_T Kd[60], const
            real_T mfiAdjMean[192], const real_T v[2], const real_T biCoefMat[676],
-           const real_T tnpbsa[2], real_T *J, real_T mfiExp_data[], int32_T
-           mfiExp_size[2], real_T mfiExpPre[48])
+           real_T tnpbsa, real_T *J, real_T mfiExp_data[], int32_T mfiExp_size[2],
+           real_T mfiExpPre[48])
 {
   real_T y[9];
   int32_T k;
@@ -87,10 +87,10 @@ void Error(const emlrtStack *sp, real_T Rtot[9], const real_T Kd[24], const
     while (k < 4) {
       st.site = &d_emlrtRSI;
       mfiExpPrePre[j + 6 * k] = StoneSolver(&st, Rtot[j], Kx, v[0], Kd[j + 6 * k],
-        tnpbsa[0], biCoefMat);
+        tnpbsa, biCoefMat);
       st.site = &e_emlrtRSI;
       mfiExpPrePre[j + 6 * (4 + k)] = StoneSolver(&st, Rtot[j], Kx, v[1], Kd[j +
-        6 * k], tnpbsa[1], biCoefMat);
+        6 * k], tnpbsa, biCoefMat);
       k++;
       if (*emlrtBreakCheckR2012bFlagVar != 0) {
         emlrtBreakCheckR2012b(sp);
