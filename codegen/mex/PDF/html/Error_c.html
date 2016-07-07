@@ -54,10 +54,10 @@
 <a name="42"><font color="#888888 "><i>   42   </i></font></a>  0 <b>}</b>;
 <a name="43"><font color="#888888 "><i>   43   </i></font></a>
 <a name="44"><font color="#888888 "><i>   44   </i></font></a><font color="#117755"><i>/* Function Definitions */</i></font>
-<a name="45"><font color="#888888 "><i>   45   </i></font></a><font color="#112266"><b>void</b></font> <a name="fcn_Error">Error</a>(<font color="#112266"><b>const</b></font> emlrtStack *sp, real_T Rtot[9], <font color="#112266"><b>const</b></font> real_T Kd[60], <font color="#112266"><b>const</b></font>
+<a name="45"><font color="#888888 "><i>   45   </i></font></a><font color="#112266"><b>void</b></font> <a name="fcn_Error">Error</a>(<font color="#112266"><b>const</b></font> emlrtStack *sp, real_T Rtot[9], <font color="#112266"><b>const</b></font> real_T Kd[24], <font color="#112266"><b>const</b></font>
 <a name="46"><font color="#888888 "><i>   46   </i></font></a>           real_T mfiAdjMean[192], <font color="#112266"><b>const</b></font> real_T v[2], <font color="#112266"><b>const</b></font> real_T biCoefMat[676],
-<a name="47"><font color="#888888 "><i>   47   </i></font></a>           real_T tnpbsa, real_T *J, real_T mfiExp_data[], int32_T mfiExp_size[2],
-<a name="48"><font color="#888888 "><i>   48   </i></font></a>           real_T mfiExpPre[48])
+<a name="47"><font color="#888888 "><i>   47   </i></font></a>           <font color="#112266"><b>const</b></font> real_T tnpbsa[2], real_T *J, real_T mfiExp_data[], int32_T
+<a name="48"><font color="#888888 "><i>   48   </i></font></a>           mfiExp_size[2], real_T mfiExpPre[48])
 <a name="49"><font color="#888888 "><i>   49   </i></font></a><b>{</b>
 <a name="50"><font color="#888888 "><i>   50   </i></font></a>  real_T y[9];
 <a name="51"><font color="#888888 "><i>   51   </i></font></a>  int32_T k;
@@ -99,10 +99,10 @@
 <a name="87"><font color="#888888 "><i>   87   </i></font></a>    <font color="#112266"><b>while</b></font> (k &lt; 4) <b>{</b>
 <a name="88"><font color="#888888 "><i>   88   </i></font></a>      st.site = &amp;<a href="#var_d_emlrtRSI" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_d_emlrtRSI');" target="_self"><font color="#1122aa">d_emlrtRSI</font></a>;
 <a name="89"><font color="#888888 "><i>   89   </i></font></a>      mfiExpPrePre[j + 6 * k] = <a href="StoneSolver_c.html#fcn_StoneSolver" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_StoneSolver');" target="_self"><font color="#1122aa">StoneSolver</font></a>(&amp;st, Rtot[j], Kx, v[0], Kd[j + 6 * k],
-<a name="90"><font color="#888888 "><i>   90   </i></font></a>        tnpbsa, biCoefMat);
+<a name="90"><font color="#888888 "><i>   90   </i></font></a>        tnpbsa[0], biCoefMat);
 <a name="91"><font color="#888888 "><i>   91   </i></font></a>      st.site = &amp;<a href="#var_e_emlrtRSI" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_e_emlrtRSI');" target="_self"><font color="#1122aa">e_emlrtRSI</font></a>;
 <a name="92"><font color="#888888 "><i>   92   </i></font></a>      mfiExpPrePre[j + 6 * (4 + k)] = <a href="StoneSolver_c.html#fcn_StoneSolver" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_StoneSolver');" target="_self"><font color="#1122aa">StoneSolver</font></a>(&amp;st, Rtot[j], Kx, v[1], Kd[j +
-<a name="93"><font color="#888888 "><i>   93   </i></font></a>        6 * k], tnpbsa, biCoefMat);
+<a name="93"><font color="#888888 "><i>   93   </i></font></a>        6 * k], tnpbsa[1], biCoefMat);
 <a name="94"><font color="#888888 "><i>   94   </i></font></a>      k++;
 <a name="95"><font color="#888888 "><i>   95   </i></font></a>      <font color="#112266"><b>if</b></font> (*<a href="PDF_data_c.html#var_emlrtBreakCheckR2012bFlagVar" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_emlrtBreakCheckR2012bFlagVar');" target="_self"><font color="#1122aa">emlrtBreakCheckR2012bFlagVar</font></a> != 0) <b>{</b>
 <a name="96"><font color="#888888 "><i>   96   </i></font></a>        emlrtBreakCheckR2012b(sp);

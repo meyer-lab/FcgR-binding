@@ -5,7 +5,7 @@
  * File: _coder_PDF_info.c
  *
  * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 07-Jul-2016 12:53:52
+ * C/C++ source code generated on  : 30-Jun-2016 10:18:23
  */
 
 /* Include Files */
@@ -391,7 +391,7 @@ static void info_helper(const mxArray **info)
   emlrtAddField(*info, emlrt_marshallOut("double"), "dominantType", 13);
   emlrtAddField(*info, emlrt_marshallOut(
     "[E]C:/Users/ryan/Documents/GitHub/recepnum1/Error.m"), "resolved", 13);
-  emlrtAddField(*info, b_emlrt_marshallOut(1467909812U), "fileTimeLo", 13);
+  emlrtAddField(*info, b_emlrt_marshallOut(1467218794U), "fileTimeLo", 13);
   emlrtAddField(*info, b_emlrt_marshallOut(0U), "fileTimeHi", 13);
   emlrtAddField(*info, b_emlrt_marshallOut(0U), "mFileTimeLo", 13);
   emlrtAddField(*info, b_emlrt_marshallOut(0U), "mFileTimeHi", 13);
@@ -769,7 +769,7 @@ static void info_helper(const mxArray **info)
   emlrtAddField(*info, emlrt_marshallOut("double"), "dominantType", 36);
   emlrtAddField(*info, emlrt_marshallOut(
     "[E]C:/Users/ryan/Documents/GitHub/recepnum1/StoneSolver.m"), "resolved", 36);
-  emlrtAddField(*info, b_emlrt_marshallOut(1467755209U), "fileTimeLo", 36);
+  emlrtAddField(*info, b_emlrt_marshallOut(1467296102U), "fileTimeLo", 36);
   emlrtAddField(*info, b_emlrt_marshallOut(0U), "fileTimeHi", 36);
   emlrtAddField(*info, b_emlrt_marshallOut(0U), "mFileTimeLo", 36);
   emlrtAddField(*info, b_emlrt_marshallOut(0U), "mFileTimeHi", 36);

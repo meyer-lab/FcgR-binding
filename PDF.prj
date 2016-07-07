@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.coder" plugin-version="R2015b">
-  <configuration build-checksum="3676319811" file="C:\Users\ryan\Documents\GitHub\recepnum1\PDF.prj" location="C:\Users\ryan\Documents\GitHub\recepnum1" name="PDF" target="target.unifiedcoder" target-name="MATLAB Coder">
+  <configuration build-checksum="1549096274" file="C:\Users\ryan\Documents\GitHub\recepnum1\PDF.prj" location="C:\Users\ryan\Documents\GitHub\recepnum1" name="PDF" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -693,7 +693,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>3378662629</param.AnnotationChecksum>
+    <param.AnnotationChecksum>83596757</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -701,12 +701,12 @@
     <var.DismissScreener>true</var.DismissScreener>
     <param.unifiedParamStorage />
     <var.gc.lastOutputRoot>codegen\lib\PDF</var.gc.lastOutputRoot>
-    <var.gc.preBuildChecksum>2792861291</var.gc.preBuildChecksum>
+    <var.gc.preBuildChecksum>676051576</var.gc.preBuildChecksum>
     <var.cfi.lastOutputRoot>codegen\mex\PDF</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>736710463</var.cfi.preBuildChecksum>
+    <var.cfi.preBuildChecksum>2826243972</var.cfi.preBuildChecksum>
     <var.lastCfiTestSnippet>play</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
-    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\Error.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\ErrorAvidityChange.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\PDF.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\StoneSolver.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;276024944&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
+    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\Error.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\ErrorAvidityChange.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\PDF.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\StoneSolver.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;1998208610&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
     <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\Error.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\ErrorAvidityChange.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\PDF.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\StoneSolver.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.configImportActive>false</param.configImportActive>
@@ -835,7 +835,7 @@
           </Input>
           <Input Name="kd">
             <Class>double</Class>
-            <Size>6 x 10</Size>
+            <Size>6 x 4</Size>
             <Value />
             <InitialValue />
             <UserDefined>false</UserDefined>
@@ -859,7 +859,7 @@
           </Input>
           <Input Name="tnpbsa">
             <Class>double</Class>
-            <Size>1 x 1</Size>
+            <Size>2 x 1</Size>
             <Value />
             <InitialValue />
             <UserDefined>false</UserDefined>
