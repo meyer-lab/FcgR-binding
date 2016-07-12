@@ -22,7 +22,7 @@ check = zeros(6,6);
 for j = 1:6
     for k = 1:6
         if j == k
-            bigDiff(:,j,k) = NaN*ones(3,1);
+            bigDiff(2:3,j,k) = NaN*ones(2,1);
             Diff(j,k) = NaN;
         else
             [x,fval,exitflag,output] = simulannealbnd(@(x) -playSimAnneal(x,...
