@@ -1,34 +1,24 @@
-function [L, Rmulti] = Stone(Kd, v, logKx)
-    %Returns the number of mutlivalent ligand bound to a cell with 1000
-    %receptors, and the number of receptor clusters formed on said cell,
-    %granted each epitope of the ligand binds to the receptor kind in 
-    %question with dissociation constant Kd and cross-links with other 
-    %receptors with crosslinking constant Kx = 10^logKx. All equations 
-    %derived from Stone et al. (2001). Assumed that ligand is at saturating
-    %concentration L0 = 7e-8 M, which is as it is (approximately) for 
-    %TNP-4-BSA in Lux et al. (2013).
+function [L] = StoneMod(logR, Kd, v, logKx, L0)
+    %Returns the number of mutlivalent ligand bound to a cell with 10^logR
+    %receptors, granted each epitope of the ligand binds to the receptor
+    %kind in question with dissociation constant Kd and cross-links with
+    %other receptors with crosslinking constant Kx = 10^logKx. All
+    %equations derived from Stone et al. (2001). Assumed that ligand is at
+    %saturating concentration L0 = 7e-8 M, which is as it is (approximately)
+    %for TNP-4-BSA in Lux et al. (2013).
     
-    L0 = 7e-8;    
     Kx = 10^logKx;
-    R = 1e3;
+    R = 10^logR;
     
     %Vector of binomial coefficients
     biCoefVec = zeros(1,v);
     for j = 1:v
-        biCoefVec(j) = nchoosek(v,j)
+        biCoefVec(j) = nchoosek(v,j);
     end
     Req = 10^ReqFuncSolver(R,Kd,L0,v,Kx);
     
     %Calculate L, according to equations 1 and 7
     L = sum(biCoefVec.*(Kx.^([1:v]-1)).*(L0/Kd*(Req.^[1:v])));
-    
-    %Calculate Rmulti, according to equations 1 and 5
-    if v == 1
-        Rmulti = 0;
-    else
-        Rmulti = sum([2:v].*biCoefVec(2:v).*(Kx.^([2:v]-1)).*...
-            (L0/Kd*(Req.^[2:v])));
-    end
 end
 %--------------------------------------------------------------------------
 function c = ReqFuncSolver(R, kdi, Li, vi, kx)
