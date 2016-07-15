@@ -1,4 +1,4 @@
-function [L] = StoneMod(logR, Kd, v, logKx, L0)
+function [L] = StoneMod(logR, Kd, v, logKx, L0, biCoefMat)
     %Returns the number of mutlivalent ligand bound to a cell with 10^logR
     %receptors, granted each epitope of the ligand binds to the receptor
     %kind in question with dissociation constant Kd and cross-links with
@@ -11,10 +11,7 @@ function [L] = StoneMod(logR, Kd, v, logKx, L0)
     R = 10^logR;
     
     %Vector of binomial coefficients
-    biCoefVec = zeros(1,v);
-    for j = 1:v
-        biCoefVec(j) = nchoosek(v,j);
-    end
+    biCoefVec = biCoefMat(1:v,v)';
     Req = 10^ReqFuncSolver(R,Kd,L0,v,Kx);
     
     %Calculate L, according to equations 1 and 7
