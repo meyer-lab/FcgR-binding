@@ -1,0 +1,7 @@
+NormalError_mex.mexw64
+NormalError		NormalError
+NormalError_atexit		NormalError_atexit
+NormalError_initialize		NormalError_initialize
+NormalError_terminate		NormalError_terminate
+emlrtMexFcnProperties		emlrtMexFcnProperties
+mexFunction		mexFunction
