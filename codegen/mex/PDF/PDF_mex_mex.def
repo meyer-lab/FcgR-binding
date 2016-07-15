@@ -1,8 +1,0 @@
-LIBRARY PDF_mex.mexw64
-EXPORTS
-mexFunction
-emlrtMexFcnProperties
-PDF
-PDF_initialize
-PDF_terminate
-PDF_atexit
