@@ -1,21 +1,55 @@
-function [x, fval] = play7(meanPerCond,stdPerCond)
-    [x, fval] = fmincon(@(x) Err(x(1), stdPerCond, meanPerCond, x(2)),[1;1],[],[]);
-end
-%--------------------------------------------------------------------------
-function negJ = Err(a, stdPerCond, meanPerCond, sigma)
-    J = 0;
-    for j = 1:24
-        for k = 1:2
-            J = J + pseudoNormlike(stdPerCond(j,k),a*meanPerCond(j,k),sigma);
-        end
+clear;clc;
+
+%Loading basic parameters
+[kd, tnpbsa, mfiAdjMean, kdBruhns, best, meanPerCond, stdPerCond] = loadData;
+
+%Load tempbest
+load('tempbest.mat')
+
+%Load gong sound
+load gong
+
+%Create a matrix of binomial coefficients of the form v!/((v-i)!*i!) for
+%all i from 1 to v for all v from 1 to 26
+biCoefMat = zeros(30,30);
+for j = 1:30
+    for k = 1:j
+        biCoefMat(k,j) = nchoosek(j,k);
     end
-    negJ = -J;
 end
-%--------------------------------------------------------------------------
-function logprob = pseudoNormlike(x,mu,sigma)
-    %To replace normlike in the function PDF; while normlike returns
-    %negated log probabilities, this function returns log probabilities as
-    %they are.
-    z = (x - mu) / sigma;
-    logprob = -.5 * z^2 - log(sqrt(2.*pi).*sigma);
+
+%%%Note carefully that start is a row vector that must be transposed to be
+%%%put into Error
+start = ones(1,13);
+% start(1:9) = -10*ones(1,9);
+%Number of samples for MCMC
+nsamples = 100000;
+%Log probability proposal distribution
+%proppdf = @(x,y) -sum(([x(1:9), x(12:13)]-[y(1:9), y(12:13)]).^2);
+% proppdf = @(x,y) 1/(1+max(10.^x(1:6))-min(10.^x(1:6)));
+proppdf = @(x,y) 1;
+%Pseudo-random generator of new points to test; 0.039 gives accept of about
+%0.23 for 7 parameters
+proprnd = @(x) PROPRND(x);
+%Probability distribution of interest
+pdf = @(x) NormalError_mex(x,kdBruhns,mfiAdjMean,tnpbsa,meanPerCond,...
+    biCoefMat)*1/(1+max(10.^x(1:6))-min(10.^x(1:6)));
+
+%Run Metropolis-Hastings algorithm
+[sample,accept] = mhsample(start,nsamples,'logpdf',pdf,'proppdf',proppdf, ...
+    'proprnd',proprnd,'symmetric',0,'burnin',1000);
+
+%Collect the errors for each element in the chain. Also, collect the list
+%of all displacements in log space and "standard" space from the best fit
+%point. From these displacements, find the distances in log space and in
+%standard space.
+likelihoods = zeros(nsamples,1);
+for j = 1:nsamples
+    likelihoods(j) = NormalError_mex(sample(j,:),kdBruhns,mfiAdjMean,tnpbsa,...
+        meanPerCond,biCoefMat);
 end
+testsample = sample;
+testsample(:,1:9) = 10.^sample(:,1:9);
+testsample(:,12) = 10.^sample(:,12);
+
+sound(y);
