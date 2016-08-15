@@ -23,6 +23,7 @@
 #include "emlrt.h"
 #include "covrt.h"
 #include "rtwtypes.h"
+#include "omp.h"
 #include "NormalErrorCoef2_types.h"
 
 /* Function Declarations */

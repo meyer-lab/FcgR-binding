@@ -34,7 +34,13 @@ static emlrtRTEInfo d_emlrtRTEI = { 17, 19, "scalexpAlloc",
 void power(const emlrtStack *sp, real_T a, const real_T b_data[], const int32_T
            b_size[2], real_T y_data[], int32_T y_size[2])
 {
+  real_T x;
+  int32_T loop_ub;
+  int32_T i0;
+  real_T b_y_data[30];
   int32_T k;
+  int32_T b_k;
+  jmp_buf * volatile emlrtJBStack;
   emlrtStack st;
   emlrtStack b_st;
   emlrtStack c_st;
@@ -46,6 +52,12 @@ void power(const emlrtStack *sp, real_T a, const real_T b_data[], const int32_T
   c_st.prev = &b_st;
   c_st.tls = b_st.tls;
   b_st.site = &p_emlrtRSI;
+  x = a;
+  loop_ub = b_size[0] * b_size[1];
+  for (i0 = 0; i0 < loop_ub; i0++) {
+    b_y_data[i0] = b_data[i0];
+  }
+
   c_st.site = &q_emlrtRSI;
   y_size[0] = 1;
   y_size[1] = (int8_T)b_size[1];
@@ -54,9 +66,21 @@ void power(const emlrtStack *sp, real_T a, const real_T b_data[], const int32_T
     emlrtErrorWithMessageIdR2012b(&c_st, &d_emlrtRTEI, "MATLAB:dimagree", 0);
   }
 
-  for (k = 0; k + 1 <= b_size[1]; k++) {
-    y_data[k] = muDoubleScalarPower(a, b_data[k]);
+  loop_ub = b_size[1];
+  emlrtEnterParallelRegion(&b_st, omp_in_parallel());
+  emlrtPushJmpBuf(&b_st, &emlrtJBStack);
+
+#pragma omp parallel for \
+ num_threads(emlrtAllocRegionTLSs(b_st.tls, omp_in_parallel(), omp_get_max_threads(), omp_get_num_procs())) \
+ private(b_k)
+
+  for (k = 1; k <= loop_ub; k++) {
+    b_k = k;
+    y_data[b_k - 1] = muDoubleScalarPower(x, b_y_data[b_k - 1]);
   }
+
+  emlrtPopJmpBuf(&b_st, &emlrtJBStack);
+  emlrtExitParallelRegion(&b_st, omp_in_parallel());
 }
 
 /* End of code generation (power.c) */

@@ -18,23 +18,23 @@
 
 /* Variable Definitions */
 static emlrtRSInfo emlrtRSI = { 15, "NormalErrorCoef2",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
 
 static emlrtRSInfo b_emlrtRSI = { 16, "NormalErrorCoef2",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
 
 static emlrtRSInfo c_emlrtRSI = { 21, "NormalErrorCoef2",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
 
 static emlrtRSInfo d_emlrtRSI = { 26, "NormalErrorCoef2",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
 
 static emlrtRSInfo e_emlrtRSI = { 13, "log10",
   "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\lib\\matlab\\elfun\\log10.m"
 };
 
 static emlrtRSInfo s_emlrtRSI = { 34, "NormalErrorCoef2",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m" };
 
 static emlrtRSInfo u_emlrtRSI = { 13, "log",
   "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\lib\\matlab\\elfun\\log.m" };
@@ -55,15 +55,15 @@ static emlrtBCInfo c_emlrtBCI = { 1, 192, 100, 23, "", "nan_sum_or_mean",
   0 };
 
 static emlrtBCInfo d_emlrtBCI = { 1, 6, 13, 24, "KdMat", "NormalErrorCoef2",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m", 0 };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m", 0 };
 
 static emlrtDCInfo emlrtDCI = { 13, 24, "NormalErrorCoef2",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m", 1 };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m", 1 };
 
 /* Function Definitions */
-real_T NormalErrorCoef2(const emlrtStack *sp, const real_T Rtot[12], const
-  real_T KdMat[60], const real_T mfiAdjMean[192], const real_T tnpbsa[2], const
-  real_T meanPerCond[48], const real_T biCoefMat[900], real_T whichR)
+real_T NormalErrorCoef2(const emlrtStack *sp, const real_T Rtot[7], const real_T
+  KdMat[60], const real_T mfiAdjMean[192], const real_T tnpbsa[2], const real_T
+  meanPerCond[48], const real_T biCoefMat[900], real_T whichR)
 {
   real_T logSqrErr;
   real_T sigCoef;

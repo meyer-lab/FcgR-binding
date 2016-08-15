@@ -23,12 +23,13 @@
 #include "emlrt.h"
 #include "covrt.h"
 #include "rtwtypes.h"
+#include "omp.h"
 #include "NormalErrorCoef2_types.h"
 
 /* Function Declarations */
-extern real_T NormalErrorCoef2(const emlrtStack *sp, const real_T Rtot[12],
-  const real_T KdMat[60], const real_T mfiAdjMean[192], const real_T tnpbsa[2],
-  const real_T meanPerCond[48], const real_T biCoefMat[900], real_T whichR);
+extern real_T NormalErrorCoef2(const emlrtStack *sp, const real_T Rtot[7], const
+  real_T KdMat[60], const real_T mfiAdjMean[192], const real_T tnpbsa[2], const
+  real_T meanPerCond[48], const real_T biCoefMat[900], real_T whichR);
 
 #ifdef __WATCOMC__
 
