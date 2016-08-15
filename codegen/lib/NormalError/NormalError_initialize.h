@@ -4,12 +4,12 @@
  * government, commercial, or other organizational use.
  * File: NormalError_initialize.h
  *
- * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 15-Jul-2016 09:48:12
+ * MATLAB Coder version            : 3.1
+ * C/C++ source code generated on  : 10-Aug-2016 17:24:40
  */
 
-#ifndef __NORMALERROR_INITIALIZE_H__
-#define __NORMALERROR_INITIALIZE_H__
+#ifndef NORMALERROR_INITIALIZE_H
+#define NORMALERROR_INITIALIZE_H
 
 /* Include Files */
 #include <math.h>

@@ -1,0 +1,8 @@
+LIBRARY NormalError2_mex.mexw64
+EXPORTS
+mexFunction
+emlrtMexFcnProperties
+NormalError2
+NormalError2_initialize
+NormalError2_terminate
+NormalError2_atexit

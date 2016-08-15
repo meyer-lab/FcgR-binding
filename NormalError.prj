@@ -1,5 +1,5 @@
-<deployment-project plugin="plugin.coder" plugin-version="R2015b">
-  <configuration build-checksum="3426065504" file="C:\Users\ryan\Documents\GitHub\recepnum1\NormalError.prj" location="C:\Users\ryan\Documents\GitHub\recepnum1" name="NormalError" target="target.unifiedcoder" target-name="MATLAB Coder">
+<deployment-project plugin="plugin.coder" plugin-version="R2016a">
+  <configuration build-checksum="1081999586" file="C:\Users\mitadm\Documents\GitHub\recepnum2\recepnum1-e341e5ae190230fa1e37b36ad6975b293cd98acc\NormalError.prj" location="C:\Users\mitadm\Documents\GitHub\recepnum2\recepnum1-e341e5ae190230fa1e37b36ad6975b293cd98acc" name="NormalError" target="target.unifiedcoder" target-name="MATLAB Coder">
     <profile key="profile.mex">
       <param.BuiltInstrumentedMex>false</param.BuiltInstrumentedMex>
       <param.RanInstrumentedMex>false</param.RanInstrumentedMex>
@@ -50,6 +50,7 @@
       <param.EnableOpenMP>true</param.EnableOpenMP>
       <param.InitFltsAndDblsToZero>true</param.InitFltsAndDblsToZero>
       <param.ConstantInputs>option.ConstantInputs.CheckValues</param.ConstantInputs>
+      <param.EnableCRICodeCoverage>true</param.EnableCRICodeCoverage>
       <unset>
         <param.BuiltInstrumentedMex />
         <param.RanInstrumentedMex />
@@ -97,6 +98,7 @@
         <param.EnableOpenMP />
         <param.InitFltsAndDblsToZero />
         <param.ConstantInputs />
+        <param.EnableCRICodeCoverage />
       </unset>
     </profile>
     <profile key="profile.c">
@@ -230,6 +232,7 @@
       <param.EnableOpenMP>true</param.EnableOpenMP>
       <param.InitFltsAndDblsToZero>true</param.InitFltsAndDblsToZero>
       <param.PassStructByReference>true</param.PassStructByReference>
+      <param.CustomLAPACKCallback />
       <param.UseECoderFeatures>true</param.UseECoderFeatures>
       <unset>
         <param.WorkingFolder />
@@ -330,6 +333,7 @@
         <param.EnableOpenMP />
         <param.InitFltsAndDblsToZero />
         <param.PassStructByReference />
+        <param.CustomLAPACKCallback />
         <param.UseECoderFeatures />
       </unset>
     </profile>
@@ -368,6 +372,7 @@
       <param.SearchPaths />
       <param.hdl.MapPersistentVarsToRAM />
       <param.hdl.RAMThreshold />
+      <param.hdl.MapPipelineDelaysToRAM />
       <param.hdl.RAMVariableNames />
       <param.hdl.RegisterInputs />
       <param.hdl.RegisterOutputs />
@@ -537,6 +542,7 @@
         <param.SearchPaths />
         <param.hdl.MapPersistentVarsToRAM />
         <param.hdl.RAMThreshold />
+        <param.hdl.MapPipelineDelaysToRAM />
         <param.hdl.RAMVariableNames />
         <param.hdl.RegisterInputs />
         <param.hdl.RegisterOutputs />
@@ -676,7 +682,7 @@
     <param.objective>option.objective.c</param.objective>
     <param.WorkflowStep>workflowSummary</param.WorkflowStep>
     <param.TestSnippets>
-      <item>play7</item>
+      <item>NormalErrorCnct;NormalErrorCnct(ones(1,12));</item>
     </param.TestSnippets>
     <param.DefaultImportExportVariable>config</param.DefaultImportExportVariable>
     <param.UseGlobals>option.UseGlobals.No</param.UseGlobals>
@@ -693,7 +699,7 @@
     <param.AutoInferUnboundedSizeThreshold>2048</param.AutoInferUnboundedSizeThreshold>
     <param.EnableFixedPointStep>false</param.EnableFixedPointStep>
     <param.EnableScreener>true</param.EnableScreener>
-    <param.AnnotationChecksum>867243727</param.AnnotationChecksum>
+    <param.AnnotationChecksum>1435163152</param.AnnotationChecksum>
     <var.LegacyTarget />
     <var.MirrorOnOpen>false</var.MirrorOnOpen>
     <param.FixedPointEnabled>false</param.FixedPointEnabled>
@@ -701,13 +707,13 @@
     <var.DismissScreener>true</var.DismissScreener>
     <param.unifiedParamStorage />
     <var.gc.lastOutputRoot>codegen\lib\NormalError</var.gc.lastOutputRoot>
-    <var.gc.preBuildChecksum>3260761569</var.gc.preBuildChecksum>
+    <var.gc.preBuildChecksum>446765928</var.gc.preBuildChecksum>
     <var.cfi.lastOutputRoot>codegen\mex\NormalError</var.cfi.lastOutputRoot>
-    <var.cfi.preBuildChecksum>2767319095</var.cfi.preBuildChecksum>
-    <var.lastCfiTestSnippet>play7</var.lastCfiTestSnippet>
+    <var.cfi.preBuildChecksum>2280025902</var.cfi.preBuildChecksum>
+    <var.lastCfiTestSnippet>NormalErrorCnct;NormalErrorCnct(ones(1,12));</var.lastCfiTestSnippet>
     <var.outdatedOnRestore>false</var.outdatedOnRestore>
-    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\NormalError.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\StoneMod.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;1997719345&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
-    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\NormalError.m&lt;/file&gt;&lt;file&gt;C:\Users\ryan\Documents\GitHub\recepnum1\StoneMod.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
+    <var.lastUserSourceChecksum>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;checksum&gt;&lt;includedFiles&gt;&lt;file&gt;C:\Users\mitadm\Documents\GitHub\recepnum2\recepnum1-e341e5ae190230fa1e37b36ad6975b293cd98acc\NormalError.m&lt;/file&gt;&lt;file&gt;C:\Users\mitadm\Documents\GitHub\recepnum2\recepnum1-e341e5ae190230fa1e37b36ad6975b293cd98acc\StoneMod.m&lt;/file&gt;&lt;/includedFiles&gt;&lt;value&gt;2619268440&lt;/value&gt;&lt;/checksum&gt;</var.lastUserSourceChecksum>
+    <var.sourceSetState>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;sourceModel&gt;&lt;primarySourceFiles&gt;&lt;file&gt;C:\Users\mitadm\Documents\GitHub\recepnum2\recepnum1-e341e5ae190230fa1e37b36ad6975b293cd98acc\NormalError.m&lt;/file&gt;&lt;file&gt;C:\Users\mitadm\Documents\GitHub\recepnum2\recepnum1-e341e5ae190230fa1e37b36ad6975b293cd98acc\StoneMod.m&lt;/file&gt;&lt;/primarySourceFiles&gt;&lt;fixedPointSourceFiles/&gt;&lt;fixedPointSourceRegistered&gt;false&lt;/fixedPointSourceRegistered&gt;&lt;fixedPointSourceSelected&gt;false&lt;/fixedPointSourceSelected&gt;&lt;/sourceModel&gt;</var.sourceSetState>
     <param.forceMexBuild>false</param.forceMexBuild>
     <param.configImportActive>false</param.configImportActive>
     <var.boundToGui>true</var.boundToGui>
@@ -756,6 +762,8 @@
     <param.fpDataRoot />
     <param.fpUserFileChecksum />
     <var.snapshotChecksum />
+    <var.functionBlockSid />
+    <param.fptSignedness>false</param.fptSignedness>
     <unset>
       <param.DefaultImportExportVariable />
       <param.UseGlobals />
@@ -798,7 +806,6 @@
       <param.LogAllIOValues />
       <param.DetectOverflows />
       <param.LogHistogram />
-      <param.ShowCoverage />
       <param.ExcludedFixedPointVerificationFiles />
       <param.ExcludedFixedPointSimulationFiles />
       <param.InstrumentedBuildChecksum />
@@ -821,95 +828,108 @@
       <param.fpDataRoot />
       <param.fpUserFileChecksum />
       <var.snapshotChecksum />
+      <var.functionBlockSid />
+      <param.fptSignedness />
     </unset>
     <fileset.entrypoints>
       <file custom-data-expanded="false" value="${PROJECT_ROOT}\NormalError.m">
-        <Inputs fileName="NormalError.m" functionName="NormalError">
-          <Input Name="Rtot">
-            <Class>double</Class>
-            <Size>1 x 13</Size>
-            <Value />
-            <InitialValue />
-            <UserDefined>false</UserDefined>
-            <Complex>false</Complex>
-          </Input>
-          <Input Name="KdMat">
-            <Class>double</Class>
-            <Size>6 x 10</Size>
-            <Value />
-            <InitialValue />
-            <UserDefined>false</UserDefined>
-            <Complex>false</Complex>
-          </Input>
-          <Input Name="mfiAdjMean">
-            <Class>double</Class>
-            <Size>24 x 8</Size>
-            <Value />
-            <InitialValue />
-            <UserDefined>false</UserDefined>
-            <Complex>false</Complex>
-          </Input>
-          <Input Name="tnpbsa">
-            <Class>double</Class>
-            <Size>2 x 1</Size>
-            <Value />
-            <InitialValue />
-            <UserDefined>false</UserDefined>
-            <Complex>false</Complex>
-          </Input>
-          <Input Name="meanPerCond">
-            <Class>double</Class>
-            <Size>24 x 2</Size>
-            <Value />
-            <InitialValue />
-            <UserDefined>false</UserDefined>
-            <Complex>false</Complex>
-          </Input>
-          <Input Name="biCoefMat">
-            <Class>double</Class>
-            <Size>30 x 30</Size>
-            <Value />
-            <InitialValue />
-            <UserDefined>false</UserDefined>
-            <Complex>false</Complex>
-          </Input>
-        </Inputs>
+        <Marker>1470864205562</Marker>
       </file>
     </fileset.entrypoints>
-    <fileset.testbench>
-      <file>${PROJECT_ROOT}\play7.m</file>
-    </fileset.testbench>
+    <fileset.testbench />
+    <fileset.inputtypes>
+      <file custom-data-expanded="false" value="${PROJECT_ROOT}\NormalError.m">
+        <Inputs fileName="NormalError.m" functionName="NormalError">
+          <Input Name="Rtot" typeId="0" />
+          <Input Name="KdMat" typeId="1" />
+          <Input Name="mfiAdjMean" typeId="2" />
+          <Input Name="tnpbsa" typeId="3" />
+          <Input Name="meanPerCond" typeId="4" />
+          <Input Name="biCoefMat" typeId="5" />
+          <idpTable>
+            <type typeId="0">
+              <Class>double</Class>
+              <Size>1 x 12</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="1">
+              <Class>double</Class>
+              <Size>6 x 10</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="2">
+              <Class>double</Class>
+              <Size>24 x 8</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="3">
+              <Class>double</Class>
+              <Size>2 x 1</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="4">
+              <Class>double</Class>
+              <Size>24 x 2</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+            <type typeId="5">
+              <Class>double</Class>
+              <Size>30 x 30</Size>
+              <Value />
+              <InitialValue />
+              <UserDefined>false</UserDefined>
+              <Complex>false</Complex>
+            </type>
+          </idpTable>
+        </Inputs>
+      </file>
+    </fileset.inputtypes>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\codegen\lib\NormalError" name="NormalError.lib" optional="false">C:\Users\ryan\Documents\GitHub\recepnum1\codegen\lib\NormalError\NormalError.lib</file>
+      <file location="${PROJECT_ROOT}\codegen\lib\NormalError" name="NormalError.lib" optional="false">C:\Users\mitadm\Documents\GitHub\recepnum2\recepnum1-e341e5ae190230fa1e37b36ad6975b293cd98acc\codegen\lib\NormalError\NormalError.lib</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2015b</root>
+      <root>C:\Program Files\MATLAB\R2016a</root>
       <toolboxes>
-        <toolbox name="matlabhdlcoder" />
         <toolbox name="fixedpoint" />
-        <toolbox name="embeddedcoder" />
         <toolbox name="matlabcoder" />
+        <toolbox name="matlabhdlcoder" />
+        <toolbox name="embeddedcoder" />
       </toolboxes>
-      <toolbox>
-        <matlabhdlcoder>
-          <enabled>true</enabled>
-        </matlabhdlcoder>
-      </toolbox>
       <toolbox>
         <fixedpoint>
           <enabled>true</enabled>
         </fixedpoint>
       </toolbox>
       <toolbox>
-        <embeddedcoder>
-          <enabled>true</enabled>
-        </embeddedcoder>
-      </toolbox>
-      <toolbox>
         <matlabcoder>
           <enabled>true</enabled>
         </matlabcoder>
+      </toolbox>
+      <toolbox>
+        <matlabhdlcoder>
+          <enabled>true</enabled>
+        </matlabhdlcoder>
+      </toolbox>
+      <toolbox>
+        <embeddedcoder>
+          <enabled>true</enabled>
+        </embeddedcoder>
       </toolbox>
     </matlab>
     <platform>

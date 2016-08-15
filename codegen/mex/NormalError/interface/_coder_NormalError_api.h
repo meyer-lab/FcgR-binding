@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef ___CODER_NORMALERROR_API_H__
-#define ___CODER_NORMALERROR_API_H__
+#ifndef _CODER_NORMALERROR_API_H
+#define _CODER_NORMALERROR_API_H
 
 /* Include files */
 #include <math.h>
@@ -21,7 +21,7 @@
 #include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
-#include "blas.h"
+#include "covrt.h"
 #include "rtwtypes.h"
 #include "NormalError_types.h"
 

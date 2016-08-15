@@ -2,8 +2,8 @@
 ## Makefile generated for MATLAB file/project 'NormalError'. 
 ## 
 ## Makefile     : NormalError_rtw.mk
-## Generated on : Fri Jul 15 09:48:20 2016
-## MATLAB Coder version: 3.0 (R2015b)
+## Generated on : Wed Aug 10 17:24:48 2016
+## MATLAB Coder version: 3.1 (R2016a)
 ## 
 ## Build Info:
 ## 
@@ -27,11 +27,11 @@
 PRODUCT_NAME              = NormalError
 MAKEFILE                  = NormalError_rtw.mk
 COMPUTER                  = PCWIN64
-MATLAB_ROOT               = C:/PROGRA~1/MATLAB/R2015b
-MATLAB_BIN                = C:/PROGRA~1/MATLAB/R2015b/bin
-MATLAB_ARCH_BIN           = C:/PROGRA~1/MATLAB/R2015b/bin/win64
+MATLAB_ROOT               = C:/PROGRA~1/MATLAB/R2016a
+MATLAB_BIN                = C:/PROGRA~1/MATLAB/R2016a/bin
+MATLAB_ARCH_BIN           = C:/PROGRA~1/MATLAB/R2016a/bin/win64
 MASTER_ANCHOR_DIR         = 
-START_DIR                 = C:/Users/ryan/Documents/GitHub/recepnum1
+START_DIR                 = C:/Users/mitadm/Documents/GitHub/recepnum2/recepnum1-e341e5ae190230fa1e37b36ad6975b293cd98acc
 ARCH                      = win64
 RELATIVE_PATH_TO_ANCHOR   = .
 PERL                      = $(MATLAB_ROOT)/sys/perl/win32/bin/perl.exe
@@ -44,7 +44,7 @@ CMD_FILE                  = $(PRODUCT_NAME).lnk
 
 # Toolchain Name:          LCC-win64 v2.4.1 | gmake (64-bit Windows)
 # Supported Version(s):    2.4.1
-# ToolchainInfo Version:   R2015b
+# ToolchainInfo Version:   R2016a
 # Specification Revision:  1.0
 # 
 

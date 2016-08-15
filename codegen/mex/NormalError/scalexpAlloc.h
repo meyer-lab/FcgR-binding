@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef __SCALEXPALLOC_H__
-#define __SCALEXPALLOC_H__
+#ifndef SCALEXPALLOC_H
+#define SCALEXPALLOC_H
 
 /* Include files */
 #include <math.h>
@@ -21,7 +21,7 @@
 #include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
-#include "blas.h"
+#include "covrt.h"
 #include "rtwtypes.h"
 #include "NormalError_types.h"
 

@@ -4,12 +4,12 @@
  * government, commercial, or other organizational use.
  * File: StoneMod.h
  *
- * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 15-Jul-2016 09:48:12
+ * MATLAB Coder version            : 3.1
+ * C/C++ source code generated on  : 10-Aug-2016 17:24:40
  */
 
-#ifndef __STONEMOD_H__
-#define __STONEMOD_H__
+#ifndef STONEMOD_H
+#define STONEMOD_H
 
 /* Include Files */
 #include <math.h>

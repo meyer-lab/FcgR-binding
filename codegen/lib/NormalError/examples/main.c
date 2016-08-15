@@ -4,8 +4,8 @@
  * government, commercial, or other organizational use.
  * File: main.c
  *
- * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 15-Jul-2016 09:48:12
+ * MATLAB Coder version            : 3.1
+ * C/C++ source code generated on  : 10-Aug-2016 17:24:40
  */
 
 /*************************************************************************/
@@ -40,7 +40,7 @@
 #include "NormalError_initialize.h"
 
 /* Function Declarations */
-static void argInit_1x13_real_T(double result[13]);
+static void argInit_1x12_real_T(double result[12]);
 static void argInit_24x2_real_T(double result[48]);
 static void argInit_24x8_real_T(double result[192]);
 static void argInit_2x1_real_T(double result[2]);
@@ -52,15 +52,15 @@ static void main_NormalError(void);
 /* Function Definitions */
 
 /*
- * Arguments    : double result[13]
+ * Arguments    : double result[12]
  * Return Type  : void
  */
-static void argInit_1x13_real_T(double result[13])
+static void argInit_1x12_real_T(double result[12])
 {
   int idx1;
 
   /* Loop over the array to initialize each element. */
-  for (idx1 = 0; idx1 < 13; idx1++) {
+  for (idx1 = 0; idx1 < 12; idx1++) {
     /* Set the value of the array element.
        Change this value to the value that the application requires. */
     result[idx1] = argInit_real_T();
@@ -174,7 +174,7 @@ static double argInit_real_T(void)
  */
 static void main_NormalError(void)
 {
-  double dv0[13];
+  double dv0[12];
   double dv1[60];
   double dv2[192];
   double dv3[2];
@@ -190,7 +190,7 @@ static void main_NormalError(void)
   /* Initialize function input argument 'meanPerCond'. */
   /* Initialize function input argument 'biCoefMat'. */
   /* Call the entry-point 'NormalError'. */
-  argInit_1x13_real_T(dv0);
+  argInit_1x12_real_T(dv0);
   argInit_6x10_real_T(dv1);
   argInit_24x8_real_T(dv2);
   argInit_2x1_real_T(dv3);

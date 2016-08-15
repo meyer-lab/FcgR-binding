@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef __NORMALERROR_TYPES_H__
-#define __NORMALERROR_TYPES_H__
+#ifndef NORMALERROR_TYPES_H
+#define NORMALERROR_TYPES_H
 
 /* Include files */
 #include "rtwtypes.h"
