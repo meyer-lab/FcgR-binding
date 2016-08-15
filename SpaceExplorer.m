@@ -17,9 +17,9 @@ ubsigma = 2;
 
 % Create intervals of state space search using parameter bounds; 3 per
 % analog parameter and 10 for each avidity
-Riss = lbR:(ubR-lbR)/3:ubR;
-Kxiss = lbKx:(ubKx-lbKx)/3:ubKx;
-viss = 1:29/10:30;
+Riss = lbR:(ubR-lbR)/2:ubR;
+Kxiss = lbKx:(ubKx-lbKx)/2:ubKx;
+viss = 1:29/3:30;
 viss = ceil(viss);
 
 RissL = length(Riss);
