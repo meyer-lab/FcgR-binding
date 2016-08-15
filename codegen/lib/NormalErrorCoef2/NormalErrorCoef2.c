@@ -5,7 +5,7 @@
  * File: NormalErrorCoef2.c
  *
  * MATLAB Coder version            : 3.1
- * C/C++ source code generated on  : 15-Aug-2016 16:47:28
+ * C/C++ source code generated on  : 15-Aug-2016 17:19:22
  */
 
 /* Include Files */
@@ -18,7 +18,7 @@
 /* Function Definitions */
 
 /*
- * Arguments    : const double Rtot[12]
+ * Arguments    : const double Rtot[7]
  *                const double KdMat[60]
  *                const double mfiAdjMean[192]
  *                const double tnpbsa[2]
@@ -27,7 +27,7 @@
  *                double whichR
  * Return Type  : double
  */
-double NormalErrorCoef2(const double Rtot[12], const double KdMat[60], const
+double NormalErrorCoef2(const double Rtot[7], const double KdMat[60], const
   double mfiAdjMean[192], const double tnpbsa[2], const double meanPerCond[48],
   const double biCoefMat[900], double whichR)
 {

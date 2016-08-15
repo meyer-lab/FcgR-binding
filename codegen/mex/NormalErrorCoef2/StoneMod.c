@@ -18,22 +18,22 @@
 
 /* Variable Definitions */
 static emlrtRSInfo f_emlrtRSI = { 15, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
 
 static emlrtRSInfo g_emlrtRSI = { 18, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
 
 static emlrtRSInfo h_emlrtRSI = { 29, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
 
 static emlrtRSInfo i_emlrtRSI = { 31, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
 
 static emlrtRSInfo j_emlrtRSI = { 32, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
 
 static emlrtRSInfo k_emlrtRSI = { 46, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
 
 static emlrtRSInfo l_emlrtRSI = { 21, "colon",
   "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\lib\\matlab\\ops\\colon.m" };
@@ -51,19 +51,19 @@ static emlrtRTEInfo c_emlrtRTEI = { 20, 15, "sumprod",
 };
 
 static emlrtECInfo emlrtECI = { 2, 18, 13, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m" };
 
 static emlrtBCInfo e_emlrtBCI = { 1, 30, 14, 31, "biCoefMat", "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m", 0 };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m", 0 };
 
 static emlrtDCInfo b_emlrtDCI = { 14, 31, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m", 1 };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m", 1 };
 
 static emlrtBCInfo f_emlrtBCI = { 1, 30, 14, 27, "biCoefMat", "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m", 0 };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m", 0 };
 
 static emlrtDCInfo c_emlrtDCI = { 14, 27, "StoneMod",
-  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m", 1 };
+  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m", 1 };
 
 /* Function Definitions */
 real_T StoneMod(const emlrtStack *sp, real_T logR, real_T Kd, real_T v, real_T

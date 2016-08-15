@@ -29,7 +29,7 @@
 <a name="17"><font color="#888888 "><i>   17   </i></font></a>
 <a name="18"><font color="#888888 "><i>   18   </i></font></a><font color="#117755"><i>/* Function Declarations */</i></font>
 <a name="19"><font color="#888888 "><i>   19   </i></font></a><font color="#112266"><b>static</b></font> real_T (*b_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *u, <font color="#112266"><b>const</b></font>
-<a name="20"><font color="#888888 "><i>   20   </i></font></a>  emlrtMsgIdentifier *parentId))[12];
+<a name="20"><font color="#888888 "><i>   20   </i></font></a>  emlrtMsgIdentifier *parentId))[7];
 <a name="21"><font color="#888888 "><i>   21   </i></font></a><font color="#112266"><b>static</b></font> real_T (*c_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *KdMat,
 <a name="22"><font color="#888888 "><i>   22   </i></font></a>  <font color="#112266"><b>const</b></font> char_T *identifier))[60];
 <a name="23"><font color="#888888 "><i>   23   </i></font></a><font color="#112266"><b>static</b></font> real_T (*d_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *u, <font color="#112266"><b>const</b></font>
@@ -37,7 +37,7 @@
 <a name="25"><font color="#888888 "><i>   25   </i></font></a><font color="#112266"><b>static</b></font> real_T (*e_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray
 <a name="26"><font color="#888888 "><i>   26   </i></font></a>  *mfiAdjMean, <font color="#112266"><b>const</b></font> char_T *identifier))[192];
 <a name="27"><font color="#888888 "><i>   27   </i></font></a><font color="#112266"><b>static</b></font> real_T (*emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *Rtot,
-<a name="28"><font color="#888888 "><i>   28   </i></font></a>  <font color="#112266"><b>const</b></font> char_T *identifier))[12];
+<a name="28"><font color="#888888 "><i>   28   </i></font></a>  <font color="#112266"><b>const</b></font> char_T *identifier))[7];
 <a name="29"><font color="#888888 "><i>   29   </i></font></a><font color="#112266"><b>static</b></font> <font color="#112266"><b>const</b></font> mxArray *<a href="#fcn_emlrt_marshallOut" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_emlrt_marshallOut');" target="_self"><font color="#1122aa">emlrt_marshallOut</font></a>(<font color="#112266"><b>const</b></font> real_T u);
 <a name="30"><font color="#888888 "><i>   30   </i></font></a><font color="#112266"><b>static</b></font> real_T (*f_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *u, <font color="#112266"><b>const</b></font>
 <a name="31"><font color="#888888 "><i>   31   </i></font></a>  emlrtMsgIdentifier *parentId))[192];
@@ -58,7 +58,7 @@
 <a name="46"><font color="#888888 "><i>   46   </i></font></a><font color="#112266"><b>static</b></font> real_T <a href="#fcn_n_emlrt_marshallIn" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_n_emlrt_marshallIn');" target="_self"><font color="#1122aa">n_emlrt_marshallIn</font></a>(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *u, <font color="#112266"><b>const</b></font>
 <a name="47"><font color="#888888 "><i>   47   </i></font></a>  emlrtMsgIdentifier *parentId);
 <a name="48"><font color="#888888 "><i>   48   </i></font></a><font color="#112266"><b>static</b></font> real_T (*o_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *src,
-<a name="49"><font color="#888888 "><i>   49   </i></font></a>  <font color="#112266"><b>const</b></font> emlrtMsgIdentifier *msgId))[12];
+<a name="49"><font color="#888888 "><i>   49   </i></font></a>  <font color="#112266"><b>const</b></font> emlrtMsgIdentifier *msgId))[7];
 <a name="50"><font color="#888888 "><i>   50   </i></font></a><font color="#112266"><b>static</b></font> real_T (*p_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *src,
 <a name="51"><font color="#888888 "><i>   51   </i></font></a>  <font color="#112266"><b>const</b></font> emlrtMsgIdentifier *msgId))[60];
 <a name="52"><font color="#888888 "><i>   52   </i></font></a><font color="#112266"><b>static</b></font> real_T (*q_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *src,
@@ -74,9 +74,9 @@
 <a name="62"><font color="#888888 "><i>   62   </i></font></a>
 <a name="63"><font color="#888888 "><i>   63   </i></font></a><font color="#117755"><i>/* Function Definitions */</i></font>
 <a name="64"><font color="#888888 "><i>   64   </i></font></a><font color="#112266"><b>static</b></font> real_T (*b_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *u, <font color="#112266"><b>const</b></font>
-<a name="65"><font color="#888888 "><i>   65   </i></font></a>  emlrtMsgIdentifier *parentId))[12]
+<a name="65"><font color="#888888 "><i>   65   </i></font></a>  emlrtMsgIdentifier *parentId))[7]
 <a name="66"><font color="#888888 "><i>   66   </i></font></a><b>{</b>
-<a name="67"><font color="#888888 "><i>   67   </i></font></a>  real_T (*y)[12];
+<a name="67"><font color="#888888 "><i>   67   </i></font></a>  real_T (*y)[7];
 <a name="68"><font color="#888888 "><i>   68   </i></font></a>  y = o_emlrt_marshallIn(sp, emlrtAlias(u), parentId);
 <a name="69"><font color="#888888 "><i>   69   </i></font></a>  emlrtDestroyArray(&amp;u);
 <a name="70"><font color="#888888 "><i>   70   </i></font></a>  <font color="#112266"><b>return</b></font> y;
@@ -116,9 +116,9 @@
 <a name="104"><font color="#888888 "><i>  104   </i></font></a><b>}</b>
 <a name="105"><font color="#888888 "><i>  105   </i></font></a>
 <a name="106"><font color="#888888 "><i>  106   </i></font></a><font color="#112266"><b>static</b></font> real_T (*emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *Rtot,
-<a name="107"><font color="#888888 "><i>  107   </i></font></a>  <font color="#112266"><b>const</b></font> char_T *identifier))[12]
+<a name="107"><font color="#888888 "><i>  107   </i></font></a>  <font color="#112266"><b>const</b></font> char_T *identifier))[7]
 <a name="108"><font color="#888888 "><i>  108   </i></font></a><b>{</b>
-<a name="109"><font color="#888888 "><i>  109   </i></font></a>  real_T (*y)[12];
+<a name="109"><font color="#888888 "><i>  109   </i></font></a>  real_T (*y)[7];
 <a name="110"><font color="#888888 "><i>  110   </i></font></a>  emlrtMsgIdentifier thisId;
 <a name="111"><font color="#888888 "><i>  111   </i></font></a>  thisId.fIdentifier = identifier;
 <a name="112"><font color="#888888 "><i>  112   </i></font></a>  thisId.fParent = NULL;
@@ -231,13 +231,13 @@
 <a name="219"><font color="#888888 "><i>  219   </i></font></a><b>}</b>
 <a name="220"><font color="#888888 "><i>  220   </i></font></a>
 <a name="221"><font color="#888888 "><i>  221   </i></font></a><font color="#112266"><b>static</b></font> real_T (*o_emlrt_marshallIn(<font color="#112266"><b>const</b></font> emlrtStack *sp, <font color="#112266"><b>const</b></font> mxArray *src,
-<a name="222"><font color="#888888 "><i>  222   </i></font></a>  <font color="#112266"><b>const</b></font> emlrtMsgIdentifier *msgId))[12]
+<a name="222"><font color="#888888 "><i>  222   </i></font></a>  <font color="#112266"><b>const</b></font> emlrtMsgIdentifier *msgId))[7]
 <a name="223"><font color="#888888 "><i>  223   </i></font></a><b>{</b>
-<a name="224"><font color="#888888 "><i>  224   </i></font></a>  real_T (*ret)[12];
-<a name="225"><font color="#888888 "><i>  225   </i></font></a>  <font color="#112266"><b>static</b></font> <font color="#112266"><b>const</b></font> int32_T dims[2] = <b>{</b> 1, 12 <b>}</b>;
+<a name="224"><font color="#888888 "><i>  224   </i></font></a>  real_T (*ret)[7];
+<a name="225"><font color="#888888 "><i>  225   </i></font></a>  <font color="#112266"><b>static</b></font> <font color="#112266"><b>const</b></font> int32_T dims[2] = <b>{</b> 1, 7 <b>}</b>;
 <a name="226"><font color="#888888 "><i>  226   </i></font></a>
 <a name="227"><font color="#888888 "><i>  227   </i></font></a>  emlrtCheckBuiltInR2012b(sp, msgId, src, <font color="#1122ff">&quot;double&quot;</font>, false, 2U, dims);
-<a name="228"><font color="#888888 "><i>  228   </i></font></a>  ret = (real_T (*)[12])mxGetData(src);
+<a name="228"><font color="#888888 "><i>  228   </i></font></a>  ret = (real_T (*)[7])mxGetData(src);
 <a name="229"><font color="#888888 "><i>  229   </i></font></a>  emlrtDestroyArray(&amp;src);
 <a name="230"><font color="#888888 "><i>  230   </i></font></a>  <font color="#112266"><b>return</b></font> ret;
 <a name="231"><font color="#888888 "><i>  231   </i></font></a><b>}</b>
@@ -312,7 +312,7 @@
 <a name="300"><font color="#888888 "><i>  300   </i></font></a>
 <a name="301"><font color="#888888 "><i>  301   </i></font></a><font color="#112266"><b>void</b></font> <a name="fcn_NormalErrorCoef2_api">NormalErrorCoef2_api</a>(<font color="#112266"><b>const</b></font> mxArray * <font color="#112266"><b>const</b></font> prhs[7], <font color="#112266"><b>const</b></font> mxArray *plhs[1])
 <a name="302"><font color="#888888 "><i>  302   </i></font></a><b>{</b>
-<a name="303"><font color="#888888 "><i>  303   </i></font></a>  real_T (*Rtot)[12];
+<a name="303"><font color="#888888 "><i>  303   </i></font></a>  real_T (*Rtot)[7];
 <a name="304"><font color="#888888 "><i>  304   </i></font></a>  real_T (*KdMat)[60];
 <a name="305"><font color="#888888 "><i>  305   </i></font></a>  real_T (*mfiAdjMean)[192];
 <a name="306"><font color="#888888 "><i>  306   </i></font></a>  real_T (*tnpbsa)[2];

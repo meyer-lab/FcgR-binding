@@ -5,13 +5,14 @@
  * File: NormalErrorCoef2_terminate.c
  *
  * MATLAB Coder version            : 3.1
- * C/C++ source code generated on  : 15-Aug-2016 16:47:28
+ * C/C++ source code generated on  : 15-Aug-2016 17:19:22
  */
 
 /* Include Files */
 #include "rt_nonfinite.h"
 #include "NormalErrorCoef2.h"
 #include "NormalErrorCoef2_terminate.h"
+#include "NormalErrorCoef2_data.h"
 
 /* Function Definitions */
 
@@ -21,7 +22,7 @@
  */
 void NormalErrorCoef2_terminate(void)
 {
-  /* (no terminate code required) */
+  omp_destroy_nest_lock(&emlrtNestLockGlobal);
 }
 
 /*

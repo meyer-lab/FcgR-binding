@@ -1,7 +1,7 @@
 clear;clc;
 
-% Initialize persistent variables in NormalErrorCnct
-NormalErrorCnct;
+% Initialize persistent variables in NormalErrorCoefCnct
+NormalErrorCoefCnct;
 
 % Lower and upper bounds of various parameters
 lbR = 0;
@@ -53,8 +53,8 @@ for j = 1:(RissL-1)
                         lbR6 = Riss(o);
                         ubR6 = Riss(o+1);
                         for p = 1:(RissL-1)
-                            lbKx = Riss(p);
-                            ubKx = Riss(p+1);
+                            lbKx = Kxiss(p);
+                            ubKx = Kxiss(p+1);
                             for q = 1:(vissL-1)
                                 lbv1 = viss(q);
                                 ubv1 = viss(q+1);
@@ -62,7 +62,7 @@ for j = 1:(RissL-1)
                                     lbv2 = viss(r);
                                     ubv2 = viss(r+1);
                                     
-                                    [x,fval] = ga(@(x) -NormalErrorCnct(x),...
+                                    [x,fval] = ga(@(x) -NormalErrorCoefCnct(x),...
                                         12,[],[],[],[],[lbR1 lbR2 lbR3 lbR4...
                                         lbR5 lbR6 lbKx lbc lbc lbv1 lbv2...
                                         lbsigma],[ubR1 ubR2 ubR3 ubR4 ubR5...
@@ -81,5 +81,7 @@ for j = 1:(RissL-1)
 end
 
 save('SpaceExplorerData.mat','RissL','vissL','ptent','lntent')
+
+disp('SpaceExplorer complete.')
 % This script is meant to be appended to by the script SpaceExplorerApp1
 SpaceExplorerApp1;
