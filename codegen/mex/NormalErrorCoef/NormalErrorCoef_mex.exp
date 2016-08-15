@@ -1,0 +1,7 @@
+NormalErrorCoef_mex.mexw64
+NormalErrorCoef		NormalErrorCoef
+NormalErrorCoef_atexit		NormalErrorCoef_atexit
+NormalErrorCoef_initialize		NormalErrorCoef_initialize
+NormalErrorCoef_terminate		NormalErrorCoef_terminate
+emlrtMexFcnProperties		emlrtMexFcnProperties
+mexFunction		mexFunction

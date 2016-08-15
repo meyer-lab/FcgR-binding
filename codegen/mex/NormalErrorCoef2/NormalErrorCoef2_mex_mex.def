@@ -1,0 +1,8 @@
+LIBRARY NormalErrorCoef2_mex.mexw64
+EXPORTS
+mexFunction
+emlrtMexFcnProperties
+NormalErrorCoef2
+NormalErrorCoef2_initialize
+NormalErrorCoef2_terminate
+NormalErrorCoef2_atexit
