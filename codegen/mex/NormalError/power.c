@@ -16,18 +16,18 @@
 #include "scalexpAlloc.h"
 
 /* Variable Definitions */
-static emlrtRSInfo j_emlrtRSI = { 49, "power",
-  "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\power.m" };
+static emlrtRSInfo m_emlrtRSI = { 49, "power",
+  "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\lib\\matlab\\ops\\power.m" };
 
-static emlrtRSInfo k_emlrtRSI = { 58, "power",
-  "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\power.m" };
+static emlrtRSInfo n_emlrtRSI = { 58, "power",
+  "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\lib\\matlab\\ops\\power.m" };
 
-static emlrtRSInfo l_emlrtRSI = { 73, "applyScalarFunction",
-  "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\eml\\+coder\\+internal\\applyScalarFunction.m"
+static emlrtRSInfo o_emlrtRSI = { 73, "applyScalarFunction",
+  "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\eml\\+coder\\+internal\\applyScalarFunction.m"
 };
 
 static emlrtRTEInfo d_emlrtRTEI = { 17, 19, "scalexpAlloc",
-  "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\eml\\+coder\\+internal\\scalexpAlloc.m"
+  "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\eml\\+coder\\+internal\\scalexpAlloc.m"
 };
 
 /* Function Definitions */
@@ -40,13 +40,13 @@ void power(const emlrtStack *sp, real_T a, const real_T b_data[], const int32_T
   emlrtStack c_st;
   st.prev = sp;
   st.tls = sp->tls;
-  st.site = &j_emlrtRSI;
+  st.site = &m_emlrtRSI;
   b_st.prev = &st;
   b_st.tls = st.tls;
   c_st.prev = &b_st;
   c_st.tls = b_st.tls;
-  b_st.site = &k_emlrtRSI;
-  c_st.site = &l_emlrtRSI;
+  b_st.site = &n_emlrtRSI;
+  c_st.site = &o_emlrtRSI;
   y_size[0] = 1;
   y_size[1] = (int8_T)b_size[1];
   if (dimagree(y_size, b_size)) {

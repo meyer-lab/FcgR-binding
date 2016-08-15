@@ -220,7 +220,7 @@ for j = 1:6
     end
 end
 
-plot(presimilMat(1:3,:)')
+plot(presimilMat(1:3,:)','o')
 
 kdCompare = zeros(4,6,6);
 kdCompareBar = zeros(6);
@@ -229,6 +229,9 @@ for j = 1:6
         for l = 1:4
             kdCompare(l,j,k) = log10(kdBruhns(j,l)/kdBruhns(k,l));
             [~, kdCompareBar(j,k)] = max(kdCompare(:,j,k));
+        end
+        if j == k
+            kdCompareBar(j,k) = 0;
         end
     end
 end

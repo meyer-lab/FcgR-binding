@@ -4,12 +4,12 @@
  * government, commercial, or other organizational use.
  * File: NormalError.h
  *
- * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 15-Jul-2016 09:48:12
+ * MATLAB Coder version            : 3.1
+ * C/C++ source code generated on  : 10-Aug-2016 17:24:40
  */
 
-#ifndef __NORMALERROR_H__
-#define __NORMALERROR_H__
+#ifndef NORMALERROR_H
+#define NORMALERROR_H
 
 /* Include Files */
 #include <math.h>
@@ -20,7 +20,7 @@
 #include "NormalError_types.h"
 
 /* Function Declarations */
-extern double NormalError(const double Rtot[13], const double KdMat[60], const
+extern double NormalError(const double Rtot[12], const double KdMat[60], const
   double mfiAdjMean[192], const double tnpbsa[2], const double meanPerCond[48],
   const double biCoefMat[900]);
 
