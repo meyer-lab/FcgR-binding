@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef __NORMALERROR_H__
-#define __NORMALERROR_H__
+#ifndef NORMALERROR_H
+#define NORMALERROR_H
 
 /* Include files */
 #include <math.h>
@@ -21,12 +21,12 @@
 #include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
-#include "blas.h"
+#include "covrt.h"
 #include "rtwtypes.h"
 #include "NormalError_types.h"
 
 /* Function Declarations */
-extern real_T NormalError(const emlrtStack *sp, const real_T Rtot[13], const
+extern real_T NormalError(const emlrtStack *sp, const real_T Rtot[12], const
   real_T KdMat[60], const real_T mfiAdjMean[192], const real_T tnpbsa[2], const
   real_T meanPerCond[48], const real_T biCoefMat[900]);
 

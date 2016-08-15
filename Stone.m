@@ -15,7 +15,7 @@ function [L, Rmulti] = Stone(Kd, v, logKx)
     %Vector of binomial coefficients
     biCoefVec = zeros(1,v);
     for j = 1:v
-        biCoefVec(j) = nchoosek(v,j)
+        biCoefVec(j) = nchoosek(v,j);
     end
     Req = 10^ReqFuncSolver(R,Kd,L0,v,Kx);
     

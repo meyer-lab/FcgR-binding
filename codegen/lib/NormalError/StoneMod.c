@@ -4,8 +4,8 @@
  * government, commercial, or other organizational use.
  * File: StoneMod.c
  *
- * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 15-Jul-2016 09:48:12
+ * MATLAB Coder version            : 3.1
+ * C/C++ source code generated on  : 10-Aug-2016 17:24:40
  */
 
 /* Include Files */
@@ -51,11 +51,11 @@ double StoneMod(double logR, double Kd, double v, double logKx, double L0, const
   int apnd;
   int cdiff;
   double y_data[30];
-  int k;
   double b_y_data[30];
   int y_size[2];
-  int tmp_size[2];
+  int k;
   double tmp_data[30];
+  int tmp_size[2];
   int b_y_size[2];
   Kx = rt_powd_snf(10.0, logKx);
   R = rt_powd_snf(10.0, logR);
@@ -92,7 +92,7 @@ double StoneMod(double logR, double Kd, double v, double logKx, double L0, const
     c = 1000.0;
 
     /* Commence algorithm */
-    while ((b - a > 0.0001) || (fabs(cVal) > 0.0001)) {
+    while ((b - a > 0.0001) && (fabs(cVal) > 0.0001)) {
       c = (a + b) / 2.0;
 
       /* -------------------------------------------------------------------------- */
@@ -124,8 +124,7 @@ double StoneMod(double logR, double Kd, double v, double logKx, double L0, const
     y_data[0] = 1.0;
     if (ndbl > 1) {
       y_data[ndbl - 1] = apnd;
-      cdiff = ndbl - 1;
-      cdiff /= 2;
+      cdiff = (ndbl - 1) / 2;
       for (k = 1; k < cdiff; k++) {
         y_data[k] = 1.0 + (double)k;
         y_data[(ndbl - k) - 1] = apnd - k;
@@ -166,8 +165,7 @@ double StoneMod(double logR, double Kd, double v, double logKx, double L0, const
     y_data[0] = 1.0;
     if (ndbl > 1) {
       y_data[ndbl - 1] = apnd;
-      cdiff = ndbl - 1;
-      cdiff /= 2;
+      cdiff = (ndbl - 1) / 2;
       for (k = 1; k < cdiff; k++) {
         y_data[k] = 1.0 + (double)k;
         y_data[(ndbl - k) - 1] = apnd - k;

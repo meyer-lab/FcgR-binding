@@ -16,16 +16,14 @@
 
 /* Variable Definitions */
 static emlrtRTEInfo emlrtRTEI = { 17, 9, "error",
-  "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\eml\\+coder\\+internal\\error.m"
+  "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\eml\\+coder\\+internal\\error.m"
 };
 
 /* Function Definitions */
 void error(const emlrtStack *sp)
 {
-  static const char_T varargin_1[3] = { 'l', 'o', 'g' };
-
   emlrtErrorWithMessageIdR2012b(sp, &emlrtRTEI, "Coder:toolbox:ElFunDomainError",
-    3, 4, 3, varargin_1);
+    3, 4, 3, "log");
 }
 
 /* End of code generation (error.c) */

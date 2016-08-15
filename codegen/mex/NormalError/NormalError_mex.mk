@@ -1,6 +1,6 @@
-START_DIR = C:\Users\ryan\DOCUME~1\GitHub\RECEPN~1
+START_DIR = C:\Users\mitadm\DOCUME~1\GitHub\RECEPN~2\RECEPN~1
 
-MATLAB_ROOT = C:\PROGRA~1\MATLAB\R2015b
+MATLAB_ROOT = C:\PROGRA~1\MATLAB\R2016a
 MAKEFILE = NormalError_mex.mk
 
 include NormalError_mex.mki
@@ -29,7 +29,7 @@ SYS_LIBS =
 #
 #====================================================================
 # gmake makefile fragment for building MEX functions using LCC
-# Copyright 2007-2012 The MathWorks, Inc.
+# Copyright 2007-2015 The MathWorks, Inc.
 #====================================================================
 #
 SHELL = cmd
@@ -58,12 +58,12 @@ SYS_INCLUDE += -I".\interface"
 SYS_INCLUDE += -I"$(MATLAB_ROOT)\extern\include"
 SYS_INCLUDE += -I"."
 
-EML_LIBS = libemlrt.lib libcovrt.lib libut.lib libmwblas.lib libmwmathutil.lib
+EML_LIBS = libemlrt.lib libcovrt.lib libut.lib libmwmathutil.lib
 SYS_LIBS += $(EML_LIBS)
 
 DIRECTIVES = $(MEX_FILE_NAME_WO_EXT)_mex.def
 
-COMP_FLAGS = $(COMPFLAGS) -DMX_COMPAT_32
+COMP_FLAGS = $(COMPFLAGS)
 LINK_FLAGS0= $(subst $(MEXSTUB),$(LCCSTUB),$(LINKFLAGS))
 LINK_FLAGS = $(filter-out "mexFunction.def", $(LINK_FLAGS0))
 

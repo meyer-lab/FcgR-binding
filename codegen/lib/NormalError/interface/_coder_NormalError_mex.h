@@ -4,12 +4,12 @@
  * government, commercial, or other organizational use.
  * File: _coder_NormalError_mex.h
  *
- * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 15-Jul-2016 09:48:12
+ * MATLAB Coder version            : 3.1
+ * C/C++ source code generated on  : 10-Aug-2016 17:24:40
  */
 
-#ifndef ___CODER_NORMALERROR_MEX_H__
-#define ___CODER_NORMALERROR_MEX_H__
+#ifndef _CODER_NORMALERROR_MEX_H
+#define _CODER_NORMALERROR_MEX_H
 
 /* Include Files */
 #include <math.h>

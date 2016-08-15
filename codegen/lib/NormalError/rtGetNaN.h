@@ -4,12 +4,12 @@
  * government, commercial, or other organizational use.
  * File: rtGetNaN.h
  *
- * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 15-Jul-2016 09:48:12
+ * MATLAB Coder version            : 3.1
+ * C/C++ source code generated on  : 10-Aug-2016 17:24:40
  */
 
-#ifndef __RTGETNAN_H__
-#define __RTGETNAN_H__
+#ifndef RTGETNAN_H
+#define RTGETNAN_H
 #include <stddef.h>
 #include "rtwtypes.h"
 #include "rt_nonfinite.h"
