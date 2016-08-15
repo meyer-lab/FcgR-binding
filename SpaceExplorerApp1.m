@@ -1,4 +1,4 @@
-clear;clc;
+clear;
 
 load('SpaceExplorerData.mat')
 
@@ -25,3 +25,8 @@ for j = 1:len
 end
 
 save('SpaceExplorerApp1Data.mat','pstruct','lnstruct')
+
+disp('SpaceExplorerApp1 complete.')
+
+% Move on to SpaceExplorer2
+SpaceExplorer2;

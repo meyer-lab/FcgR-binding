@@ -5,7 +5,7 @@
  * File: main.h
  *
  * MATLAB Coder version            : 3.1
- * C/C++ source code generated on  : 15-Aug-2016 16:47:28
+ * C/C++ source code generated on  : 15-Aug-2016 17:19:22
  */
 
 /*************************************************************************/
@@ -42,6 +42,7 @@
 #include <string.h>
 #include "rt_nonfinite.h"
 #include "rtwtypes.h"
+#include "omp.h"
 #include "NormalErrorCoef2_types.h"
 
 /* Function Declarations */
