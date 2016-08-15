@@ -27,7 +27,7 @@ static void NormalErrorCoef2_once(void)
 
   /* Initialize Coverage Information */
   covrtScriptInit(&emlrtCoverageInstance,
-                  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m",
+                  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m",
                   0, 2, 6, 0, 0, 0, 0, 3, 0, 0, 0);
 
   /* Initialize Function Information */
@@ -59,7 +59,7 @@ static void NormalErrorCoef2_once(void)
 
   /* Initialize Coverage Information */
   covrtScriptInit(&emlrtCoverageInstance,
-                  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m",
+                  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m",
                   1, 3, 8, 2, 0, 0, 0, 0, 1, 0, 0);
 
   /* Initialize Function Information */

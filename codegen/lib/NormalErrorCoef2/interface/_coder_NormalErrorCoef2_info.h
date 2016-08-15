@@ -5,7 +5,7 @@
  * File: _coder_NormalErrorCoef2_info.h 
  *  
  * MATLAB Coder version            : 3.1 
- * C/C++ source code generated on  : 15-Aug-2016 16:47:28 
+ * C/C++ source code generated on  : 15-Aug-2016 17:19:22 
  */
 
 #ifndef _CODER_NORMALERRORCOEF2_INFO_H

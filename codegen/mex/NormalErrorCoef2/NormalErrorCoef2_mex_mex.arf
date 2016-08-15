@@ -1,0 +1,13 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+libiomp5md.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:NormalErrorCoef2
+/export:emlrtGetRootTLSGlobal
+/export:emlrtLockerFunction
+/export:NormalErrorCoef2_initialize
+/export:NormalErrorCoef2_terminate
+/export:NormalErrorCoef2_atexit
