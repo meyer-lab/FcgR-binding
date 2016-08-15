@@ -51,7 +51,7 @@ sampler.reset()
 start = time.time()
 
 fdpos = open('pos.csv','a')
-fdprob = open('lnprob.csv','a')
+fdprob = open('prob.csv','a')
 
 ## Run sampler for nsamples many counts
 for j in range(nsamples):
@@ -66,7 +66,7 @@ for j in range(nsamples):
     for elem in posnew:
         posstore = posstore+','+str(elem)
     for elem in probnew:
-        probstore = probstore+','+str(probnew)
+        probstore = probstore+','+str(elem)
         
     posstore = posstore+'\n'
     probstore = probstore+'\n'
