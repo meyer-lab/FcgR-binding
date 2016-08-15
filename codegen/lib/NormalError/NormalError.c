@@ -4,8 +4,8 @@
  * government, commercial, or other organizational use.
  * File: NormalError.c
  *
- * MATLAB Coder version            : 3.0
- * C/C++ source code generated on  : 15-Jul-2016 09:48:12
+ * MATLAB Coder version            : 3.1
+ * C/C++ source code generated on  : 10-Aug-2016 17:24:40
  */
 
 /* Include Files */
@@ -18,7 +18,7 @@
 /* Function Definitions */
 
 /*
- * Arguments    : const double Rtot[13]
+ * Arguments    : const double Rtot[12]
  *                const double KdMat[60]
  *                const double mfiAdjMean[192]
  *                const double tnpbsa[2]
@@ -26,7 +26,7 @@
  *                const double biCoefMat[900]
  * Return Type  : double
  */
-double NormalError(const double Rtot[13], const double KdMat[60], const double
+double NormalError(const double Rtot[12], const double KdMat[60], const double
                    mfiAdjMean[192], const double tnpbsa[2], const double
                    meanPerCond[48], const double biCoefMat[900])
 {
@@ -34,17 +34,17 @@ double NormalError(const double Rtot[13], const double KdMat[60], const double
   double sigCoef;
   double logSqrErrMat[192];
   int j;
+  double y[8];
   double c;
+  int ix;
   int ixstart;
+  int iy;
+  int i;
   int l;
   double MFI;
   int m;
   double s;
   double z;
-  double y[8];
-  int ix;
-  int iy;
-  int i;
   sigCoef = rt_powd_snf(10.0, Rtot[11]);
   for (j = 0; j < 2; j++) {
     c = rt_powd_snf(10.0, Rtot[7 + j]);

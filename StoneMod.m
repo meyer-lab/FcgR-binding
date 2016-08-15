@@ -41,7 +41,7 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     %with; only implemented for MATLAB Coder
     c = 1000;
     %Commence algorithm
-    while b - a > 1e-4 || abs(cVal) > 1e-4
+    while ((b - a > 1e-4) && (abs(cVal) > 1e-4))
         c = (a+b)/2;
         cVal = fun(c, R, vi, kx, viLikdi);
         

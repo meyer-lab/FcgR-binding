@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef __NORMALERROR_DATA_H__
-#define __NORMALERROR_DATA_H__
+#ifndef NORMALERROR_DATA_H
+#define NORMALERROR_DATA_H
 
 /* Include files */
 #include <math.h>
@@ -21,17 +21,18 @@
 #include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
-#include "blas.h"
+#include "covrt.h"
 #include "rtwtypes.h"
 #include "NormalError_types.h"
 
 /* Variable Declarations */
 extern emlrtCTX emlrtRootTLSGlobal;
 extern const volatile char_T *emlrtBreakCheckR2012bFlagVar;
+extern covrtInstance emlrtCoverageInstance;
 extern emlrtContext emlrtContextGlobal;
-extern emlrtRSInfo h_emlrtRSI;
-extern emlrtRSInfo i_emlrtRSI;
-extern emlrtRSInfo o_emlrtRSI;
+extern emlrtRSInfo k_emlrtRSI;
+extern emlrtRSInfo l_emlrtRSI;
+extern emlrtRSInfo r_emlrtRSI;
 
 #endif
 

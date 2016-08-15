@@ -24,7 +24,6 @@ function logSqrErr = NormalError(Rtot, KdMat, mfiAdjMean, tnpbsa,...
         end
     end
     logSqrErr = nansum(nansum(logSqrErrMat));
-    logSqrErr = logSqrErr;
 end
 %--------------------------------------------------------------------------
 function logprob = pseudoNormlike(x,mu,sigma)

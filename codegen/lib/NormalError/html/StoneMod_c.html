@@ -16,8 +16,8 @@
 <a name="4"><font color="#888888 "><i>    4   </i></font></a><font color="#117755"><I> * government, commercial, or other organizational use.</i></font>
 <a name="5"><font color="#888888 "><i>    5   </i></font></a><font color="#117755"><I> * File: StoneMod.c</i></font>
 <a name="6"><font color="#888888 "><i>    6   </i></font></a><font color="#117755"><I> *</i></font>
-<a name="7"><font color="#888888 "><i>    7   </i></font></a><font color="#117755"><I> * MATLAB Coder version            : 3.0</i></font>
-<a name="8"><font color="#888888 "><i>    8   </i></font></a><font color="#117755"><I> * C/C++ source code generated on  : 15-Jul-2016 09:48:12</i></font>
+<a name="7"><font color="#888888 "><i>    7   </i></font></a><font color="#117755"><I> * MATLAB Coder version            : 3.1</i></font>
+<a name="8"><font color="#888888 "><i>    8   </i></font></a><font color="#117755"><I> * C/C++ source code generated on  : 10-Aug-2016 17:24:40</i></font>
 <a name="9"><font color="#888888 "><i>    9   </i></font></a><font color="#117755"><I> */</i></font>
 <a name="10"><font color="#888888 "><i>   10   </i></font></a>
 <a name="11"><font color="#888888 "><i>   11   </i></font></a><font color="#117755"><i>/* Include Files */</i></font>
@@ -63,11 +63,11 @@
 <a name="51"><font color="#888888 "><i>   51   </i></font></a>  <font color="#112266"><b>int</b></font> apnd;
 <a name="52"><font color="#888888 "><i>   52   </i></font></a>  <font color="#112266"><b>int</b></font> cdiff;
 <a name="53"><font color="#888888 "><i>   53   </i></font></a>  <font color="#112266"><b>double</b></font> y_data[30];
-<a name="54"><font color="#888888 "><i>   54   </i></font></a>  <font color="#112266"><b>int</b></font> k;
-<a name="55"><font color="#888888 "><i>   55   </i></font></a>  <font color="#112266"><b>double</b></font> b_y_data[30];
-<a name="56"><font color="#888888 "><i>   56   </i></font></a>  <font color="#112266"><b>int</b></font> y_size[2];
-<a name="57"><font color="#888888 "><i>   57   </i></font></a>  <font color="#112266"><b>int</b></font> tmp_size[2];
-<a name="58"><font color="#888888 "><i>   58   </i></font></a>  <font color="#112266"><b>double</b></font> tmp_data[30];
+<a name="54"><font color="#888888 "><i>   54   </i></font></a>  <font color="#112266"><b>double</b></font> b_y_data[30];
+<a name="55"><font color="#888888 "><i>   55   </i></font></a>  <font color="#112266"><b>int</b></font> y_size[2];
+<a name="56"><font color="#888888 "><i>   56   </i></font></a>  <font color="#112266"><b>int</b></font> k;
+<a name="57"><font color="#888888 "><i>   57   </i></font></a>  <font color="#112266"><b>double</b></font> tmp_data[30];
+<a name="58"><font color="#888888 "><i>   58   </i></font></a>  <font color="#112266"><b>int</b></font> tmp_size[2];
 <a name="59"><font color="#888888 "><i>   59   </i></font></a>  <font color="#112266"><b>int</b></font> b_y_size[2];
 <a name="60"><font color="#888888 "><i>   60   </i></font></a>  Kx = <a href="NormalError_rtwutil_c.html#fcn_rt_powd_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_powd_snf');" target="_self"><font color="#1122aa">rt_powd_snf</font></a>(10.0, logKx);
 <a name="61"><font color="#888888 "><i>   61   </i></font></a>  R = <a href="NormalError_rtwutil_c.html#fcn_rt_powd_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_powd_snf');" target="_self"><font color="#1122aa">rt_powd_snf</font></a>(10.0, logR);
@@ -104,7 +104,7 @@
 <a name="92"><font color="#888888 "><i>   92   </i></font></a>    c = 1000.0;
 <a name="93"><font color="#888888 "><i>   93   </i></font></a>
 <a name="94"><font color="#888888 "><i>   94   </i></font></a>    <font color="#117755"><i>/* Commence algorithm */</i></font>
-<a name="95"><font color="#888888 "><i>   95   </i></font></a>    <font color="#112266"><b>while</b></font> ((b - a &gt; 0.0001) || (fabs(cVal) &gt; 0.0001)) <b>{</b>
+<a name="95"><font color="#888888 "><i>   95   </i></font></a>    <font color="#112266"><b>while</b></font> ((b - a &gt; 0.0001) &amp;&amp; (fabs(cVal) &gt; 0.0001)) <b>{</b>
 <a name="96"><font color="#888888 "><i>   96   </i></font></a>      c = (a + b) / 2.0;
 <a name="97"><font color="#888888 "><i>   97   </i></font></a>
 <a name="98"><font color="#888888 "><i>   98   </i></font></a>      <font color="#117755"><i>/* -------------------------------------------------------------------------- */</i></font>
@@ -136,88 +136,86 @@
 <a name="124"><font color="#888888 "><i>  124   </i></font></a>    y_data[0] = 1.0;
 <a name="125"><font color="#888888 "><i>  125   </i></font></a>    <font color="#112266"><b>if</b></font> (ndbl &gt; 1) <b>{</b>
 <a name="126"><font color="#888888 "><i>  126   </i></font></a>      y_data[ndbl - 1] = apnd;
-<a name="127"><font color="#888888 "><i>  127   </i></font></a>      cdiff = ndbl - 1;
-<a name="128"><font color="#888888 "><i>  128   </i></font></a>      cdiff /= 2;
-<a name="129"><font color="#888888 "><i>  129   </i></font></a>      <font color="#112266"><b>for</b></font> (k = 1; k &lt; cdiff; k++) <b>{</b>
-<a name="130"><font color="#888888 "><i>  130   </i></font></a>        y_data[k] = 1.0 + (<font color="#112266"><b>double</b></font>)k;
-<a name="131"><font color="#888888 "><i>  131   </i></font></a>        y_data[(ndbl - k) - 1] = apnd - k;
-<a name="132"><font color="#888888 "><i>  132   </i></font></a>      <b>}</b>
-<a name="133"><font color="#888888 "><i>  133   </i></font></a>
-<a name="134"><font color="#888888 "><i>  134   </i></font></a>      <font color="#112266"><b>if</b></font> (cdiff &lt;&lt; 1 == ndbl - 1) <b>{</b>
-<a name="135"><font color="#888888 "><i>  135   </i></font></a>        y_data[cdiff] = (1.0 + (<font color="#112266"><b>double</b></font>)apnd) / 2.0;
-<a name="136"><font color="#888888 "><i>  136   </i></font></a>      <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
-<a name="137"><font color="#888888 "><i>  137   </i></font></a>        y_data[cdiff] = 1.0 + (<font color="#112266"><b>double</b></font>)cdiff;
-<a name="138"><font color="#888888 "><i>  138   </i></font></a>        y_data[cdiff + 1] = apnd - cdiff;
-<a name="139"><font color="#888888 "><i>  139   </i></font></a>      <b>}</b>
-<a name="140"><font color="#888888 "><i>  140   </i></font></a>    <b>}</b>
-<a name="141"><font color="#888888 "><i>  141   </i></font></a>  <b>}</b>
-<a name="142"><font color="#888888 "><i>  142   </i></font></a>
-<a name="143"><font color="#888888 "><i>  143   </i></font></a>  y_size[0] = 1;
-<a name="144"><font color="#888888 "><i>  144   </i></font></a>  y_size[1] = ndbl;
-<a name="145"><font color="#888888 "><i>  145   </i></font></a>  <font color="#112266"><b>for</b></font> (cdiff = 0; cdiff &lt; ndbl; cdiff++) <b>{</b>
-<a name="146"><font color="#888888 "><i>  146   </i></font></a>    b_y_data[cdiff] = y_data[cdiff] - 1.0;
-<a name="147"><font color="#888888 "><i>  147   </i></font></a>  <b>}</b>
-<a name="148"><font color="#888888 "><i>  148   </i></font></a>
-<a name="149"><font color="#888888 "><i>  149   </i></font></a>  <a href="power_c.html#fcn_power" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_power');" target="_self"><font color="#1122aa">power</font></a>(Kx, b_y_data, y_size, tmp_data, tmp_size);
-<a name="150"><font color="#888888 "><i>  150   </i></font></a>  x = L0 / Kd;
-<a name="151"><font color="#888888 "><i>  151   </i></font></a>  ndbl = (<font color="#112266"><b>int</b></font>)floor((v - 1.0) + 0.5);
-<a name="152"><font color="#888888 "><i>  152   </i></font></a>  apnd = ndbl + 1;
-<a name="153"><font color="#888888 "><i>  153   </i></font></a>  cdiff = (ndbl - (<font color="#112266"><b>int</b></font>)v) + 1;
-<a name="154"><font color="#888888 "><i>  154   </i></font></a>  <font color="#112266"><b>if</b></font> (fabs(cdiff) &lt; 4.4408920985006262E-16 * (<font color="#112266"><b>double</b></font>)(<font color="#112266"><b>int</b></font>)v) <b>{</b>
-<a name="155"><font color="#888888 "><i>  155   </i></font></a>    ndbl++;
-<a name="156"><font color="#888888 "><i>  156   </i></font></a>    apnd = (<font color="#112266"><b>int</b></font>)v;
-<a name="157"><font color="#888888 "><i>  157   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (cdiff &gt; 0) <b>{</b>
-<a name="158"><font color="#888888 "><i>  158   </i></font></a>    apnd = ndbl;
-<a name="159"><font color="#888888 "><i>  159   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
-<a name="160"><font color="#888888 "><i>  160   </i></font></a>    ndbl++;
-<a name="161"><font color="#888888 "><i>  161   </i></font></a>  <b>}</b>
-<a name="162"><font color="#888888 "><i>  162   </i></font></a>
-<a name="163"><font color="#888888 "><i>  163   </i></font></a>  b_y_size[0] = 1;
-<a name="164"><font color="#888888 "><i>  164   </i></font></a>  b_y_size[1] = ndbl;
-<a name="165"><font color="#888888 "><i>  165   </i></font></a>  <font color="#112266"><b>if</b></font> (ndbl &gt; 0) <b>{</b>
-<a name="166"><font color="#888888 "><i>  166   </i></font></a>    y_data[0] = 1.0;
-<a name="167"><font color="#888888 "><i>  167   </i></font></a>    <font color="#112266"><b>if</b></font> (ndbl &gt; 1) <b>{</b>
-<a name="168"><font color="#888888 "><i>  168   </i></font></a>      y_data[ndbl - 1] = apnd;
-<a name="169"><font color="#888888 "><i>  169   </i></font></a>      cdiff = ndbl - 1;
-<a name="170"><font color="#888888 "><i>  170   </i></font></a>      cdiff /= 2;
-<a name="171"><font color="#888888 "><i>  171   </i></font></a>      <font color="#112266"><b>for</b></font> (k = 1; k &lt; cdiff; k++) <b>{</b>
-<a name="172"><font color="#888888 "><i>  172   </i></font></a>        y_data[k] = 1.0 + (<font color="#112266"><b>double</b></font>)k;
-<a name="173"><font color="#888888 "><i>  173   </i></font></a>        y_data[(ndbl - k) - 1] = apnd - k;
-<a name="174"><font color="#888888 "><i>  174   </i></font></a>      <b>}</b>
-<a name="175"><font color="#888888 "><i>  175   </i></font></a>
-<a name="176"><font color="#888888 "><i>  176   </i></font></a>      <font color="#112266"><b>if</b></font> (cdiff &lt;&lt; 1 == ndbl - 1) <b>{</b>
-<a name="177"><font color="#888888 "><i>  177   </i></font></a>        y_data[cdiff] = (1.0 + (<font color="#112266"><b>double</b></font>)apnd) / 2.0;
-<a name="178"><font color="#888888 "><i>  178   </i></font></a>      <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
-<a name="179"><font color="#888888 "><i>  179   </i></font></a>        y_data[cdiff] = 1.0 + (<font color="#112266"><b>double</b></font>)cdiff;
-<a name="180"><font color="#888888 "><i>  180   </i></font></a>        y_data[cdiff + 1] = apnd - cdiff;
-<a name="181"><font color="#888888 "><i>  181   </i></font></a>      <b>}</b>
-<a name="182"><font color="#888888 "><i>  182   </i></font></a>    <b>}</b>
-<a name="183"><font color="#888888 "><i>  183   </i></font></a>  <b>}</b>
-<a name="184"><font color="#888888 "><i>  184   </i></font></a>
-<a name="185"><font color="#888888 "><i>  185   </i></font></a>  <a href="power_c.html#fcn_power" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_power');" target="_self"><font color="#1122aa">power</font></a>(<a href="NormalError_rtwutil_c.html#fcn_rt_powd_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_powd_snf');" target="_self"><font color="#1122aa">rt_powd_snf</font></a>(10.0, c), y_data, b_y_size, b_y_data, y_size);
-<a name="186"><font color="#888888 "><i>  186   </i></font></a>  <font color="#112266"><b>for</b></font> (cdiff = 0; cdiff &lt; loop_ub; cdiff++) <b>{</b>
-<a name="187"><font color="#888888 "><i>  187   </i></font></a>    y_data[cdiff] = biCoefMat[cdiff + 30 * ((<font color="#112266"><b>int</b></font>)v - 1)] * tmp_data[tmp_size[0] *
-<a name="188"><font color="#888888 "><i>  188   </i></font></a>      cdiff] * (x * b_y_data[y_size[0] * cdiff]);
-<a name="189"><font color="#888888 "><i>  189   </i></font></a>  <b>}</b>
-<a name="190"><font color="#888888 "><i>  190   </i></font></a>
-<a name="191"><font color="#888888 "><i>  191   </i></font></a>  <font color="#112266"><b>if</b></font> (loop_ub == 0) <b>{</b>
-<a name="192"><font color="#888888 "><i>  192   </i></font></a>    L = 0.0;
-<a name="193"><font color="#888888 "><i>  193   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
-<a name="194"><font color="#888888 "><i>  194   </i></font></a>    L = y_data[0];
-<a name="195"><font color="#888888 "><i>  195   </i></font></a>    <font color="#112266"><b>for</b></font> (k = 2; k &lt;= loop_ub; k++) <b>{</b>
-<a name="196"><font color="#888888 "><i>  196   </i></font></a>      L += y_data[k - 1];
-<a name="197"><font color="#888888 "><i>  197   </i></font></a>    <b>}</b>
-<a name="198"><font color="#888888 "><i>  198   </i></font></a>  <b>}</b>
-<a name="199"><font color="#888888 "><i>  199   </i></font></a>
-<a name="200"><font color="#888888 "><i>  200   </i></font></a>  <font color="#112266"><b>return</b></font> L;
-<a name="201"><font color="#888888 "><i>  201   </i></font></a><b>}</b>
-<a name="202"><font color="#888888 "><i>  202   </i></font></a>
-<a name="203"><font color="#888888 "><i>  203   </i></font></a><font color="#117755"><i>/*</i></font>
-<a name="204"><font color="#888888 "><i>  204   </i></font></a><font color="#117755"><I> * File trailer for StoneMod.c</i></font>
-<a name="205"><font color="#888888 "><i>  205   </i></font></a><font color="#117755"><I> *</i></font>
-<a name="206"><font color="#888888 "><i>  206   </i></font></a><font color="#117755"><I> * [EOF]</i></font>
-<a name="207"><font color="#888888 "><i>  207   </i></font></a><font color="#117755"><I> */</i></font>
-<a name="208"><font color="#888888 "><i>  208   </i></font></a></pre>
+<a name="127"><font color="#888888 "><i>  127   </i></font></a>      cdiff = (ndbl - 1) / 2;
+<a name="128"><font color="#888888 "><i>  128   </i></font></a>      <font color="#112266"><b>for</b></font> (k = 1; k &lt; cdiff; k++) <b>{</b>
+<a name="129"><font color="#888888 "><i>  129   </i></font></a>        y_data[k] = 1.0 + (<font color="#112266"><b>double</b></font>)k;
+<a name="130"><font color="#888888 "><i>  130   </i></font></a>        y_data[(ndbl - k) - 1] = apnd - k;
+<a name="131"><font color="#888888 "><i>  131   </i></font></a>      <b>}</b>
+<a name="132"><font color="#888888 "><i>  132   </i></font></a>
+<a name="133"><font color="#888888 "><i>  133   </i></font></a>      <font color="#112266"><b>if</b></font> (cdiff &lt;&lt; 1 == ndbl - 1) <b>{</b>
+<a name="134"><font color="#888888 "><i>  134   </i></font></a>        y_data[cdiff] = (1.0 + (<font color="#112266"><b>double</b></font>)apnd) / 2.0;
+<a name="135"><font color="#888888 "><i>  135   </i></font></a>      <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="136"><font color="#888888 "><i>  136   </i></font></a>        y_data[cdiff] = 1.0 + (<font color="#112266"><b>double</b></font>)cdiff;
+<a name="137"><font color="#888888 "><i>  137   </i></font></a>        y_data[cdiff + 1] = apnd - cdiff;
+<a name="138"><font color="#888888 "><i>  138   </i></font></a>      <b>}</b>
+<a name="139"><font color="#888888 "><i>  139   </i></font></a>    <b>}</b>
+<a name="140"><font color="#888888 "><i>  140   </i></font></a>  <b>}</b>
+<a name="141"><font color="#888888 "><i>  141   </i></font></a>
+<a name="142"><font color="#888888 "><i>  142   </i></font></a>  y_size[0] = 1;
+<a name="143"><font color="#888888 "><i>  143   </i></font></a>  y_size[1] = ndbl;
+<a name="144"><font color="#888888 "><i>  144   </i></font></a>  <font color="#112266"><b>for</b></font> (cdiff = 0; cdiff &lt; ndbl; cdiff++) <b>{</b>
+<a name="145"><font color="#888888 "><i>  145   </i></font></a>    b_y_data[cdiff] = y_data[cdiff] - 1.0;
+<a name="146"><font color="#888888 "><i>  146   </i></font></a>  <b>}</b>
+<a name="147"><font color="#888888 "><i>  147   </i></font></a>
+<a name="148"><font color="#888888 "><i>  148   </i></font></a>  <a href="power_c.html#fcn_power" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_power');" target="_self"><font color="#1122aa">power</font></a>(Kx, b_y_data, y_size, tmp_data, tmp_size);
+<a name="149"><font color="#888888 "><i>  149   </i></font></a>  x = L0 / Kd;
+<a name="150"><font color="#888888 "><i>  150   </i></font></a>  ndbl = (<font color="#112266"><b>int</b></font>)floor((v - 1.0) + 0.5);
+<a name="151"><font color="#888888 "><i>  151   </i></font></a>  apnd = ndbl + 1;
+<a name="152"><font color="#888888 "><i>  152   </i></font></a>  cdiff = (ndbl - (<font color="#112266"><b>int</b></font>)v) + 1;
+<a name="153"><font color="#888888 "><i>  153   </i></font></a>  <font color="#112266"><b>if</b></font> (fabs(cdiff) &lt; 4.4408920985006262E-16 * (<font color="#112266"><b>double</b></font>)(<font color="#112266"><b>int</b></font>)v) <b>{</b>
+<a name="154"><font color="#888888 "><i>  154   </i></font></a>    ndbl++;
+<a name="155"><font color="#888888 "><i>  155   </i></font></a>    apnd = (<font color="#112266"><b>int</b></font>)v;
+<a name="156"><font color="#888888 "><i>  156   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (cdiff &gt; 0) <b>{</b>
+<a name="157"><font color="#888888 "><i>  157   </i></font></a>    apnd = ndbl;
+<a name="158"><font color="#888888 "><i>  158   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="159"><font color="#888888 "><i>  159   </i></font></a>    ndbl++;
+<a name="160"><font color="#888888 "><i>  160   </i></font></a>  <b>}</b>
+<a name="161"><font color="#888888 "><i>  161   </i></font></a>
+<a name="162"><font color="#888888 "><i>  162   </i></font></a>  b_y_size[0] = 1;
+<a name="163"><font color="#888888 "><i>  163   </i></font></a>  b_y_size[1] = ndbl;
+<a name="164"><font color="#888888 "><i>  164   </i></font></a>  <font color="#112266"><b>if</b></font> (ndbl &gt; 0) <b>{</b>
+<a name="165"><font color="#888888 "><i>  165   </i></font></a>    y_data[0] = 1.0;
+<a name="166"><font color="#888888 "><i>  166   </i></font></a>    <font color="#112266"><b>if</b></font> (ndbl &gt; 1) <b>{</b>
+<a name="167"><font color="#888888 "><i>  167   </i></font></a>      y_data[ndbl - 1] = apnd;
+<a name="168"><font color="#888888 "><i>  168   </i></font></a>      cdiff = (ndbl - 1) / 2;
+<a name="169"><font color="#888888 "><i>  169   </i></font></a>      <font color="#112266"><b>for</b></font> (k = 1; k &lt; cdiff; k++) <b>{</b>
+<a name="170"><font color="#888888 "><i>  170   </i></font></a>        y_data[k] = 1.0 + (<font color="#112266"><b>double</b></font>)k;
+<a name="171"><font color="#888888 "><i>  171   </i></font></a>        y_data[(ndbl - k) - 1] = apnd - k;
+<a name="172"><font color="#888888 "><i>  172   </i></font></a>      <b>}</b>
+<a name="173"><font color="#888888 "><i>  173   </i></font></a>
+<a name="174"><font color="#888888 "><i>  174   </i></font></a>      <font color="#112266"><b>if</b></font> (cdiff &lt;&lt; 1 == ndbl - 1) <b>{</b>
+<a name="175"><font color="#888888 "><i>  175   </i></font></a>        y_data[cdiff] = (1.0 + (<font color="#112266"><b>double</b></font>)apnd) / 2.0;
+<a name="176"><font color="#888888 "><i>  176   </i></font></a>      <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="177"><font color="#888888 "><i>  177   </i></font></a>        y_data[cdiff] = 1.0 + (<font color="#112266"><b>double</b></font>)cdiff;
+<a name="178"><font color="#888888 "><i>  178   </i></font></a>        y_data[cdiff + 1] = apnd - cdiff;
+<a name="179"><font color="#888888 "><i>  179   </i></font></a>      <b>}</b>
+<a name="180"><font color="#888888 "><i>  180   </i></font></a>    <b>}</b>
+<a name="181"><font color="#888888 "><i>  181   </i></font></a>  <b>}</b>
+<a name="182"><font color="#888888 "><i>  182   </i></font></a>
+<a name="183"><font color="#888888 "><i>  183   </i></font></a>  <a href="power_c.html#fcn_power" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_power');" target="_self"><font color="#1122aa">power</font></a>(<a href="NormalError_rtwutil_c.html#fcn_rt_powd_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_powd_snf');" target="_self"><font color="#1122aa">rt_powd_snf</font></a>(10.0, c), y_data, b_y_size, b_y_data, y_size);
+<a name="184"><font color="#888888 "><i>  184   </i></font></a>  <font color="#112266"><b>for</b></font> (cdiff = 0; cdiff &lt; loop_ub; cdiff++) <b>{</b>
+<a name="185"><font color="#888888 "><i>  185   </i></font></a>    y_data[cdiff] = biCoefMat[cdiff + 30 * ((<font color="#112266"><b>int</b></font>)v - 1)] * tmp_data[tmp_size[0] *
+<a name="186"><font color="#888888 "><i>  186   </i></font></a>      cdiff] * (x * b_y_data[y_size[0] * cdiff]);
+<a name="187"><font color="#888888 "><i>  187   </i></font></a>  <b>}</b>
+<a name="188"><font color="#888888 "><i>  188   </i></font></a>
+<a name="189"><font color="#888888 "><i>  189   </i></font></a>  <font color="#112266"><b>if</b></font> (loop_ub == 0) <b>{</b>
+<a name="190"><font color="#888888 "><i>  190   </i></font></a>    L = 0.0;
+<a name="191"><font color="#888888 "><i>  191   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="192"><font color="#888888 "><i>  192   </i></font></a>    L = y_data[0];
+<a name="193"><font color="#888888 "><i>  193   </i></font></a>    <font color="#112266"><b>for</b></font> (k = 2; k &lt;= loop_ub; k++) <b>{</b>
+<a name="194"><font color="#888888 "><i>  194   </i></font></a>      L += y_data[k - 1];
+<a name="195"><font color="#888888 "><i>  195   </i></font></a>    <b>}</b>
+<a name="196"><font color="#888888 "><i>  196   </i></font></a>  <b>}</b>
+<a name="197"><font color="#888888 "><i>  197   </i></font></a>
+<a name="198"><font color="#888888 "><i>  198   </i></font></a>  <font color="#112266"><b>return</b></font> L;
+<a name="199"><font color="#888888 "><i>  199   </i></font></a><b>}</b>
+<a name="200"><font color="#888888 "><i>  200   </i></font></a>
+<a name="201"><font color="#888888 "><i>  201   </i></font></a><font color="#117755"><i>/*</i></font>
+<a name="202"><font color="#888888 "><i>  202   </i></font></a><font color="#117755"><I> * File trailer for StoneMod.c</i></font>
+<a name="203"><font color="#888888 "><i>  203   </i></font></a><font color="#117755"><I> *</i></font>
+<a name="204"><font color="#888888 "><i>  204   </i></font></a><font color="#117755"><I> * [EOF]</i></font>
+<a name="205"><font color="#888888 "><i>  205   </i></font></a><font color="#117755"><I> */</i></font>
+<a name="206"><font color="#888888 "><i>  206   </i></font></a></pre>
 </td></tr></table>
 </p>
 </body>

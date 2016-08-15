@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef __NORMALERROR_INITIALIZE_H__
-#define __NORMALERROR_INITIALIZE_H__
+#ifndef NORMALERROR_INITIALIZE_H
+#define NORMALERROR_INITIALIZE_H
 
 /* Include files */
 #include <math.h>
@@ -21,7 +21,7 @@
 #include "tmwtypes.h"
 #include "mex.h"
 #include "emlrt.h"
-#include "blas.h"
+#include "covrt.h"
 #include "rtwtypes.h"
 #include "NormalError_types.h"
 

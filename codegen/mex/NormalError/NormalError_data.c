@@ -17,17 +17,18 @@
 /* Variable Definitions */
 emlrtCTX emlrtRootTLSGlobal = NULL;
 const volatile char_T *emlrtBreakCheckR2012bFlagVar = NULL;
-emlrtContext emlrtContextGlobal = { true, false, 131419U, NULL, "NormalError",
+covrtInstance emlrtCoverageInstance;
+emlrtContext emlrtContextGlobal = { true, false, 131434U, NULL, "NormalError",
   NULL, false, { 2433290357U, 2237796540U, 4066813863U, 833189415U }, NULL };
 
-emlrtRSInfo h_emlrtRSI = { 79, "colon",
-  "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\colon.m" };
+emlrtRSInfo k_emlrtRSI = { 79, "colon",
+  "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\lib\\matlab\\ops\\colon.m" };
 
-emlrtRSInfo i_emlrtRSI = { 283, "colon",
-  "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\colon.m" };
+emlrtRSInfo l_emlrtRSI = { 283, "colon",
+  "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\lib\\matlab\\ops\\colon.m" };
 
-emlrtRSInfo o_emlrtRSI = { 37, "mpower",
-  "C:\\Program Files\\MATLAB\\R2015b\\toolbox\\eml\\lib\\matlab\\ops\\mpower.m"
+emlrtRSInfo r_emlrtRSI = { 37, "mpower",
+  "C:\\Program Files\\MATLAB\\R2016a\\toolbox\\eml\\lib\\matlab\\ops\\mpower.m"
 };
 
 /* End of code generation (NormalError_data.c) */

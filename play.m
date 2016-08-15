@@ -1,11 +1,10 @@
-[kd, tnpbsa, mfiAdjMean, kdBruhns, best, meanPerCond, stdPerCond] = loadData()
+load('DiffCompare.mat')
 
-biCoefMat = zeros(26,26);
-for j = 1:26
-    for k = 1:j
-        biCoefMat(k,j) = nchoosek(j,k);
+temp = [];
+for j = 1:6
+    for k = 1:6
+        if (bigDiffLigand(2,j,k) > 10) && (DiffLigand(2,j,k) < 20)
+            temp = [temp [bigDiffLigand(:,j,k);j;k]];
+        end
     end
 end
-
-v = [4;26];
-PDF(ones(1,11),kdBruhns,mfiAdjMean,biCoefMat,tnpbsa,meanPerCond,stdPerCond)
