@@ -11,22 +11,20 @@ lnlikestr = 'lnlike'
 csv = '.csv'
 
 ## Clear as csvs to be used, if necessary
-query = input('Clean all csvs? If so, say "pls".\n')
-if query == 'pls':
-    w = 'w'
-    for j in range(6):
-        num = str(j+1)
-        fd = eval('open(pstr+num+csv,w)')
-        fd.write('')
-        fd.close()
+w = 'w'
+for j in range(6):
+    num = str(j+1)
+    fd = eval('open(pstr+num+csv,w)')
+    fd.write('')
+    fd.close()
 
-        fd = eval('open(lnprobstr+num+csv,w)')
-        fd.write('')
-        fd.close()
+    fd = eval('open(lnprobstr+num+csv,w)')
+    fd.write('')
+    fd.close()
 
-        fd = eval('open(lnlikestr+num+csv,w)')
-        fd.write('')
-        fd.close()
+    fd = eval('open(lnlikestr+num+csv,w)')
+    fd.write('')
+    fd.close()
 
 #### Run simulation
 nsamples = int(input('Do you want to run the MCMC? If so, list how many \n' \
@@ -59,7 +57,6 @@ def logp(inp):
 ## For each FcgR in Lux's Data
 for j in range(6):
     ## Open csvs for appending
-    a = 'a'
     pnumstr = pstr+str(j+1)
     lnprobnumstr = lnprobstr+str(j+1)
     lnlikenumstr = lnlikestr+str(j+1)
