@@ -17,9 +17,6 @@
 #include "NormalErrorCoef2_initialize.h"
 #include "NormalErrorCoef2_data.h"
 
-/* Variable Definitions */
-static jmp_buf emlrtJBEnviron;
-
 /* Function Declarations */
 static void NormalErrorCoef2_mexFunction(int32_T nlhs, mxArray *plhs[1], int32_T
   nrhs, const mxArray *prhs[7]);
@@ -74,34 +71,19 @@ static void NormalErrorCoef2_mexFunction(int32_T nlhs, mxArray *plhs[1], int32_T
 void mexFunction(int32_T nlhs, mxArray *plhs[], int32_T nrhs, const mxArray
                  *prhs[])
 {
-  emlrtStack st = { NULL, NULL, NULL };
-
   mexAtExit(NormalErrorCoef2_atexit);
 
   /* Initialize the memory manager. */
-  omp_init_lock(&emlrtLockGlobal);
-  omp_init_nest_lock(&emlrtNestLockGlobal);
-
   /* Module initialization. */
   NormalErrorCoef2_initialize();
-  st.tls = emlrtRootTLSGlobal;
-  emlrtSetJmpBuf(&st, &emlrtJBEnviron);
-  if (setjmp(emlrtJBEnviron) == 0) {
-    /* Dispatch the entry-point. */
-    NormalErrorCoef2_mexFunction(nlhs, plhs, nrhs, prhs);
-    omp_destroy_lock(&emlrtLockGlobal);
-    omp_destroy_nest_lock(&emlrtNestLockGlobal);
-  } else {
-    omp_destroy_lock(&emlrtLockGlobal);
-    omp_destroy_nest_lock(&emlrtNestLockGlobal);
-    emlrtReportParallelRunTimeError(&st);
-  }
+
+  /* Dispatch the entry-point. */
+  NormalErrorCoef2_mexFunction(nlhs, plhs, nrhs, prhs);
 }
 
 emlrtCTX mexFunctionCreateRootTLS(void)
 {
-  emlrtCreateRootTLS(&emlrtRootTLSGlobal, &emlrtContextGlobal,
-                     emlrtLockerFunction, omp_get_num_procs());
+  emlrtCreateRootTLS(&emlrtRootTLSGlobal, &emlrtContextGlobal, NULL, 1);
   return emlrtRootTLSGlobal;
 }
 

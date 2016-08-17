@@ -5,7 +5,7 @@
  * File: power.c
  *
  * MATLAB Coder version            : 3.1
- * C/C++ source code generated on  : 15-Aug-2016 17:19:22
+ * C/C++ source code generated on  : 17-Aug-2016 11:10:55
  */
 
 /* Include Files */
@@ -27,29 +27,11 @@
 void power(double a, const double b_data[], const int b_size[2], double y_data[],
            int y_size[2])
 {
-  double x;
-  int loop_ub;
-  int i0;
-  double b_y_data[30];
   int k;
-  int b_k;
-  x = a;
-  loop_ub = b_size[0] * b_size[1];
-  for (i0 = 0; i0 < loop_ub; i0++) {
-    b_y_data[i0] = b_data[i0];
-  }
-
   y_size[0] = 1;
   y_size[1] = (signed char)b_size[1];
-  loop_ub = b_size[1];
-
-#pragma omp parallel for \
- num_threads(omp_get_max_threads()) \
- private(b_k)
-
-  for (k = 1; k <= loop_ub; k++) {
-    b_k = k;
-    y_data[b_k - 1] = rt_powd_snf(x, b_y_data[b_k - 1]);
+  for (k = 0; k + 1 <= b_size[1]; k++) {
+    y_data[k] = rt_powd_snf(a, b_data[k]);
   }
 }
 

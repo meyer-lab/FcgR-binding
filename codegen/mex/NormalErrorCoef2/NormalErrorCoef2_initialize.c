@@ -27,22 +27,25 @@ static void NormalErrorCoef2_once(void)
 
   /* Initialize Coverage Information */
   covrtScriptInit(&emlrtCoverageInstance,
-                  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m",
-                  0, 2, 6, 0, 0, 0, 0, 3, 0, 0, 0);
+                  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\NormalErrorCoef2.m",
+                  0, 2, 7, 1, 0, 0, 0, 3, 0, 0, 0);
 
   /* Initialize Function Information */
-  covrtFcnInit(&emlrtCoverageInstance, 0, 0, "NormalErrorCoef2", 0, -1, 855);
-  covrtFcnInit(&emlrtCoverageInstance, 0, 1, "pseudoNormlike", 932, -1, 1217);
+  covrtFcnInit(&emlrtCoverageInstance, 0, 0, "NormalErrorCoef2", 0, -1, 935);
+  covrtFcnInit(&emlrtCoverageInstance, 0, 1, "pseudoNormlike", 1012, -1, 1297);
 
   /* Initialize Basic Block Information */
+  covrtBasicBlockInit(&emlrtCoverageInstance, 0, 5, 895, -1, 922);
   covrtBasicBlockInit(&emlrtCoverageInstance, 0, 4, 810, -1, 850);
   covrtBasicBlockInit(&emlrtCoverageInstance, 0, 3, 639, -1, 768);
   covrtBasicBlockInit(&emlrtCoverageInstance, 0, 2, 331, -1, 597);
   covrtBasicBlockInit(&emlrtCoverageInstance, 0, 1, 234, -1, 297);
   covrtBasicBlockInit(&emlrtCoverageInstance, 0, 0, 111, -1, 208);
-  covrtBasicBlockInit(&emlrtCoverageInstance, 0, 5, 1141, -1, 1212);
+  covrtBasicBlockInit(&emlrtCoverageInstance, 0, 6, 1221, -1, 1292);
 
   /* Initialize If Information */
+  covrtIfInit(&emlrtCoverageInstance, 0, 0, 856, 886, -1, 931);
+
   /* Initialize MCDC Information */
   /* Initialize For Information */
   covrtForInit(&emlrtCoverageInstance, 0, 0, 214, 226, 805);
@@ -59,7 +62,7 @@ static void NormalErrorCoef2_once(void)
 
   /* Initialize Coverage Information */
   covrtScriptInit(&emlrtCoverageInstance,
-                  "C:\\Users\\admin\\Documents\\GitHub\\recepnum1\\StoneMod.m",
+                  "C:\\Users\\mitadm\\Documents\\GitHub\\recepnum1\\StoneMod.m",
                   1, 3, 8, 2, 0, 0, 0, 0, 1, 0, 0);
 
   /* Initialize Function Information */

@@ -5,14 +5,13 @@
  * File: NormalErrorCoef2_initialize.c
  *
  * MATLAB Coder version            : 3.1
- * C/C++ source code generated on  : 15-Aug-2016 17:19:22
+ * C/C++ source code generated on  : 17-Aug-2016 11:10:55
  */
 
 /* Include Files */
 #include "rt_nonfinite.h"
 #include "NormalErrorCoef2.h"
 #include "NormalErrorCoef2_initialize.h"
-#include "NormalErrorCoef2_data.h"
 
 /* Function Definitions */
 
@@ -23,7 +22,6 @@
 void NormalErrorCoef2_initialize(void)
 {
   rt_InitInfAndNaN(8U);
-  omp_init_nest_lock(&emlrtNestLockGlobal);
 }
 
 /*

@@ -3,6 +3,12 @@ from emcee import *
 import numpy
 import csv
 import time
+from multiprocessing import Pool
+
+## For running in parallel
+#### Set to 8 if running on VM
+#### Set to 5 if running on Ryan's laptop
+##p = Pool(8)
 
 ## Clear as csvs to be used
 fd = open('pos.csv','w')

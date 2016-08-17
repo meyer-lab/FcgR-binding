@@ -1,4 +1,4 @@
-START_DIR = C:\Users\admin\DOCUME~1\GitHub\RECEPN~1
+START_DIR = C:\Users\mitadm\DOCUME~1\GitHub\RECEPN~1
 
 MATLAB_ROOT = C:\PROGRA~1\MATLAB\R2016a
 MAKEFILE = NormalErrorCoef2_mex.mk
@@ -7,7 +7,6 @@ include NormalErrorCoef2_mex.mki
 
 
 SRC_FILES =  \
-	NormalErrorCoef2_mexutil.c \
 	NormalErrorCoef2_data.c \
 	NormalErrorCoef2_initialize.c \
 	NormalErrorCoef2_terminate.c \
@@ -29,7 +28,7 @@ SYS_LIBS =
 
 #
 #====================================================================
-# gmake makefile fragment for building MEX functions using MSVC
+# gmake makefile fragment for building MEX functions using LCC
 # Copyright 2007-2015 The MathWorks, Inc.
 #====================================================================
 #
@@ -39,86 +38,70 @@ CC = $(COMPILER)
 LD = $(LINKER)
 .SUFFIXES: .$(OBJEXT)
 
-OBJLISTC = $(SRC_FILES:.c=.$(OBJEXT))
-OBJLIST  = $(OBJLISTC:.cpp=.$(OBJEXT))
+OBJLIST += $(SRC_FILES:.c=.$(OBJEXT))
+MEXSTUB = $(MEX_FILE_NAME_WO_EXT)2.$(OBJEXT)
+LCCSTUB = $(MEX_FILE_NAME_WO_EXT)_lccstub.$(OBJEXT)
 
-ifneq (,$(findstring $(EMC_COMPILER),msvc80 msvc90 msvc100 msvc100free msvc110 msvc120 msvc140 msvcsdk))
-  TARGETMT = $(TARGET).manifest
-  MEX = $(TARGETMT)
-  STRICTFP = /fp:strict
-else
-  MEX = $(TARGET)
-  STRICTFP = /Op
-endif
+target: $(TARGET)
 
-target: $(MEX)
+ML_INCLUDES = -I"$(MATLAB_ROOT)\simulink\include"
+ML_INCLUDES+= -I"$(MATLAB_ROOT)\toolbox\shared\simtargets"
+SYS_INCLUDE = $(ML_INCLUDES)
 
-MATLAB_INCLUDES = /I "$(MATLAB_ROOT)\simulink\include"
-MATLAB_INCLUDES+= /I "$(MATLAB_ROOT)\toolbox\shared\simtargets"
-SYS_INCLUDE = $(MATLAB_INCLUDES)
+LCC_ROOT = $(MATLAB_ROOT)\sys\lcc64\lcc64
 
 # Additional includes
 
-SYS_INCLUDE += /I "$(START_DIR)"
-SYS_INCLUDE += /I "$(START_DIR)\codegen\mex\NormalErrorCoef2"
-SYS_INCLUDE += /I ".\interface"
-SYS_INCLUDE += /I "$(MATLAB_ROOT)\extern\include"
-SYS_INCLUDE += /I "."
+SYS_INCLUDE += -I"$(START_DIR)"
+SYS_INCLUDE += -I"$(START_DIR)\codegen\mex\NormalErrorCoef2"
+SYS_INCLUDE += -I".\interface"
+SYS_INCLUDE += -I"$(MATLAB_ROOT)\extern\include"
+SYS_INCLUDE += -I"."
 
-DIRECTIVES = $(MEX_FILE_NAME_WO_EXT)_mex.arf
-COMP_FLAGS = $(COMPFLAGS) $(OMPFLAGS)
-LINK_FLAGS = $(filter-out /export:mexFunction, $(LINKFLAGS))
-LINK_FLAGS += /NODEFAULTLIB:LIBCMT
+EML_LIBS = libemlrt.lib libcovrt.lib libut.lib libmwmathutil.lib
+SYS_LIBS += $(EML_LIBS)
+
+DIRECTIVES = $(MEX_FILE_NAME_WO_EXT)_mex.def
+
+COMP_FLAGS = $(COMPFLAGS)
+LINK_FLAGS0= $(subst $(MEXSTUB),$(LCCSTUB),$(LINKFLAGS))
+LINK_FLAGS = $(filter-out "mexFunction.def", $(LINK_FLAGS0))
+
+
 ifeq ($(EMC_CONFIG),optim)
-  COMP_FLAGS += $(OPTIMFLAGS) $(STRICTFP)
+  COMP_FLAGS += $(OPTIMFLAGS)
   LINK_FLAGS += $(LINKOPTIMFLAGS)
 else
   COMP_FLAGS += $(DEBUGFLAGS)
   LINK_FLAGS += $(LINKDEBUGFLAGS)
 endif
-LINK_FLAGS += $(OMPLINKFLAGS)
-LINK_FLAGS += /OUT:$(TARGET)
+LINK_FLAGS += -o $(TARGET)
 LINK_FLAGS += 
 
 CFLAGS =  $(COMP_FLAGS) $(USER_INCLUDE) $(SYS_INCLUDE)
-CPPFLAGS =  $(CFLAGS)
 
 %.$(OBJEXT) : %.c
 	$(CC) $(CFLAGS) "$<"
 
-%.$(OBJEXT) : %.cpp
-	$(CC) $(CPPFLAGS) "$<"
-
 # Additional sources
 
 %.$(OBJEXT) : $(START_DIR)/%.c
-	$(CC) $(CFLAGS) "$<"
+	$(CC) -Fo"$@" $(CFLAGS) "$<"
 
 %.$(OBJEXT) : $(START_DIR)\codegen\mex\NormalErrorCoef2/%.c
-	$(CC) $(CFLAGS) "$<"
+	$(CC) -Fo"$@" $(CFLAGS) "$<"
 
 %.$(OBJEXT) : interface/%.c
-	$(CC) $(CFLAGS) "$<"
+	$(CC) -Fo"$@" $(CFLAGS) "$<"
 
 
 
-%.$(OBJEXT) : $(START_DIR)/%.cpp
-	$(CC) $(CPPFLAGS) "$<"
+$(LCCSTUB) : $(LCC_ROOT)\mex\lccstub.c
+	$(CC) -Fo$(LCCSTUB) $(CFLAGS) "$<"
 
-%.$(OBJEXT) : $(START_DIR)\codegen\mex\NormalErrorCoef2/%.cpp
-	$(CC) $(CPPFLAGS) "$<"
-
-%.$(OBJEXT) : interface/%.cpp
-	$(CC) $(CPPFLAGS) "$<"
-
-
-
-$(TARGET): $(OBJLIST) $(MAKEFILE) $(DIRECTIVES)
-	$(LD) $(LINK_FLAGS) $(OBJLIST) $(USER_LIBS) $(SYS_LIBS) @$(DIRECTIVES)
+$(TARGET): $(OBJLIST) $(LCCSTUB) $(MAKEFILE) $(DIRECTIVES)
+	$(LD) $(OBJLIST) $(LINK_FLAGS) $(LINKFLAGSPOST) $(SYS_LIBS) $(DIRECTIVES)
 	@cmd /C "echo Build completed using compiler $(EMC_COMPILER)"
-
-$(TARGETMT): $(TARGET)
-	mt -outputresource:"$(TARGET);2" -manifest "$(TARGET).manifest"
 
 #====================================================================
 
