@@ -14,8 +14,8 @@ function logprob = NormalErrorCnct2(Rtot,witchR)
         logprob = 0;
         return
     else
-        if max(isnan(Rtot)) == 1
-            logprob = -1e10;
+        if (max(isnan(Rtot)) == 1) || (max(isinf(Rtot)) == 1)
+            logprob = -realmax/(1e20);
             return
         end
         for j = 5:6

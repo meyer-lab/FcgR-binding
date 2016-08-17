@@ -17,8 +17,6 @@
 /* Variable Definitions */
 emlrtCTX emlrtRootTLSGlobal = NULL;
 const volatile char_T *emlrtBreakCheckR2012bFlagVar = NULL;
-omp_lock_t emlrtLockGlobal;
-omp_nest_lock_t emlrtNestLockGlobal;
 covrtInstance emlrtCoverageInstance;
 emlrtContext emlrtContextGlobal = { true, false, 131434U, NULL,
   "NormalErrorCoef2", NULL, false, { 2433290357U, 2237796540U, 4066813863U,

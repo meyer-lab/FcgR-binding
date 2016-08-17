@@ -5,7 +5,7 @@
  * File: NormalErrorCoef2.c
  *
  * MATLAB Coder version            : 3.1
- * C/C++ source code generated on  : 15-Aug-2016 17:19:22
+ * C/C++ source code generated on  : 17-Aug-2016 11:10:55
  */
 
 /* Include Files */
@@ -95,6 +95,10 @@ double NormalErrorCoef2(const double Rtot[7], const double KdMat[60], const
     if (!rtIsNaN(y[ixstart])) {
       logSqrErr += y[ixstart];
     }
+  }
+
+  if (logSqrErr < -1.7976931348623158E+288) {
+    logSqrErr = -1.7976931348623158E+288;
   }
 
   return logSqrErr;
