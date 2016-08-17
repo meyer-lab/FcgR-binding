@@ -35,22 +35,21 @@
 <a name="23"><font color="#888888 "><i>   23   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;emlrt.h&quot;</font>
 <a name="24"><font color="#888888 "><i>   24   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;covrt.h&quot;</font>
 <a name="25"><font color="#888888 "><i>   25   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;rtwtypes.h&quot;</font>
-<a name="26"><font color="#888888 "><i>   26   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;omp.h&quot;</font>
-<a name="27"><font color="#888888 "><i>   27   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;NormalErrorCoef2_types.h&quot;</font>
-<a name="28"><font color="#888888 "><i>   28   </i></font></a>
-<a name="29"><font color="#888888 "><i>   29   </i></font></a><font color="#117755"><i>/* Function Declarations */</i></font>
-<a name="30"><font color="#888888 "><i>   30   </i></font></a><font color="#112266"><b>extern</b></font> real_T <a href="StoneMod_c.html#fcn_StoneMod" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_StoneMod');" target="_self"><font color="#1122aa">StoneMod</font></a>(<font color="#112266"><b>const</b></font> emlrtStack *sp, real_T logR, real_T Kd, real_T v,
-<a name="31"><font color="#888888 "><i>   31   </i></font></a>  real_T logKx, real_T L0, <font color="#112266"><b>const</b></font> real_T biCoefMat[900]);
-<a name="32"><font color="#888888 "><i>   32   </i></font></a>
-<a name="33"><font color="#888888 "><i>   33   </i></font></a><font color="#992211">#</font><font color="#992211"><b>ifdef</b></font> __WATCOMC__
-<a name="34"><font color="#888888 "><i>   34   </i></font></a>
-<a name="35"><font color="#888888 "><i>   35   </i></font></a><font color="#992211">#</font><font color="#992211"><b>pragma</b></font> <a name="var_aux">aux</a> <a href="StoneMod_c.html#fcn_StoneMod" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_StoneMod');" target="_self"><font color="#1122aa">StoneMod</font></a> <a href="NormalErrorCoef2_h.html#var_value" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_value');" target="_self"><font color="#1122aa">value</font></a> [8087];
-<a name="36"><font color="#888888 "><i>   36   </i></font></a>
+<a name="26"><font color="#888888 "><i>   26   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;NormalErrorCoef2_types.h&quot;</font>
+<a name="27"><font color="#888888 "><i>   27   </i></font></a>
+<a name="28"><font color="#888888 "><i>   28   </i></font></a><font color="#117755"><i>/* Function Declarations */</i></font>
+<a name="29"><font color="#888888 "><i>   29   </i></font></a><font color="#112266"><b>extern</b></font> real_T <a href="StoneMod_c.html#fcn_StoneMod" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_StoneMod');" target="_self"><font color="#1122aa">StoneMod</font></a>(<font color="#112266"><b>const</b></font> emlrtStack *sp, real_T logR, real_T Kd, real_T v,
+<a name="30"><font color="#888888 "><i>   30   </i></font></a>  real_T logKx, real_T L0, <font color="#112266"><b>const</b></font> real_T biCoefMat[900]);
+<a name="31"><font color="#888888 "><i>   31   </i></font></a>
+<a name="32"><font color="#888888 "><i>   32   </i></font></a><font color="#992211">#</font><font color="#992211"><b>ifdef</b></font> __WATCOMC__
+<a name="33"><font color="#888888 "><i>   33   </i></font></a>
+<a name="34"><font color="#888888 "><i>   34   </i></font></a><font color="#992211">#</font><font color="#992211"><b>pragma</b></font> <a name="var_aux">aux</a> <a href="StoneMod_c.html#fcn_StoneMod" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_StoneMod');" target="_self"><font color="#1122aa">StoneMod</font></a> <a href="NormalErrorCoef2_h.html#var_value" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_value');" target="_self"><font color="#1122aa">value</font></a> [8087];
+<a name="35"><font color="#888888 "><i>   35   </i></font></a>
+<a name="36"><font color="#888888 "><i>   36   </i></font></a><font color="#992211">#</font><font color="#992211"><b>endif</b></font>
 <a name="37"><font color="#888888 "><i>   37   </i></font></a><font color="#992211">#</font><font color="#992211"><b>endif</b></font>
-<a name="38"><font color="#888888 "><i>   38   </i></font></a><font color="#992211">#</font><font color="#992211"><b>endif</b></font>
-<a name="39"><font color="#888888 "><i>   39   </i></font></a>
-<a name="40"><font color="#888888 "><i>   40   </i></font></a><font color="#117755"><i>/* End of code generation (StoneMod.h) */</i></font>
-<a name="41"><font color="#888888 "><i>   41   </i></font></a></pre>
+<a name="38"><font color="#888888 "><i>   38   </i></font></a>
+<a name="39"><font color="#888888 "><i>   39   </i></font></a><font color="#117755"><i>/* End of code generation (StoneMod.h) */</i></font>
+<a name="40"><font color="#888888 "><i>   40   </i></font></a></pre>
 </td></tr></table>
 </p>
 </body>

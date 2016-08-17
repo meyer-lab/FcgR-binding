@@ -23,14 +23,11 @@
 #include "emlrt.h"
 #include "covrt.h"
 #include "rtwtypes.h"
-#include "omp.h"
 #include "NormalErrorCoef2_types.h"
 
 /* Variable Declarations */
 extern emlrtCTX emlrtRootTLSGlobal;
 extern const volatile char_T *emlrtBreakCheckR2012bFlagVar;
-extern omp_lock_t emlrtLockGlobal;
-extern omp_nest_lock_t emlrtNestLockGlobal;
 extern covrtInstance emlrtCoverageInstance;
 extern emlrtContext emlrtContextGlobal;
 extern emlrtRSInfo m_emlrtRSI;

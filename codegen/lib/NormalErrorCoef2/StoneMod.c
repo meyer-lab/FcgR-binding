@@ -5,7 +5,7 @@
  * File: StoneMod.c
  *
  * MATLAB Coder version            : 3.1
- * C/C++ source code generated on  : 15-Aug-2016 17:19:22
+ * C/C++ source code generated on  : 17-Aug-2016 11:10:55
  */
 
 /* Include Files */

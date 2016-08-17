@@ -17,7 +17,7 @@
 <a name="5"><font color="#888888 "><i>    5   </i></font></a><font color="#117755"><I> * File: NormalErrorCoef2.c</i></font>
 <a name="6"><font color="#888888 "><i>    6   </i></font></a><font color="#117755"><I> *</i></font>
 <a name="7"><font color="#888888 "><i>    7   </i></font></a><font color="#117755"><I> * MATLAB Coder version            : 3.1</i></font>
-<a name="8"><font color="#888888 "><i>    8   </i></font></a><font color="#117755"><I> * C/C++ source code generated on  : 15-Aug-2016 17:19:22</i></font>
+<a name="8"><font color="#888888 "><i>    8   </i></font></a><font color="#117755"><I> * C/C++ source code generated on  : 17-Aug-2016 11:10:55</i></font>
 <a name="9"><font color="#888888 "><i>    9   </i></font></a><font color="#117755"><I> */</i></font>
 <a name="10"><font color="#888888 "><i>   10   </i></font></a>
 <a name="11"><font color="#888888 "><i>   11   </i></font></a><font color="#117755"><i>/* Include Files */</i></font>
@@ -109,15 +109,19 @@
 <a name="97"><font color="#888888 "><i>   97   </i></font></a>    <b>}</b>
 <a name="98"><font color="#888888 "><i>   98   </i></font></a>  <b>}</b>
 <a name="99"><font color="#888888 "><i>   99   </i></font></a>
-<a name="100"><font color="#888888 "><i>  100   </i></font></a>  <font color="#112266"><b>return</b></font> logSqrErr;
-<a name="101"><font color="#888888 "><i>  101   </i></font></a><b>}</b>
-<a name="102"><font color="#888888 "><i>  102   </i></font></a>
-<a name="103"><font color="#888888 "><i>  103   </i></font></a><font color="#117755"><i>/*</i></font>
-<a name="104"><font color="#888888 "><i>  104   </i></font></a><font color="#117755"><I> * File trailer for NormalErrorCoef2.c</i></font>
-<a name="105"><font color="#888888 "><i>  105   </i></font></a><font color="#117755"><I> *</i></font>
-<a name="106"><font color="#888888 "><i>  106   </i></font></a><font color="#117755"><I> * [EOF]</i></font>
-<a name="107"><font color="#888888 "><i>  107   </i></font></a><font color="#117755"><I> */</i></font>
-<a name="108"><font color="#888888 "><i>  108   </i></font></a></pre>
+<a name="100"><font color="#888888 "><i>  100   </i></font></a>  <font color="#112266"><b>if</b></font> (logSqrErr &lt; -1.7976931348623158E+288) <b>{</b>
+<a name="101"><font color="#888888 "><i>  101   </i></font></a>    logSqrErr = -1.7976931348623158E+288;
+<a name="102"><font color="#888888 "><i>  102   </i></font></a>  <b>}</b>
+<a name="103"><font color="#888888 "><i>  103   </i></font></a>
+<a name="104"><font color="#888888 "><i>  104   </i></font></a>  <font color="#112266"><b>return</b></font> logSqrErr;
+<a name="105"><font color="#888888 "><i>  105   </i></font></a><b>}</b>
+<a name="106"><font color="#888888 "><i>  106   </i></font></a>
+<a name="107"><font color="#888888 "><i>  107   </i></font></a><font color="#117755"><i>/*</i></font>
+<a name="108"><font color="#888888 "><i>  108   </i></font></a><font color="#117755"><I> * File trailer for NormalErrorCoef2.c</i></font>
+<a name="109"><font color="#888888 "><i>  109   </i></font></a><font color="#117755"><I> *</i></font>
+<a name="110"><font color="#888888 "><i>  110   </i></font></a><font color="#117755"><I> * [EOF]</i></font>
+<a name="111"><font color="#888888 "><i>  111   </i></font></a><font color="#117755"><I> */</i></font>
+<a name="112"><font color="#888888 "><i>  112   </i></font></a></pre>
 </td></tr></table>
 </p>
 </body>
