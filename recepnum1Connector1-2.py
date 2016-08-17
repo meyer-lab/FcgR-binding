@@ -19,6 +19,18 @@ fd = open('prob.csv','w')
 fd.write('')
 fd.close()
 
+## Upper and lower bounds of the 12 parameters
+lbR = 0
+ubR = 8
+lbKx = -20
+ubKx = 0
+lbc = -20
+ubc = 5
+lbv = 1
+ubv = 30
+lbsigma = -20
+ubsigma = 2
+
 #### Run simulation
 nsamples = int(input('Do you want to run the MCMC? If so, list how many \n' \
                  + 'samples.\n'))
@@ -50,8 +62,32 @@ sampler = EnsembleSampler(nwalkers,ndims,logl,2.0,[],{},None,1,None,False,None)
 
 ## Burn-in run
 p0 = numpy.random.rand(ndims*nwalkers).reshape((nwalkers,ndims))
+newp0 = []
+for walker in p0:
+    newwalker = []
+    for j in range(ndims):
+        if j < 6:
+            lb = lbR
+            ub = ubR
+        elif j == 6:
+            lb = lbKx
+            ub = ubKx
+        elif j < 9:
+            lb = lbc
+            ub = ubc
+        elif j < 11:
+            lb = lbv
+            ub = ubv
+        else:
+            lb = lbsigma
+            ub = ubsigma
+        newwalker.append(walker[j]*(ub-lb)+lb)
+    newp0.append(newwalker)
+p0 = numpy.array(newp0)
 pos, prob, _ = sampler.run_mcmc(p0, 100)
 sampler.reset()
+
+print('YAAASSSS')
 
 ## Start timer
 start = time.time()
