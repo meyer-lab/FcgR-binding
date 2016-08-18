@@ -10,15 +10,15 @@ temp = csvread(csvname);
 temp = temp(:,2:size(temp,2));
 nsamples = size(temp,1);
 nwalkers = 100;
-if csvname == 'pos.csv'
+if csvname ~= 'pos1.csv'
     ndims = 12;
 else
     ndims = 7;
 end
 
-checkauto = input(['Check autocorrelation for ergodicity test? If so,' char(10)...
-    'please input "pls" in single quotes.' char(10) char(10)]);clc
-if chechauto == 'pls'
+% checkauto = input(['Check autocorrelation for ergodicity test? If so,' char(10)...
+%     'please input "pls" in single quotes.' char(10) char(10)]);clc
+if 0
     clc
     disp('Plotting...')
     for j = 1:nwalkers
@@ -37,7 +37,7 @@ end
 sample = reshape(temp,ndims,nwalkers*nsamples);
 sample = sample';
 
-if csvname == 'pos.csv'
+if csvname ~= 'pos1.csv'
     for j = 1:12
         if j < 7
             name = ['log Fc\gammaR No. ' num2str(j)];
