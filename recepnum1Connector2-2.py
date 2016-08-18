@@ -27,6 +27,18 @@ for j in range(6):
     fd.write('')
     fd.close()
 
+## Upper and lower bounds of the 12 parameters
+lbR = 0
+ubR = 8
+lbKx = -20
+ubKx = 0
+lbc = -20
+ubc = 5
+lbv = 1
+ubv = 30
+lbsigma = -20
+ubsigma = 2
+
 #### Run simulation
 nsamples = int(input('Do you want to run the MCMC? If so, list how many \n' \
                  + 'samples.\n'))
