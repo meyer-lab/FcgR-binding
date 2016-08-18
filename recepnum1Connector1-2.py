@@ -10,7 +10,7 @@ from multiprocessing import Pool
 #### Set to 5 if running on Ryan's laptop
 ##p = Pool(8)
 
-## Clear as csvs to be used
+## Clear csvs to be used
 fd = open('pos.csv','w')
 fd.write('')
 fd.close()
