@@ -26,9 +26,6 @@ function logSqrErr = NormalError(Rtot, KdMat, mfiAdjMean, tnpbsa,...
         end
     end
     logSqrErr = nansum(nansum(logSqrErrMat));
-    if logSqrErr == -inf
-        logSqrErr = -realmax/(1e10);
-    end
 end
 %--------------------------------------------------------------------------
 function logprob = pseudoNormlike(x,mu,sigma)
