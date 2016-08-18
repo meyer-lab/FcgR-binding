@@ -31,6 +31,10 @@ ubv = 30
 lbsigma = -20
 ubsigma = 2
 
+## Create vectors for upper and lower bounds
+lb = numpy.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+ub = numpy.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+
 #### Run simulation
 nsamples = int(input('Do you want to run the MCMC? If so, list how many \n' \
                  + 'samples.\n'))
@@ -49,7 +53,14 @@ lnlength = nwalkers
 
 def logl(inp):
     ## Data is input as a Numpy array; must convert to list in order
-    ## to input into MATLAB engine
+    ## to input into MATLAB engine. First, the point is checked to see
+    ## if it fits within the prescribed parameter range
+
+    test1 = numpy.greater(inp,lb)
+    test2 = numpy.less(inp,ub)
+    for j in range(12):
+        if not test1[j] and test2[j]:
+            return -numpy.inf
 
     Rtot = [];
     for rtot in inp:
