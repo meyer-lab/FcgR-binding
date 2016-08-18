@@ -76,6 +76,28 @@ for j in range(6):
 
     ## Burn-in run
     p0 = numpy.random.rand(ndims*nwalkers).reshape((nwalkers,ndims))
+    newp0 = []
+    for walker in p0:
+        newwalker = []
+        for j in range(ndims):
+            if j < 1:
+                lb = lbR
+                ub = ubR
+            elif j == 1:
+                lb = lbKx
+                ub = ubKx
+            elif j < 4:
+                lb = lbc
+                ub = ubc
+            elif j < 6:
+                lb = lbv
+                ub = ubv
+            else:
+                lb = lbsigma
+                ub = ubsigma
+            newwalker.append(walker[j]*(ub-lb)+lb)
+        newp0.append(newwalker)
+    p0 = numpy.array(newp0)
     pos, prob, _ = sampler.run_mcmc(p0, 100)
     sampler.reset()
 

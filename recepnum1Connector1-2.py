@@ -87,8 +87,6 @@ p0 = numpy.array(newp0)
 pos, prob, _ = sampler.run_mcmc(p0, 100)
 sampler.reset()
 
-print('YAAASSSS')
-
 ## Start timer
 start = time.time()
 
