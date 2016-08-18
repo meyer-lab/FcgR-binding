@@ -27,6 +27,6 @@ function logprob = NormalErrorCnct2(Rtot,witchR)
                 Rtot(j) = floor(Rtot(j));
             end
         end
-        logprob = NormalError2_mex(Rtot,kdBruhns,mfiAdjMean,tnpbsa,...
+        logprob = NormalErrorCoef2_mex(Rtot,kdBruhns,mfiAdjMean,tnpbsa,...
             meanPerCond,biCoefMat,whichR);  
     end
