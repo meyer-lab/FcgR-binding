@@ -39,6 +39,10 @@ ubv = 30
 lbsigma = -20
 ubsigma = 2
 
+## Create vectors for upper and lower bounds
+lb = numpy.array([lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+ub = numpy.array([ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+
 #### Run simulation
 nsamples = int(input('Do you want to run the MCMC? If so, list how many \n' \
                  + 'samples.\n'))
@@ -60,7 +64,14 @@ a = 'a'
 
 def logl(inp):
     ## Data is input as a Numpy array; must convert to list in order
-    ## to input into MATLAB engine
+    ## to input into MATLAB engine. First, the point is checked to see
+    ## if it fits within the prescribed parameter range
+
+    test1 = numpy.greater(inp,lb)
+    test2 = numpy.less(inp,ub)
+    for j in range(7):
+        if not test1[j] and test2[j]:
+            return matlab.double([-numpy.inf])
 
     Rtot = [];
     for rtot in inp:
@@ -91,23 +102,23 @@ for j in range(6):
     newp0 = []
     for walker in p0:
         newwalker = []
-        for j in range(ndims):
-            if j < 1:
+        for k in range(ndims):
+            if k < 1:
                 lb = lbR
                 ub = ubR
-            elif j == 1:
+            elif k == 1:
                 lb = lbKx
                 ub = ubKx
-            elif j < 4:
+            elif k < 4:
                 lb = lbc
                 ub = ubc
-            elif j < 6:
+            elif k < 6:
                 lb = lbv
                 ub = ubv
             else:
                 lb = lbsigma
                 ub = ubsigma
-            newwalker.append(walker[j]*(ub-lb)+lb)
+            newwalker.append(walker[k]*(ub-lb)+lb)
         newp0.append(newwalker)
     p0 = numpy.array(newp0)
     pos, prob, _ = sampler.run_mcmc(p0, 100)
