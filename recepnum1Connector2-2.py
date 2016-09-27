@@ -27,7 +27,7 @@ for j in range(6):
     fd.write('')
     fd.close()
 
-## Upper and lower bounds of the 12 parameters
+## Upper and lower bounds of the 7 parameters
 lbR = 0
 ubR = 8
 lbKx = -20
@@ -67,12 +67,10 @@ def logl(inp):
     ## to input into MATLAB engine. First, the point is checked to see
     ## if it fits within the prescribed parameter range
 
-    test1 = numpy.greater(inp,lb)
-    test2 = numpy.less(inp,ub)
-    for j in range(7):
-        if not test1[j] and test2[j]:
-            return matlab.double([-numpy.inf])
-
+    test1 = numpy.less(inp,lb)
+    test2 = numpy.greater(inp,ub)
+    if numpy.any(test1) or numpy.any(test2):
+        return -numpy.inf
     Rtot = [];
     for rtot in inp:
         Rtot.append(rtot)
