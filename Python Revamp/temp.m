@@ -1,23 +1,3 @@
-function [L] = StoneMod(logR, Kd, v, logKx, L0, biCoefMat)
-    %Returns the number of mutlivalent ligand bound to a cell with 10^logR
-    %receptors, granted each epitope of the ligand binds to the receptor
-    %kind in question with dissociation constant Kd and cross-links with
-    %other receptors with crosslinking constant Kx = 10^logKx. All
-    %equations derived from Stone et al. (2001). Assumed that ligand is at
-    %saturating concentration L0 = 7e-8 M, which is as it is (approximately)
-    %for TNP-4-BSA in Lux et al. (2013).
-    
-    Kx = 10^logKx;
-    R = 10^logR;
-    
-    %Vector of binomial coefficients
-    biCoefVec = biCoefMat(1:v,v)';
-    Req = 10^ReqFuncSolver(R,Kd,L0,v,Kx);
-    
-    %Calculate L, according to equations 1 and 7
-    L = sum(biCoefVec.*(Kx.^([1:v]-1)).*(L0/Kd*(Req.^[1:v])));
-end
-%--------------------------------------------------------------------------
 function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     %%%This function returns the point at which function fun equals zero
     %%using the bisection algorithm. The closest a and b will converge to
@@ -27,9 +7,13 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     
     a = -20;
     b = log10(R);
+    disp(a)
+    disp(b)
+    disp(char(10))
     
     bVal = fun(b, R, vi, kx, viLikdi);
     cVal = fun(a, R, vi, kx, viLikdi);
+    disp([bVal;cVal])
     
     % Is there no root within the interval?
     if bVal*cVal > 0
@@ -43,6 +27,7 @@ function c = ReqFuncSolver(R, kdi, Li, vi, kx)
     %Commence algorithm
     while ((b - a > 1e-4) && (abs(cVal) > 1e-4))
         c = (a+b)/2;
+%         disp([bVal;cVal])
         cVal = fun(c, R, vi, kx, viLikdi);
         
         if cVal*bVal >= 0

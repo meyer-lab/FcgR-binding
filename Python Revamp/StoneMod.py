@@ -20,14 +20,22 @@ def StoneMod(logR,Ka,v,logKx,L0,biCoefMat):
     ## Vector of binomial coefficients
 ##    biCoefVec = biCoefMat(1:v,v)';
     biCoefVec = biCoefMat[v-1][0:v]
-    print(biCoefVec)
     Req = 10**ReqFuncSolver(R,Kd,L0,v,Kx)
     
     ## Calculate L, according to equations 1 and 7
-##    L = sum(biCoefVec.*(Kx.^([1:v]-1)).*(L0/Kd*(Req.^[1:v])));
+##    L = np.sum(biCoefVec.*(Kx.^([1:v]-1)).*(L0/Kd*(Req.^[1:v])))
+    L = 0
+    for j in range(v):
+        print('L = '+str(L))
+        print('biCoefVec = ')
+        print(biCoefVec)
+        print('Kx = '+str(Kx))
+        print('Req = '+str(Req))
+        L = L+biCoefVec[j]*Kx**j*Req**(j+1)
+    return L*L0/Kd
 
-biCoefMat = data['biCoefMat']
-kaBruhns = data['kaBruhns']
-tnpbsa4 = data['tnpbsa'][0]
-
-StoneMod(3,kaBruhns[0,0],20,-10,tnpbsa4,biCoefMat)
+##biCoefMat = data['biCoefMat']
+##kaBruhns = data['kaBruhns']
+##tnpbsa4 = data['tnpbsa'][0]
+##
+##StoneMod(3,kaBruhns[0,0],20,-10,tnpbsa4,biCoefMat)

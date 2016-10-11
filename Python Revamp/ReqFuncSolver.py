@@ -10,9 +10,14 @@ def ReqFuncSolver(R, kai, Li, vi, kx):
 
     a = -20
     b = log10(R)
+    print(a)
+    print(b)
+    print(' ')
 
     bVal = diffFun(b,R,vi,kx,viLikdi)
     cVal = diffFun(a,R,vi,kx,viLikdi)
+    print(bVal)
+    print(cVal)
 
     ## Is there no root within the interval?
     if bVal*cVal > 0:
@@ -25,6 +30,7 @@ def ReqFuncSolver(R, kai, Li, vi, kx):
     ## Commence algorithm
     while ((b - a > 1e-4) and (abs(cVal) > 1e-4)):
         c = (a+b)/2
+##        print(str(bVal)+'     '+str(cVal))
         cVal = diffFun(c, R, vi, kx, viLikdi)
         
         if cVal*bVal >= 0:
@@ -39,4 +45,4 @@ def diffFun(x, R, vi, kx, viLikdi):
     diff = R-x*(1+viLikdi*(1+kx*x)**(vi-1))
     return diff
 
-print(ReqFuncSolver(1000,data['kaBruhns'][0,0],data['tnpbsa'][0],26,1e-10))
+##print(ReqFuncSolver(1000,data['kaBruhns'][0,0],data['tnpbsa'][0],26,1e-10))
