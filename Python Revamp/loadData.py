@@ -94,11 +94,10 @@ def loadData():
         temp = []
         for k in range(j+1):
             temp.append(nchoosek(j+1,k+1))
-            while len(temp) < 30:
-                temp.append(0)
+        while len(temp) < 30:
+            temp.append(0)
         biCoefMat.append(temp)
     biCoefMat = np.array(biCoefMat)
 
     return {'mfiAdjMean':mfiAdjMean, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
             'meanPerCond':meanPerCond, 'biCoefMat':biCoefMat}
-loadData()
