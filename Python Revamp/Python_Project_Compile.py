@@ -2,6 +2,10 @@ import numpy as np
 from math import *
 import emcee as mc
 
+## Define nan and inf for sake of ease for rest of script
+nan = float('nan')
+inf = float('inf')
+
 ##########################################################################################################
 ## Functions for creation of data for other scripts:
 
@@ -43,8 +47,13 @@ def loadData():
     [49,8,14,7,49,8,9,8], \
     [295,596,1016,334,488,813,1330,383], \
     [105,186,293,65,177,362,573,114], \
-    [np.nan,623,1055,365,924,1317,1861,676], \
+    [nan,623,1055,365,924,1317,1861,676], \
     [122,136,262,91,313,558,1026,239]]
+
+    ## Covert all values in mfi to floats
+    for j in range(len(mfi)):
+        for k in range(len(mfi[j])):
+            mfi[j][k] = float(mfi[j][k])
 
     ## mfiAdj is the background-MFI-adjusted MFI values given above
     mfiAdj = []
@@ -142,9 +151,9 @@ def ReqFuncSolver(R, kai, Li, vi, kx):
     ## b is the upper bound of the bisection.
     a = -20
     b = log10(R)
-    print(a)
-    print(b)
-    print(' ')
+##    print(a)
+##    print(b)
+##    print(' ')
 
     ## This algorithm works by generating a value c between a and b at each step and finding whether the solution
     ## is above or below c. After determining which, a new a and b are generated using the pre-existing a, b, and c,
@@ -152,16 +161,16 @@ def ReqFuncSolver(R, kai, Li, vi, kx):
     ## value of the function diffFun at x = a.
     bVal = diffFun(b,R,vi,kx,viLikdi)
     cVal = diffFun(a,R,vi,kx,viLikdi)
-    print(bVal)
-    print(cVal)
+##    print(bVal)
+##    print(cVal)
 
     ## Is there no root within the interval?
     if bVal*cVal > 0:
-        c = 1000
+        c = nan
         return c
     
     ## In the case that (b - a > 1e-4 and abs(cVal) > 1e-4) == 1 to begin with.
-    c = 1000
+    c = nan
     ## Commence algorithm; please see description of algortith above. Note that this bisection algorithm is being used
     ## to find the common logarithm of Req and not Req directly.
     while ((b - a > 1e-4) and (abs(cVal) > 1e-4)):
@@ -174,6 +183,7 @@ def ReqFuncSolver(R, kai, Li, vi, kx):
             bVal = cVal
         else:
             a = c
+
     return c
 
     ######################
@@ -182,7 +192,7 @@ def diffFun(x, R, vi, kx, viLikdi):
     ## The function by which the bisection algorithm gauges convergence. The closer the value of diffFun to 0, the closer
     ## x is to the common logarithm of Req.
     x = 10**x
-    diff = R-x*(1+viLikdi*(1+kx*x)**(vi-1))
+    diff = R-x*(1+viLikdi*np.power((1+kx*x),(vi-1)))
     return diff
 
 ########################################################################################################################
@@ -195,6 +205,8 @@ def StoneMod(logR,Ka,v,logKx,L0,biCoefMat):
     ## equations derived from Stone et al. (2001).
     
     ####################################################################################
+    ## Convert v into an int for the sake of iterations
+    v = int(v)
     ## Convert Ka to Kd for similarity to original MATLAB script. Create Kx from logKx and R from logR
     Kd = 1/Ka
     Kx = 10**logKx
@@ -202,12 +214,15 @@ def StoneMod(logR,Ka,v,logKx,L0,biCoefMat):
     
     ## Vector of binomial coefficients from biCoefMat; to avoid computation of n choose k in equation 1 from Stone 2001
     biCoefVec = biCoefMat[v-1][0:v]
+    logReq = ReqFuncSolver(R,Kd,L0,v,Kx)
+    if isnan(logReq):
+        return -1e50
     Req = 10**ReqFuncSolver(R,Kd,L0,v,Kx)
     
     ## Calculate L, according to equations 1 and 7
     L = 0
     for j in range(v):
-        L = L+biCoefVec[j]*Kx**j*Req**(j+1)
+        L = L+biCoefVec[j]*np.power(Kx,j)*np.power(Req,(j+1))
 
     ##************************************************************************************************************
     ## Return the sum of all values L from equation 1 which are pertinent according to equation 7
@@ -251,19 +266,24 @@ def NormalErrorCoef(Rtot,KaMat,mfiAdjMean,tnpbsa,meanPerCond,biCoefMat):
                 ## Find the MFI value given by our model
                 MFI = c*StoneMod(logR,Ka,v,logKx,L0,biCoefMat)
                 ## Find the difference in the projected MFI and the reported MFI for each of the four reported MFIs per condition
-                temp = np.array([0]*4)
+                temp = []
                 for m in range(4):
-                    temp[m] = mfiAdjMean[4*k+l][4*j+m]
+                    temp.append(mfiAdjMean[4*k+l][4*j+m])
                 mean = meanPerCond[4*k+l][j]
                 tempm = []
                 for m in range(4):
                     tempm.append(pseudoNormlike(temp[m],MFI,(sigCoef*mean)))
-                ## Create each of the 24x4 matrices by concatenation
-                tempm = np.array(tempm)
+                ## Create lists which will become each of the 24x4 matrices
                 if j == 0:
-                    logSqrErrMatPre0 = np.concatenate((logSqrErrMatPre0,tempm))
+                    logSqrErrMatPre0.append(tempm)
                 else:
-                    logSqrErrMatPre1 = np.concatenate((logSqrErrMatPre1,tempm))
+                    logSqrErrMatPre1.append(tempm)
+
+    ## Convert the lists representing the 24x4 matrices into matrices
+    logSqrErrMatPre0 = np.array(logSqrErrMatPre0)
+    logSqrErrMatPre1 = np.array(logSqrErrMatPre1)
+    ## Create logSqrErrMat by concatenation
+    logSqrErrMat = np.concatenate((logSqrErrMatPre0,logSqrErrMatPre1))
 
     #################################
     ## Add up and return the log likelihoods from each point in logSwrErrMat
@@ -279,17 +299,12 @@ def pseudoNormlike(x,mu,sigma):
     ## probability density associated with the point x. Used to compute likelihoods in our calculation of the Akaike information
     ## criterion for a model.
     z = (x - mu) / sigma
-    logprob = -0.5*z**2-log(sqrt(2*pi)*sigma)
+    logprob = -0.5*np.power(z,2)-log(sqrt(2*pi)*sigma)
     return logprob
-
-###############################################################################################################################
-###############################################################################################################################
-## Run MCMC:
-
 
 ########################################################################################################################################################
 ########################################################################################################################################################
 ## Test lines:
-print(NormalErrorCoef([1]*12,data['kaBruhns'],data['mfiAdjMean'],data['tnpbsa'],data['meanPerCond'],data['biCoefMat']))
+##print(NormalErrorCoef([1]*12,data['kaBruhns'],data['mfiAdjMean'],data['tnpbsa'],data['meanPerCond'],data['biCoefMat']))
 
 ##print(ReqFuncSolver(1000,data['kaBruhns'][0,0],data['tnpbsa'][0],26,1e-10))
