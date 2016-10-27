@@ -5,6 +5,10 @@ def nchoosek(n,k):
     return factorial(n)/(factorial(k)*factorial(n-k))
 
 def loadData():
+    ## Create a matrix of mean-adjusted MFIs from the Nimmerjahn Lab's original assays called mfiAdjMean1
+
+    # First, create iterated lists, isomorphic to a 30x8 matrix, holding the lab's original MFI data.
+    
     mfi = [[113,5,7,8,38,6,8,10], \
     [441,427,784,172,318,552,900,248], \
     [440,578,997,176,404,392,894,124], \
@@ -36,6 +40,7 @@ def loadData():
     [np.nan,623,1055,365,924,1317,1861,676], \
     [122,136,262,91,313,558,1026,239]]
 
+    # Subtract background MFIs from MFIs for each combination of FcgR, IgG, and avidity
     mfiAdj = []
     noise = []
     for j in range(len(mfi)):
@@ -46,6 +51,7 @@ def loadData():
                 noise.append(mfi[j])
     mfiAdj = np.array(mfiAdj)-np.array(noise)
 
+    # Normalize the data by replicate mean (please see Lux's original presentation of the data in the spreadsheet she sent us)
     temp = np.transpose(mfiAdj)
     means = [np.nanmean(np.concatenate((temp[j],temp[j+4]))) for j in range(4)]
     means2 = np.concatenate((means,means))
@@ -53,7 +59,9 @@ def loadData():
     for j in range(23):
         temp = np.concatenate((temp,means2))
     noise = np.reshape(temp,(24,8))
-    mfiAdjMean = mfiAdj/noise
+    mfiAdjMean1 = mfiAdj/noise
+
+    ## Replicate what was done aboce, except now let this be done for the second batch of MFIs given us by the Nimmerjahn Lab
 
     ## Define concentrations of TNP-4-BSA and TNP-26-BSA
     ## These are put into the numpy array "tnpbsa"
@@ -99,5 +107,5 @@ def loadData():
         biCoefMat.append(temp)
     biCoefMat = np.array(biCoefMat)
 
-    return {'mfiAdjMean':mfiAdjMean, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
+    return {'mfiAdjMean1':mfiAdjMean1, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
             'meanPerCond':meanPerCond, 'biCoefMat':biCoefMat}
