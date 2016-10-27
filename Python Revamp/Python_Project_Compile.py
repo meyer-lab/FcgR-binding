@@ -175,7 +175,6 @@ def ReqFuncSolver(R, kai, Li, vi, kx):
     ## to find the common logarithm of Req and not Req directly.
     while ((b - a > 1e-4) and (abs(cVal) > 1e-4)):
         c = (a+b)/2
-##        print(str(bVal)+'     '+str(cVal))
         cVal = diffFun(c, R, vi, kx, viLikdi)
         
         if cVal*bVal >= 0:

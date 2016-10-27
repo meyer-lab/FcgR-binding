@@ -57,6 +57,7 @@ ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
 
 ## Create function for the running of the MCMC
 def logl(Rtot):
+    print(Rtot)
     for j in range(12):
         elem = Rtot[j]
         if (elem == float('inf') or elem == -float('inf') or elem == float('nan')):
