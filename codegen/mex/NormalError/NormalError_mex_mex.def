@@ -1,8 +1,0 @@
-LIBRARY NormalError_mex.mexw64
-EXPORTS
-mexFunction
-emlrtMexFcnProperties
-NormalError
-NormalError_initialize
-NormalError_terminate
-NormalError_atexit
