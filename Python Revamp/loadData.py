@@ -1,6 +1,8 @@
 import numpy as np
 from math import *
 
+nan = np.nan
+
 def nchoosek(n,k):
     return factorial(n)/(factorial(k)*factorial(n-k))
 
@@ -37,7 +39,7 @@ def loadData():
     [49,8,14,7,49,8,9,8], \
     [295,596,1016,334,488,813,1330,383], \
     [105,186,293,65,177,362,573,114], \
-    [np.nan,623,1055,365,924,1317,1861,676], \
+    [nan,623,1055,365,924,1317,1861,676], \
     [122,136,262,91,313,558,1026,239]]
 
     # Subtract background MFIs from MFIs for each combination of FcgR, IgG, and avidity
@@ -61,7 +63,62 @@ def loadData():
     noise = np.reshape(temp,(24,8))
     mfiAdjMean1 = mfiAdj/noise
 
-    ## Replicate what was done aboce, except now let this be done for the second batch of MFIs given us by the Nimmerjahn Lab
+    ## Replicate what was done above, except now let this be done for the second batch of MFIs given us by the Nimmerjahn Lab.
+    ## Instead of resulting in the NumPy array mfiAdjMean1, this will result in the NumPy array mfiAdjMean2.
+    
+    mfi = [[4,6,8,13,5,8,11,14], \
+    [34,54,77,115,53,128,115,201], \
+    [23,29,58,94,64,85,80,150], \
+    [39,52,86,134,80,103,129,228], \
+    [33,41,68,105,56,81,108,179], \
+    [nan,nan,nan,nan,nan,nan,nan,nan], \
+    [nan,nan,nan,nan,nan,nan,nan,nan], \
+    [nan,nan,nan,nan,nan,nan,nan,nan], \
+    [nan,nan,nan,nan,nan,nan,nan,nan], \
+    [nan,nan,nan,nan,nan,nan,nan,nan], \
+    [4,6,8,12,4,11,19,12], \
+    [149,319,272,390,288,484,499,756], \
+    [119,138,180,287,197,257,282,458], \
+    [194,226,274,461,348,478,543,801], \
+    [61,92,122,187,236,287,341,597], \
+    [4,6,7,11,7,9,22,13], \
+    [12,29,44,65,84,186,237,361], \
+    [9,14,19,27,60,94,81,158], \
+    [37,52,105,197,124,189,300,489], \
+    [10,16,34,51,58,98,159,223], \
+    [8,10,24,20,8,18,70,42], \
+    [167,375,374,520,468,749,583,918], \
+    [11,21,43,44,103,109,105,156], \
+    [294,390,420,636,523,746,772,1029], \
+    [8,16,43,28,72,96,126,175], \
+    [7,10,13,17,8,23,38,34], \
+    [155,253,430,539,211,318,534,738], \
+    [44,43,87,130,117,105,199,274], \
+    [218,230,482,784,296,364,736,1014], \
+    [114,94,254,339,229,220,462,639]]
+
+    mfiAdj = []
+    noise = []
+    for j in range(len(mfi)):
+        if j%5 != 0:
+            mfiAdj.append(mfi[j])
+        else:
+            for k in range(4):
+                noise.append(mfi[j])
+    mfiAdj = np.array(mfiAdj)-np.array(noise)
+
+    temp = np.transpose(mfiAdj)
+    means = [np.nanmean(np.concatenate((temp[j],temp[j+4]))) for j in range(4)]
+    means2 = np.concatenate((means,means))
+    temp = means2
+    for j in range(23):
+        temp = np.concatenate((temp,means2))
+    noise = np.reshape(temp,(24,8))
+    mfiAdjMean2 = mfiAdj/noise
+
+    ## Concatenate mfiAdjMean1 and mfiAdjMean2 into the NumPy array mfiAdjMean; mfiAdjMean has the shape (48,8).
+
+    mfiAdjMean = np.concatenate((mfiAdjMean1,mfiAdjMean2),0)
 
     ## Define concentrations of TNP-4-BSA and TNP-26-BSA
     ## These are put into the numpy array "tnpbsa"
@@ -107,5 +164,5 @@ def loadData():
         biCoefMat.append(temp)
     biCoefMat = np.array(biCoefMat)
 
-    return {'mfiAdjMean1':mfiAdjMean1, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
+    return {'mfiAdjMean':mfiAdjMean, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
             'meanPerCond':meanPerCond, 'biCoefMat':biCoefMat}
