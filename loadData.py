@@ -10,7 +10,7 @@ def loadData():
     ## Create a matrix of mean-adjusted MFIs from the Nimmerjahn Lab's original assays called mfiAdjMean1
 
     # First, create iterated lists, isomorphic to a 30x8 matrix, holding the lab's original MFI data.
-    
+
     mfi = [[113,5,7,8,38,6,8,10], \
     [441,427,784,172,318,552,900,248], \
     [440,578,997,176,404,392,894,124], \
@@ -65,7 +65,7 @@ def loadData():
 
     ## Replicate what was done above, except now let this be done for the second batch of MFIs given us by the Nimmerjahn Lab.
     ## Instead of resulting in the NumPy array mfiAdjMean1, this will result in the NumPy array mfiAdjMean2.
-    
+
     mfi = [[4,6,8,13,5,8,11,14], \
     [34,54,77,115,53,128,115,201], \
     [23,29,58,94,64,85,80,150], \
