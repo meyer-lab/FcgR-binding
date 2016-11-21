@@ -86,32 +86,6 @@ lnlength = nwalkers
 ## Set up sampler
 sampler = EnsembleSampler(nwalkers,ndims,logl,2.0,[],{},None,1,None,False,None)
 
-## Burn-in run
-##p0 = np.random.rand(ndims*nwalkers).reshape((nwalkers,ndims))
-##newp0 = []
-##for walker in p0:
-##    newwalker = []
-##    for j in range(ndims):
-##        if j < 6:
-##            lb = lbR
-##            ub = ubR
-##        elif j == 6:
-##            lb = lbKx
-##            ub = ubKx
-##        elif j < 9:
-##            lb = lbc
-##            ub = ubc
-##        elif j < 11:
-##            lb = lbv
-##            ub = ubv
-##        else:
-##            lb = lbsigma
-##            ub = ubsigma
-##        newwalker.append(walker[j]*(ub-lb)+lb)
-##    newp0.append(newwalker)
-##p0 = np.array(newp0)
-##pos, prob, _ = sampler.run_mcmc(p0, 100)
-##sampler.reset()
 p0 = best
 
 ## Start timer
@@ -130,18 +104,18 @@ for j in range(nsamples):
 
     posstore = ''
     probstore = ''
-    
+
     for elem in posnew:
         posstore = posstore+','+str(elem)
     for elem in probnew:
         probstore = probstore+','+str(elem)
-        
+
     posstore = posstore+'\n'
     probstore = probstore+'\n'
 
     fdpos.write(posstore)
     fdprob.write(probstore)
-    
+
     sampler.reset()
 fdpos.close()
 fdprob.close()
