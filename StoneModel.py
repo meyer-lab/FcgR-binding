@@ -54,6 +54,7 @@ class StoneModel:
         Kd = 1/Ka
         Kx = 10**logKx
         R = 10**logR
+        v = np.int_(v)
 
         ## Vector of binomial coefficients
         biCoefVec = biCoefMat[v-1][0:v]
@@ -76,7 +77,7 @@ class StoneModel:
     ## logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
     ## of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
     ## standard deviation of MFIs for that condition.
-    def NormalErrorCoef(self, Rtot,KaMat,mfiAdjMean,tnpbsa,meanPerCond,biCoefMat):
+    def NormalErrorCoef(self, Rtot):
         ## Set the standard deviation coefficient
         sigCoef = 10**Rtot[11]
 
@@ -92,7 +93,7 @@ class StoneModel:
             ## Set the MFI-per-TNP-BSA conversion ratio for the kind of TNP-BSA in question
             c = 10**Rtot[7+j]
             ## Set the ligand (TNP-BSA) concentration for the kind of TNP-BSA in question
-            L0 = tnpbsa[j]
+            L0 = self.tnpbsa[j]
 
             ## Iterate over each kind of FcgR
             for k in range(6):
@@ -102,19 +103,19 @@ class StoneModel:
                 ## Iterate over each kind of IgG
                 for l in range(4):
                     ## Set the affinity for the binding of the FcgR and IgG in question
-                    Ka = KaMat[k][l]
+                    Ka = self.kaBruhns[k][l]
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
                     Kx = 10**logKxcoef/Ka
                     logKx = log10(Kx)
                     ## Calculate the MFI which should result from this condition according to the model
-                    MFI = c*self.StoneMod(logR,Ka,v,logKx,L0,biCoefMat)
+                    MFI = c*self.StoneMod(logR,Ka,v,logKx,L0,self.biCoefMat)
 
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
                     ## of the point assuming the calculated point is true.
                     temp = np.array([0.0]*4)
                     for m in range(4):
-                        temp[m] = mfiAdjMean[4*k+l][4*j+m]
-                    mean = meanPerCond[4*k+l][j]
+                        temp[m] = self.mfiAdjMean[4*k+l][4*j+m]
+                    mean = self.meanPerCond[4*k+l][j]
                     tempm = []
                     for m in range(4):
                         tempm.append(norm.logpdf(temp[m], MFI, (sigCoef*mean)))
@@ -141,3 +142,4 @@ class StoneModel:
         self.kaBruhns = self.data['kaBruhns']
         self.mfiAdjMean = self.data['mfiAdjMean']
         self.meanPerCond = self.data['meanPerCond']
+        self.tnpbsa = self.data['tnpbsa']
