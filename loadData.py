@@ -165,4 +165,4 @@ def loadData():
     biCoefMat = np.array(biCoefMat)
 
     return {'mfiAdjMean':mfiAdjMean, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
-            'meanPerCond':meanPerCond, 'biCoefMat':biCoefMat}
+            'meanPerCond':meanPerCond, 'biCoefMat':biCoefMat, 'mfiAdjMean2':mfiAdjMean2}
