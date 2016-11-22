@@ -55,7 +55,7 @@ def loglF(Rtot):
     return(output)
 
 #### Run simulation
-niters = 1000
+niters = 100000
 
 ## Set up parameters for parallel-tempered Ensemble Sampler
 ndims, nwalkers = int(np.size(lb)), 100
@@ -65,13 +65,13 @@ for ii in range(0, nwalkers):
     p0[ii] = lb + (ub - lb)*p0[ii]
 
 ## Set up sampler
-sampler = EnsembleSampler(nwalkers,ndims,loglF,2.0,[],{},None,3)
+sampler = EnsembleSampler(nwalkers,ndims,loglF,2.0,[],{},None,12)
 
 f = h5py.File("mcmc_chain.h5", 'w', libver='latest')
 dset = f.create_dataset("data", chunks=True, maxshape=(None, len(lb) + 2), data=np.ndarray((0, len(lb) + 2)))
 f.swmr_mode = True
 thinTrack = 1
-thin = 1
+thin = 10
 
 for p, lnprob, lnlike in sampler.sample(p0, iterations=niters, storechain=False):
     if thinTrack < thin:
