@@ -26,6 +26,9 @@ class StoneModel:
         ## Create anonymous function diffFunAnon which calls diffFun for parameters R, vi=v, kx=Kx, and viLikdi.
         diffFunAnon = lambda x: self.diffFun(x,R,vi,kx,viLikdi)
 
+        if diffFunAnon(a)*diffFunAnon(b) > 0:
+            return np.nan
+
         ## Implement the bisection algorithm using SciPy's bisect. Please see SciPy documentation for rationale behind
         ## input parameter not described beforehand.
         logReq = bisect(diffFunAnon,a,b,(),1e-12,np.finfo(float).eps*10,100,False,False)
@@ -60,7 +63,7 @@ class StoneModel:
         biCoefVec = biCoefMat[v-1][0:v]
         Req = 10**self.ReqFuncSolver(R,Kd,L0,v,Kx)
         if isnan(Req):
-            return -1e50
+            return -1000
 
         ## Calculate L, according to equations 1 and 7
         Lpre = 0
@@ -106,7 +109,8 @@ class StoneModel:
                     Ka = self.kaBruhns[k][l]
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
                     Kx = 10**logKxcoef/Ka
-                    logKx = log10(Kx)
+                    logKx = logKxcoef - log10(Ka)
+
                     ## Calculate the MFI which should result from this condition according to the model
                     MFI = c*self.StoneMod(logR,Ka,v,logKx,L0,self.biCoefMat)
 

@@ -36,10 +36,10 @@ ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
 
 ## Create function for the running of the MCMC
 def loglF(Rtot):
-    if np.any(np.isinf(Rtot)):
+    if np.any(np.isinf(Rtot)) or np.any(np.isnan(Rtot)):
         return -float('inf')
 
-    if np.any(np.isnan(Rtot)):
+    if np.any(np.less(Rtot, lb)) or np.any(np.greater(Rtot, ub)):
         return -float('inf')
 
     for j in range(9,11):
@@ -49,11 +49,9 @@ def loglF(Rtot):
             Rtot[j] = 30
         else:
             Rtot[j] = floor(Rtot[j])
-    try:
-        output = StoneM.NormalErrorCoef(Rtot)
-    except OverflowError:
-        return -float('inf')
-    
+
+    output = StoneM.NormalErrorCoef(Rtot)
+
     return(output)
 
 #### Run simulation
@@ -73,7 +71,7 @@ f = h5py.File("mcmc_chain.h5", 'w', libver='latest')
 dset = f.create_dataset("data", chunks=True, maxshape=(None, len(lb) + 2), data=np.ndarray((0, len(lb) + 2)))
 f.swmr_mode = True
 thinTrack = 1
-thin = 20
+thin = 1
 
 for p, lnprob, lnlike in sampler.sample(p0, iterations=niters, storechain=False):
     if thinTrack < thin:
