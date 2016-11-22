@@ -139,11 +139,81 @@ class StoneModel:
             logSqrErr = logSqrErr+np.nansum(elem)
         return logSqrErr
 
+    # This should do the same as NormalErrorCoef above, but with the second batch of Nimmerjahn data and specified
+    # Receptor expression levels
+    def NormalErrorCoefRset(self, x):
+        Rvalues = np.array([5.375709327, 6.208906576, -1, 5.627625946, 6.676895076, 6.574806476])
+        # TODO: Rvalues needs to be set by data
+
+        ## Set the standard deviation coefficient
+        sigCoef = 10**x[5]
+
+        ## Set thecommon logarithm of the Kx coefficient
+        logKxcoef = x[0]
+        logSqrErrMatPre0 = []
+        logSqrErrMatPre1 = []
+
+        ## Iterate over each kind of TNP-BSA (4 or 26)
+        for j in range(2):
+            ## Set the effective avidity for the kind of TNP-BSA in question
+            v = x[3+j]
+            ## Set the MFI-per-TNP-BSA conversion ratio for the kind of TNP-BSA in question
+            c = 10**x[1+j]
+            ## Set the ligand (TNP-BSA) concentration for the kind of TNP-BSA in question
+            L0 = self.tnpbsa[j]
+
+            ## Iterate over each kind of FcgR
+            for k in range(6):
+                if k == 2:
+                    continue
+
+                ## Set the common logarith of the level of receptor expression for the FcgR in question
+                logR = Rvalues[k]
+
+                ## Iterate over each kind of IgG
+                for l in range(4):
+                    ## Set the affinity for the binding of the FcgR and IgG in question
+                    Ka = self.kaBruhns[k][l]
+                    ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
+                    Kx = 10**logKxcoef/Ka
+                    logKx = logKxcoef - log10(Ka)
+
+                    ## Calculate the MFI which should result from this condition according to the model
+                    MFI = c*self.StoneMod(logR,Ka,v,logKx,L0,self.biCoefMat)
+
+                    ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
+                    ## of the point assuming the calculated point is true.
+                    temp = np.array([0.0]*4)
+                    for m in range(4):
+                        temp[m] = self.mfiAdjMean2[4*k+l][4*j+m]
+                    mean = self.meanPerCond[4*k+l][j]
+                    tempm = []
+                    for m in range(4):
+                        tempm.append(norm.logpdf(temp[m], MFI, (sigCoef*mean)))
+                    tempm = np.array(tempm)
+
+                    ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
+                    if j == 0:
+                        logSqrErrMatPre0 = np.concatenate((logSqrErrMatPre0,tempm))
+                    else:
+                        logSqrErrMatPre1 = np.concatenate((logSqrErrMatPre1,tempm))
+
+        ## Concatenate the arrays logSqrErrMatPre0 and logSqrErrMatPre1 to form logSqrErrMat
+        logSqrErrMat = np.concatenate((logSqrErrMatPre0,logSqrErrMatPre1),0)
+        ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
+        logSqrErr = 0
+        for elem in logSqrErrMat:
+            logSqrErr = logSqrErr+np.nansum(elem)
+            
+        return logSqrErr
+
+
     def __init__(self):
         self.data = loadData()
 
         self.biCoefMat = self.data['biCoefMat']
         self.kaBruhns = self.data['kaBruhns']
         self.mfiAdjMean = self.data['mfiAdjMean']
+        self.mfiAdjMean2 = self.data['mfiAdjMean2']
         self.meanPerCond = self.data['meanPerCond']
         self.tnpbsa = self.data['tnpbsa']
