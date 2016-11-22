@@ -7,11 +7,7 @@ import time
 import sys
 import h5py
 
-## Define best
-best = np.array([5.7204,5.658,5.9681,5.8991,4.8384,6.1420,-6.8541,-5.7668,-5.5631,7.0,30.0,-0.2307])
-
-## Note that 308 is the largest integer to which 10 may be exponentiated and the number be representable as a float
-logmax = 308
+newData = 1
 
 ###########################################################
 ## Load model
@@ -31,31 +27,30 @@ lbsigma = -10
 ubsigma = 2
 
 ## Create vectors for upper and lower bounds
-lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
-ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+
+if newData:
+    lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+    ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+else:
+    lb = np.array([lbKx,lbc,lbc,lbv,lbv,lbsigma])
+    ub = np.array([ubKx,ubc,ubc,ubv,ubv,ubsigma])
 
 ## Create function for the running of the MCMC
-def loglF(Rtot):
-    if np.any(np.isinf(Rtot)) or np.any(np.isnan(Rtot)):
+def loglF(x):
+    if np.any(np.isinf(x)) or np.any(np.isnan(x)) or np.any(np.less(x, lb)) or np.any(np.greater(x, ub)):
         return -float('inf')
 
-    if np.any(np.less(Rtot, lb)) or np.any(np.greater(Rtot, ub)):
-        return -float('inf')
-
-    for j in range(9,11):
-        if Rtot[j] < 1:
-            Rtot[j] = 1
-        elif Rtot[j] > 30:
-            Rtot[j] = 30
-        else:
-            Rtot[j] = floor(Rtot[j])
-
-    output = StoneM.NormalErrorCoef(Rtot)
+    if newData:
+        x[3:5] = np.floor(x[3:5])
+        output = StoneM.NormalErrorCoefRset(x)
+    else:
+        x[9:11] = np.floor(x[9:11])
+        output = StoneM.NormalErrorCoef(x)
 
     return(output)
 
 #### Run simulation
-niters = 100000
+niters = 10
 
 ## Set up parameters for parallel-tempered Ensemble Sampler
 ndims, nwalkers = int(np.size(lb)), 100
@@ -65,7 +60,7 @@ for ii in range(0, nwalkers):
     p0[ii] = lb + (ub - lb)*p0[ii]
 
 ## Set up sampler
-sampler = EnsembleSampler(nwalkers,ndims,loglF,2.0,[],{},None,12)
+sampler = EnsembleSampler(nwalkers,ndims,loglF,2.0,[],{},None,1)
 
 f = h5py.File("mcmc_chain.h5", 'w', libver='latest')
 dset = f.create_dataset("data", chunks=True, maxshape=(None, len(lb) + 2), data=np.ndarray((0, len(lb) + 2)))
