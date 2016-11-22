@@ -1,7 +1,7 @@
 import numpy as np
 from loadData import *
 from math import *
-from scipy.optimize import bisect
+from scipy.optimize import brentq
 from scipy.stats import norm
 from scipy.misc import comb
 from memoize import memoize
@@ -36,9 +36,9 @@ class StoneModel:
         if diffFunAnon(a)*diffFunAnon(b) > 0:
             return np.nan
 
-        ## Implement the bisection algorithm using SciPy's bisect. Please see SciPy documentation for rationale behind
-        ## input parameter not described beforehand.
-        logReq = bisect(diffFunAnon,a,b,(),1e-12,np.finfo(float).eps*10,100,False,False)
+        ## Implement the bisection algorithm using SciPy's brentq. Please see SciPy documentation for rationale behind
+        ## input parameter not described beforehand. Brentq is ~2x faster than bisect
+        logReq = brentq(diffFunAnon,a,b,(),1e-12,np.finfo(float).eps*10,100,False,False)
 
         return logReq
 
@@ -62,7 +62,7 @@ class StoneModel:
         ## Vector of binomial coefficients
         Req = 10**self.ReqFuncSolver(R,Kd,L0,v,Kx)
         if isnan(Req):
-            return -1000
+            return nan
 
         ## Calculate L, according to equations 1 and 7
         Lpre = 0
@@ -108,17 +108,29 @@ class StoneModel:
                 for l in range(4):
                     ## Set the affinity for the binding of the FcgR and IgG in question
                     Ka = self.kaBruhns[k][l]
+                    if isnan(Ka):
+                        continue
+
+                    # Setup the data
+                    temp = mfiAdjMean[4*k+l][4*j:4*j+3]
+                    # If data not available, skip
+                    if np.any(np.isnan(temp)):
+                        continue
+                    mean = meanPerCond[4*k+l][j]
+
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
                     logKx = logKxcoef - log10(Ka)
 
                     ## Calculate the MFI which should result from this condition according to the model
                     MFI = c*self.StoneMod(logR,Ka,v,logKx,L0)
+                    if isnan(MFI):
+                        return -inf
 
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
                     ## of the point assuming the calculated point is true.
-                    temp = mfiAdjMean[4*k+l][4*j:4*j+3]
-                    mean = meanPerCond[4*k+l][j]
                     tempm = norm.logpdf(temp, MFI, sigCoef*mean)
+                    if np.any(np.isnan(tempm)):
+                        return -inf
 
                     ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
