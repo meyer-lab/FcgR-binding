@@ -3,9 +3,6 @@ from math import *
 
 nan = np.nan
 
-def nchoosek(n,k):
-    return factorial(n)/(factorial(k)*factorial(n-k))
-
 def loadData():
     ## Create a matrix of mean-adjusted MFIs from the Nimmerjahn Lab's original assays called mfiAdjMean1
 
@@ -154,15 +151,5 @@ def loadData():
         meanPerCond.append(temp)
     meanPerCond = np.array(meanPerCond)
 
-    biCoefMat = []
-    for j in range(30):
-        temp = []
-        for k in range(j+1):
-            temp.append(nchoosek(j+1,k+1))
-        while len(temp) < 30:
-            temp.append(0)
-        biCoefMat.append(temp)
-    biCoefMat = np.array(biCoefMat)
-
     return {'mfiAdjMean':mfiAdjMean, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
-            'meanPerCond':meanPerCond, 'biCoefMat':biCoefMat, 'mfiAdjMean2':mfiAdjMean2}
+            'meanPerCond':meanPerCond, 'mfiAdjMean2':mfiAdjMean2}
