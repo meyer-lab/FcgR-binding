@@ -1,44 +1,48 @@
 import unittest
 import StoneModel
 import numpy as np
+import random
+from math import *
 
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
         self.M = StoneModel.StoneModel()
 
+    def test_nchoosek(self):
+        self.assertTrue(self.M.nchoosek(5,3) == 10)
+        self.assertTrue(self.M.nchoosek(6,3) == 20)
+        self.assertTrue(self.M.nchoosek(7,3) == 35)
+        self.assertTrue(self.M.nchoosek(8,3) == 56)
+        self.assertTrue(self.M.nchoosek(9,3) == 84)
+
+    def test_reqFuncSolver(self):
+        for xx in range(100):
+            kai = random.random()
+            kx = random.random()
+            vi = random.randint(1, 30)
+            R = random.random()
+            Li = random.random()
+
+            diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*kai*(1+kx*(10**x))**(vi-1))
+
+            output = self.M.ReqFuncSolver(R, kai, Li, vi, kx)
+
+            self.assertTrue(abs(diffFunAnon(output)) < 1E-8)
+
+        self.assertTrue(isnan(self.M.ReqFuncSolver(R, kai, Li, -10, kx)))
+
     def test_StoneMod(self):
-        biCoefMat = self.M.data['biCoefMat']
-        tnpbsa = self.M.data['tnpbsa']
-        L0 = tnpbsa[0]
+        # This test should check that the model output satisfies Rbound = Rtot - Req
+        kai = random.random()
+        kx = random.random()
+        v = random.randint(1, 30)
+        R = random.random()
+        Li = random.random()
 
-        go = 0
-        while go < 10:
-            R = 50000*np.random.rand(1)
-            logR = np.log10(R)
-            Ka = 10**(np.random.rand(1)+5)
-            logKx = 8*np.random.rand(1)-12
-            v = np.random.randint(1,30)
+        StoneRet = self.M.StoneMod(log10(R),kai,v,log10(kx),Li)
+        Req = 10**self.M.ReqFuncSolver(R,kai,Li,v,kx)
 
-            temp = self.M.StoneMod(logR,Ka,v,logKx,L0,biCoefMat)
-            # Ideally write an assertion for accuracy here.
-            go += 1
-
-    def test_pseudoNormLike(self):
-        print("Testing pseudoNormlike")
-
-    def test_NormalErrorCoef(self):
-        data = self.M.data
-
-        print(self.M.NormalErrorCoef([1]*12, data['kaBruhns'], data['mfiAdjMean'], data['tnpbsa'], data['meanPerCond'], data['biCoefMat']))
-        print(self.M.StoneMod(8,1e-6,4,-8,7e-6,self.M.biCoefMat))
-
-
-
-
-
-
-
-
+        self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
 
 if __name__ == '__main__':
     unittest.main()
