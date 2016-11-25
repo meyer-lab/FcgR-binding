@@ -1,4 +1,9 @@
 *.asv
 **/__pycache__/
-
 *.h5
+.Rproj.user
+*.nb.html
+.Rhistory
+Manuscript/.texpadtmp
+
+Manuscript/Manuscript.pdf
