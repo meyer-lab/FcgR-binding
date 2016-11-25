@@ -13,14 +13,7 @@ class StoneModel:
     ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
     ## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
     ## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
-    def ReqFuncSolver(self, R, kai, Li, vi, kx):
-        ## Calculate kdi from kai for the sake of maintaining similarity to the original MATLAB function; kdi=Kd, Kd being
-        ## Kd as used in Equation 2 from Stone.
-        kdi = 1/kai
-        ## Caculate the product vi*Li/kdi, which is used in Equation 2 from Stone and which is constant for all iterations
-        ## of the bisection algorithm on diffFun (Equation 2 from Stone) for a given calling of ReqFuncSolver.
-        viLikdi = vi*Li/kdi
-
+    def ReqFuncSolver(self, R, ka, Li, vi, kx):
         ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req) is necessarily lower than log10(R).
         a = -20
         b = log10(R)
@@ -31,14 +24,14 @@ class StoneModel:
         ## Each time this function is called: x is log10 of the value of Req being tested, R is R from Stone 2, vi is v from
         ## Stone 2, kx is Kx from Stone 2, and viLikdi is a product which is constant over all iterations of the bisection
         ## algorithm over diffFun for a single calling of ReqFuncSolver.
-        diffFunAnon = lambda x: R-(10**x)*(1+viLikdi*(1+kx*(10**x))**(vi-1))
+        diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
 
         if diffFunAnon(a)*diffFunAnon(b) > 0:
             return np.nan
 
         ## Implement the bisection algorithm using SciPy's brentq. Please see SciPy documentation for rationale behind
         ## input parameter not described beforehand. Brentq is ~2x faster than bisect
-        logReq = brentq(diffFunAnon,a,b,(),1e-12,np.finfo(float).eps*10,100,False,False)
+        logReq = brentq(diffFunAnon, a, b, disp=False)
 
         return logReq
 
@@ -54,23 +47,34 @@ class StoneModel:
         ## equations derived from Stone et al. (2001). Assumed that ligand is at
         ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
         ## for TNP-4-BSA in Lux et al. (2013).
-        Kd = 1/Ka
         Kx = 10**logKx
-        R = 10**logR
         v = np.int_(v)
 
         ## Vector of binomial coefficients
-        Req = 10**self.ReqFuncSolver(R,Kd,L0,v,Kx)
+        Req = 10**self.ReqFuncSolver(10**logR,Ka,L0,v,Kx)
         if isnan(Req):
             return nan
 
-        ## Calculate L, according to equations 1 and 7
-        Lpre = 0
-        for j in range(v):
-            Lpre = Lpre+self.nchoosek(v,j+1)*Kx**j*Req**(j+1) # TODO: Check that this is the right expression, now using a memoised nchoosek
-        L = Lpre*L0/Kd
+        # Calculate vieq from equation 1
+        vieqIter = (L0*Ka*self.nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
+        vieq = np.fromiter(vieqIter, np.float, count = v)
 
-        return L
+        ## Calculate L, according to equation 7
+        Lbound = np.sum(vieq)
+
+        # Calculate Rmulti from equation 5
+        RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
+        Rmulti = np.sum(np.fromiter(RmultiIter, np.float, count = v-1))
+
+        # Calculate Rbound
+        RbndIter = ((j+1)*vieq[j] for j in range(v))
+        Rbnd = np.sum(np.fromiter(RbndIter, np.float, count = v))
+
+        # Calculate numXlinks from equation 4
+        nXlinkIter = (j*vieq[j] for j in range(1,v))
+        nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
+
+        return (Lbound, Rbnd, Rmulti, nXlink)
 
     ## This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
     ## tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
@@ -122,7 +126,7 @@ class StoneModel:
                     logKx = logKxcoef - log10(Ka)
 
                     ## Calculate the MFI which should result from this condition according to the model
-                    MFI = c*self.StoneMod(logR,Ka,v,logKx,L0)
+                    MFI = c*(self.StoneMod(logR,Ka,v,logKx,L0))[0]
                     if isnan(MFI):
                         return -inf
 
