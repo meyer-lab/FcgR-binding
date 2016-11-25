@@ -1,0 +1,33 @@
+---
+title: "MCMC Chain Diagnostics"
+output: html_notebook
+---
+
+```{r load}
+require(h5, quietly = T)
+require(tidyverse, quietly = T)
+require(Rtsne, quietly = T)
+
+# Read in chain and close file
+f <- h5file("../mcmc_chain.h5", mode = "r")
+data <- readDataSet(f["/data"])
+h5close(f)
+
+data <- as.data.frame(data)
+data <- mutate(data, crawler = as.factor(V2), LL = V1, gnu1 = floor(V6), gnu2 = floor(V7)) %>%
+  select(-V2, -V1, -V6, -V7) %>% filter(LL > max(LL)-3) %>% unique
+
+data <- data %>% sample_n(size = 4000)
+
+# Add principle components of parameters, make data matrix
+tsn <- Rtsne(as.matrix(select(data, -LL, -crawler)), check_duplicates=F, verbose=T)
+data <- data %>% mutate(T1 = tsn$Y[,1], T2 = tsn$Y[,2])
+```
+
+
+
+
+```{r}
+ggplot(data, aes(x = T1, y = T2, color = LL)) + geom_point()
+```
+
