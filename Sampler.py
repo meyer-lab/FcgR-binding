@@ -1,11 +1,10 @@
-from math import *
 from emcee import EnsembleSampler
 import numpy as np
 import StoneModel
-import csv
-import time
-import sys
 import h5py
+from math import inf
+from scipy.optimize import minimize
+from joblib import Parallel, delayed
 
 newData = 1
 bestLL = -inf
@@ -50,6 +49,14 @@ def loglF(x):
 
     return(output)
 
+# Bounds list for optimization
+boundsOpt = list(zip(lb.tolist(),ub.tolist()))
+
+# Optimization routine for finding an initial point
+def initOpt(pp):
+    minOut = minimize(fun=lambda x: -loglF(x), x0=pp, bounds=boundsOpt)
+    return(minOut['x'])
+
 #### Run simulation
 niters = 100000
 
@@ -57,8 +64,16 @@ niters = 100000
 ndims, nwalkers = int(np.size(lb)), 100
 p0 = np.random.uniform(low=0, high=1, size=(nwalkers, ndims))
 
-for ii in range(0, nwalkers):
+for ii in range(nwalkers):
     p0[ii] = lb + (ub - lb)*p0[ii]
+
+## Run a local optimization of each starting point to try and reduce burn in time
+print('Optimizing the initial point of each walker')
+
+outtput = Parallel(n_jobs = 16)(delayed(initOpt)(p0[ii]) for ii in range(nwalkers))
+p0 = np.asarray(outtput)
+
+print('Done initializing points.')
 
 ## Set up sampler
 sampler = EnsembleSampler(nwalkers,ndims,loglF,2.0,[],{},None,16)
@@ -66,8 +81,8 @@ sampler = EnsembleSampler(nwalkers,ndims,loglF,2.0,[],{},None,16)
 f = h5py.File("mcmc_chain.h5", 'w', libver='latest')
 dset = f.create_dataset("data", chunks=True, maxshape=(None, len(lb) + 2), data=np.ndarray((0, len(lb) + 2)))
 f.swmr_mode = True
-thinTrack = 1
-thin = 10
+thinTrack = -1000
+thin = 20
 
 for p, lnprob, lnlike in sampler.sample(p0, iterations=niters, storechain=False):
     if thinTrack < thin:
