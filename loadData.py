@@ -1,155 +1,328 @@
-import numpy as np
+from numpy import array, concatenate, nanmean, reshape, transpose
 from math import *
+from csv import reader
+from os import getcwd
+from os.path import join, split
 
-nan = np.nan
+nan = float('nan')
 
 def loadData():
-    ## Create a matrix of mean-adjusted MFIs from the Nimmerjahn Lab's original assays called mfiAdjMean1
+    ## To begin, read in the MFI measurements from both of Lux's experiments from
+    ## their respective csvs. Then, subtract background MFIs from these nominal
+    ## MFIs. Then, normalize the data by replicate. For each step after the
+    ##reading, I manipulated the csv data in different ways, which are explained
+    ## in the comments. Please refer to these comments to understand what is
+    ## going on, especially with variables of the name "book$" or "temp$." All
+    ## variables with such names are only meant to construct mfiAdjMean1 (from
+    ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
 
-    # First, create iterated lists, isomorphic to a 30x8 matrix, holding the lab's original MFI data.
-
-    mfi = [[113,5,7,8,38,6,8,10], \
-    [441,427,784,172,318,552,900,248], \
-    [440,578,997,176,404,392,894,124], \
-    [442,407,905,185,322,515,957,242], \
-    [388,428,618,139,530,431,810,172], \
-    [14,8,9,9,18,9,12,12], \
-    [130,177,274,58,266,604,1016,281], \
-    [50,23,57,13,149,139,381,48], \
-    [184,193,408,87,523,621,1297,281], \
-    [44,21,29,17,265,151,343,72], \
-    [38,4,4,5,53,5,5,10], \
-    [327,308,539,113,660,585,1298,377], \
-    [277,203,174,36,533,394,742,156], \
-    [307,334,305,135,421,674,1173,405], \
-    [148,54,6,20,630,517,1005,145], \
-    [7,6,7,4,9,7,9,10], \
-    [80,200,262,30,139,737,1108,230], \
-    [17,27,40,8,63,111,260,32], \
-    [124,231,349,62,442,942,746,244], \
-    [33,44,100,21,183,331,605,68], \
-    [7,6,8,6,7,7,8,11], \
-    [262,676,1015,269,709,1333,1935,698], \
-    [14,31,31,14,23,26,68,19], \
-    [328,528,790,267,788,1668,2628,891], \
-    [9,8,16,10,17,21,46,20], \
-    [49,8,14,7,49,8,9,8], \
-    [295,596,1016,334,488,813,1330,383], \
-    [105,186,293,65,177,362,573,114], \
-    [nan,623,1055,365,924,1317,1861,676], \
-    [122,136,262,91,313,558,1026,239]]
-
-    # Subtract background MFIs from MFIs for each combination of FcgR, IgG, and avidity
-    mfiAdj = []
-    noise = []
-    for j in range(len(mfi)):
-        if j%5 != 0:
-            mfiAdj.append(mfi[j])
+    ## mfiAdjMean1:
+    ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
+    path = split(getcwd())[0]+'\\recepnum1\\Nimmerjahn Lab and Bruhns Data'
+    ## Read in the csv data for the first experiments. lux1 is an iterable data
+    ## structure wherein each iterable element is a single-element list containing a
+    ## string. Each such string represents a single row from the csv.
+    Fig2B = open(join(path,'Luxetal2013-Fig2B.csv'),newline = '')
+    lux1 = reader(Fig2B,delimiter = ' ', quotechar = '|')
+    ## Iterate over each element in lux1, appending each list to the list book.
+    book = []
+    for row in lux1:
+        book.append(row)
+    ## Rows 1 and 2 from the csv are only text; create the new list book2 which
+    ## contains only rows 3 through 32 of book.
+    book2 = []
+    for j in range(2,32):
+        book2.append(book[j][0])
+    ## From each string in book2, create an individual string for each element in
+    ## the original csv. In book3, each string in book2 corresponds to a list of
+    ## these smaller strings.
+    book3 = []
+    for string in book2:
+        temp = []
+        temp2 = ''
+        for j in range(len(string)):
+            if string[j] != ',':
+                temp2 = temp2+string[j]
+            else:
+                temp.append(temp2)
+                temp2 = ''
+        temp.append(temp2)
+        book3.append(temp)
+    ## Covert all strings in book4 to floats, where applicable. All strings with
+    ## alphabetical characters, including the empty cell in replicate 1,
+    ## TNP-4-BSA, are skipped over; no float is created for these. This results
+    ## in the list book4, wherein each element is a list containing eight
+    ## floats, save the second-to-last element, which contains seven.
+    book4 = []
+    for row in book3:
+        temp = []
+        for elem in row:
+            try:
+                temp.append(float(elem))
+            except ValueError:
+                continue
+        book4.append(temp)
+    ## In the second-to-last element of book4, add to the front of the list a float
+    ## nan.
+    book4[28] = [nan]+book4[28]
+    ## Convert book4 to a NumPy array
+    book4 = array(book4)
+    ## The first row in every set of five rows in book4 consists of background
+    ## MFIs. book5 is made by taking each of the four non-background MFIs from
+    ## reach cluster of 5 from book4, subtracting the corresponding background
+    ## MFI from each, and then forming a NumPy array of shape (24,8) from all of
+    ## these collectively. The final result, book5, will be a NumPy array of
+    ## shape (1,192).
+    book5 = array([])
+    for j in range(len(book4)):
+        if j%5 == 0:
+            temp = array(book4[j])
         else:
-            for k in range(4):
-                noise.append(mfi[j])
-    mfiAdj = np.array(mfiAdj)-np.array(noise)
-
-    # Normalize the data by replicate mean (please see Lux's original presentation of the data in the spreadsheet she sent us)
-    temp = np.transpose(mfiAdj)
-    means = [np.nanmean(np.concatenate((temp[j],temp[j+4]))) for j in range(4)]
-    means2 = np.concatenate((means,means))
+            temp2 = array(book4[j])-temp
+            book5 = concatenate((book5,temp2),0)
+    ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
+    ## MFIs from Lux's original experiments.
+    book5 = reshape(book5,(24,8))
+    ## Transponse book5, so that all the elements in rows n and n+4 correspond to
+    ## the same replicate (for all n in {0,1,2,3}; Python indexing used). Then,
+    ## concatenate both rows in a single replicate, and take the mean of the
+    ## resulting array. This mean will correspond to the normalizing factor by
+    ## which the corresponding replicate is normalized. These are first contained
+    ## the (1,4) NumPy array means.
+    temp = transpose(book5)
+    means = [nanmean(concatenate((temp[j],temp[j+4]))) for j in range(4)]
+    ## Concatenate means with itself to result in a (1,8) NumPy array, means2
+    means2 = concatenate((means,means))
+    ## Concatenate means2 with itself until a NumPy array of shape (1,192) is
+    ## created. This array is titled "temp." Then, reshape temp into a (24,8)
+    ## NumPy array called "noise." Each element in book5 must be divided by the
+    ## corresponding element in temp in order to be normalized.
     temp = means2
-    for j in range(23):
-        temp = np.concatenate((temp,means2))
-    noise = np.reshape(temp,(24,8))
-    mfiAdjMean1 = mfiAdj/noise
+    for j in range(book5.shape[0]-1):
+        temp = concatenate((temp,means2))
+    noise = reshape(temp,(24,8))
+    ## Create mfiAdjMean1 by dividing book5 by noise.
+    mfiAdjMean1 = book5/noise
 
-    ## Replicate what was done above, except now let this be done for the second batch of MFIs given us by the Nimmerjahn Lab.
-    ## Instead of resulting in the NumPy array mfiAdjMean1, this will result in the NumPy array mfiAdjMean2.
-
-    mfi = [[4,6,8,13,5,8,11,14], \
-    [34,54,77,115,53,128,115,201], \
-    [23,29,58,94,64,85,80,150], \
-    [39,52,86,134,80,103,129,228], \
-    [33,41,68,105,56,81,108,179], \
-    [nan,nan,nan,nan,nan,nan,nan,nan], \
-    [nan,nan,nan,nan,nan,nan,nan,nan], \
-    [nan,nan,nan,nan,nan,nan,nan,nan], \
-    [nan,nan,nan,nan,nan,nan,nan,nan], \
-    [nan,nan,nan,nan,nan,nan,nan,nan], \
-    [4,6,8,12,4,11,19,12], \
-    [149,319,272,390,288,484,499,756], \
-    [119,138,180,287,197,257,282,458], \
-    [194,226,274,461,348,478,543,801], \
-    [61,92,122,187,236,287,341,597], \
-    [4,6,7,11,7,9,22,13], \
-    [12,29,44,65,84,186,237,361], \
-    [9,14,19,27,60,94,81,158], \
-    [37,52,105,197,124,189,300,489], \
-    [10,16,34,51,58,98,159,223], \
-    [8,10,24,20,8,18,70,42], \
-    [167,375,374,520,468,749,583,918], \
-    [11,21,43,44,103,109,105,156], \
-    [294,390,420,636,523,746,772,1029], \
-    [8,16,43,28,72,96,126,175], \
-    [7,10,13,17,8,23,38,34], \
-    [155,253,430,539,211,318,534,738], \
-    [44,43,87,130,117,105,199,274], \
-    [218,230,482,784,296,364,736,1014], \
-    [114,94,254,339,229,220,462,639]]
-
-    mfiAdj = []
-    noise = []
-    for j in range(len(mfi)):
-        if j%5 != 0:
-            mfiAdj.append(mfi[j])
+    ## mfiAdjMean2:
+    ## Read in the csv data for the first experiments. lux2 is an iterable data
+    ## structure wherein each iterable element is a single-element list
+    ## contraining a string. Each such string represents a single row from the
+    ## csv.
+    Fig2B = open(join(path,'New-Fig2B.csv'),newline = '')
+    lux2 = reader(Fig2B,delimiter = ' ', quotechar = '|')
+    ## Iterate over each list in lux2, appending each list to the list book.
+    book = []
+    for row in lux2:
+        book.append(row)
+    ## Rows 1 and 2 from the csv are only text; create the new list book2 which
+    ## contains only rows 3 through 32 of book.
+    book2 = []
+    for j in range(2,32):
+        book2.append(book[j][0])
+    ## From each string in book2, create an individual string for each element in
+    ## the original csv. In book3, each string in book2 corresponds to a list of
+    ## these smaller strings.
+    book3 = []
+    for string in book2:
+        temp = []
+        temp2 = ''
+        for j in range(len(string)):
+            if string[j] != ',':
+                temp2 = temp2+string[j]
+            else:
+                temp.append(temp2)
+                temp2 = ''
+        temp.append(temp2)
+        book3.append(temp)
+    ## Covert all strings in book4 to floats, where applicable. All strings with
+    ## alphabetical characters are skipped over; no float is created for these.
+    ## This results in the list book4, wherein each element is a list
+    ## containing eight floats, save the second-to-last element, which
+    ## contains seven.
+    book4 = []
+    for row in book3:
+        temp = []
+        for elem in row:
+            try:
+                temp.append(float(elem))
+            except ValueError:
+                a = 6
+        book4.append(temp)
+    ## In book4, due to there being data lost from the FcgRIIA-R experimentation,
+    ## the rows corresponding to this group are all empty lists. Therefore, book5
+    ## Is identical to book4, save for that the elements of length 0 are excluded.
+    book5 = []
+    for row in book4:
+        if len(row) == 8:
+            book5.append(row)
+    ## The first row in every set of five rows in book5 consists of background
+    ## MFIs. book6 is made by taking each of the four non-background MFIs from
+    ## reach cluster of 5 from book5, subtracting the corresponding background
+    ## MFI from each, and then forming a NumPy array of shape (20,8) from all of
+    ## these collectively. The final result, book5, will be a NumPy array of
+    ## shape (1,160).
+    book5 = array(book5)
+    book6 = array([])
+    for j in range(len(book5)):
+        if j%5 == 0:
+            temp = array(book5[j])
         else:
-            for k in range(4):
-                noise.append(mfi[j])
-    mfiAdj = np.array(mfiAdj)-np.array(noise)
-
-    temp = np.transpose(mfiAdj)
-    means = [np.nanmean(np.concatenate((temp[j],temp[j+4]))) for j in range(4)]
-    means2 = np.concatenate((means,means))
+            temp2 = array(book5[j])-temp
+            book6 = concatenate((book6,temp2),0)
+    ## Reshape book6 into an array of shape (20,8).
+    book6 = reshape(book6,(20,8))
+    ## Transponse book6, so that all the elements in rows n and n+4 correspond
+    ## to the same replicate (for all n in {0,1,2,3}; Python indexing used).
+    ## Then, concatenate both rows in a single replicate, and take the mean of
+    ## the resulting array. This mean will correspond to the normalizing factor
+    ## by which the corresponding replicate is normalized. These are first
+    ## contained the (1,4) NumPy array means.
+    temp = transpose(book6)
+    means = [nanmean(concatenate((temp[j],temp[j+4]))) for j in range(4)]
+    ## Concatenate means with itself to result in a (1,8) NumPy array, means2
+    means2 = concatenate((means,means))
+    ## Concatenate means2 with itself until a NumPy array of shape (1,192) is
+    ## created. This array is titled "temp." Then, reshape temp into a (24,8)
+    ## NumPy array called "noise." Each element in book6 must be divided by the
+    ## corresponding element in temp in order to be normalized.
     temp = means2
-    for j in range(23):
-        temp = np.concatenate((temp,means2))
-    noise = np.reshape(temp,(24,8))
-    mfiAdjMean2 = mfiAdj/noise
-
-    ## Concatenate mfiAdjMean1 and mfiAdjMean2 into the NumPy array mfiAdjMean; mfiAdjMean has the shape (48,8).
-
-    mfiAdjMean = np.concatenate((mfiAdjMean1,mfiAdjMean2),0)
+    for j in range(book6.shape[0]-1):
+        temp = concatenate((temp,means2))
+    noise = reshape(temp,(20,8))
+    ## Create mfiAdjMean2 by dividing book6 by noise.
+    mfiAdjMean2 = book6/noise
 
     ## Define concentrations of TNP-4-BSA and TNP-26-BSA
     ## These are put into the numpy array "tnpbsa"
     tnpbsa4 = 1/67122*1e-3*5
     tnpbsa26 = 1/70928*1e-3*5
-    tnpbsa = np.array([tnpbsa4,tnpbsa26])
+    tnpbsa = array([tnpbsa4,tnpbsa26])
 
     ## Define the matrix of Ka values from Bruhns
     ## For accuracy, the Python implementation of this code will use
-    ##  Ka values as opposed to Kd, as these were the values which Bruhns
-    ##  gives in his experiments.
+    ## Ka values as opposed to Kd, as these were the values which Bruhns
+    ## gives in his experiments. These are read in from a csv in the
+    ## folder Nimmerjahn Lab and Bruhns Data. Each row represents a particular
+    ## FcgR (FcgRIA, FcgRIIA-H, FcgRIIA-R, FcgRIIB, FcgRIIIA-F, FcgRIIIA-V)
+    ## and each column represents a particular IgG(1, 2, 3, 4).
 
-    kaBruhns = [[6.50e7,np.nan,6.10e7,3.40e7], \
-    [4.00e6,8.00e4,1.00e6,2.00e5], \
-    [4.00e6,4.50e5,1.00e6,2.00e5], \
-    [2.00e5,2.50e4,1.70e5,2.00e5], \
-    [1.50e6,2.50e4,5.00e6,2.00e5], \
-    [1.50e6,8.00e4,5.00e6,2.00e5]]
-
-    kaBruhns = np.array(kaBruhns)
+    ## First, read in the csv. It will result in an iterable object, wherein
+    ## each element is a single-element list containing a single string, each
+    ## string corresponding to a single row from the csv.
+    read = open(join(path,'FcgR-Ka-Bruhns.csv'),newline = '')
+    Kas = reader(read,delimiter = ' ', quotechar = '|')
+    ## Iterate over the read-in object, appending each string to a list
+    book = []
+    for row in Kas:
+        book.append(row[0])
+    ## Convert each string to a list of smaller strings, where each string
+    ## corresponds to a single element of the csv.
+    book2 = []
+    for string in book:
+        temp = []
+        temp2 = ''
+        for j in range(len(string)):
+            if string[j] != ',':
+                temp2 = temp2+string[j]
+            else:
+                temp.append(temp2)
+                temp2 = ''
+        temp.append(temp2)
+        book2.append(temp)
+    ## Convert each string into a float. There does not exist a measured Ka
+    ## Between IgG2 and FcgRIIA-H.
+    for j in range(len(book2)):
+        for k in range(len(book2[0])):
+            try:
+                book2[j][k] = float(book2[j][k])
+            except ValueError:
+                book2[j][k] = nan
+    ## Make kaBruhns by converting book2 to a NumPy array.
+    kaBruhns = array(book2)
 
     ## Create a matrix which contains the mean value for each condition
-    ##  (after mean adjustment) of the size 24x2
+    ## (after mean adjustment) from Lux's first experiments of the size
+    ## 24x2
 
-    meanPerCond = []
+    meanPerCond1 = []
     for j in range(24):
         temp = []
         for k in range(2):
             temp2 = []
             for l in range(4):
-                temp2.append(mfiAdjMean[j,k*4+l])
-            temp.append(np.nanmean(np.array(temp2)))
-        meanPerCond.append(temp)
-    meanPerCond = np.array(meanPerCond)
+                temp2.append(mfiAdjMean1[j,k*4+l])
+            temp.append(nanmean(array(temp2)))
+        meanPerCond1.append(temp)
+    meanPerCond1 = array(meanPerCond1)
 
-    return {'mfiAdjMean':mfiAdjMean, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
-            'meanPerCond':meanPerCond, 'mfiAdjMean2':mfiAdjMean2}
+    ## Create a matrix which contains the mean value for each condition
+    ## (after mean adjustment) from Lux's second experiments of the size
+    ## 20x2
+
+    meanPerCond2 = []
+    for j in range(20):
+        temp = []
+        for k in range(2):
+            temp2 = []
+            for l in range(4):
+                temp2.append(mfiAdjMean2[j,k*4+l])
+            temp.append(nanmean(array(temp2)))
+        meanPerCond2.append(temp)
+    meanPerCond2 = array(meanPerCond2)
+
+    ## Create the NumPy array Rquant, where each row represents a particular
+    ## IgG (1,2,3, or 4) and each column corresponds to a particular FcgR
+    ## (FcgRIA, FcgRIIA-H,FcgRIIA-R, FcgRIIB, FcgRIIIA-F, and FcgRIIIA-V)
+    
+    ## Read in the receptor quantifications for the Nimmerjahn Lab's second
+    ## set of data. Using the function reader from the csv library, this data
+    ## is used to make the iterable object quant, each iterable element of
+    ## which is a single-element list containing a string corresponding to
+    ## a row in the original csv.
+    quantDoc = open(join(path,'FcgRquant.csv'),newline='')
+    quant = reader(quantDoc,delimiter = ' ', quotechar = '|')
+    ## Create a list book which contains all of the lists from quant
+    book = []
+    for row in quant:
+        book.append(row)
+    ## Remove the first element from book, which is only a string corresponding
+    ## to the names of the receptor species. Also, convert each single-element
+    ## list (containing a single string) in book to that list's single element
+    ## (the string). Each list in book2 corresponds to its respective list in
+    ## book in regards to this conversion.
+    book2 = []
+    for j in range(1,len(book)):
+        book2.append(book[j][0])
+    ## Convert every single-element list into a list of smaller strings, where
+    ## each string corresponds to an element of the original csv. book3 is a
+    ## list corresponding to book such that each list in book3 is made of the
+    ## substrings of the string in the corresponding single-element list of book2.
+    book3 = []
+    for string in book2:
+        temp = []
+        temp2 = ''
+        for j in range(len(string)):
+            if string[j] != ',':
+                temp2 = temp2+string[j]
+            else:
+                temp.append(temp2)
+                temp2 = ''
+        temp.append(temp2)
+        book3.append(temp)
+    ## Convert every string in book3 to a float, wherein possible. All strings
+    ## equal to '' are turned into float nans. These transformations account
+    ## for all the strings in book3.
+    for j in range(len(book3)):
+        for k in range(len(book3[0])):
+            try:
+                book3[j][k] = float(book3[j][k])
+            except ValueError:
+                book3[j][k] = nan
+    ## Create Rquant by converting book3 to a NumPy array
+    Rquant = array(book3)
+    
+    return {'mfiAdjMean1':mfiAdjMean1, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
+            'meanPerCond1':meanPerCond1, 'mfiAdjMean2':mfiAdjMean2, \
+            'meanPerCond2':meanPerCond2, 'Rquant':Rquant}
+
