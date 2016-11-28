@@ -321,8 +321,16 @@ def loadData():
                 book3[j][k] = nan
     ## Create Rquant by converting book3 to a NumPy array
     Rquant = array(book3)
+
+    ## Create a list of tuples RquantTups, each tuple corresponding to the
+    ## indices of a non-nan float in Rquant.
+    RquantTups = []
+    for j in range(len(Rquant)):
+        for k in range(len(Rquant[0])):
+            if not isnan(Rquant[j][k]):
+                RquantTups.append((j,k))
     
     return {'mfiAdjMean1':mfiAdjMean1, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
             'meanPerCond1':meanPerCond1, 'mfiAdjMean2':mfiAdjMean2, \
-            'meanPerCond2':meanPerCond2, 'Rquant':Rquant}
-
+            'meanPerCond2':meanPerCond2, 'Rquant':Rquant, \
+            'RquantTups':RquantTups}
