@@ -56,12 +56,6 @@ class TestStoneMethods(unittest.TestCase):
     def test_dataImport_mfiAdjMean1(self):
         self.assertTrue(self.M.data['mfiAdjMean1'].shape == (24, 8))
 
-    def test_dataImport_meanPerCond1(self):
-        self.assertTrue(self.M.data['meanPerCond1'].shape == (24, 2))
-
-    def test_dataImport_meanPerCond2(self):
-        self.assertTrue(self.M.data['meanPerCond2'].shape == (24, 2))
-
     def test_dataImport_mfiAdjMean2(self):
         self.assertTrue(self.M.data['mfiAdjMean2'].shape == (24, 8))
 
