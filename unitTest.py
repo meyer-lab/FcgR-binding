@@ -44,27 +44,5 @@ class TestStoneMethods(unittest.TestCase):
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
 
-    def test_dataImport_kaBruhns(self):
-        self.assertTrue(self.M.data['kaBruhns'].shape == (6,4))
-
-    def test_dataImport_tnpbsa(self):
-        self.assertTrue(self.M.data['tnpbsa'].shape == (2,))
-
-    def test_dataImport_Rquant(self):
-        self.assertTrue(self.M.data['Rquant'].shape == (6,))
-
-    def test_dataImport_mfiAdjMean1(self):
-        self.assertTrue(self.M.data['mfiAdjMean1'].shape == (24, 8))
-
-    def test_dataImport_meanPerCond1(self):
-        self.assertTrue(self.M.data['meanPerCond1'].shape == (24, 2))
-
-    def test_dataImport_meanPerCond2(self):
-        self.assertTrue(self.M.data['meanPerCond2'].shape == (24, 2))
-
-    def test_dataImport_mfiAdjMean2(self):
-        self.assertTrue(self.M.data['mfiAdjMean2'].shape == (24, 8))
-
-
 if __name__ == '__main__':
     unittest.main()
