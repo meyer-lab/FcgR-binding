@@ -182,36 +182,6 @@ def loadData():
     kaBruhns = np.loadtxt(join(path,'FcgR-Ka-Bruhns.csv'),\
         converters = {1: converter}, delimiter=',')
 
-    ## Create a matrix which contains the mean value for each condition
-    ## (after mean adjustment) from Lux's first experiments of the size
-    ## 24x2
-
-    meanPerCond1 = []
-    for j in range(24):
-        temp = []
-        for k in range(2):
-            temp2 = []
-            for l in range(4):
-                temp2.append(mfiAdjMean1[j,k*4+l])
-            temp.append(nanmean(array(temp2)))
-        meanPerCond1.append(temp)
-    meanPerCond1 = array(meanPerCond1)
-
-    ## Create a matrix which contains the mean value for each condition
-    ## (after mean adjustment) from Lux's second experiments of the size
-    ## 20x2
-
-    meanPerCond2 = []
-    for j in range(20):
-        temp = []
-        for k in range(2):
-            temp2 = []
-            for l in range(4):
-                temp2.append(mfiAdjMean2[j,k*4+l])
-            temp.append(nanmean(array(temp2)))
-        meanPerCond2.append(temp)
-    meanPerCond2 = array(meanPerCond2)
-
     ## Create the NumPy array Rquant, where each row represents a particular
     ## IgG (1,2,3, or 4) and each column corresponds to a particular FcgR
     ## (FcgRIA, FcgRIIA-H,FcgRIIA-R, FcgRIIB, FcgRIIIA-F, and FcgRIIIA-V)
@@ -224,11 +194,10 @@ def loadData():
     Rquant = np.loadtxt(join(path,'FcgRquant.csv'),\
         converters = {0: converter, 2: converter, 4: converter, 5: converter}, \
         delimiter=',', skiprows=1)
-    
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
         Rquant = np.nanmean(Rquant, axis=0)
 
     return {'mfiAdjMean1':mfiAdjMean1, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
-            'meanPerCond1':meanPerCond1, 'mfiAdjMean2':mfiAdjMean2, \
-            'meanPerCond2':meanPerCond2, 'Rquant':Rquant}
+            'mfiAdjMean2':mfiAdjMean2, 'Rquant':Rquant}
