@@ -9,7 +9,7 @@ from memoize import memoize
 nan = float('nan')
 inf = float('inf')
 
-class StoneModel1:
+class StoneModel:
     ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
     ## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
     ## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
@@ -75,7 +75,7 @@ class StoneModel1:
         nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
 
         return (Lbound, Rbnd, Rmulti, nXlink)
-    
+
     ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
     ## This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
     ## tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
@@ -84,7 +84,7 @@ class StoneModel1:
     ## logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
     ## of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
     ## standard deviation of MFIs for that condition.
-    def NormalErrorCoefcalc(self, x, mfiAdjMean1, meanPerCond1):
+    def NormalErrorCoefcalc(self, x, mfiAdjMean, meanPerCond):
         ## Set the standard deviation coefficient
         sigCoef = 10**x[11]
 
@@ -117,11 +117,11 @@ class StoneModel1:
                         continue
 
                     # Setup the data
-                    temp = mfiAdjMean1[4*k+l][4*j:4*j+3]
+                    temp = mfiAdjMean[4*k+l][4*j:4*j+3]
                     # If data not available, skip
                     if np.any(np.isnan(temp)):
                         continue
-                    mean = meanPerCond1[4*k+l][j]
+                    mean = meanPerCond[4*k+l][j]
 
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
                     logKx = logKxcoef - log10(Ka)
@@ -146,19 +146,14 @@ class StoneModel1:
     # This should do the same as NormalErrorCoef above, but with the second batch of Nimmerjahn data and specified
     # Receptor expression levels
     def NormalErrorCoefRset(self, x):
-        Rvalues = np.array([5.375709327, 6.208906576, -1, 5.627625946, 6.676895076, 6.574806476])
-        # TODO: Rvalues needs to be set by data
+        Rvalues = self.data['Rquant']
 
-        return self.NormalErrorCoefcalc(np.concatenate((Rvalues, x)), self.data['mfiAdjMean1'], self.data['meanPerCond1'])
+        return self.NormalErrorCoefcalc(np.concatenate((Rvalues, x)), self.data['mfiAdjMean2'], self.data['meanPerCond2'])
 
     def NormalErrorCoef(self, x):
         return self.NormalErrorCoefcalc(x, self.data['mfiAdjMean1'], self.data['meanPerCond1'])
 
-
     def __init__(self):
         self.data = loadData()
-
         self.kaBruhns = self.data['kaBruhns']
-        self.mfiAdjMean1 = self.data['mfiAdjMean1']
-        self.meanPerCond1 = self.data['meanPerCond1']
         self.tnpbsa = self.data['tnpbsa']
