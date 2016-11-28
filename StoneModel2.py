@@ -163,3 +163,4 @@ class StoneModel2:
         self.meanPerCond2 = self.data['meanPerCond2']
         self.tnpbsa = self.data['tnpbsa']
         self.Rquant = self.data['Rquant']
+        self.RquantTups = self.data['RquantTups']
