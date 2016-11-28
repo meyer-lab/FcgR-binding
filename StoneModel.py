@@ -84,7 +84,7 @@ class StoneModel:
     ## logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
     ## of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
     ## standard deviation of MFIs for that condition.
-    def NormalErrorCoefcalc(self, x, mfiAdjMean, meanPerCond):
+    def NormalErrorCoefcalc(self, x, mfiAdjMean):
         ## Set the standard deviation coefficient
         sigCoef = 10**x[11]
 
@@ -121,7 +121,6 @@ class StoneModel:
                     # If data not available, skip
                     if np.any(np.isnan(temp)):
                         continue
-                    mean = meanPerCond[4*k+l][j]
 
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
                     logKx = logKxcoef - log10(Ka)
@@ -133,7 +132,7 @@ class StoneModel:
 
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
                     ## of the point assuming the calculated point is true.
-                    tempm = norm.logpdf(temp, MFI, sigCoef*mean)
+                    tempm = norm.logpdf(temp, MFI, sigCoef*MFI)
                     if np.any(np.isnan(tempm)):
                         return -inf
 
@@ -148,10 +147,10 @@ class StoneModel:
     def NormalErrorCoefRset(self, x):
         Rvalues = self.data['Rquant']
 
-        return self.NormalErrorCoefcalc(np.concatenate((Rvalues, x)), self.data['mfiAdjMean2'], self.data['meanPerCond2'])
+        return self.NormalErrorCoefcalc(np.concatenate((Rvalues, x)), self.data['mfiAdjMean2'])
 
     def NormalErrorCoef(self, x):
-        return self.NormalErrorCoefcalc(x, self.data['mfiAdjMean1'], self.data['meanPerCond1'])
+        return self.NormalErrorCoefcalc(x, self.data['mfiAdjMean1'])
 
     def __init__(self):
         self.data = loadData()
