@@ -3,14 +3,8 @@ from math import *
 from csv import reader
 from os import getcwd
 from os.path import join, split
-import numpy as np
-import warnings
 
-def converter(x):
-    try:
-        return float(x)
-    except ValueError:
-        return np.nan
+nan = float('nan')
 
 def loadData():
     ## To begin, read in the MFI measurements from both of Lux's experiments from
@@ -24,14 +18,55 @@ def loadData():
 
     ## mfiAdjMean1:
     ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
-    path = split(getcwd())[0]+'/recepnum1/Nimmerjahn Lab and Bruhns Data'
+    path = split(getcwd())[0]+'\\recepnum1\\Nimmerjahn Lab and Bruhns Data'
     ## Read in the csv data for the first experiments. lux1 is an iterable data
     ## structure wherein each iterable element is a single-element list containing a
     ## string. Each such string represents a single row from the csv.
-    book4 = np.loadtxt(join(path,'Luxetal2013-Fig2B.csv'),\
-        converters = {2: converter}, delimiter=',', skiprows=2, \
-        usecols=list(range(2,10)))
-
+    Fig2B = open(join(path,'Luxetal2013-Fig2B.csv'),newline = '')
+    lux1 = reader(Fig2B,delimiter = ' ', quotechar = '|')
+    ## Iterate over each element in lux1, appending each list to the list book.
+    book = []
+    for row in lux1:
+        book.append(row)
+    ## Rows 1 and 2 from the csv are only text; create the new list book2 which
+    ## contains only rows 3 through 32 of book.
+    book2 = []
+    for j in range(2,32):
+        book2.append(book[j][0])
+    ## From each string in book2, create an individual string for each element in
+    ## the original csv. In book3, each string in book2 corresponds to a list of
+    ## these smaller strings.
+    book3 = []
+    for string in book2:
+        temp = []
+        temp2 = ''
+        for j in range(len(string)):
+            if string[j] != ',':
+                temp2 = temp2+string[j]
+            else:
+                temp.append(temp2)
+                temp2 = ''
+        temp.append(temp2)
+        book3.append(temp)
+    ## Covert all strings in book4 to floats, where applicable. All strings with
+    ## alphabetical characters, including the empty cell in replicate 1,
+    ## TNP-4-BSA, are skipped over; no float is created for these. This results
+    ## in the list book4, wherein each element is a list containing eight
+    ## floats, save the second-to-last element, which contains seven.
+    book4 = []
+    for row in book3:
+        temp = []
+        for elem in row:
+            try:
+                temp.append(float(elem))
+            except ValueError:
+                continue
+        book4.append(temp)
+    ## In the second-to-last element of book4, add to the front of the list a float
+    ## nan.
+    book4[28] = [nan]+book4[28]
+    ## Convert book4 to a NumPy array
+    book4 = array(book4)
     ## The first row in every set of five rows in book4 consists of background
     ## MFIs. book5 is made by taking each of the four non-background MFIs from
     ## reach cluster of 5 from book4, subtracting the corresponding background
@@ -114,7 +149,6 @@ def loadData():
             except ValueError:
                 a = 6
         book4.append(temp)
-
     ## In book4, due to there being data lost from the FcgRIIA-R experimentation,
     ## the rows corresponding to this group are all empty lists. Therefore, book5
     ## Is identical to book4, save for that the elements of length 0 are excluded.
@@ -122,7 +156,6 @@ def loadData():
     for row in book4:
         if len(row) == 8:
             book5.append(row)
-
     ## The first row in every set of five rows in book5 consists of background
     ## MFIs. book6 is made by taking each of the four non-background MFIs from
     ## reach cluster of 5 from book5, subtracting the corresponding background
@@ -139,8 +172,6 @@ def loadData():
             book6 = concatenate((book6,temp2),0)
     ## Reshape book6 into an array of shape (20,8).
     book6 = reshape(book6,(20,8))
-
-    #print(book6)
     ## Transponse book6, so that all the elements in rows n and n+4 correspond
     ## to the same replicate (for all n in {0,1,2,3}; Python indexing used).
     ## Then, concatenate both rows in a single replicate, and take the mean of
@@ -179,8 +210,36 @@ def loadData():
     ## First, read in the csv. It will result in an iterable object, wherein
     ## each element is a single-element list containing a single string, each
     ## string corresponding to a single row from the csv.
-    kaBruhns = np.loadtxt(join(path,'FcgR-Ka-Bruhns.csv'),\
-        converters = {1: converter}, delimiter=',')
+    read = open(join(path,'FcgR-Ka-Bruhns.csv'),newline = '')
+    Kas = reader(read,delimiter = ' ', quotechar = '|')
+    ## Iterate over the read-in object, appending each string to a list
+    book = []
+    for row in Kas:
+        book.append(row[0])
+    ## Convert each string to a list of smaller strings, where each string
+    ## corresponds to a single element of the csv.
+    book2 = []
+    for string in book:
+        temp = []
+        temp2 = ''
+        for j in range(len(string)):
+            if string[j] != ',':
+                temp2 = temp2+string[j]
+            else:
+                temp.append(temp2)
+                temp2 = ''
+        temp.append(temp2)
+        book2.append(temp)
+    ## Convert each string into a float. There does not exist a measured Ka
+    ## Between IgG2 and FcgRIIA-H.
+    for j in range(len(book2)):
+        for k in range(len(book2[0])):
+            try:
+                book2[j][k] = float(book2[j][k])
+            except ValueError:
+                book2[j][k] = nan
+    ## Make kaBruhns by converting book2 to a NumPy array.
+    kaBruhns = array(book2)
 
     ## Create a matrix which contains the mean value for each condition
     ## (after mean adjustment) from Lux's first experiments of the size
@@ -215,54 +274,10 @@ def loadData():
     ## Create the NumPy array Rquant, where each row represents a particular
     ## IgG (1,2,3, or 4) and each column corresponds to a particular FcgR
     ## (FcgRIA, FcgRIIA-H,FcgRIIA-R, FcgRIIB, FcgRIIIA-F, and FcgRIIIA-V)
-
-    ## Read in the receptor quantifications for the Nimmerjahn Lab's second
-    ## set of data. Using the function reader from the csv library, this data
-    ## is used to make the iterable object quant, each iterable element of
-    ## which is a single-element list containing a string corresponding to
-    ## a row in the original csv.
-<<<<<<< HEAD
-    quantDoc = open(join(path,'FcgRquant.csv'),newline='')
-    quant = reader(quantDoc,delimiter = ' ', quotechar = '|')
-    ## Create a list book which contains all of the lists from quant
-    book = []
-    for row in quant:
-        book.append(row)
-    ## Remove the first element from book, which is only a string corresponding
-    ## to the names of the receptor species. Also, convert each single-element
-    ## list (containing a single string) in book to that list's single element
-    ## (the string). Each list in book2 corresponds to its respective list in
-    ## book in regards to this conversion.
-    book2 = []
-    for j in range(1,len(book)):
-        book2.append(book[j][0])
-    ## Convert every single-element list into a list of smaller strings, where
-    ## each string corresponds to an element of the original csv. book3 is a
-    ## list corresponding to book such that each list in book3 is made of the
-    ## substrings of the string in the corresponding single-element list of book2.
-    book3 = []
-    for string in book2:
-        temp = []
-        temp2 = ''
-        for j in range(len(string)):
-            if string[j] != ',':
-                temp2 = temp2+string[j]
-            else:
-                temp.append(temp2)
-                temp2 = ''
-        temp.append(temp2)
-        book3.append(temp)
-    ## Convert every string in book3 to a float, wherein possible. All strings
-    ## equal to '' are turned into float nans. These transformations account
-    ## for all the strings in book3.
-    for j in range(len(book3)):
-        for k in range(len(book3[0])):
-            try:
-                book3[j][k] = float(book3[j][k])
-            except ValueError:
-                book3[j][k] = nan
-    ## Create Rquant by converting book3 to a NumPy array
-    Rquant = array(book3)
+    
+    Rquant = np.loadtxt(join(path,'FcgRquant.csv'),\
+        converters = {0: converter, 2: converter, 4: converter, 5: converter}, \
+        delimiter=',', skiprows=1)
 
     ## Create a list of tuples RquantTups, each tuple corresponding to the
     ## indices of a non-nan float in Rquant.
@@ -271,21 +286,12 @@ def loadData():
         for k in range(len(Rquant[0])):
             if not isnan(Rquant[j][k]):
                 RquantTups.append((j,k))
-=======
+
     Rquant = np.loadtxt(join(path,'FcgRquant.csv'),\
         converters = {0: converter, 2: converter, 4: converter, 5: converter}, \
         delimiter=',', skiprows=1)
->>>>>>> 2508392ef0b47bcd0830352cd3e30f3d3b98945e
-    
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=RuntimeWarning)
-        Rquant = np.nanmean(Rquant, axis=0)
 
     return {'mfiAdjMean1':mfiAdjMean1, 'tnpbsa':tnpbsa, 'kaBruhns':kaBruhns, \
             'meanPerCond1':meanPerCond1, 'mfiAdjMean2':mfiAdjMean2, \
-<<<<<<< HEAD
             'meanPerCond2':meanPerCond2, 'Rquant':Rquant, \
             'RquantTups':RquantTups}
-=======
-            'meanPerCond2':meanPerCond2, 'Rquant':Rquant}
->>>>>>> 2508392ef0b47bcd0830352cd3e30f3d3b98945e
