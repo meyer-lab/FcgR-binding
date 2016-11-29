@@ -24,7 +24,7 @@ def loadData():
 
     ## mfiAdjMean1:
     ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
-    path = split(getcwd())[0]+'/recepnum1/Nimmerjahn Lab and Bruhns Data'
+    path = './Nimmerjahn Lab and Bruhns Data'
     ## Read in the csv data for the first experiments. lux1 is an iterable data
     ## structure wherein each iterable element is a single-element list containing a
     ## string. Each such string represents a single row from the csv.
@@ -192,7 +192,7 @@ def loadData():
     ## which is a single-element list containing a string corresponding to
     ## a row in the original csv.
     Rquant = np.loadtxt(join(path,'FcgRquant.csv'),\
-        converters = {0: converter, 2: converter, 4: converter, 5: converter}, \
+        converters = {0: converter, 1: converter, 4: converter, 5: converter}, \
         delimiter=',', skiprows=1)
 
     with warnings.catch_warnings():
