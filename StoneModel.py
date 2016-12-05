@@ -52,7 +52,7 @@ class StoneModel:
 
         ## Vector of binomial coefficients
         Req = 10**self.ReqFuncSolver(10**logR,Ka,L0,v,Kx)
-        if isnan(Req):
+        if np.isnan(Req):
             return nan
 
         # Calculate vieq from equation 1
@@ -109,6 +109,9 @@ class StoneModel:
                 if logR == -1:
                     continue;
 
+                if np.isnan(logR):
+                    continue;
+
                 ## Iterate over each kind of IgG
                 for l in range(4):
                     ## Set the affinity for the binding of the FcgR and IgG in question
@@ -127,7 +130,7 @@ class StoneModel:
 
                     ## Calculate the MFI which should result from this condition according to the model
                     MFI = c*(self.StoneMod(logR,Ka,v,logKx,L0))[0]
-                    if isnan(MFI):
+                    if np.isnan(MFI):
                         return -inf
 
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
@@ -156,3 +159,4 @@ class StoneModel:
         self.data = loadData()
         self.kaBruhns = self.data['kaBruhns']
         self.tnpbsa = self.data['tnpbsa']
+        self.Rquant = self.data['Rquant']
