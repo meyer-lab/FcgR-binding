@@ -39,7 +39,7 @@ class StoneModel:
     def nchoosek(self, n, k):
         return comb(n, k, exact=True)
 
-    def StoneMod(self,logR,Ka,v,logKx,L0):
+    def StoneMod(self,logR,Ka,v,logKx,L0,fullOutput = False):
         ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
         ## receptors, granted each epitope of the ligand binds to the receptor
         ## kind in question with dissociation constant Kd and cross-links with
@@ -52,8 +52,8 @@ class StoneModel:
 
         ## Vector of binomial coefficients
         Req = 10**self.ReqFuncSolver(10**logR,Ka,L0,v,Kx)
-        if np.isnan(Req):
-            return nan
+        if isnan(Req):
+            return (nan, nan, nan, nan)
 
         # Calculate vieq from equation 1
         vieqIter = (L0*Ka*self.nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
@@ -61,6 +61,10 @@ class StoneModel:
 
         ## Calculate L, according to equation 7
         Lbound = np.sum(vieq)
+
+        # If we just need the amount of ligand bound, exit here.
+        if fullOutput == False:
+            return (Lbound, nan, nan, nan)
 
         # Calculate Rmulti from equation 5
         RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
@@ -106,10 +110,7 @@ class StoneModel:
                 ## Set the common logarith of the level of receptor expression for the FcgR in question
                 logR = x[k]
 
-                if logR == -1:
-                    continue;
-
-                if np.isnan(logR):
+                if isnan(logR):
                     continue;
 
                 ## Iterate over each kind of IgG
@@ -130,7 +131,7 @@ class StoneModel:
 
                     ## Calculate the MFI which should result from this condition according to the model
                     MFI = c*(self.StoneMod(logR,Ka,v,logKx,L0))[0]
-                    if np.isnan(MFI):
+                    if isnan(MFI):
                         return -inf
 
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
@@ -148,7 +149,7 @@ class StoneModel:
     # This should do the same as NormalErrorCoef above, but with the second batch of Nimmerjahn data and specified
     # Receptor expression levels
     def NormalErrorCoefRset(self, x):
-        Rvalues = self.data['Rquant']
+        Rvalues = np.log10(self.data['Rquant'])
 
         return self.NormalErrorCoefcalc(np.concatenate((Rvalues, x)), self.data['mfiAdjMean2'])
 
@@ -159,4 +160,3 @@ class StoneModel:
         self.data = loadData()
         self.kaBruhns = self.data['kaBruhns']
         self.tnpbsa = self.data['tnpbsa']
-        self.Rquant = self.data['Rquant']
