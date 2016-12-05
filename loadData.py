@@ -162,6 +162,10 @@ def loadData():
     ## Create mfiAdjMean2 by dividing book6 by noise.
     mfiAdjMean2 = book6/noise
 
+    ## Make mfiAdjMean2 of shape (24,8) by inserting a (4,8) array of NaNs where the
+    ## FcgRIIA-Arg data would otherwise be.
+    mfiAdjMean2 = concatenate((mfiAdjMean2[0:4,:],np.nan*np.ones((4,8)),mfiAdjMean2[4:20,:]))
+
     ## Define concentrations of TNP-4-BSA and TNP-26-BSA
     ## These are put into the numpy array "tnpbsa"
     tnpbsa4 = 1/67122*1e-3*5
