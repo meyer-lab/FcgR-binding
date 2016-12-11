@@ -132,7 +132,7 @@ class StoneModel:
         logSqrErr = 0
 
         if fullOutput:
-            outputFit = np.full((2,6,4), np.nan)
+            outputFit = np.full((24,2), np.nan)
 
         ## Iterate over each kind of TNP-BSA (4 or 26)
         for j in range(2):
@@ -173,7 +173,7 @@ class StoneModel:
                         return -np.inf
 
                     if fullOutput:
-                        outputFit[j,k,l] = MFI
+                        outputFit[4*k+l,j] = MFI
 
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
                     ## of the point assuming the calculated point is true.

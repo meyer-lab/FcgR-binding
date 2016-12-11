@@ -44,8 +44,8 @@ sampler = EnsembleSampler(nwalkers,ndims,StoneM.NormalErrorCoef,2.0,[],{},None,1
 
 f = h5py.File("mcmc_chain.h5", 'w', libver='latest')
 dset = f.create_dataset("data", chunks=True, maxshape=(None, StoneM.Nparams + 2), data=np.ndarray((0, StoneM.Nparams + 2)))
-dbestFit = f.create_dataset("bestFit", chunks=True, maxshape=(2,6,4), data=np.full((2,6,4), np.nan))
-normData = f.create_dataset("normData", chunks=True, maxshape=(24,8), data=StoneM.mfiAdjMean)
+dbestFit = f.create_dataset("bestFit", shape=(24,2), data=np.ndarray((24,2)))
+normData = f.create_dataset("normData", shape=(24,8), data=StoneM.mfiAdjMean)
 f.swmr_mode = True
 thinTrack = 0
 thin = 20
