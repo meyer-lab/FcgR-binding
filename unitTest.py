@@ -2,11 +2,16 @@ import unittest
 import StoneModel
 import numpy as np
 import random
-from math import *
+import time
 
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
         self.M = StoneModel.StoneModel()
+        self.startTime = time.time()
+
+    def tearDown(self):
+        t = time.time() - self.startTime
+        print("%s: %.3f" % (self.id(), t*1000))
 
     def test_nchoosek(self):
         self.assertTrue(self.M.nchoosek(5,3) == 10)
@@ -29,7 +34,7 @@ class TestStoneMethods(unittest.TestCase):
 
             self.assertTrue(abs(diffFunAnon(output)) < 1E-8)
 
-        self.assertTrue(isnan(self.M.ReqFuncSolver(R, kai, Li, -10, kx)))
+        self.assertTrue(np.isnan(self.M.ReqFuncSolver(R, kai, Li, -10, kx)))
 
     def test_StoneMod(self):
         # This test should check that the model output satisfies Rbound = Rtot - Req
@@ -39,7 +44,7 @@ class TestStoneMethods(unittest.TestCase):
         R = random.random()
         Li = random.random()
 
-        StoneRet = self.M.StoneMod(log10(R),kai,v,log10(kx),Li,fullOutput = True)
+        StoneRet = self.M.StoneMod(np.log10(R),kai,v,np.log10(kx),Li,fullOutput = True)
         Req = 10**self.M.ReqFuncSolver(R,kai,Li,v,kx)
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)

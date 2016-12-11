@@ -132,7 +132,7 @@ class StoneModel:
     ## logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
     ## of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
     ## standard deviation of MFIs for that condition.
-    def NormalErrorCoefcalc(self, x, mfiAdjMean, skip=False):
+    def NormalErrorCoefcalc(self, x, mfiAdjMean):
         ## Set the standard deviation coefficient
         sigCoef = 10**x[11]
 
@@ -151,13 +151,9 @@ class StoneModel:
 
             ## Iterate over each kind of FcgR
             for k in range(6):
-                ## Skip over the FcgRIIA-His MFIs if using the new data
-                if k == 1 and skip:
-                    continue
-                ## Set the common logarith of the level of receptor expression for the FcgR in question
-                print(k)
                 logR = x[k]
 
+                ## Skip over the FcgRIIA-His MFIs if using the new data
                 if isnan(logR):
                     continue;
 
@@ -197,7 +193,7 @@ class StoneModel:
     # This should do the same as NormalErrorCoef above, but with the second batch of Nimmerjahn data and specified
     # Receptor expression levels
     def NormalErrorCoefRset(self, x):
-        return self.NormalErrorCoefcalc(np.concatenate((self.Rquant, x)), self.mfiAdjMean2, skip=True)
+        return self.NormalErrorCoefcalc(np.concatenate((self.Rquant, x)), self.mfiAdjMean2)
 
     def NormalErrorCoef(self, x):
         return self.NormalErrorCoefcalc(x, self.mfiAdjMean1)
