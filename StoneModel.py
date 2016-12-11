@@ -37,6 +37,15 @@ class StoneModel:
         return comb(n, k, exact=True)
 
     def normalizeData(self, filepath):
+        ## To begin, read in the MFI measurements from both of Lux's experiments from
+        ## their respective csvs. Then, subtract background MFIs from these nominal
+        ## MFIs. Then, normalize the data by replicate. For each step after the
+        ##reading, I manipulated the csv data in different ways, which are explained
+        ## in the comments. Please refer to these comments to understand what is
+        ## going on, especially with variables of the name "book$" or "temp$." All
+        ## variables with such names are only meant to construct mfiAdjMean1 (from
+        ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
+
         ## Read in the csv data for the first experiments. lux1 is an iterable data
         ## structure wherein each iterable element is a single-element list containing a
         ## string. Each such string represents a single row from the csv.
@@ -114,13 +123,16 @@ class StoneModel:
     ## logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
     ## of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
     ## standard deviation of MFIs for that condition.
-    def NormalErrorCoefcalc(self, x, mfiAdjMean):
+    def NormalErrorCoefcalc(self, x, fullOutput = False):
         ## Set the standard deviation coefficient
         sigCoef = 10**x[11]
 
         ## Set thecommon logarithm of the Kx coefficient
         logKxcoef = x[6]
         logSqrErr = 0
+
+        if fullOutput:
+            outputFit = np.full((2,6,4), np.nan)
 
         ## Iterate over each kind of TNP-BSA (4 or 26)
         for j in range(2):
@@ -147,7 +159,7 @@ class StoneModel:
                         continue
 
                     # Setup the data
-                    temp = mfiAdjMean[4*k+l][4*j:4*j+3]
+                    temp = self.mfiAdjMean[4*k+l][4*j:4*j+3]
                     # If data not available, skip
                     if np.any(np.isnan(temp)):
                         continue
@@ -160,6 +172,9 @@ class StoneModel:
                     if np.isnan(MFI):
                         return -np.inf
 
+                    if fullOutput:
+                        outputFit[j,k,l] = MFI
+
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
                     ## of the point assuming the calculated point is true.
                     tempm = norm.logpdf(temp, MFI, sigCoef*MFI)
@@ -170,19 +185,52 @@ class StoneModel:
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
                     logSqrErr = logSqrErr+np.nansum(tempm)
 
+        if fullOutput:
+            return (logSqrErr, outputFit)
+
         return logSqrErr
 
-    # This should do the same as NormalErrorCoef above, but with the second batch of Nimmerjahn data and specified
-    # Receptor expression levels
-    def NormalErrorCoefRset(self, x):
-        return self.NormalErrorCoefcalc(np.concatenate((self.Rquant, x)), self.mfiAdjMean2)
+    def NormalErrorCoef(self, x, fullOutput = False):
+        # Return -inf for parameters out of bounds
+        if np.any(np.isinf(x)) or np.any(np.isnan(x)) or np.any(np.less(x, self.lb)) or np.any(np.greater(x, self.ub)):
+            return -np.inf
 
-    def NormalErrorCoef(self, x):
-        return self.NormalErrorCoefcalc(x, self.mfiAdjMean1)
+        if self.newData:
+            x[3:5] = np.floor(x[3:5])
+            return self.NormalErrorCoefcalc(np.concatenate((self.Rquant, x)), fullOutput)
+        else:
+            x[9:11] = np.floor(x[9:11])
+            return self.NormalErrorCoefcalc(x, fullOutput)
 
-    def __init__(self):
+    def __init__(self, newData = True):
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
         path = './Nimmerjahn Lab and Bruhns Data'
+
+        self.newData = newData
+
+        if newData:
+            ## Create the NumPy array Rquant, where each row represents a particular
+            ## IgG (1,2,3, or 4) and each column corresponds to a particular FcgR
+            ## (FcgRIA, FcgRIIA-H,FcgRIIA-R, FcgRIIB, FcgRIIIA-F, and FcgRIIIA-V)
+
+            ## Read in the receptor quantifications for the Nimmerjahn Lab's second
+            ## set of data. Using the function reader from the csv library, this data
+            ## is used to make the iterable object quant, each iterable element of
+            ## which is a single-element list containing a string corresponding to
+            ## a row in the original csv.
+            self.Rquant = np.loadtxt(join(path,'FcgRquant.csv'), delimiter=',', skiprows=1)
+
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=RuntimeWarning)
+                self.Rquant = np.nanmean(self.Rquant, axis=0)
+
+            self.Rquant = np.log10(self.Rquant)
+
+            # Load and normalize dataset two
+            self.mfiAdjMean = self.normalizeData(join(path,'New-Fig2B.csv'))
+        else:
+            # Load and normalize dataset one
+            self.mfiAdjMean = self.normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
 
         ## Define the matrix of Ka values from Bruhns
         ## For accuracy, the Python implementation of this code will use
@@ -201,34 +249,26 @@ class StoneModel:
         ## These are put into the numpy array "tnpbsa"
         self.tnpbsa = np.array([1/67122,1/70928])*1e-3*5
 
-        ## Create the NumPy array Rquant, where each row represents a particular
-        ## IgG (1,2,3, or 4) and each column corresponds to a particular FcgR
-        ## (FcgRIA, FcgRIIA-H,FcgRIIA-R, FcgRIIB, FcgRIIIA-F, and FcgRIIIA-V)
+        # Set upper and lower bounds
+        ## Upper and lower bounds of the 12 parameters
+        lbR = 0
+        ubR = 8
+        lbKx = -10
+        ubKx = 0
+        lbc = -10
+        ubc = 5
+        lbv = 1
+        ubv = 30
+        lbsigma = -10
+        ubsigma = 2
 
-        ## Read in the receptor quantifications for the Nimmerjahn Lab's second
-        ## set of data. Using the function reader from the csv library, this data
-        ## is used to make the iterable object quant, each iterable element of
-        ## which is a single-element list containing a string corresponding to
-        ## a row in the original csv.
-        self.Rquant = np.loadtxt(join(path,'FcgRquant.csv'), delimiter=',', skiprows=1)
+        ## Create vectors for upper and lower bounds
+        ## Only allow sampling of TNP-4 up to double its expected avidity.
+        if newData:
+            self.lb = np.array([lbKx,lbc,lbc,lbv,lbv,lbsigma])
+            self.ub = np.array([ubKx,ubc,ubc,8.9,ubv,ubsigma])
+        else:
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,8.9,ubv,ubsigma])
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            self.Rquant = np.nanmean(self.Rquant, axis=0)
-
-        self.Rquant = np.log10(self.Rquant)
-
-        ## To begin, read in the MFI measurements from both of Lux's experiments from
-        ## their respective csvs. Then, subtract background MFIs from these nominal
-        ## MFIs. Then, normalize the data by replicate. For each step after the
-        ##reading, I manipulated the csv data in different ways, which are explained
-        ## in the comments. Please refer to these comments to understand what is
-        ## going on, especially with variables of the name "book$" or "temp$." All
-        ## variables with such names are only meant to construct mfiAdjMean1 (from
-        ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
-
-        # Load and normalize dataset one
-        self.mfiAdjMean1 = self.normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
-
-        # Load and normalize dataset two
-        self.mfiAdjMean2 = self.normalizeData(join(path,'New-Fig2B.csv'))
+        self.Nparams = len(self.lb)
