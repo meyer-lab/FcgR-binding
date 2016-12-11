@@ -1,14 +1,10 @@
 import numpy as np
-from math import *
 from scipy.optimize import brentq
 from scipy.stats import norm
 from scipy.misc import comb
 from memoize import memoize
 import warnings
 from os.path import join
-
-nan = float('nan')
-inf = float('inf')
 
 class StoneModel:
     ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
@@ -17,7 +13,7 @@ class StoneModel:
     def ReqFuncSolver(self, R, ka, Li, vi, kx):
         ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req) is necessarily lower than log10(R).
         a = -20
-        b = log10(R)
+        b = np.log10(R)
 
         ## Create anonymous function diffFunAnon which calls diffFun for parameters R, vi=v, kx=Kx, and viLikdi.
         ## This function subtracts the right side of Equation 2 from Stone from the left side of the same Equation. The
@@ -62,26 +58,12 @@ class StoneModel:
         ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
         ## MFIs from Lux's original experiments.
         book5 = np.reshape(book5,(24,8))
-        ## Transponse book5, so that all the elements in rows n and n+4 correspond to
-        ## the same replicate (for all n in {0,1,2,3}; Python indexing used). Then,
-        ## concatenate both rows in a single replicate, and take the mean of the
-        ## resulting array. This mean will correspond to the normalizing factor by
-        ## which the corresponding replicate is normalized. These are first contained
-        ## the (1,4) NumPy array means.
-        temp = np.transpose(book5)
-        means = [np.nanmean(np.concatenate((temp[j],temp[j+4]))) for j in range(4)]
-        ## Concatenate means with itself to result in a (1,8) NumPy array, means2
-        means2 = np.concatenate((means,means))
-        ## Concatenate means2 with itself until a NumPy array of shape (1,192) is
-        ## created. This array is titled "temp." Then, reshape temp into a (24,8)
-        ## NumPy array called "noise." Each element in book5 must be divided by the
-        ## corresponding element in temp in order to be normalized.
-        temp = means2
-        for j in range(book5.shape[0]-1):
-            temp = np.concatenate((temp,means2))
-        noise = np.reshape(temp,(24,8))
-        ## Create mfiAdjMean1 by dividing book5 by noise.
-        return(book5/noise)
+
+        # Normalize by the average intensity of each replicate
+        for j in range(4):
+            book5[:,(j,j+4)] = book5[:,(j,j+4)] / np.nanmean(np.nanmean(book5[:,(j,j+4)]))
+
+        return(book5)
 
     def StoneMod(self,logR,Ka,v,logKx,L0,fullOutput = False,skip=False):
         ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
@@ -96,8 +78,8 @@ class StoneModel:
 
         ## Vector of binomial coefficients
         Req = 10**self.ReqFuncSolver(10**logR,Ka,L0,v,Kx)
-        if isnan(Req):
-            return (nan, nan, nan, nan)
+        if np.isnan(Req):
+            return (np.nan, np.nan, np.nan, np.nan)
 
         # Calculate vieq from equation 1
         vieqIter = (L0*Ka*self.nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
@@ -108,7 +90,7 @@ class StoneModel:
 
         # If we just need the amount of ligand bound, exit here.
         if fullOutput == False:
-            return (Lbound, nan, nan, nan)
+            return (Lbound, np.nan, np.nan, np.nan)
 
         # Calculate Rmulti from equation 5
         RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
@@ -154,14 +136,14 @@ class StoneModel:
                 logR = x[k]
 
                 ## Skip over the FcgRIIA-His MFIs if using the new data
-                if isnan(logR):
+                if np.isnan(logR):
                     continue;
 
                 ## Iterate over each kind of IgG
                 for l in range(4):
                     ## Set the affinity for the binding of the FcgR and IgG in question
                     Ka = self.kaBruhns[k][l]
-                    if isnan(Ka):
+                    if np.isnan(Ka):
                         continue
 
                     # Setup the data
@@ -171,12 +153,12 @@ class StoneModel:
                         continue
 
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
-                    logKx = logKxcoef - log10(Ka)
+                    logKx = logKxcoef - np.log10(Ka)
 
                     ## Calculate the MFI which should result from this condition according to the model
                     MFI = c*(self.StoneMod(logR,Ka,v,logKx,L0))[0]
-                    if isnan(MFI):
-                        return -inf
+                    if np.isnan(MFI):
+                        return -np.inf
 
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
                     ## of the point assuming the calculated point is true.
