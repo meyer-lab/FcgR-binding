@@ -7,6 +7,7 @@ import time
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
         self.M = StoneModel.StoneModel()
+        self.Mold = StoneModel.StoneModel(False)
         self.startTime = time.time()
 
     def tearDown(self):
@@ -58,18 +59,22 @@ class TestStoneMethods(unittest.TestCase):
     def test_dataImport_Rquant(self):
         self.assertTrue(self.M.Rquant.shape == (6,))
 
-    def test_dataImport_mfiAdjMean1(self):
-        self.assertTrue(self.M.mfiAdjMean1.shape == (24, 8))
+    def test_dataImport_mfiAdjMean(self):
+        self.assertTrue(self.M.mfiAdjMean.shape == (24, 8))
+        self.assertTrue(self.Mold.mfiAdjMean.shape == (24, 8))
 
-    def test_dataImport_mfiAdjMean2(self):
-        self.assertTrue(self.M.mfiAdjMean2.shape == (24, 8))
-
-    def test_NormalErrorCoefRset(self):
+    def test_NormalErrorCoef(self):
         params = np.array([-8,0,0,2,2,0])
-        retVal = self.M.NormalErrorCoefRset(params)
+        retVal = self.M.NormalErrorCoef(params)
 
         self.assertFalse(np.isnan(retVal))
         self.assertFalse(np.isinf(retVal))
+
+    def test_bounds(self):
+        self.assertTrue(self.M.lb.shape == (6,))
+        self.assertTrue(self.M.ub.shape == (6,))
+        self.assertTrue(self.Mold.lb.shape == (12,))
+        self.assertTrue(self.Mold.ub.shape == (12,))
 
 if __name__ == '__main__':
     unittest.main()
