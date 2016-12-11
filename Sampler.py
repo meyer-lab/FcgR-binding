@@ -2,9 +2,9 @@ from emcee import EnsembleSampler
 import numpy as np
 import StoneModel
 import h5py
-from math import inf
 from scipy.optimize import minimize
 from joblib import Parallel, delayed
+inf = float('inf')
 
 newData = 1
 bestLL = -inf

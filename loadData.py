@@ -74,55 +74,9 @@ def loadData():
     ## structure wherein each iterable element is a single-element list
     ## contraining a string. Each such string represents a single row from the
     ## csv.
-    Fig2B = open(join(path,'New-Fig2B.csv'),newline = '')
-    lux2 = reader(Fig2B,delimiter = ' ', quotechar = '|')
-    ## Iterate over each list in lux2, appending each list to the list book.
-    book = []
-    for row in lux2:
-        book.append(row)
-    ## Rows 1 and 2 from the csv are only text; create the new list book2 which
-    ## contains only rows 3 through 32 of book.
-    book2 = []
-    for j in range(2,32):
-        book2.append(book[j][0])
-    ## From each string in book2, create an individual string for each element in
-    ## the original csv. In book3, each string in book2 corresponds to a list of
-    ## these smaller strings.
-    book3 = []
-    for string in book2:
-        temp = []
-        temp2 = ''
-        for j in range(len(string)):
-            if string[j] != ',':
-                temp2 = temp2+string[j]
-            else:
-                temp.append(temp2)
-                temp2 = ''
-        temp.append(temp2)
-        book3.append(temp)
-    ## Covert all strings in book4 to floats, where applicable. All strings with
-    ## alphabetical characters are skipped over; no float is created for these.
-    ## This results in the list book4, wherein each element is a list
-    ## containing eight floats, save the second-to-last element, which
-    ## contains seven.
-    book4 = []
-    for row in book3:
-        temp = []
-        for elem in row:
-            try:
-                temp.append(float(elem))
-            except ValueError:
-                a = 6
-        book4.append(temp)
-
-    ## In book4, due to there being data lost from the FcgRIIA-R experimentation,
-    ## the rows corresponding to this group are all empty lists. Therefore, book5
-    ## Is identical to book4, save for that the elements of length 0 are excluded.
-    book5 = []
-    for row in book4:
-        if len(row) == 8:
-            book5.append(row)
-
+    book5 = np.loadtxt(join(path,'New-Fig2B.csv'),\
+        converters = {2: converter}, delimiter=',', skiprows=2, \
+        usecols=list(range(2,10)))
     ## The first row in every set of five rows in book5 consists of background
     ## MFIs. book6 is made by taking each of the four non-background MFIs from
     ## reach cluster of 5 from book5, subtracting the corresponding background
@@ -138,7 +92,7 @@ def loadData():
             temp2 = array(book5[j])-temp
             book6 = concatenate((book6,temp2),0)
     ## Reshape book6 into an array of shape (20,8).
-    book6 = reshape(book6,(20,8))
+    book6 = reshape(book6,(24,8))
 
     #print(book6)
     ## Transponse book6, so that all the elements in rows n and n+4 correspond
@@ -158,7 +112,7 @@ def loadData():
     temp = means2
     for j in range(book6.shape[0]-1):
         temp = concatenate((temp,means2))
-    noise = reshape(temp,(20,8))
+    noise = reshape(temp,(24,8))
     ## Create mfiAdjMean2 by dividing book6 by noise.
     mfiAdjMean2 = book6/noise
 
