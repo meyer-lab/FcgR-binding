@@ -27,12 +27,13 @@ lbsigma = -10
 ubsigma = 2
 
 ## Create vectors for upper and lower bounds
+## Only allow sampling of TNP-4 up to double its expected avidity.
 if newData:
     lb = np.array([lbKx,lbc,lbc,lbv,lbv,lbsigma])
-    ub = np.array([ubKx,ubc,ubc,ubv,ubv,ubsigma])
+    ub = np.array([ubKx,ubc,ubc,8.9,ubv,ubsigma])
 else:
     lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
-    ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+    ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,8.9,ubv,ubsigma])
 
 
 ## Create function for the running of the MCMC
