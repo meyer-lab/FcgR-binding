@@ -39,7 +39,7 @@ class StoneModel:
     def nchoosek(self, n, k):
         return comb(n, k, exact=True)
 
-    def StoneMod(self,logR,Ka,v,logKx,L0,fullOutput = False):
+    def StoneMod(self,logR,Ka,v,logKx,L0,fullOutput = False,skip=False):
         ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
         ## receptors, granted each epitope of the ligand binds to the receptor
         ## kind in question with dissociation constant Kd and cross-links with
@@ -88,9 +88,9 @@ class StoneModel:
     ## logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
     ## of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
     ## standard deviation of MFIs for that condition.
-    def NormalErrorCoefcalc(self, x, mfiAdjMean):
+    def NormalErrorCoefcalc(self, x, mfiAdjMean, skip=False):
         ## Set the standard deviation coefficient
-        sigCoef = 10**x[11]
+        sigCoef = 10**x[10]
 
         ## Set thecommon logarithm of the Kx coefficient
         logKxcoef = x[6]
@@ -107,7 +107,11 @@ class StoneModel:
 
             ## Iterate over each kind of FcgR
             for k in range(6):
+                ## Skip over the FcgRIIA-His MFIs if using the new data
+                if k == 1 and skip:
+                    continue
                 ## Set the common logarith of the level of receptor expression for the FcgR in question
+                print(k)
                 logR = x[k]
 
                 if isnan(logR):
@@ -151,7 +155,7 @@ class StoneModel:
     def NormalErrorCoefRset(self, x):
         Rvalues = np.log10(self.data['Rquant'])
 
-        return self.NormalErrorCoefcalc(np.concatenate((Rvalues, x)), self.data['mfiAdjMean2'])
+        return self.NormalErrorCoefcalc(np.concatenate((Rvalues, x)), self.data['mfiAdjMean2'], skip=True)
 
     def NormalErrorCoef(self, x):
         return self.NormalErrorCoefcalc(x, self.data['mfiAdjMean1'])
