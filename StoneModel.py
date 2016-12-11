@@ -90,7 +90,7 @@ class StoneModel:
     ## standard deviation of MFIs for that condition.
     def NormalErrorCoefcalc(self, x, mfiAdjMean, skip=False):
         ## Set the standard deviation coefficient
-        sigCoef = 10**x[10]
+        sigCoef = 10**x[11]
 
         ## Set thecommon logarithm of the Kx coefficient
         logKxcoef = x[6]
