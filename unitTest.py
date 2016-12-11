@@ -64,5 +64,12 @@ class TestStoneMethods(unittest.TestCase):
     def test_dataImport_mfiAdjMean2(self):
         self.assertTrue(self.M.mfiAdjMean2.shape == (24, 8))
 
+    def test_NormalErrorCoefRset(self):
+        params = np.array([-8,0,0,2,2,0])
+        retVal = self.M.NormalErrorCoefRset(params)
+
+        self.assertFalse(np.isnan(retVal))
+        self.assertFalse(np.isinf(retVal))
+
 if __name__ == '__main__':
     unittest.main()
