@@ -254,7 +254,7 @@ class StoneModel:
         lbR = 0
         ubR = 8
         lbKx = -10
-        ubKx = 0
+        ubKx = 6
         lbc = -10
         ubc = 5
         lbv = 1
