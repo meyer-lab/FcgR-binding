@@ -11,12 +11,46 @@ require(Rtsne, quietly = T)
 # Read in chain and close file
 f <- h5file("../mcmc_chain.h5", mode = "r")
 data <- readDataSet(f["/data"])
+bestFitRaw <- readDataSet(f["/bestFit"])
+normDataRaw <- readDataSet(f["/normData"])
 h5close(f)
 
-data <- as.data.frame(data)
-data <- mutate(data, crawler = as.factor(V2), LL = V1, gnu1 = floor(V6), gnu2 = floor(V7)) %>%
-  select(-V2, -V1, -V6, -V7) %>% filter(LL > max(LL)-3) %>% unique
+Ig.names <- c("IgG1", "IgG2", "IgG3", "IgG4")
+FcgR.quant <- read.csv("../Nimmerjahn Lab and Bruhns Data/FcgRquant.csv", row.names = Ig.names)
+FcgR.names <- colnames(FcgR.quant)
+FcgR.Ka <- read.csv("../Nimmerjahn Lab and Bruhns Data/FcgR-Ka-Bruhns.csv", header = F, col.names = Ig.names, row.names = FcgR.names)
+FcgR.Ka$FcgR <- row.names(FcgR.Ka)
 
+bestFit <- data.frame(Fit = cbind(c(bestFitRaw[,1], bestFitRaw[,2])), Ig = rep(factor(Ig.names), 12), 
+                      FcgR = rep(colnames(FcgR.quant), each = 4, times = 2), 
+                      TNP = rep(c("TNP4", "TNP26"), each = 24))
+
+dim(normDataRaw) <- c(24*8, 1)
+normData <- data.frame(Meas = normDataRaw, Ig = rep(factor(Ig.names), 48), 
+                      FcgR = rep(colnames(FcgR.quant), each = 4, times = 8),
+                      TNP = rep(c("TNP4", "TNP26"), each = 24*4))
+
+FcgR.Ka <- reshape2::melt(FcgR.Ka, value.name = "Ka", variable.name = "Ig", id.vars = "FcgR")
+FcgR.quant <- reshape2::melt(FcgR.quant, variable.name = "FcgR", value.name = "Expression") %>%
+  filter(!is.na(Expression)) %>% group_by(FcgR) %>% summarize(Expression = mean(Expression))
+
+allFit <- full_join(bestFit, normData, by = c("Ig", "FcgR", "TNP")) %>% 
+  full_join(FcgR.Ka, by = c("Ig", "FcgR")) %>% 
+  full_join(FcgR.quant, by = "FcgR") %>% mutate(FcgR = factor(FcgR))
+
+rm(bestFit, normData, FcgR.Ka, FcgR.quant)
+
+data <- as.data.frame(data)
+data <- mutate(data, crawler = as.factor(V2), LL = V1, gnu1 = floor(V6), gnu2 = floor(V7), sigma = V8, Kx = V3) %>%
+  select(-V2, -V1, -V6, -V7, -V8, -V3) %>% filter(LL > max(LL)-2) %>% unique
+```
+
+```{r}
+ggplot(allFit, aes(x = Fit, y = Meas, color = FcgR, shape = TNP)) + geom_point() + 
+  annotate("segment", x = 0.1, xend = 4, y = 0.1, yend = 4, colour = "black") + scale_x_log10()
+```
+
+```{r process}
 data <- data %>% sample_n(size = 4000)
 
 # Add principle components of parameters, make data matrix
@@ -24,10 +58,12 @@ tsn <- Rtsne(as.matrix(select(data, -LL, -crawler)), check_duplicates=F, verbose
 data <- data %>% mutate(T1 = tsn$Y[,1], T2 = tsn$Y[,2])
 ```
 
-
-
-
 ```{r}
-ggplot(data, aes(x = T1, y = T2, color = LL)) + geom_point()
+ggplot(data, aes(x = sigma, y = LL, color = factor(gnu2), shape = factor(gnu1))) + geom_point()
 ```
+
+
+
+
+
 
