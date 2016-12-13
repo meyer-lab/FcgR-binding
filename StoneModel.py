@@ -12,7 +12,7 @@ class StoneModel:
     ## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
     def ReqFuncSolver(self, R, ka, Li, vi, kx):
         ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req) is necessarily lower than log10(R).
-        a = -20
+        a = -40
         b = np.log10(R)
 
         ## Create anonymous function diffFunAnon which calls diffFun for parameters R, vi=v, kx=Kx, and viLikdi.
@@ -127,12 +127,12 @@ class StoneModel:
         ## Set the standard deviation coefficient
         sigCoef = 10**x[11]
 
-        ## Set thecommon logarithm of the Kx coefficient
-        logKxcoef = x[6]
+        ## Keep track of cumulative error
         logSqrErr = 0
 
         if fullOutput:
             outputFit = np.full((24,2), np.nan)
+            outputLL = np.full((24,8), np.nan)
 
         ## Iterate over each kind of TNP-BSA (4 or 26)
         for j in range(2):
@@ -165,28 +165,30 @@ class StoneModel:
                         continue
 
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
-                    logKx = logKxcoef - np.log10(Ka)
+                    logKx = x[6] + np.log10(Ka)
 
                     ## Calculate the MFI which should result from this condition according to the model
                     MFI = c*(self.StoneMod(logR,Ka,v,logKx,L0))[0]
                     if np.isnan(MFI):
                         return -np.inf
 
-                    if fullOutput:
-                        outputFit[4*k+l,j] = MFI
-
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
                     ## of the point assuming the calculated point is true.
                     tempm = norm.logpdf(temp, MFI, sigCoef*MFI)
                     if np.any(np.isnan(tempm)):
-                        return -inf
+                        return -np.inf
+
+                    # If the fit was requested output the model predictions
+                    if fullOutput:
+                        outputFit[4*k+l,j] = MFI
+                        outputLL[4*k+l][4*j:4*j+3] = tempm
 
                     ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
                     logSqrErr = logSqrErr+np.nansum(tempm)
 
         if fullOutput:
-            return (logSqrErr, outputFit)
+            return (logSqrErr, outputFit, outputLL)
 
         return logSqrErr
 
@@ -197,9 +199,19 @@ class StoneModel:
 
         if self.newData:
             x[3:5] = np.floor(x[3:5])
+
+            # Force TNP26 to be higher avidity.
+            if x[4] < x[3]:
+                return -np.inf
+
             return self.NormalErrorCoefcalc(np.concatenate((self.Rquant, x)), fullOutput)
         else:
             x[9:11] = np.floor(x[9:11])
+
+            # Force TNP26 to be higher avidity.
+            if x[10] < x[9]:
+                return -np.inf
+
             return self.NormalErrorCoefcalc(x, fullOutput)
 
     def __init__(self, newData = True):
@@ -253,8 +265,8 @@ class StoneModel:
         ## Upper and lower bounds of the 12 parameters
         lbR = 0
         ubR = 8
-        lbKx = -10
-        ubKx = 6
+        lbKx = -15
+        ubKx = 3
         lbc = -10
         ubc = 5
         lbv = 1
