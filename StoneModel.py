@@ -159,7 +159,7 @@ class StoneModel:
                         continue
 
                     # Setup the data
-                    temp = self.mfiAdjMean[4*k+l][4*j:4*j+3]
+                    temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
                     # If data not available, skip
                     if np.any(np.isnan(temp)):
                         continue
@@ -181,7 +181,7 @@ class StoneModel:
                     # If the fit was requested output the model predictions
                     if fullOutput:
                         outputFit[4*k+l,j] = MFI
-                        outputLL[4*k+l][4*j:4*j+3] = tempm
+                        outputLL[4*k+l][4*j:4*j+4] = tempm
 
                     ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
