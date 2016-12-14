@@ -6,6 +6,8 @@ from memoize import memoize
 import warnings
 from os.path import join
 
+np.seterr(over = 'raise')
+
 class StoneModel:
     ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
     ## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
@@ -23,7 +25,10 @@ class StoneModel:
         ## algorithm over diffFun for a single calling of ReqFuncSolver.
         diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
 
-        if diffFunAnon(a)*diffFunAnon(b) > 0:
+        try:
+            if diffFunAnon(a)*diffFunAnon(b) > 0:
+                return np.nan
+        except FloatingPointError:
             return np.nan
 
         ## Implement the bisection algorithm using SciPy's brentq. Please see SciPy documentation for rationale behind
