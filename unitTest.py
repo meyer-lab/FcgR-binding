@@ -3,6 +3,7 @@ import StoneModel
 import numpy as np
 import random
 import time
+from scipy.stats import norm
 
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
@@ -75,6 +76,12 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(self.M.ub.shape == (6,))
         self.assertTrue(self.Mold.lb.shape == (12,))
         self.assertTrue(self.Mold.ub.shape == (12,))
+
+    def test_logpdf(self):
+        vecIn = np.array([0.01, 0.2, 0.3, 0.4])
+
+        self.assertAlmostEqual(norm.logpdf(vecIn, 0.2, 1).sum(), StoneModel.logpdf_sum(vecIn, 0.2, 1), 0.000001)
+
 
 if __name__ == '__main__':
     unittest.main()

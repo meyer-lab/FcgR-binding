@@ -34,7 +34,7 @@ for ii in range(nwalkers):
 ## Run a local optimization of each starting point to try and reduce burn in time
 print('Optimizing the initial point of each walker')
 
-outtput = Parallel(n_jobs = 16)(delayed(initOpt)(p0[ii]) for ii in range(nwalkers))
+outtput = Parallel(n_jobs = -1, verbose = 10)(delayed(initOpt)(p0[ii]) for ii in range(nwalkers))
 p0 = np.asarray(outtput)
 
 print('Done initializing points.')
@@ -46,7 +46,7 @@ f = h5py.File("mcmc_chain.h5", 'w', libver='latest')
 dset = f.create_dataset("data", chunks=True, maxshape=(None, StoneM.Nparams + 2), data=np.ndarray((0, StoneM.Nparams + 2)))
 dbestFit = f.create_dataset("bestFit", shape=(24,2), data = np.full((24,2), np.nan))
 normData = f.create_dataset("normData", shape=(24,8), data=StoneM.mfiAdjMean)
-llData = f.create_dataset("llData", shape=(24,8), data = np.full((24,8), np.nan))
+llData = f.create_dataset("llData", shape=(24,2), data = np.full((24,2), np.nan))
 f.swmr_mode = True
 thinTrack = 0
 thin = 200

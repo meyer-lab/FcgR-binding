@@ -1,12 +1,18 @@
 import numpy as np
 from scipy.optimize import brentq
-from scipy.stats import norm
 from scipy.misc import comb
 from memoize import memoize
 import warnings
 from os.path import join
 
 np.seterr(over = 'raise')
+
+def logpdf_sum(x, loc, scale):
+    root2 = np.sqrt(2)
+    root2pi = np.sqrt(2*np.pi)
+    prefactor = - x.size * np.log(scale * root2pi)
+    summand = -np.square((x - loc)/(root2 * scale))
+    return  prefactor + summand.sum()
 
 class StoneModel:
     ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
@@ -130,21 +136,21 @@ class StoneModel:
     ## standard deviation of MFIs for that condition.
     def NormalErrorCoefcalc(self, x, fullOutput = False):
         ## Set the standard deviation coefficient
-        sigCoef = 10**x[11]
+        sigCoef = np.power(10, x[self.sigIDX])
 
         ## Keep track of cumulative error
         logSqrErr = 0
 
         if fullOutput:
             outputFit = np.full((24,2), np.nan)
-            outputLL = np.full((24,8), np.nan)
+            outputLL = np.full((24,2), np.nan)
 
         ## Iterate over each kind of TNP-BSA (4 or 26)
         for j in range(2):
             ## Set the effective avidity for the kind of TNP-BSA in question
-            v = x[9+j]
+            v = x[self.uvIDX[j]]
             ## Set the MFI-per-TNP-BSA conversion ratio for the kind of TNP-BSA in question
-            c = 10**x[7+j]
+            c = 10**x[self.cIDX[j]]
             ## Set the ligand (TNP-BSA) concentration for the kind of TNP-BSA in question
             L0 = self.tnpbsa[j]
 
@@ -170,7 +176,7 @@ class StoneModel:
                         continue
 
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
-                    logKx = x[6] + np.log10(Ka)
+                    logKx = x[self.kxIDX] + np.log10(Ka) + logR
 
                     ## Calculate the MFI which should result from this condition according to the model
                     MFI = c*(self.StoneMod(logR,Ka,v,logKx,L0))[0]
@@ -179,18 +185,18 @@ class StoneModel:
 
                     ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
                     ## of the point assuming the calculated point is true.
-                    tempm = norm.logpdf(temp, MFI, sigCoef*MFI)
-                    if np.any(np.isnan(tempm)):
+                    tempm = logpdf_sum(temp, MFI, sigCoef*MFI)
+                    if np.isnan(tempm):
                         return -np.inf
 
                     # If the fit was requested output the model predictions
                     if fullOutput:
                         outputFit[4*k+l,j] = MFI
-                        outputLL[4*k+l][4*j:4*j+4] = tempm
+                        outputLL[4*k+l, j] = tempm
 
                     ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
-                    logSqrErr = logSqrErr+np.nansum(tempm)
+                    logSqrErr = logSqrErr+tempm
 
         if fullOutput:
             return (logSqrErr, outputFit, outputLL)
@@ -202,22 +208,14 @@ class StoneModel:
         if np.any(np.isinf(x)) or np.any(np.isnan(x)) or np.any(np.less(x, self.lb)) or np.any(np.greater(x, self.ub)):
             return -np.inf
 
+        # If the receptor expression levels are set then set them
         if self.newData:
-            x[3:5] = np.floor(x[3:5])
+            x = np.concatenate((self.Rquant, x))
 
-            # Force TNP26 to be higher avidity.
-            if x[4] < x[3]:
-                return -np.inf
+        # Set avidities to integers
+        x[self.uvIDX] = np.floor(x[self.uvIDX])
 
-            return self.NormalErrorCoefcalc(np.concatenate((self.Rquant, x)), fullOutput)
-        else:
-            x[9:11] = np.floor(x[9:11])
-
-            # Force TNP26 to be higher avidity.
-            if x[10] < x[9]:
-                return -np.inf
-
-            return self.NormalErrorCoefcalc(x, fullOutput)
+        return self.NormalErrorCoefcalc(x, fullOutput)
 
     def __init__(self, newData = True):
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
@@ -287,5 +285,12 @@ class StoneModel:
         else:
             self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
             self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,8.9,ubv,ubsigma])
+
+        # Indices for the various elements. Remember that for the new data the receptor
+        # expression is concatted
+        self.uvIDX = [9, 10]
+        self.kxIDX = 6
+        self.cIDX = [7, 8]
+        self.sigIDX = 11
 
         self.Nparams = len(self.lb)

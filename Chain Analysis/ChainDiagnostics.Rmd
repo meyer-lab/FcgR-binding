@@ -23,16 +23,16 @@ FcgR.names <- colnames(FcgR.quant)
 FcgR.Ka <- read.csv("../Nimmerjahn Lab and Bruhns Data/FcgR-Ka-Bruhns.csv", header = F, col.names = Ig.names, row.names = FcgR.names)
 FcgR.Ka$FcgR <- row.names(FcgR.Ka)
 
+dim(llDataRaw) <- c(24*2, 1)
 bestFit <- data.frame(Fit = cbind(c(bestFitRaw[,1], bestFitRaw[,2])), Ig = rep(factor(Ig.names), 12), 
                       FcgR = rep(colnames(FcgR.quant), each = 4, times = 2), 
-                      TNP = rep(c("TNP4", "TNP26"), each = 24))
+                      TNP = rep(c("TNP4", "TNP26"), each = 24), LL = llDataRaw)
 
 dim(normDataRaw) <- c(24*8, 1)
-dim(llDataRaw) <- c(24*8, 1)
+
 normData <- data.frame(Meas = normDataRaw, Ig = rep(factor(Ig.names), 48), 
                       FcgR = rep(colnames(FcgR.quant), each = 4, times = 8),
-                      TNP = rep(c("TNP4", "TNP26"), each = 24*4), 
-                      LL = llDataRaw)
+                      TNP = rep(c("TNP4", "TNP26"), each = 24*4))
 
 FcgR.Ka <- reshape2::melt(FcgR.Ka, value.name = "Ka", variable.name = "Ig", id.vars = "FcgR")
 FcgR.quant <- reshape2::melt(FcgR.quant, variable.name = "FcgR", value.name = "Expression") %>%
