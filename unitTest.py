@@ -65,17 +65,17 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(self.Mold.mfiAdjMean.shape == (24, 8))
 
     def test_NormalErrorCoef(self):
-        params = np.array([-8,0,0,2,2,0])
+        params = np.array([-8,-8,0,0,2,2,0])
         retVal = self.M.NormalErrorCoef(params)
 
         self.assertFalse(np.isnan(retVal))
         self.assertFalse(np.isinf(retVal))
 
     def test_bounds(self):
-        self.assertTrue(self.M.lb.shape == (6,))
-        self.assertTrue(self.M.ub.shape == (6,))
-        self.assertTrue(self.Mold.lb.shape == (12,))
-        self.assertTrue(self.Mold.ub.shape == (12,))
+        self.assertTrue(self.M.lb.shape == (7,))
+        self.assertTrue(self.M.ub.shape == (7,))
+        self.assertTrue(self.Mold.lb.shape == (13,))
+        self.assertTrue(self.Mold.ub.shape == (13,))
 
     def test_logpdf(self):
         vecIn = np.array([0.01, 0.2, 0.3, 0.4])

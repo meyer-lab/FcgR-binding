@@ -44,9 +44,6 @@ sampler = EnsembleSampler(nwalkers,ndims,StoneM.NormalErrorCoef,2.0,[],{},None,1
 
 f = h5py.File("mcmc_chain.h5", 'w', libver='latest')
 dset = f.create_dataset("data", chunks=True, maxshape=(None, StoneM.Nparams + 2), data=np.ndarray((0, StoneM.Nparams + 2)))
-dbestFit = f.create_dataset("bestFit", shape=(24,2), data = np.full((24,2), np.nan))
-normData = f.create_dataset("normData", shape=(24,8), data=StoneM.mfiAdjMean)
-llData = f.create_dataset("llData", shape=(24,2), data = np.full((24,2), np.nan))
 f.swmr_mode = True
 thinTrack = 0
 thin = 200
@@ -57,13 +54,6 @@ for p, lnprob, lnlike in sampler.sample(p0, iterations=niters, storechain=False)
     else:
         if np.max(lnprob) > bestLL:
             bestLL = np.max(lnprob)
-            bestIDX = np.argmax(lnprob)
-            bestp = p[bestIDX, :]
-
-            # Save the output of the best fit model
-            dataRet = StoneM.NormalErrorCoef(bestp, True)
-            dbestFit[:,:] = dataRet[1]
-            llData[:,:] = dataRet[2]
 
         matOut = np.concatenate((lnprob.reshape(nwalkers, 1), np.arange(0, nwalkers).reshape(nwalkers, 1), p.reshape(nwalkers, ndims)), axis=1)
 
