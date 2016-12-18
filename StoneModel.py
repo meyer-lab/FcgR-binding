@@ -4,6 +4,7 @@ from scipy.misc import comb
 from memoize import memoize
 import warnings
 from os.path import join
+import pandas as pd
 
 np.seterr(over = 'raise')
 
@@ -14,7 +15,51 @@ def logpdf_sum(x, loc, scale):
     summand = -np.square((x - loc)/(root2 * scale))
     return  prefactor + summand.sum()
 
+def rep(x, N):
+    return [item for item in x for i in range(N)]
+
 class StoneModel:
+    # Return a dataframe with the measured data labeled with the condition variables
+    def getMeasuredDataFrame(self):
+        normData = pd.DataFrame(self.mfiAdjMean)
+        normData = pd.melt(normData, value_name = "Meas")
+
+        normData = (normData.assign(TNP = rep(self.TNPs, 24*4))
+                    .assign(Ig = self.Igs*12*4)
+                    .drop('variable', axis = 1)
+                    .assign(FcgR = rep(self.FcgRs, 4)*8)
+                    .assign(Expression = rep(np.power(10, self.Rquant), 4)*8)
+                    .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (8, 1)))
+                    )
+
+        return normData
+
+    # Return a dataframe with the fit data labeled with the condition variables
+    def getFitPrediction(self, x):
+        logSqrErr, outputFit, outputLL = self.NormalErrorCoef(x, fullOutput = True)
+
+        outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
+
+        dd = (pd.DataFrame(data = outputFit, columns = ['Fit'])
+                .assign(LL = np.reshape(np.transpose(outputLL), (-1, 1)))
+                .assign(Ig = self.Igs*12)
+                .assign(FcgR = rep(self.FcgRs, 4)*2)
+                .assign(TNP = rep(self.TNPs, 24))
+                .assign(Expression = rep(np.power(10, self.Rquant), 4)*2)
+                .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (2, 1)))
+                )
+
+        return dd
+
+    # Return the fit and measured data merged into a single dataframe
+    def getFitMeasMerged(self, x):
+        fit = self.getFitPrediction(x)
+        data = self.getMeasuredDataFrame()
+
+        allFrame = fit.merge(data, 'outer', on=('FcgR', 'TNP', 'Ig', 'Ka', 'Expression'))
+
+        return allFrame
+
     ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
     ## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
     ## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
@@ -85,7 +130,7 @@ class StoneModel:
 
         return(book5)
 
-    def StoneMod(self,logR,Ka,v,logKx,L0,fullOutput = False,skip=False):
+    def StoneMod(self,logR,Ka,v,logKx,L0,fullOutput = False):
         ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
         ## receptors, granted each epitope of the ligand binds to the receptor
         ## kind in question with dissociation constant Kd and cross-links with
@@ -176,7 +221,10 @@ class StoneModel:
                         continue
 
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
-                    logKx = x[self.kxIDX] + np.log10(Ka) + logR
+                    logKx = x[self.kxIDX[0]] + np.log10(Ka) + logR
+
+                    if k > 3:
+                        logKx = x[self.kxIDX[1]] + np.log10(Ka) + logR
 
                     ## Calculate the MFI which should result from this condition according to the model
                     MFI = c*(self.StoneMod(logR,Ka,v,logKx,L0))[0]
@@ -220,6 +268,10 @@ class StoneModel:
     def __init__(self, newData = True):
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
         path = './Nimmerjahn Lab and Bruhns Data'
+        self.TNPs = ['TNP-4', 'TNP-26']
+        self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
+        self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
+        self.pNames = ['Kx1', 'Kx2', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
 
         self.newData = newData
 
@@ -268,7 +320,7 @@ class StoneModel:
         ## Upper and lower bounds of the 12 parameters
         lbR = 0
         ubR = 8
-        lbKx = -15
+        lbKx = -25
         ubKx = 3
         lbc = -10
         ubc = 5
@@ -280,17 +332,17 @@ class StoneModel:
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([lbKx,lbc,lbc,lbv,lbv,lbsigma])
-            self.ub = np.array([ubKx,ubc,ubc,8.9,ubv,ubsigma])
+            self.lb = np.array([lbKx,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+            self.ub = np.array([ubKx,ubKx,ubc,ubc,ubv,ubv,ubsigma])
         else:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,8.9,ubv,ubsigma])
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubKx,ubc,ubc,ubv,ubv,ubsigma])
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
-        self.uvIDX = [9, 10]
-        self.kxIDX = 6
-        self.cIDX = [7, 8]
-        self.sigIDX = 11
+        self.uvIDX = [10, 11]
+        self.kxIDX = [6, 7]
+        self.cIDX = [8, 9]
+        self.sigIDX = 12
 
         self.Nparams = len(self.lb)
