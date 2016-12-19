@@ -5,11 +5,11 @@ FcgRIA,IgG1,34,54,77,115,53,128,115,201
 FcgRIA,IgG2,23,29,58,94,64,85,80,150
 FcgRIA,IgG3,39,52,86,134,80,103,129,228
 FcgRIA,IgG4,33,41,68,105,56,81,108,179
-FcgRIIA-Arg,TNP-BSA,nan,nan,nan,nan,nan,nan,nan,nan
-FcgRIIA-Arg,IgG1,nan,nan,nan,nan,nan,nan,nan,nan
-FcgRIIA-Arg,IgG2,nan,nan,nan,nan,nan,nan,nan,nan
-FcgRIIA-Arg,IgG3,nan,nan,nan,nan,nan,nan,nan,nan
-FcgRIIA-Arg,IgG4,nan,nan,nan,nan,nan,nan,nan,nan
+FcgRIIA-Arg,TNP-BSA,10,11,10,10,11,13,10,11
+FcgRIIA-Arg,IgG1,79,84,43,43,220,221,129,134
+FcgRIIA-Arg,IgG2,18,19,23,23,76,66,75,78
+FcgRIIA-Arg,IgG3,165,96,134,136,258,225,321,328
+FcgRIIA-Arg,IgG4,48,39,16,17,90,104,103,101
 FcgRIIA-His,TNP-BSA,4,6,8,12,4,11,19,12
 FcgRIIA-His,IgG1,149,319,272,390,288,484,499,756
 FcgRIIA-His,IgG2,119,138,180,287,197,257,282,458
