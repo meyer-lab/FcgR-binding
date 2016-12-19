@@ -5,6 +5,11 @@ import h5py
 from scipy.optimize import minimize
 from joblib import Parallel, delayed
 
+try:
+   import cPickle as pickle
+except:
+   import pickle
+
 newData = True
 bestLL = -np.inf
 
@@ -12,6 +17,9 @@ bestLL = -np.inf
 ## Load model
 StoneM = StoneModel.StoneModel(newData)
 ###########################################################
+
+# Dump class to a string to store with MCMC chain
+StoneMs = pickle.dumps(StoneM, pickle.HIGHEST_PROTOCOL)
 
 # Bounds list for optimization
 boundsOpt = list(zip(StoneM.lb.tolist(),StoneM.ub.tolist()))
@@ -44,6 +52,7 @@ sampler = EnsembleSampler(nwalkers,ndims,StoneM.NormalErrorCoef,2.0,[],{},None,1
 
 f = h5py.File("mcmc_chain.h5", 'w', libver='latest')
 dset = f.create_dataset("data", chunks=True, maxshape=(None, StoneM.Nparams + 2), data=np.ndarray((0, StoneM.Nparams + 2)))
+dset.attrs["class"] = np.void(StoneMs)
 f.swmr_mode = True
 thinTrack = 0
 thin = 200
