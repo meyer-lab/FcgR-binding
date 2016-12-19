@@ -203,10 +203,6 @@ class StoneModel:
             for k in range(6):
                 logR = x[k]
 
-                ## Skip over the FcgRIIA-His MFIs if using the new data
-                if np.isnan(logR):
-                    continue;
-
                 ## Iterate over each kind of IgG
                 for l in range(4):
                     ## Set the affinity for the binding of the FcgR and IgG in question
@@ -216,9 +212,6 @@ class StoneModel:
 
                     # Setup the data
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
-                    # If data not available, skip
-                    if np.any(np.isnan(temp)):
-                        continue
 
                     ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
                     logKx = x[self.kxIDX[0]] + np.log10(Ka) + logR
