@@ -15,51 +15,7 @@ def logpdf_sum(x, loc, scale):
     summand = -np.square((x - loc)/(root2 * scale))
     return  prefactor + summand.sum()
 
-def rep(x, N):
-    return [item for item in x for i in range(N)]
-
 class StoneModel:
-    # Return a dataframe with the measured data labeled with the condition variables
-    def getMeasuredDataFrame(self):
-        normData = pd.DataFrame(self.mfiAdjMean)
-        normData = pd.melt(normData, value_name = "Meas")
-
-        normData = (normData.assign(TNP = rep(self.TNPs, 24*4))
-                    .assign(Ig = self.Igs*12*4)
-                    .drop('variable', axis = 1)
-                    .assign(FcgR = rep(self.FcgRs, 4)*8)
-                    .assign(Expression = rep(np.power(10, self.Rquant), 4)*8)
-                    .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (8, 1)))
-                    )
-
-        return normData
-
-    # Return a dataframe with the fit data labeled with the condition variables
-    def getFitPrediction(self, x):
-        logSqrErr, outputFit, outputLL = self.NormalErrorCoef(x, fullOutput = True)
-
-        outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
-
-        dd = (pd.DataFrame(data = outputFit, columns = ['Fit'])
-                .assign(LL = np.reshape(np.transpose(outputLL), (-1, 1)))
-                .assign(Ig = self.Igs*12)
-                .assign(FcgR = rep(self.FcgRs, 4)*2)
-                .assign(TNP = rep(self.TNPs, 24))
-                .assign(Expression = rep(np.power(10, self.Rquant), 4)*2)
-                .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (2, 1)))
-                )
-
-        return dd
-
-    # Return the fit and measured data merged into a single dataframe
-    def getFitMeasMerged(self, x):
-        fit = self.getFitPrediction(x)
-        data = self.getMeasuredDataFrame()
-
-        allFrame = fit.merge(data, 'outer', on=('FcgR', 'TNP', 'Ig', 'Ka', 'Expression'))
-
-        return allFrame
-
     ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
     ## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
     ## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
