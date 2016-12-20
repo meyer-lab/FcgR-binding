@@ -2,11 +2,8 @@ import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
-import warnings
 from os.path import join
 import pandas as pd
-
-np.seterr(over = 'raise')
 
 def logpdf_sum(x, loc, scale):
     root2 = np.sqrt(2)
@@ -246,11 +243,7 @@ class StoneModel:
             ## a row in the original csv.
             self.Rquant = np.loadtxt(join(path,'FcgRquant.csv'), delimiter=',', skiprows=1)
 
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=RuntimeWarning)
-                self.Rquant = np.nanmean(self.Rquant, axis=0)
-
-            self.Rquant = np.log10(self.Rquant)
+            self.Rquant = np.log10(np.nanmean(self.Rquant, axis=0))
 
             # Load and normalize dataset two
             self.mfiAdjMean = self.normalizeData(join(path,'New-Fig2B.csv'))
@@ -285,8 +278,8 @@ class StoneModel:
         ubc = 5
         lbv = 1
         ubv = 30
-        lbsigma = -10
-        ubsigma = 2
+        lbsigma = -4
+        ubsigma = 1
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
