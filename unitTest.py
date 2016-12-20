@@ -16,11 +16,11 @@ class TestStoneMethods(unittest.TestCase):
         print("%s: %.3f" % (self.id(), t*1000))
 
     def test_nchoosek(self):
-        self.assertTrue(self.M.nchoosek(5,3) == 10)
-        self.assertTrue(self.M.nchoosek(6,3) == 20)
-        self.assertTrue(self.M.nchoosek(7,3) == 35)
-        self.assertTrue(self.M.nchoosek(8,3) == 56)
-        self.assertTrue(self.M.nchoosek(9,3) == 84)
+        self.assertTrue(StoneModel.nchoosek(5,3) == 10)
+        self.assertTrue(StoneModel.nchoosek(6,3) == 20)
+        self.assertTrue(StoneModel.nchoosek(7,3) == 35)
+        self.assertTrue(StoneModel.nchoosek(8,3) == 56)
+        self.assertTrue(StoneModel.nchoosek(9,3) == 84)
 
     def test_reqFuncSolver(self):
         for xx in range(100):
@@ -32,11 +32,11 @@ class TestStoneMethods(unittest.TestCase):
 
             diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*kai*(1+kx*(10**x))**(vi-1))
 
-            output = self.M.ReqFuncSolver(R, kai, Li, vi, kx)
+            output = StoneModel.ReqFuncSolver(R, kai, Li, vi, kx)
 
             self.assertTrue(abs(diffFunAnon(output)) < 1E-8)
 
-        self.assertTrue(np.isnan(self.M.ReqFuncSolver(R, kai, Li, -10, kx)))
+        self.assertTrue(np.isnan(StoneModel.ReqFuncSolver(R, kai, Li, -10, kx)))
 
     def test_StoneMod(self):
         # This test should check that the model output satisfies Rbound = Rtot - Req
@@ -47,7 +47,7 @@ class TestStoneMethods(unittest.TestCase):
         Li = random.random()
 
         StoneRet = self.M.StoneMod(np.log10(R),kai,v,np.log10(kx),Li,fullOutput = True)
-        Req = 10**self.M.ReqFuncSolver(R,kai,Li,v,kx)
+        Req = 10**StoneModel.ReqFuncSolver(R,kai,Li,v,kx)
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
 
@@ -65,17 +65,10 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(self.Mold.mfiAdjMean.shape == (24, 8))
 
     def test_NormalErrorCoef(self):
-        params = np.array([-8,-8,0,0,2,2,0])
-        retVal = self.M.NormalErrorCoef(params)
+        retVal = self.M.NormalErrorCoef(self.M.lb)
 
         self.assertFalse(np.isnan(retVal))
         self.assertFalse(np.isinf(retVal))
-
-    def test_bounds(self):
-        self.assertTrue(self.M.lb.shape == (7,))
-        self.assertTrue(self.M.ub.shape == (7,))
-        self.assertTrue(self.Mold.lb.shape == (13,))
-        self.assertTrue(self.Mold.ub.shape == (13,))
 
     def test_logpdf(self):
         vecIn = np.array([0.01, 0.2, 0.3, 0.4])
