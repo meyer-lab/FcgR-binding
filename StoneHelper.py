@@ -110,7 +110,7 @@ def plotFit(fitFrame):
     ax.set_yscale('log')
     ax.set_xscale('log')
     ax.plot([0.08, 10], [0.08, 10])
-    ax.set_ylim(0.08, 10)
+    ax.set_ylim(0.02, 10)
     ax.set_xlim(0.08, 10)
 
 
@@ -184,6 +184,9 @@ def read_chain(filename):
 
     # Read in dataset to Pandas frame
     pdset = pd.DataFrame(dset.value, columns = cNames)
+
+    pdset['gnu1'] = np.floor(pdset['gnu1'])
+    pdset['gnu2'] = np.floor(pdset['gnu2'])
 
     f.close()
 

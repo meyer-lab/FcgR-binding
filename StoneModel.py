@@ -2,9 +2,13 @@ import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
+import warnings
 from os.path import join
 import pandas as pd
 
+np.seterr(over = 'raise')
+
+# Normal distribution function. Sums over the likelihoods of points in x
 def logpdf_sum(x, loc, scale):
     root2 = np.sqrt(2)
     root2pi = np.sqrt(2*np.pi)
@@ -12,77 +16,79 @@ def logpdf_sum(x, loc, scale):
     summand = -np.square((x - loc)/(root2 * scale))
     return  prefactor + summand.sum()
 
-class StoneModel:
-    ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
-    ## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
-    ## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
-    def ReqFuncSolver(self, R, ka, Li, vi, kx):
-        ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req) is necessarily lower than log10(R).
-        a = -40
-        b = np.log10(R)
+# A fast cached version of nchoosek
+@memoize
+def nchoosek(n, k):
+    return comb(n, k, exact=True)
 
-        ## Create anonymous function diffFunAnon which calls diffFun for parameters R, vi=v, kx=Kx, and viLikdi.
-        ## This function subtracts the right side of Equation 2 from Stone from the left side of the same Equation. The
-        ## bisection algorithm is run using this function so as to calculate log10(Req) which satisfies all parameters.
-        ## Each time this function is called: x is log10 of the value of Req being tested, R is R from Stone 2, vi is v from
-        ## Stone 2, kx is Kx from Stone 2, and viLikdi is a product which is constant over all iterations of the bisection
-        ## algorithm over diffFun for a single calling of ReqFuncSolver.
-        diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
+# Normalize the input data taking into account batch effects
+def normalizeData(filepath):
+    ## To begin, read in the MFI measurements from both of Lux's experiments from
+    ## their respective csvs. Then, subtract background MFIs from these nominal
+    ## MFIs. Then, normalize the data by replicate. For each step after the
+    ##reading, I manipulated the csv data in different ways, which are explained
+    ## in the comments. Please refer to these comments to understand what is
+    ## going on, especially with variables of the name "book$" or "temp$." All
+    ## variables with such names are only meant to construct mfiAdjMean1 (from
+    ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
 
-        try:
-            if diffFunAnon(a)*diffFunAnon(b) > 0:
-                return np.nan
-        except FloatingPointError:
+    ## Read in the csv data for the first experiments. lux1 is an iterable data
+    ## structure wherein each iterable element is a single-element list containing a
+    ## string. Each such string represents a single row from the csv.
+    book4 = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
+
+    ## The first row in every set of five rows in book4 consists of background
+    ## MFIs. book5 is made by taking each of the four non-background MFIs from
+    ## reach cluster of 5 from book4, subtracting the corresponding background
+    ## MFI from each, and then forming a NumPy array of shape (24,8) from all of
+    ## these collectively. The final result, book5, will be a NumPy array of
+    ## shape (1,192).
+    book5 = np.array([])
+    for j in range(len(book4)):
+        if j%5 == 0:
+            temp = np.array(book4[j])
+        else:
+            temp2 = np.array(book4[j])-temp
+            book5 = np.concatenate((book5,temp2),0)
+    ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
+    ## MFIs from Lux's original experiments.
+    book5 = np.reshape(book5,(24,8))
+
+    # Normalize by the average intensity of each replicate
+    for j in range(4):
+        book5[:,(j,j+4)] = book5[:,(j,j+4)] / np.nanmean(np.nanmean(book5[:,(j,j+4)]))
+
+    return(book5)
+
+## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
+## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
+## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
+def ReqFuncSolver(R, ka, Li, vi, kx):
+    ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req) is necessarily lower than log10(R).
+    a = -40
+    b = np.log10(R)
+
+    ## Create anonymous function diffFunAnon which calls diffFun for parameters R, vi=v, kx=Kx, and viLikdi.
+    ## This function subtracts the right side of Equation 2 from Stone from the left side of the same Equation. The
+    ## bisection algorithm is run using this function so as to calculate log10(Req) which satisfies all parameters.
+    ## Each time this function is called: x is log10 of the value of Req being tested, R is R from Stone 2, vi is v from
+    ## Stone 2, kx is Kx from Stone 2, and viLikdi is a product which is constant over all iterations of the bisection
+    ## algorithm over diffFun for a single calling of ReqFuncSolver.
+    diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
+
+    try:
+        if diffFunAnon(a)*diffFunAnon(b) > 0:
             return np.nan
+    except FloatingPointError:
+        return np.nan
 
-        ## Implement the bisection algorithm using SciPy's brentq. Please see SciPy documentation for rationale behind
-        ## input parameter not described beforehand. Brentq is ~2x faster than bisect
-        logReq = brentq(diffFunAnon, a, b, disp=False)
+    ## Implement the bisection algorithm using SciPy's brentq. Please see SciPy documentation for rationale behind
+    ## input parameter not described beforehand. Brentq is ~2x faster than bisect
+    logReq = brentq(diffFunAnon, a, b, disp=False)
 
-        return logReq
+    return logReq
 
-    @memoize
-    def nchoosek(self, n, k):
-        return comb(n, k, exact=True)
-
-    def normalizeData(self, filepath):
-        ## To begin, read in the MFI measurements from both of Lux's experiments from
-        ## their respective csvs. Then, subtract background MFIs from these nominal
-        ## MFIs. Then, normalize the data by replicate. For each step after the
-        ##reading, I manipulated the csv data in different ways, which are explained
-        ## in the comments. Please refer to these comments to understand what is
-        ## going on, especially with variables of the name "book$" or "temp$." All
-        ## variables with such names are only meant to construct mfiAdjMean1 (from
-        ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
-
-        ## Read in the csv data for the first experiments. lux1 is an iterable data
-        ## structure wherein each iterable element is a single-element list containing a
-        ## string. Each such string represents a single row from the csv.
-        book4 = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
-
-        ## The first row in every set of five rows in book4 consists of background
-        ## MFIs. book5 is made by taking each of the four non-background MFIs from
-        ## reach cluster of 5 from book4, subtracting the corresponding background
-        ## MFI from each, and then forming a NumPy array of shape (24,8) from all of
-        ## these collectively. The final result, book5, will be a NumPy array of
-        ## shape (1,192).
-        book5 = np.array([])
-        for j in range(len(book4)):
-            if j%5 == 0:
-                temp = np.array(book4[j])
-            else:
-                temp2 = np.array(book4[j])-temp
-                book5 = np.concatenate((book5,temp2),0)
-        ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
-        ## MFIs from Lux's original experiments.
-        book5 = np.reshape(book5,(24,8))
-
-        # Normalize by the average intensity of each replicate
-        for j in range(4):
-            book5[:,(j,j+4)] = book5[:,(j,j+4)] / np.nanmean(np.nanmean(book5[:,(j,j+4)]))
-
-        return(book5)
-
+class StoneModel:
     def StoneMod(self,logR,Ka,v,logKx,L0,fullOutput = False):
         ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
         ## receptors, granted each epitope of the ligand binds to the receptor
@@ -95,12 +101,12 @@ class StoneModel:
         v = np.int_(v)
 
         ## Vector of binomial coefficients
-        Req = 10**self.ReqFuncSolver(10**logR,Ka,L0,v,Kx)
+        Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
         if np.isnan(Req):
             return (np.nan, np.nan, np.nan, np.nan)
 
         # Calculate vieq from equation 1
-        vieqIter = (L0*Ka*self.nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
+        vieqIter = (L0*Ka*nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
         vieq = np.fromiter(vieqIter, np.float, count = v)
 
         ## Calculate L, according to equation 7
@@ -227,7 +233,7 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'Kx2', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
+        self.pNames = ['Kx1', 'Kx2', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'KxNus']
 
         self.newData = newData
 
@@ -246,10 +252,10 @@ class StoneModel:
             self.Rquant = np.log10(np.nanmean(self.Rquant, axis=0))
 
             # Load and normalize dataset two
-            self.mfiAdjMean = self.normalizeData(join(path,'New-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(join(path,'New-Fig2B.csv'))
         else:
             # Load and normalize dataset one
-            self.mfiAdjMean = self.normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
 
         ## Define the matrix of Ka values from Bruhns
         ## For accuracy, the Python implementation of this code will use
@@ -284,8 +290,8 @@ class StoneModel:
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([lbKx,lbKx,lbc,lbc,lbv,lbv,lbsigma])
-            self.ub = np.array([ubKx,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+            self.lb = np.array([lbKx,lbKx,lbc,lbc,lbv,lbv,lbsigma, -2])
+            self.ub = np.array([ubKx,ubKx,ubc,ubc,ubv,ubv,ubsigma,  2])
         else:
             self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbKx,lbc,lbc,lbv,lbv,lbsigma])
             self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubKx,ubc,ubc,ubv,ubv,ubsigma])
