@@ -51,6 +51,18 @@ class TestStoneMethods(unittest.TestCase):
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
 
+    # Test that monovalent ligand follows the binding curve
+    def test_StoneModTwo(self):
+        # logR,Ka,v,logKx,L0
+
+        # Sweep across ligand concentration
+        for i in range(100):
+            L = i / 100.0
+
+            StoneRet = self.M.StoneMod(0.0,1,1,3,L)
+
+            self.assertAlmostEqual(StoneRet[0], L / (1 + L), delta = 0.0001)
+
     def test_dataImport_kaBruhns(self):
         self.assertTrue(self.M.kaBruhns.shape == (6,4))
 
