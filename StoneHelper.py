@@ -28,7 +28,7 @@ def getMeasuredDataFrame(self):
                 .assign(Ig = self.Igs*12*4)
                 .drop('variable', axis = 1)
                 .assign(FcgR = rep(self.FcgRs, 4)*8)
-                .assign(Expression = rep(np.power(10, self.Rquant), 4)*8)
+                #.assign(Expression = rep(np.power(10, self.Rquant), 4)*8)
                 .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (8, 1)))
                 )
 
@@ -36,7 +36,7 @@ def getMeasuredDataFrame(self):
 
 # Return a dataframe with the fit data labeled with the condition variables
 def getFitPrediction(self, x):
-    logSqrErr, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd = self.NormalErrorCoef(x, fullOutput = True)
+    logSqrErr, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = self.NormalErrorCoef(x, fullOutput = True)
 
     outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
 
@@ -45,12 +45,13 @@ def getFitPrediction(self, x):
             .assign(Ig = self.Igs*12)
             .assign(FcgR = rep(self.FcgRs, 4)*2)
             .assign(TNP = rep(self.TNPs, 24))
-            .assign(Expression = rep(np.power(10, self.Rquant), 4)*2)
+            #.assign(Expression = rep(np.power(10, self.Rquant), 4)*2)
             .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (2, 1)))
             .assign(RbndPred = np.reshape(np.transpose(outputRbnd), (-1, 1)))
             .assign(RmultiPred = np.reshape(np.transpose(outputRmulti), (-1, 1)))
             .assign(nXlinkPred = np.reshape(np.transpose(outputnXlink), (-1, 1)))
             .assign(LbndPred = np.reshape(np.transpose(outputLbnd), (-1, 1)))
+            .assign(Req = np.reshape(np.transpose(outputReq), (-1, 1)))
             )
 
     return dd
@@ -60,14 +61,14 @@ def getFitMeasMerged(self, x):
     fit = getFitPrediction(self, x)
     data = getMeasuredDataFrame(self)
 
-    allFrame = fit.merge(data, 'outer', on=('FcgR', 'TNP', 'Ig', 'Ka', 'Expression'))
+    allFrame = fit.merge(data, 'outer', on=('FcgR', 'TNP', 'Ig', 'Ka'))#, 'Expression'))
 
     return allFrame
 
 def plotFit(fitFrame):
     # Massage data frame into mean and sem of measured values
     fitMean = fitFrame.groupby(['Ig', 'TNP', 'FcgR']).mean().reset_index()
-    fitSTD = (fitFrame.drop(['Expression', 'Fit', 'LL', 'Ka'], axis = 1)
+    fitSTD = (fitFrame.drop(['Fit', 'LL', 'Ka'], axis = 1)
               .groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
 
     fitMean = fitMean.merge(fitSTD, how = 'outer',
@@ -110,14 +111,16 @@ def plotFit(fitFrame):
     ax.set_yscale('log')
     ax.set_xscale('log')
     ax.plot([0.08, 10], [0.08, 10])
-    ax.set_ylim(0.02, 10)
-    ax.set_xlim(0.08, 10)
+    ax.set_ylim(0.01, 10)
+    ax.set_xlim(0.08, 70)
+    plt.xlabel('Fitted prediction')
+    plt.ylabel('Measured ligand binding')
 
 
-def plotL(fitFrame):
+def plotQuant(fitFrame, nameField):
     # Massage data frame into mean and sem of measured values
     fitMean = fitFrame.groupby(['Ig', 'TNP', 'FcgR']).mean().reset_index()
-    fitSTD = (fitFrame.drop(['Expression', 'Fit', 'LL', 'Ka', 'LbndPred'], axis = 1)
+    fitSTD = (fitFrame.drop(['Fit', 'LL', 'Ka', 'LbndPred', 'Req'], axis = 1)
               .groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
 
     fitMean = fitMean.merge(fitSTD, how = 'outer',
@@ -141,8 +144,7 @@ def plotL(fitFrame):
                     temp = temp[temp['TNP'] != 'TNP-4']
                     mfcVal = color
 
-                ax.errorbar(temp['LbndPred'], temp['Meas_mean']+0.01,
-                            yerr = temp['Meas_std'], marker = Igs[j],
+                ax.errorbar(temp['Ka'], temp[nameField], marker = Igs[j],
                             mfc = mfcVal, mec = color, ecolor = color,
                             linestyle = 'None')
 
@@ -157,11 +159,9 @@ def plotL(fitFrame):
 
     #ax.legend(handles=patches)
 
-    ax.set_yscale('log')
+    #ax.set_yscale('log')
     ax.set_xscale('log')
-    ax.ylabel('Measured Data')
-    #ax.set_ylim(0.08, 10)
-    #ax.set_xlim(0.08, 10)
+    plt.ylabel(nameField)
 
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
