@@ -46,7 +46,7 @@ class TestStoneMethods(unittest.TestCase):
         R = random.random()
         Li = random.random()
 
-        StoneRet = self.M.StoneMod(np.log10(R),kai,v,np.log10(kx),Li,fullOutput = True)
+        StoneRet = self.M.StoneMod(np.log10(R),kai,v,kx,Li,fullOutput = True)
         Req = 10**StoneModel.ReqFuncSolver(R,kai,Li,v,kx)
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
