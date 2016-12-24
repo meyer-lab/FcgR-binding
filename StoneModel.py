@@ -8,13 +8,15 @@ import pandas as pd
 
 np.seterr(over = 'raise')
 
+# Math constants
+root2 = np.sqrt(2)
+root2pi = np.sqrt(2*np.pi)
+
 # Normal distribution function. Sums over the likelihoods of points in x
 def logpdf_sum(x, loc, scale):
-    root2 = np.sqrt(2)
-    root2pi = np.sqrt(2*np.pi)
     prefactor = - x.size * np.log(scale * root2pi)
     summand = -np.square((x - loc)/(root2 * scale))
-    return  prefactor + summand.sum()
+    return  prefactor + np.nansum(summand)
 
 # A fast cached version of nchoosek
 @memoize
@@ -89,7 +91,7 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     return logReq
 
 class StoneModel:
-    def StoneMod(self,logR,Ka,v,logKx,L0,fullOutput = False):
+    def StoneMod(self,logR,Ka,v,Kx,L0,fullOutput = False):
         ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
         ## receptors, granted each epitope of the ligand binds to the receptor
         ## kind in question with dissociation constant Kd and cross-links with
@@ -97,7 +99,6 @@ class StoneModel:
         ## equations derived from Stone et al. (2001). Assumed that ligand is at
         ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
         ## for TNP-4-BSA in Lux et al. (2013).
-        Kx = 10**logKx
         v = np.int_(v)
 
         ## Vector of binomial coefficients
@@ -114,7 +115,7 @@ class StoneModel:
 
         # If we just need the amount of ligand bound, exit here.
         if fullOutput == False:
-            return (Lbound, np.nan, np.nan, np.nan)
+            return (Lbound, np.nan, np.nan, np.nan, Req)
 
         # Calculate Rmulti from equation 5
         RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
@@ -128,7 +129,7 @@ class StoneModel:
         nXlinkIter = (j*vieq[j] for j in range(1,v))
         nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
 
-        return (Lbound, Rbnd, Rmulti, nXlink)
+        return (Lbound, Rbnd, Rmulti, nXlink, Req)
 
     ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
     ## This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
@@ -145,10 +146,15 @@ class StoneModel:
         ## Keep track of cumulative error
         logSqrErr = 0
 
+        ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
+        Kx = np.power(10, x[self.kxIDX])
+
+        # Fill in Req values for evalutation
+        outputReq = np.full((24,2), np.nan)
+
         if fullOutput:
             outputFit = np.full((24,2), np.nan)
             outputLL = np.full((24,2), np.nan)
-
             outputRbnd = np.full((24,2), np.nan)
             outputRmulti = np.full((24,2), np.nan)
             outputnXlink = np.full((24,2), np.nan)
@@ -177,14 +183,9 @@ class StoneModel:
                     # Setup the data
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
 
-                    ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
-                    logKx = x[self.kxIDX[0]] + np.log10(Ka) + logR
-
-                    if k > 3:
-                        logKx = x[self.kxIDX[1]] + np.log10(Ka) + logR
-
                     ## Calculate the MFI which should result from this condition according to the model
-                    MFI = c*(self.StoneMod(logR,Ka,v,logKx,L0))[0]
+                    stoneModOut = self.StoneMod(logR,Ka,v,Kx,L0)
+                    MFI = c*stoneModOut[0]
                     if np.isnan(MFI):
                         return -np.inf
 
@@ -194,9 +195,12 @@ class StoneModel:
                     if np.isnan(tempm):
                         return -np.inf
 
+                    # Fill in Req values for evalutation
+                    outputReq[4*k+l,j] = stoneModOut[4]
+
                     # If the fit was requested output the model predictions
                     if fullOutput:
-                        stoneRes = self.StoneMod(logR,Ka,v,logKx,L0, fullOutput = True)
+                        stoneRes = self.StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
                         outputFit[4*k+l,j] = MFI
                         outputLL[4*k+l, j] = tempm
                         outputRbnd[4*k+l,j] = stoneRes[1]
@@ -208,10 +212,12 @@ class StoneModel:
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
                     logSqrErr = logSqrErr+tempm
 
-        if fullOutput:
-            return (logSqrErr, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd)
+        corVal = (np.min([np.nanmin(outputReq[:,0] - outputReq[:,1]), 0]))
 
-        return logSqrErr
+        if fullOutput:
+            return (logSqrErr, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq)
+
+        return logSqrErr + corVal
 
     def NormalErrorCoef(self, x, fullOutput = False):
         # Return -inf for parameters out of bounds
@@ -233,7 +239,7 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'Kx2', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'KxNus']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
 
         self.newData = newData
 
@@ -256,6 +262,9 @@ class StoneModel:
         else:
             # Load and normalize dataset one
             self.mfiAdjMean = normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
+
+            for i in range(6):
+                self.pNames.insert(0, 'Rexp')
 
         ## Define the matrix of Ka values from Bruhns
         ## For accuracy, the Python implementation of this code will use
@@ -290,17 +299,17 @@ class StoneModel:
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([lbKx,lbKx,lbc,lbc,lbv,lbv,lbsigma, -2])
-            self.ub = np.array([ubKx,ubKx,ubc,ubc,ubv,ubv,ubsigma,  2])
+            self.lb = np.array([lbKx,lbc,lbc,lbv,lbv,lbsigma])
+            self.ub = np.array([ubKx,ubc,ubc,ubv,ubv,ubsigma])
         else:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbKx,lbc,lbc,lbv,lbv,lbsigma])
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
-        self.uvIDX = [10, 11]
-        self.kxIDX = [6, 7]
-        self.cIDX = [8, 9]
-        self.sigIDX = 12
+        self.uvIDX = [9, 10]
+        self.kxIDX = [6]
+        self.cIDX = [7, 8]
+        self.sigIDX = 11
 
         self.Nparams = len(self.lb)
