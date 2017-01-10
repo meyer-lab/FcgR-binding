@@ -226,7 +226,7 @@ class StoneModel:
 
         # If the receptor expression levels are set then set them
         if self.newData:
-            x = np.concatenate((self.Rquant, x))
+            x[0:6] = x[0:6] + self.Rquant
 
         # Set avidities to integers
         x[self.uvIDX] = np.floor(x[self.uvIDX])
@@ -242,6 +242,9 @@ class StoneModel:
         self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
 
         self.newData = newData
+
+        for i in range(6):
+            self.pNames.insert(0, 'Rexp')
 
         if newData:
             ## Create the NumPy array Rquant, where each row represents a particular
@@ -262,9 +265,6 @@ class StoneModel:
         else:
             # Load and normalize dataset one
             self.mfiAdjMean = normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
-
-            for i in range(6):
-                self.pNames.insert(0, 'Rexp')
 
         ## Define the matrix of Ka values from Bruhns
         ## For accuracy, the Python implementation of this code will use
@@ -299,8 +299,8 @@ class StoneModel:
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([lbKx,lbc,lbc,lbv,lbv,lbsigma])
-            self.ub = np.array([ubKx,ubc,ubc,ubv,ubv,ubsigma])
+            self.lb = np.array([-1,-1,-1,-1,-1,-1,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+            self.ub = np.array([1 ,1 ,1 ,1 ,1 ,1 ,ubKx,ubc,ubc,ubv,ubv,ubsigma])
         else:
             self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
             self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
