@@ -8,12 +8,10 @@ import pandas as pd
 
 np.seterr(over = 'raise')
 
-# Math constants
-root2 = np.sqrt(2)
-root2pi = np.sqrt(2*np.pi)
-
 # Normal distribution function. Sums over the likelihoods of points in x
 def logpdf_sum(x, loc, scale):
+    root2 = np.sqrt(2)
+    root2pi = np.sqrt(2*np.pi)
     prefactor = - x.size * np.log(scale * root2pi)
     summand = -np.square((x - loc)/(root2 * scale))
     return  prefactor + np.nansum(summand)
@@ -295,12 +293,14 @@ class StoneModel:
         ubv = 30
         lbsigma = -4
         ubsigma = 1
+        lRadj = -0.1
+        uRadj = 0.1
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([-1,-1,-1,-1,-1,-1,lbKx,lbc,lbc,lbv,lbv,lbsigma])
-            self.ub = np.array([1 ,1 ,1 ,1 ,1 ,1 ,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+            self.lb = np.array([lRadj,lRadj,lRadj,lRadj,lRadj,lRadj,lbKx,lbc,lbc,lbv,lbv,lbsigma])
+            self.ub = np.array([uRadj,uRadj,uRadj,uRadj,uRadj,uRadj,ubKx,ubc,ubc,ubv,ubv,ubsigma])
         else:
             self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
             self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
