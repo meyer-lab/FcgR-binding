@@ -24,11 +24,6 @@ StoneMs = pickle.dumps(StoneM, pickle.HIGHEST_PROTOCOL)
 # Bounds list for optimization
 boundsOpt = list(zip(StoneM.lb.tolist(),StoneM.ub.tolist()))
 
-# Optimization routine for finding an initial point
-def initOpt(pp):
-    minOut = minimize(fun=lambda x: -StoneM.NormalErrorCoef(x), x0=pp, bounds=boundsOpt)
-    return(minOut['x'])
-
 #### Run simulation
 niters = 100000
 
@@ -38,14 +33,6 @@ p0 = np.random.uniform(low=0, high=1, size=(nwalkers, ndims))
 
 for ii in range(nwalkers):
     p0[ii] = StoneM.lb + (StoneM.ub - StoneM.lb)*p0[ii]
-
-## Run a local optimization of each starting point to try and reduce burn in time
-print('Optimizing the initial point of each walker')
-
-outtput = Parallel(n_jobs = -1, verbose = 10)(delayed(initOpt)(p0[ii]) for ii in range(nwalkers))
-p0 = np.asarray(outtput)
-
-print('Done initializing points.')
 
 ## Set up sampler
 sampler = EnsembleSampler(nwalkers,ndims,StoneM.NormalErrorCoef,2.0,[],{},None,16)
