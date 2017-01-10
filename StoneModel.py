@@ -171,6 +171,10 @@ class StoneModel:
             for k in range(6):
                 logR = x[k]
 
+                # If we have the receptor expression also fit that data
+                if self.newData:
+                    logSqrErr = logSqrErr+logpdf_sum(logR, self.Rquant[k], self.RquantS[k])
+
                 ## Iterate over each kind of IgG
                 for l in range(4):
                     ## Set the affinity for the binding of the FcgR and IgG in question
@@ -206,6 +210,10 @@ class StoneModel:
                         outputnXlink[4*k+l,j] = stoneRes[3]
                         outputLbnd[4*k+l,j] = stoneRes[0]
 
+                    # Skip IIIA-Phe Ig2 and Ig4, because the affinity values seem inconsistent
+                    if k == 4 and l % 2 > 0:
+                        continue
+
                     ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
                     logSqrErr = logSqrErr+tempm
@@ -221,10 +229,6 @@ class StoneModel:
         # Return -inf for parameters out of bounds
         if np.any(np.isinf(x)) or np.any(np.isnan(x)) or np.any(np.less(x, self.lb)) or np.any(np.greater(x, self.ub)):
             return -np.inf
-
-        # If the receptor expression levels are set then set them
-        if self.newData:
-            x[0:6] = x[0:6] + self.Rquant
 
         # Set avidities to integers
         x[self.uvIDX] = np.floor(x[self.uvIDX])
@@ -256,7 +260,10 @@ class StoneModel:
             ## a row in the original csv.
             self.Rquant = np.loadtxt(join(path,'FcgRquant.csv'), delimiter=',', skiprows=1)
 
-            self.Rquant = np.log10(np.nanmean(self.Rquant, axis=0))
+            self.Rquant = np.log10(self.Rquant)
+
+            self.RquantS = np.nanstd(self.Rquant, axis=0)
+            self.Rquant = np.nanmean(self.Rquant, axis=0)
 
             # Load and normalize dataset two
             self.mfiAdjMean = normalizeData(join(path,'New-Fig2B.csv'))
@@ -283,7 +290,7 @@ class StoneModel:
 
         # Set upper and lower bounds
         ## Upper and lower bounds of the 12 parameters
-        lbR = 0
+        lbR = 3
         ubR = 8
         lbKx = -25
         ubKx = 3
@@ -293,17 +300,15 @@ class StoneModel:
         ubv = 30
         lbsigma = -4
         ubsigma = 1
-        lRadj = -0.1
-        uRadj = 0.1
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([lRadj,lRadj,lRadj,lRadj,lRadj,lRadj,lbKx,lbc,lbc,lbv,lbv,lbsigma])
-            self.ub = np.array([uRadj,uRadj,uRadj,uRadj,uRadj,uRadj,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
         else:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma])
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma])
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
