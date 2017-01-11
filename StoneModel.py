@@ -28,37 +28,35 @@ def normalizeData(filepath):
     ## MFIs. Then, normalize the data by replicate. For each step after the
     ##reading, I manipulated the csv data in different ways, which are explained
     ## in the comments. Please refer to these comments to understand what is
-    ## going on, especially with variables of the name "book$" or "temp$." All
+    ## going on, especially with variables of the name "temp$." All
     ## variables with such names are only meant to construct mfiAdjMean1 (from
     ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
 
-    ## Read in the csv data for the first experiments. lux1 is an iterable data
-    ## structure wherein each iterable element is a single-element list containing a
-    ## string. Each such string represents a single row from the csv.
-    book4 = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
+    ## Read in the csv data for the first experiments.
+    Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
 
-    ## The first row in every set of five rows in book4 consists of background
-    ## MFIs. book5 is made by taking each of the four non-background MFIs from
-    ## reach cluster of 5 from book4, subtracting the corresponding background
+    ## The first row in every set of five rows in Luxpre consists of background
+    ## MFIs. Lux is made by taking each of the four non-background MFIs from
+    ## reach cluster of 5 from Luxpre, subtracting the corresponding background
     ## MFI from each, and then forming a NumPy array of shape (24,8) from all of
-    ## these collectively. The final result, book5, will be a NumPy array of
+    ## these collectively. The final result, Lux, will be a NumPy array of
     ## shape (1,192).
-    book5 = np.array([])
-    for j in range(len(book4)):
+    Lux = np.array([])
+    for j in range(len(Luxpre)):
         if j%5 == 0:
-            temp = np.array(book4[j])
+            temp = np.array(Luxpre[j])
         else:
-            temp2 = np.array(book4[j])-temp
-            book5 = np.concatenate((book5,temp2),0)
+            temp2 = np.array(Luxpre[j])-temp
+            Lux = np.concatenate((Lux,temp2),0)
     ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
     ## MFIs from Lux's original experiments.
-    book5 = np.reshape(book5,(24,8))
+    Lux = np.reshape(Lux,(24,8))
 
     # Normalize by the average intensity of each replicate
     for j in range(4):
-        book5[:,(j,j+4)] = book5[:,(j,j+4)] / np.nanmean(np.nanmean(book5[:,(j,j+4)]))
+        Lux[:,(j,j+4)] = Lux[:,(j,j+4)] / np.nanmean(np.nanmean(Lux[:,(j,j+4)]))
 
-    return(book5)
+    return(Lux)
 
 ## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
 ## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
