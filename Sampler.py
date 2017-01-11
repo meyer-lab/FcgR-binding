@@ -28,7 +28,7 @@ boundsOpt = list(zip(StoneM.lb.tolist(),StoneM.ub.tolist()))
 niters = 100000
 
 ## Set up parameters for parallel-tempered Ensemble Sampler
-ndims, nwalkers = StoneM.Nparams, 3*StoneM.Nparams
+ndims, nwalkers = StoneM.Nparams, 4*StoneM.Nparams
 p0 = np.random.uniform(low=0, high=1, size=(nwalkers, ndims))
 
 for ii in range(nwalkers):
