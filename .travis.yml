@@ -1,0 +1,7 @@
+language: python
+python:
+  - "3.6"
+# command to install dependencies
+install: "pip install numpy scipy pandas h5py"
+# command to run tests
+script: python unitTest.py
