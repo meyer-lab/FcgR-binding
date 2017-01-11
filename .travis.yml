@@ -2,6 +2,6 @@ language: python
 python:
   - "3.6"
 # command to install dependencies
-install: "pip install numpy scipy pandas h5py memoise2"
+install: "pip install numpy scipy pandas h5py memoize2"
 # command to run tests
 script: python unitTest.py
