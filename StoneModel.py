@@ -60,7 +60,7 @@ def normalizeData(filepath):
             temp = np.array(Luxpre[j])
         else:
             temp2 = np.array(Luxpre[j])-temp
-            Lux = np.concatenate((Lux,temp2),0)
+            Lux = np.concatenate((Lux,temp2),axis=0)
     ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
     ## MFIs from Lux's original experiments.
     Lux = np.reshape(Lux,(24,8))
@@ -149,8 +149,9 @@ class StoneModel:
     ## of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
     ## standard deviation of MFIs for that condition.
     def NormalErrorCoefcalc(self, x, fullOutput = False):
-        ## Set the standard deviation coefficient
+        ## Set the standard deviation coefficients
         sigCoef = np.power(10, x[self.sigIDX])
+        sigCoef2 = np.power(10, x[self.sig2IDX])
 
         ## Keep track of cumulative error
         logSqrErr = 0
@@ -184,7 +185,7 @@ class StoneModel:
 
                 # If we have the receptor expression also fit that data
                 if self.newData:
-                    logSqrErr = logSqrErr+logpdf_sum(logR, self.Rquant[k], self.RquantS[k])
+                    logSqrErr = logSqrErr+logpdf_sum(self.Rquant[k],logR,sigCoef2*logR)
 
                 ## Iterate over each kind of IgG
                 for l in range(4):
@@ -252,7 +253,7 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma','sigma2']
 
         self.newData = newData
 
@@ -315,11 +316,15 @@ class StoneModel:
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
+##            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
+##            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma], dtype = np.float64)
         else:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
+##            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
+##            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma], dtype = np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
@@ -327,5 +332,6 @@ class StoneModel:
         self.kxIDX = [6]
         self.cIDX = [7, 8]
         self.sigIDX = 11
+        self.sig2IDX = 12
 
         self.Nparams = len(self.lb)
