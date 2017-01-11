@@ -70,7 +70,7 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(self.M.tnpbsa.shape == (2,))
 
     def test_dataImport_Rquant(self):
-        self.assertTrue(self.M.Rquant.shape == (6,))
+        self.assertTrue(len(self.M.Rquant) == 6)
 
     def test_dataImport_mfiAdjMean(self):
         self.assertTrue(self.M.mfiAdjMean.shape == (24, 8))

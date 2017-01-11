@@ -8,19 +8,6 @@ import pandas as pd
 
 np.seterr(over = 'raise')
 
-# Calculates the standard error (without adjustment or weight) of a set of data
-# in a 1D numpy array, ignoring all NaNs
-def nansem(x):
-    std = np.nanstd(x,axis=0)
-    temp = []
-    for j in range(x.shape[1]):
-        count = 0
-        for elem in x[:,j]:
-            if not np.isnan(elem):
-                count += 1
-        temp.append(count)
-    return std/np.sqrt(np.fromiter(temp,np.float))
-        
 # Normal distribution function. Sums over the likelihoods of points in x
 def logpdf_sum(x, loc, scale):
     root2 = np.sqrt(2)
@@ -253,7 +240,7 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma','sigma2']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
 
         self.newData = newData
 
@@ -271,14 +258,17 @@ class StoneModel:
             ## which is a single-element list containing a string corresponding to
             ## a row in the original csv.
             self.Rquant = np.loadtxt(join(path,'FcgRquant.csv'), delimiter=',', skiprows=1)
+            self.Rquant = np.log10(self.Rquant).transpose().tolist()
 
-            self.Rquant = np.log10(self.Rquant)
-
-            self.RquantS = nansem(self.Rquant)
-            self.Rquant = np.nanmean(self.Rquant, axis=0)
+            # Remove nan entries from each array
+            for i in range(6):
+                self.Rquant[i] = np.delete(self.Rquant[i], np.where(np.isnan(self.Rquant[i])))
 
             # Load and normalize dataset two
             self.mfiAdjMean = normalizeData(join(path,'New-Fig2B.csv'))
+
+            # We only include a second sigma if new data
+            self.pNames.append('sigma2')
         else:
             # Load and normalize dataset one
             self.mfiAdjMean = normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
@@ -316,15 +306,11 @@ class StoneModel:
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-##            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
-##            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
             self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma], dtype = np.float64)
             self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma], dtype = np.float64)
         else:
-##            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
-##            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma], dtype = np.float64)
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
