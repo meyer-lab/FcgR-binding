@@ -19,16 +19,11 @@ def mfiAdjMeanFigureMaker(newdata=True):
 
     ## Setting up strings useful for plotting
     colors = ['red','blue','green','yellow']
-    species = []
-    species.append(r'Fc$\gamma$RIA')
-    species.append(r'Fc$\gamma$RIIA-131R')
-    species.append(r'Fc$\gamma$RIIA-131H')
-    species.append(r'Fc$\gamma$RIIB')
-    species.append(r'Fc$\gamma$RIIIA-158F')
-    species.append(r'Fc$\gamma$RIIIA-158V')
-##    blankLabels = ['']*N
+    species = [r'Fc$\gamma$RIA', r'Fc$\gamma$RIIA-131R', r'Fc$\gamma$RIIA-131H',
+            r'Fc$\gamma$RIIB', r'Fc$\gamma$RIIIA-158F', r'Fc$\gamma$RIIIA-158V']
+
     tnpbsaLabels = ['']+['TNP-4-BSA']+['']*5+['TNP-26-BSA']+['']
-    
+
     ind = np.arange(N)
     ## Width of bars
     width = 0.5
@@ -46,7 +41,7 @@ def mfiAdjMeanFigureMaker(newdata=True):
             temp.remove(0)
             temp.insert(k,np.nanmean(mfiAdjMean[4*(j-1)+k][1:4]))
             rects.append(axarr[int(np.floor(j/3)),int(j+np.floor(j/3))%4].bar(ind,temp,width,color=colors[k]))
-        
+
         for k in range(4):
             temp = [0]*N
             temp.remove(0)
@@ -70,7 +65,7 @@ def mfiAdjMeanFigureMaker(newdata=True):
     ## White out the rightmost set of aubplots
     for j in range(2):
         axarr[j,3].spines['bottom'].set_color('white')
-        axarr[j,3].spines['top'].set_color('white') 
+        axarr[j,3].spines['top'].set_color('white')
         axarr[j,3].spines['right'].set_color('white')
         axarr[j,3].spines['left'].set_color('white')
         axarr[j,3].tick_params(axis='x', colors='white')
@@ -82,7 +77,7 @@ def mfiAdjMeanFigureMaker(newdata=True):
     else:
         titleEnd = ' (Old Data)'
     f.suptitle('Mean-Adjusted MFIs'+titleEnd,fontsize=18)
-    
+
     ## Show figure
     plt.show()
     ## Save figure as image
@@ -90,3 +85,5 @@ def mfiAdjMeanFigureMaker(newdata=True):
         f.savefig('mfiAdjMean2.png')
     else:
         f.savefig('mfiAdjMean1.png')
+
+mfiAdjMeanFigureMaker(True)
