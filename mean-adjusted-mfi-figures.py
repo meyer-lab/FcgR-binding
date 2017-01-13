@@ -86,9 +86,7 @@ def mfiAdjMeanFigureMaker(newdata=True):
     ## Show figure
     plt.show()
     ## Save figure as image
-##    if newdata:
-##        f.savefig('mfiAdjMean2.png')
-##    else:
-##        f.savefig('mfiAdjMean1.png')
-
-mfiAdjMeanFigureMaker(True)
+    if newdata:
+        f.savefig('mfiAdjMean2.png')
+    else:
+        f.savefig('mfiAdjMean1.png')
