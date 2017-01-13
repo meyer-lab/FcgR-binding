@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
 from StoneModel import StoneModel
+from matplotlib.font_manager import FontProperties
 
 def mfiAdjMeanFigureMaker(newdata=True):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
@@ -25,8 +26,9 @@ def mfiAdjMeanFigureMaker(newdata=True):
     species.append(r'Fc$\gamma$RIIB')
     species.append(r'Fc$\gamma$RIIIA-158F')
     species.append(r'Fc$\gamma$RIIIA-158V')
-    blankLabels = ['']*N
-
+##    blankLabels = ['']*N
+    tnpbsaLabels = ['']+['TNP-4-BSA']+['']*5+['TNP-26-BSA']+['']
+    
     ind = np.arange(N)
     ## Width of bars
     width = 0.5
@@ -55,9 +57,10 @@ def mfiAdjMeanFigureMaker(newdata=True):
     for j in range(2):
         for k in range(3):
             axarr[j,k].set_xlim(-0.5*width,len(ind)-1+1.5*width)
-            axarr[j,k].set_xticklabels(blankLabels)
+            axarr[j,k].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=10))
+            axarr[j,k].tick_params(axis='x', length=0)
             axarr[j,k].grid(b=False)
-            axarr[j,k].set_ylim(0,5)
+            axarr[j,k].set_ylim(0,4)
             if k%3 == 0:
                 axarr[j,k].set_ylabel('maMFIs',fontsize=14)
             axarr[j,k].set_title(species[3*j+k],fontsize=16)
@@ -74,11 +77,18 @@ def mfiAdjMeanFigureMaker(newdata=True):
         axarr[j,3].tick_params(axis='y', colors='white')
 
     ## Set title for the set of plots
-    ##titleEnd = ' (New Data)'
-    f.suptitle('Mean-Adjusted MFIs (Original Data)',fontsize=18)
+    if newdata:
+        titleEnd = ' (New Data)'
+    else:
+        titleEnd = ' (Old Data)'
+    f.suptitle('Mean-Adjusted MFIs'+titleEnd,fontsize=18)
+    
     ## Show figure
     plt.show()
     ## Save figure as image
-    f.savefig('mfiAdjMean1.png')
+##    if newdata:
+##        f.savefig('mfiAdjMean2.png')
+##    else:
+##        f.savefig('mfiAdjMean1.png')
 
-mfiAdjMeanFigureMaker(False)
+mfiAdjMeanFigureMaker(True)
