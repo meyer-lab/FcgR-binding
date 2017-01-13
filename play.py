@@ -6,43 +6,22 @@ from StoneModel import StoneModel
 ## Use LaTex to render text
 ##rc('text',usetex=True)
 
-# Simple data to display in various forms
-x = np.linspace(0, 2 * np.pi, 400)
-y = np.sin(x ** 2)
-
-##fig = plt.figure()
-##ax = fig.add_subplot(111)
-
 ## Our data
 StoneM1 = StoneModel(False)
 StoneM2 = StoneModel(True)
 
 mfiAdjMean1 = StoneM1.mfiAdjMean
 mfiAdjMean2 = StoneM2.mfiAdjMean
-print(mfiAdjMean2)
 colors = ['red','blue','green','yellow']
-gam = 'γ'
+gam = chr(947)
+blankLabels = ['']*4
 
 ## Relative position of bars, of 9 bars
-ind = np.arange(9)
+ind = np.arange(4)
 ## Width of bars
-width = 0.25
+width = 0.5
 ## Number of bins per subplot
-N = 9
-
-# Four axes, returned as a 2-d array
-##f, axarr = plt.subplots(2, 2)
-##axarr[0, 0].plot(x, y)
-##axarr[0, 0].set_title('Axis [0,0]')
-##axarr[0, 1].scatter(x, y)
-##axarr[0, 1].set_title('Axis [0,1]')
-##axarr[1, 0].plot(x, y ** 2)
-##axarr[1, 0].set_title('Axis [1,0]')
-##axarr[1, 1].scatter(x, y ** 2)
-##axarr[1, 1].set_title('Axis [1,1]')
-### Fine-tune figure; hide x ticks for top plots and y ticks for right plots
-##plt.setp([a.get_xticklabels() for a in axarr[0, :]], visible=False)
-##plt.setp([a.get_yticklabels() for a in axarr[:, 1]], visible=False)
+N = 4
 
 f, axarr = plt.subplots(2,3)
 graphs = []
@@ -51,34 +30,34 @@ for j in range(6):
     for k in range(4):
         temp = [0]*N
         temp.remove(0)
-        temp.insert(k,np.nanmean(mfiAdjMean1[k][1:4]))
+        temp.insert(k,np.nanmean(mfiAdjMean1[4*(j-1)+k][1:4]))
         rects.append(axarr[int(np.floor(j/3)),j%3].bar(ind,temp,width,color=colors[k]))
-    for j in range(4):
-        temp = [0]*N
-        temp.remove(0)
-        temp.insert(5+k,np.nanmean(mfiAdjMean2[k][5:8]))
-        rects.append(axarr[int(np.floor(j/3)),j%3].bar(ind,temp,width,color=colors[k]))
-    
-## the bars
-##rects1 = ax.bar(ind, menMeans, width,
-##                color='black')
-##
-##rects2 = ax.bar(ind+width, womenMeans, width,
-##                    color='red')
+##    for k in range(4):
+##        temp = [0]*N
+##        temp.remove(0)
+##        temp.insert(5+k,np.nanmean(mfiAdjMean2[k][5:8]))
+##        rects.append(axarr[int(np.floor(j/3)),j%3].bar(ind,temp,width,color=colors[k]))
 
 # axes and labels
 for j in range(2):
     for k in range(3):
-        axarr[j,k].set_xlim(-width,len(ind)+width)
-        axarr[j,k].set_ylim(0,10)
-        axarr[j,k].set_ylabel('Mean-Adjusted MFIs')
-        axarr[j,k].set_title('Fc\gammaRIA')
+        axarr[j,k].set_xlim(-0.5*width,len(ind)-1+1.5*width)
+        axarr[j,k].set_xticklabels(blankLabels)
+        axarr[j,k].grid(b=False)
+        axarr[j,k].set_ylim(0,2)
+        if k%3 == 0:
+            axarr[j,k].set_ylabel('Mean-Adjusted MFIs')
+        axarr[j,k].set_title('Fc'+gam+'RIA')
 ##xTickMarks = ['Group'+str(i) for i in range(1,6)]
 ##ax.set_xticks(ind+width)
 ##xtickNames = ax.set_xticklabels(xTickMarks)
 ##plt.setp(xtickNames, rotation=45, fontsize=10)
 ##
 #### add a legend
-##ax.legend( (rects1[0], rects2[0]), ('Men', 'Women') )
+leg = axarr[0,0].legend((rects[0][0],rects[1][0]),('Men','Women'),bbox_to_anchor=(1,1))
 ##
-plt.show()
+##wm = plt.get_current_fig_manager()
+##wm.window.state('zoomed')
+
+##plt.show()
+f.savefig('test.png')

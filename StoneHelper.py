@@ -189,5 +189,6 @@ def read_chain(filename):
     pdset['gnu2'] = np.floor(pdset['gnu2'])
 
     f.close()
+    print(pdset.shape)
 
     return (StoneM, pdset)
