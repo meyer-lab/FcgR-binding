@@ -1,5 +1,6 @@
 import unittest
 import StoneModel
+import StoneHelper
 import numpy as np
 import random
 import time
@@ -81,11 +82,43 @@ class TestStoneMethods(unittest.TestCase):
 
         self.assertFalse(np.isnan(retVal))
         self.assertFalse(np.isinf(retVal))
-
+    
+    # Test that our hand-coded logpdf matches the results of SciPy
     def test_logpdf(self):
         vecIn = np.array([0.01, 0.2, 0.3, 0.4])
 
         self.assertAlmostEqual(norm.logpdf(vecIn, 0.2, 1).sum(), StoneModel.logpdf_sum(vecIn, 0.2, 1), 0.000001)
+        
+    # From here down test that the various plotting functions correctly run
+    
+    # Test the predicted vs. measured plot
+    def test_plotFit_plot(self):
+        # Create the data and fit frame based on the lower bounds values
+        fitFrame = StoneHelper.getFitMeasMerged(self.M, self.M.lb)
+        
+        # Create fit of measured vs. predicted
+        StoneHelper.plotFit(fitFrame)
+        
+        # Create the data and fit frame based on the lower bounds values
+        #fitFrame = StoneHelper.getFitMeasMerged(self.Mold, self.Mold.ub)
+        
+        # Create fit of measured vs. predicted
+        #StoneHelper.plotFit(fitFrame)
+        
+        self.assertTrue(True)
+        
+    def test_kaBinding_plot(self):
+        # Return the fit and binding data summary data set
+        fitMean = StoneHelper.getFitMeasMergedSummarized(self.M, self.M.lb)
+        
+        # Create the measured binding vs. ka plot
+        StoneHelper.plotNormalizedBindingvsKA(fitMean)
+        
+        #fitMean = StoneHelper.getFitMeasMergedSummarized(self.Mold, self.Mold.lb)
+
+        #StoneHelper.plotNormalizedBindingvsKA(fitMean)
+        
+        self.assertTrue(True)
 
 
 if __name__ == '__main__':

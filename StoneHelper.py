@@ -176,7 +176,7 @@ def plotFit(fitFrame):
                             mfc = mfcVal, mec = color, ecolor = color,
                             linestyle = 'None')
 
-    ax.legend(handles=makeFcIgLegend())
+    ax.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
     ax.set_yscale('log')
     ax.set_xscale('log')
