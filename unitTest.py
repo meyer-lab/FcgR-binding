@@ -5,6 +5,10 @@ import numpy as np
 import random
 import time
 from scipy.stats import norm
+import matplotlib
+
+# Force matplotlib to not use any Xwindows backend.
+matplotlib.use('Agg')
 
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
