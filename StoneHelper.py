@@ -30,7 +30,7 @@ def getMeasuredDataFrame(self):
                 .assign(Ig = self.Igs*12*4)
                 .drop('variable', axis = 1)
                 .assign(FcgR = rep(self.FcgRs, 4)*8)
-                #.assign(Expression = rep(np.power(10, self.Rquant), 4)*8)
+                .assign(Expression = rep(self.Rquant, 4)*8)
                 .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (8, 1)))
                 )
 
@@ -47,7 +47,7 @@ def getFitPrediction(self, x):
             .assign(Ig = self.Igs*12)
             .assign(FcgR = rep(self.FcgRs, 4)*2)
             .assign(TNP = rep(self.TNPs, 24))
-            #.assign(Expression = rep(np.power(10, self.Rquant), 4)*2)
+            .assign(Expression = rep(self.Rquant, 4)*2)
             .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (2, 1)))
             .assign(RbndPred = np.reshape(np.transpose(outputRbnd), (-1, 1)))
             .assign(RmultiPred = np.reshape(np.transpose(outputRmulti), (-1, 1)))
@@ -62,10 +62,87 @@ def getFitPrediction(self, x):
 def getFitMeasMerged(self, x):
     fit = getFitPrediction(self, x)
     data = getMeasuredDataFrame(self)
+    
+    fit = fit.drop('Expression', axis = 1)
 
-    allFrame = fit.merge(data, 'outer', on=('FcgR', 'TNP', 'Ig', 'Ka'))#, 'Expression'))
+    allFrame = fit.merge(data, 'outer', on=('FcgR', 'TNP', 'Ig', 'Ka'))
 
     return allFrame
+
+def getFitMeasMergedSummarized(self, x):
+    fitFrame = getFitMeasMerged(self, x)
+    
+    fitFrame['Expression_mean'] = fitFrame.Expression.apply(lambda x: np.power(10, np.mean(x)))
+
+    # Massage data frame into mean and sem of measured values
+    fitMean = fitFrame.groupby(['Ig', 'TNP', 'FcgR']).mean().reset_index()
+    fitSTD = (fitFrame.drop(['Fit', 'LL', 'Ka', 'Expression_mean', 'Expression'], axis = 1)
+              .groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
+
+    # Reunite the mean and sem summarized values
+    fitMean = fitMean.merge(fitSTD, how = 'outer',
+                            on = ['Ig', 'TNP', 'FcgR'],
+                            suffixes = ['_mean', '_std'])
+    
+    return fitMean
+
+def makeFcIgLegend():
+    patches = list()
+
+    for f in FcgRs:
+        patches.append(mpatches.Patch(color=FcgRs[f], label=f))
+
+    for j in Igs:
+        patches.append(mlines.Line2D([], [], color='black', marker=Igs[j], markersize=7, label=j, linestyle='None'))
+        
+    return patches
+
+def plotNormalizedBindingvsKA(fitMean):
+    # Select the subset of data we want
+    fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
+
+    # Normalize the binding data to expression
+    fitMean = fitMean.assign(Meas_mean = fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
+    fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
+    
+    
+    fig = plt.figure(figsize=(9,5))
+    ax = fig.add_subplot(1, 2, 1)
+
+    for j in Igs:
+        for f in FcgRs:
+            temp = fitMean[fitMean['Ig'] == j]
+            temp = temp[temp['FcgR'] == f]
+
+            temp = temp[temp['TNP'] == 'TNP-4']
+            mfcVal = 'None'
+
+            ax.errorbar(temp['Ka'], temp['Meas_mean'],
+                        yerr = temp['Meas_std'], marker = Igs[j],
+                        mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
+
+    ax.set_xscale('log')
+    plt.ylabel('Measured TNP-4 binding')
+    plt.xlabel('FcgR-IgG Ka')
+
+    ax = fig.add_subplot(1, 2, 2)
+
+    for j in Igs:
+        for f in FcgRs:
+            temp = fitMean[fitMean['Ig'] == j]
+            temp = temp[temp['FcgR'] == f]
+
+            temp = temp[temp['TNP'] != 'TNP-4']
+            mfcVal = FcgRs[f]
+
+            ax.errorbar(temp['Ka'], temp['Meas_mean'],
+                        yerr = temp['Meas_std'], marker = Igs[j],
+                        mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
+
+    ax.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+    ax.set_xscale('log')
+    plt.xlabel('FcgR-IgG Ka')
 
 def plotFit(fitFrame):
     # Massage data frame into mean and sem of measured values
@@ -99,16 +176,7 @@ def plotFit(fitFrame):
                             mfc = mfcVal, mec = color, ecolor = color,
                             linestyle = 'None')
 
-    patches = list()
-
-    for f in FcgRs:
-        patches.append(mpatches.Patch(color=FcgRs[f], label=f))
-
-    for j in Igs:
-        patches.append(mlines.Line2D([], [], color='black',
-                                     marker=Igs[j], markersize=7, label=j, linestyle='None'))
-
-    ax.legend(handles=patches)
+    ax.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
     ax.set_yscale('log')
     ax.set_xscale('log')
@@ -150,16 +218,7 @@ def plotQuant(fitFrame, nameField):
                             mfc = mfcVal, mec = color, ecolor = color,
                             linestyle = 'None')
 
-    patches = list()
-
-    for f in FcgRs:
-        patches.append(mpatches.Patch(color=FcgRs[f], label=f))
-
-    for j in Igs:
-        patches.append(mlines.Line2D([], [], color='black',
-                                     marker=Igs[j], markersize=7, label=j, linestyle='None'))
-
-    #ax.legend(handles=patches)
+    #ax.legend(handles=makeFcIgLegend())
 
     #ax.set_yscale('log')
     ax.set_xscale('log')
