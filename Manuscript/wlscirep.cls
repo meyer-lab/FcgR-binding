@@ -18,9 +18,7 @@
 \RequirePackage{ifthen}
 \RequirePackage{calc}
 \AtEndOfClass{\RequirePackage{microtype}}
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
-\ProcessOptions*
-\LoadClass{article}
+\LoadClass[fleqn,12pt]{article}
 \RequirePackage{times}      % Loads the Times-Roman Fonts
 \RequirePackage{mathptmx}   % Loads the Times-Roman Math Fonts
 \RequirePackage{ifpdf}
@@ -138,7 +136,6 @@
   [\ \textbullet\ ]  
   
 \RequirePackage{enumitem}
-%\setlist{nolistsep} % Uncomment to remove spacing between items in lists (enumerate, itemize)
 
 % Remove brackets from numbering in List of References
 \renewcommand{\@biblabel}[1]{\bfseries\color{color1}#1.}
@@ -147,6 +144,8 @@
 % article meta data
 %
 \newcommand{\keywords}[1]{\def\@keywords{#1}}
+
+\newcommand{\ac}{\autocite}
 
 \def\xabstract{abstract}
 \long\def\abstract#1\end#2{\def\two{#2}\ifx\two\xabstract 
