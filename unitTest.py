@@ -95,6 +95,7 @@ class TestStoneMethods(unittest.TestCase):
         self.assertAlmostEqual(norm.logpdf(vecIn, 0.2, 1).sum(), StoneModel.logpdf_sum(vecIn, 0.2, 1), 0.000001)
         
     # From here down test that the various plotting functions correctly run
+    # TODO: Add these plots for the old model
     
     # Test the predicted vs. measured plot
     def test_plotFit_plot(self):
@@ -103,12 +104,6 @@ class TestStoneMethods(unittest.TestCase):
         
         # Create fit of measured vs. predicted
         StoneHelper.plotFit(fitFrame)
-        
-        # Create the data and fit frame based on the lower bounds values
-        #fitFrame = StoneHelper.getFitMeasMerged(self.Mold, self.Mold.ub)
-        
-        # Create fit of measured vs. predicted
-        #StoneHelper.plotFit(fitFrame)
         
         self.assertTrue(True)
         
@@ -119,9 +114,22 @@ class TestStoneMethods(unittest.TestCase):
         # Create the measured binding vs. ka plot
         StoneHelper.plotNormalizedBindingvsKA(fitMean)
         
-        #fitMean = StoneHelper.getFitMeasMergedSummarized(self.Mold, self.Mold.lb)
-
-        #StoneHelper.plotNormalizedBindingvsKA(fitMean)
+        self.assertTrue(True)
+        
+    # Test LL plot
+    def test_kaBinding_plot(self):
+        # Create the data and fit frame based on the lower bounds values
+        fitFrame = StoneHelper.getFitMeasMerged(self.M, self.M.lb)
+        
+        # Create the LL of the fit plot
+        StoneHelper.plotQuant(fitFrame, 'LL')
+        
+        self.assertTrue(True)
+        
+    # Test mfiAdjMean plot
+    def test_mfiAdjMean_figure(self):
+        # Call the plotting function
+        StoneHelper.mfiAdjMeanFigureMaker(self.M)
         
         self.assertTrue(True)
 
