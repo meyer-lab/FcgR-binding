@@ -1,8 +1,10 @@
-\documentclass[fleqn,10pt]{wlscirep}
+\documentclass{wlscirep}
+
+\newcommand{\fcgr}{Fc\textgamma{}R}
 
 \addbibresource{Library.bib}
 
-\title{A Strategy for Immune Complex Design By Ig Class and Avidity}
+\title{Dissecting \fcgr{} Regulation Through a Multivalent Binding Model}
 
 \author[1]{Ryan A. Robinett}
 \author[1,*]{Aaron S. Meyer}
@@ -13,7 +15,7 @@
 \keywords{Immune complex, multivalent ligand, receptor cross-linking, avidity, immunoglobulin G, Fc\textgamma{} receptors}
 
 \begin{abstract}
-Most immune receptors must cluster in order to transduce signal across the membrane. This clustering is achieved by the binding of immune complexes to the cell surface. Models describing the binding of multivalent ligand presenting a single repeated epitope to monovalent receptors presenting a single paratope have been used to describe the binding of immune complexes to the surfaces of immune cells. One such model predicts that immune complexes can be designed such that, for any pair of receptors which bind to the aforementioned epitope with affinities of significantly different orders of magnitude, the number of receptors of the first kind that are clustered will be far greater than the number clustered of the other. We show here that in designing immune complexes that bind with the greatest disparity in number of ligand bound between two receptor kinds of non-negligible affinity, the most important parameters to consider are the avidity of the immune complex and its rates of cross-linking and breaking cross-links between receptors. We further show that most of these complexes fall under two structural motifs.
+Many immune receptors transduce activation across the plasma membrane through their clustering. In the case of Fc\textgamma{} receptors, this clustering is usually driven by binding to antibodies of differing affinity in turn bound to multivalent antigen. As a consequence of this activation mechanism, accounting for and rationally manipulating IgG effector function is complicated by, among other factors, the contribution of differing affinities to multiple \fcgr{}s and changes in the valency of antigen binding. In this study, we show that a model of multivalent receptor-ligand binding can effectively account for the contribution of IgG-\fcgr{} affinity and immune complex valency. This model in turn enables us to make specific predictions about the effect of immune complexes of defined composition. In total, these results enable rationally designed IgG effector function, or deconvolution of function, in both a forward and reverse manner.
 \end{abstract}
 \begin{document}
 
@@ -24,13 +26,15 @@ Most immune receptors must cluster in order to transduce signal across the membr
 
 \input{Introduction}
 
-\input{Methods}
+%\input{Methods}
 
-\input{Results}
+%\input{Results}
 
-\input{Discussion}
+%\input{Discussion}
 
-\input{EndMaterial}
+%\input{Acknowledgements}
+
+\printbibliography
 
 %a -> Lux 2013
 %b -> Stone 2001
@@ -40,5 +44,7 @@ Most immune receptors must cluster in order to transduce signal across the membr
 %%f -> https://www.biosearchtech.com/tnpbsa-bovine-serum-albumin
 %g -> \textit{Akaike Information Criterion Statistics}
 %h -> mhsample documentation from MATLAB?
+
+%\input{Supplement}
 
 \end{document}
