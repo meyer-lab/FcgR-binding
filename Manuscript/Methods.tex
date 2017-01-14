@@ -4,9 +4,13 @@
 
 All binding measurements were generously provided by Anja Lux of the Nimmerjahn Lab. Binding was measured using ELISA. The quantity of ligand bound in the original data is measured in terms of mean fluorescent intensity (MFI). Four replicates were used in the lab's assays. We normalized the data by replicate in our simulations.
 
+% TODO: The binding data will need to be described in the level of detail Lux et al has since we will be including original data.
+
 \subsection*{Equations}
 
-The equilibrium binding of TNP-X-BSA to Fc\textgamma{}Rs was modeled using the following equations. They are all transcribed or derived from a model for the equilibrium binding of multivalent ligand to monovalent receptors expressed uniformly on a cell surface presented by Stone \textit{et al}. (2001)\textsuperscript{b}. The model assumes that all cells are submerged in a solution with a saturating concentration of ligand. According to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{eq}$, can be found using the relation
+The equilibrium binding of TNP-X-BSA to Fc\textgamma{}Rs was modeled using an equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface presented by Stone \textit{et al}. (2001)\textsuperscript{b}. The model assumes that all cells are submerged in a solution with a saturating concentration of ligand. 
+% TODO: Does this really assume a saturating concentration of ligand?
+According to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{eq}$, can be found using the relation
 \begin{equation}
 v_{i,eq} = {v\choose i} (K_X)^{i-1} \frac{L_0}{K_D} (R_{eq})^i.
 \end{equation}
