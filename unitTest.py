@@ -1,6 +1,5 @@
 import unittest
 import StoneModel
-import StoneHelper
 import numpy as np
 import random
 import time
@@ -9,6 +8,8 @@ import matplotlib
 
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('Agg')
+
+import StoneHelper
 
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
