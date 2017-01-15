@@ -299,7 +299,7 @@ class StoneModel:
         lbc = -10
         ubc = 5
         lbv = 1
-        ubv = 30
+        ubv = 35
         lbsigma = -4
         ubsigma = 1
 
