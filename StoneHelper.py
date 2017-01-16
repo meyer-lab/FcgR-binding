@@ -265,21 +265,27 @@ def mfiAdjMeanFigureMaker(StoneM):
     ## Number of bars, including an "empty" bar between TNP-4-BSA and TNP-26-BSA data
     N = 9
 
+    ind = np.arange(N)
+    ## Width of bars
+    width = 0.5
+    
     ## Setting up strings useful for plotting
     colors = ['red','blue','green','yellow']
     species = [r'Fc$\gamma$RIA', r'Fc$\gamma$RIIA-131R', r'Fc$\gamma$RIIA-131H',
             r'Fc$\gamma$RIIB', r'Fc$\gamma$RIIIA-158F', r'Fc$\gamma$RIIIA-158V']
 
-    tnpbsaLabels = ['']+['TNP-4-BSA']+['']*5+['TNP-26-BSA']+['']
-
-    ind = np.arange(N)
-    ## Width of bars
-    width = 0.5
+    units = int((3*width+len(ind)-1)/0.25)
+    tnpbsaLabels = ['']*int((3*width+len(ind)-1)/0.25)
+    tnpbsaLabels.insert(4,'TNP-4-BSA')
+    tnpbsaLabels.insert(14,'TNP-26-BSA')
 
     ## Generate a figure with a 2 X 4 array of subplots; the rightmost column exists
     ## only as a place to put the legend. The axes of these rightmost plots are whited
     ## out for de-facto invisibility.
-    f, axarr = plt.subplots(2,4,figsize = (14,15))
+    f = plt.figure()
+    axarr = []
+    for j in range(6):
+       exec('axarr.append(f.add_subplot(24'+str(int(j+1+np.floor(j/3)))+'))')
 
     ## Plotting mfiAdjMean
     for j in range(6):
@@ -288,36 +294,33 @@ def mfiAdjMeanFigureMaker(StoneM):
             temp = [0]*N
             temp.remove(0)
             temp.insert(k,np.nanmean(mfiAdjMean[4*(j-1)+k][1:4]))
-            rects.append(axarr[int(np.floor(j/3)),int(j+np.floor(j/3))%4].bar(ind,temp,width,color=colors[k]))
-
+            stds = [0]*N
+            stds.remove(0)
+            stds.insert(k,np.nanstd(mfiAdjMean[4*(j-1)+k][1:4]))
+            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
         for k in range(4):
             temp = [0]*N
             temp.remove(0)
             temp.insert(5+k,np.nanmean(mfiAdjMean[4*(j-1)+k][5:8]))
-            rects.append(axarr[int(np.floor(j/3)),int(j+np.floor(j/3))%4].bar(ind,temp,width,color=colors[k]))
+            stds = [0]*N
+            stds.remove(0)
+            stds.insert(5+k,np.nanstd(mfiAdjMean[4*(j-1)+k][5:8]))
+            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
 
     # axes and labels
-    for j in range(2):
-        for k in range(3):
-            axarr[j,k].set_xlim(-0.5*width,len(ind)-1+1.5*width)
-            axarr[j,k].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=10))
-            axarr[j,k].tick_params(axis='x', length=0)
-            axarr[j,k].grid(b=False)
-            axarr[j,k].set_ylim(0,4)
-            if k%3 == 0:
-                axarr[j,k].set_ylabel('maMFIs',fontsize=14)
-            axarr[j,k].set_title(species[3*j+k],fontsize=16)
+    for j in range(6):
+        axarr[j].set_xlim(-0.5*width,len(ind)-1+1.5*width)
+        axarr[j].xaxis.set_ticks(np.arange(-0.5*width,len(ind)-1+2.5*width,0.5))
+        axarr[j].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=10))
+        axarr[j].tick_params(axis='x', length=0)
+        axarr[j].grid(b=False)
+        axarr[j].set_ylim(0,5)
+        if j%3 == 0:
+            axarr[j].set_ylabel('maMFIs',fontsize=14)
+        axarr[j].set_title(species[j],fontsize=16)
 
     ## Add a legend denoting IgG species
-    leg = axarr[0,3].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=(0.5,1))
-    ## White out the rightmost set of aubplots
-    for j in range(2):
-        axarr[j,3].spines['bottom'].set_color('white')
-        axarr[j,3].spines['top'].set_color('white')
-        axarr[j,3].spines['right'].set_color('white')
-        axarr[j,3].spines['left'].set_color('white')
-        axarr[j,3].tick_params(axis='x', colors='white')
-        axarr[j,3].tick_params(axis='y', colors='white')
+    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=(2,1))
 
     ## Set title for the set of plots
     if StoneM.newData:
