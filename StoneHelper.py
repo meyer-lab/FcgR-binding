@@ -6,6 +6,7 @@ import matplotlib.lines as mlines
 from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 import h5py
+from tqdm import tqdm
 
 try:
    import cPickle as pickle
@@ -57,6 +58,22 @@ def getFitPrediction(self, x):
             )
 
     return dd
+
+# This function takes (1) a function that takes a parameter set and
+# returns a dataframe and (2) a list of parameter sets. It returns a dataframe
+# with all the individual dataframe outputs stacked, and a number identifier for
+# which parameter set each set of quantities came from
+def mapMCMC(dFunction, pSet):
+    # Make a list for all the dataframes
+    retVals = list()
+
+    # Iterate over each parameter set
+    for ii in tqdm(range(pSet.shape[0])):
+        # Call the passed function and add the output to the list
+        retVals.append(dFunction(pSet[ii,:]).assign(pSetNum = ii))
+
+    # Concatenate all the dataframes vertically and return
+    return pd.concat(retVals)
 
 # Return the fit and measured data merged into a single dataframe
 def getFitMeasMerged(self, x):

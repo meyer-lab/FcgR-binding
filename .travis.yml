@@ -2,6 +2,8 @@ language: python
 python:
   - "3.6"
 # command to install dependencies
-install: "pip install numpy scipy pandas h5py memoize2 matplotlib"
+install: "pip install numpy scipy pandas h5py memoize2 matplotlib tqdm"
 # command to run tests
 script: python unitTest.py
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
