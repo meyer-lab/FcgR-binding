@@ -62,28 +62,27 @@ def getFitPrediction(self, x):
 def getFitMeasMerged(self, x):
     fit = getFitPrediction(self, x)
     data = getMeasuredDataFrame(self)
-    
+
     fit = fit.drop('Expression', axis = 1)
 
     allFrame = fit.merge(data, 'outer', on=('FcgR', 'TNP', 'Ig', 'Ka'))
 
     return allFrame
 
-def getFitMeasMergedSummarized(self, x):
-    fitFrame = getFitMeasMerged(self, x)
-    
+def getFitMeasMergedSummarized(M, x):
+    fitFrame = getFitMeasMerged(M, x)
+
     fitFrame['Expression_mean'] = fitFrame.Expression.apply(lambda x: np.power(10, np.mean(x)))
 
     # Massage data frame into mean and sem of measured values
     fitMean = fitFrame.groupby(['Ig', 'TNP', 'FcgR']).mean().reset_index()
-    fitSTD = (fitFrame.drop(['Fit', 'LL', 'Ka', 'Expression_mean', 'Expression'], axis = 1)
-              .groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
+    fitSTD = (fitFrame[['Ig', 'TNP', 'FcgR', 'Meas']].groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
 
     # Reunite the mean and sem summarized values
     fitMean = fitMean.merge(fitSTD, how = 'outer',
                             on = ['Ig', 'TNP', 'FcgR'],
                             suffixes = ['_mean', '_std'])
-    
+
     return fitMean
 
 def makeFcIgLegend():
@@ -94,7 +93,7 @@ def makeFcIgLegend():
 
     for j in Igs:
         patches.append(mlines.Line2D([], [], color='black', marker=Igs[j], markersize=7, label=j, linestyle='None'))
-        
+
     return patches
 
 def plotNormalizedBindingvsKA(fitMean):
@@ -104,8 +103,7 @@ def plotNormalizedBindingvsKA(fitMean):
     # Normalize the binding data to expression
     fitMean = fitMean.assign(Meas_mean = fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
     fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
-    
-    
+
     fig = plt.figure(figsize=(9,5))
     ax = fig.add_subplot(1, 2, 1)
 
@@ -144,15 +142,8 @@ def plotNormalizedBindingvsKA(fitMean):
     ax.set_xscale('log')
     plt.xlabel('FcgR-IgG Ka')
 
-def plotFit(fitFrame):
-    # Massage data frame into mean and sem of measured values
-    fitMean = fitFrame.groupby(['Ig', 'TNP', 'FcgR']).mean().reset_index()
-    fitSTD = (fitFrame.drop(['Fit', 'LL', 'Ka'], axis = 1)
-              .groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
-
-    fitMean = fitMean.merge(fitSTD, how = 'outer',
-                            on = ['Ig', 'TNP', 'FcgR'],
-                            suffixes = ['_mean', '_std'])
+def plotFit(fitMean):
+    # This should take a merged and summarized data frame
 
     fig = plt.figure(figsize=(8,6))
     ax = fig.add_subplot(1, 1, 1)
@@ -187,15 +178,8 @@ def plotFit(fitFrame):
     plt.ylabel('Measured ligand binding')
 
 
-def plotQuant(fitFrame, nameField):
-    # Massage data frame into mean and sem of measured values
-    fitMean = fitFrame.groupby(['Ig', 'TNP', 'FcgR']).mean().reset_index()
-    fitSTD = (fitFrame.drop(['Fit', 'LL', 'Ka', 'LbndPred', 'Req'], axis = 1)
-              .groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
-
-    fitMean = fitMean.merge(fitSTD, how = 'outer',
-                            on = ['Ig', 'TNP', 'FcgR'],
-                            suffixes = ['_mean', '_std'])
+def plotQuant(fitMean, nameFieldX, nameFieldY):
+    # This should take a merged and summarized data frame
 
     fig = plt.figure(figsize=(8,6))
     ax = fig.add_subplot(1, 1, 1)
@@ -214,15 +198,16 @@ def plotQuant(fitFrame, nameField):
                     temp = temp[temp['TNP'] != 'TNP-4']
                     mfcVal = color
 
-                ax.errorbar(temp['Ka'], temp[nameField], marker = Igs[j],
+                ax.errorbar(temp[nameFieldX], temp[nameFieldY], marker = Igs[j],
                             mfc = mfcVal, mec = color, ecolor = color,
                             linestyle = 'None')
 
     #ax.legend(handles=makeFcIgLegend())
 
-    #ax.set_yscale('log')
+    ax.set_yscale('log')
     ax.set_xscale('log')
-    plt.ylabel(nameField)
+    plt.ylabel(nameFieldY)
+    plt.xlabel(nameFieldX)
 
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
@@ -268,7 +253,7 @@ def mfiAdjMeanFigureMaker(StoneM):
     ind = np.arange(N)
     ## Width of bars
     width = 0.5
-    
+
     ## Setting up strings useful for plotting
     colors = ['red','blue','green','yellow']
     species = [r'Fc$\gamma$RIA', r'Fc$\gamma$RIIA-131R', r'Fc$\gamma$RIIA-131H',
