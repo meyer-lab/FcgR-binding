@@ -5,3 +5,5 @@ python:
 install: "pip install numpy scipy pandas h5py memoize2 matplotlib"
 # command to run tests
 script: python unitTest.py
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
