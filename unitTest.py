@@ -87,50 +87,50 @@ class TestStoneMethods(unittest.TestCase):
 
         self.assertFalse(np.isnan(retVal))
         self.assertFalse(np.isinf(retVal))
-    
+
     # Test that our hand-coded logpdf matches the results of SciPy
     def test_logpdf(self):
         vecIn = np.array([0.01, 0.2, 0.3, 0.4])
 
         self.assertAlmostEqual(norm.logpdf(vecIn, 0.2, 1).sum(), StoneModel.logpdf_sum(vecIn, 0.2, 1), 0.000001)
-        
+
     # From here down test that the various plotting functions correctly run
     # TODO: Add these plots for the old model
-    
+
     # Test the predicted vs. measured plot
     def test_plotFit_plot(self):
         # Create the data and fit frame based on the lower bounds values
-        fitFrame = StoneHelper.getFitMeasMerged(self.M, self.M.lb)
-        
+        fitFrame = StoneHelper.getFitMeasMergedSummarized(self.M, self.M.lb)
+
         # Create fit of measured vs. predicted
         StoneHelper.plotFit(fitFrame)
-        
+
         self.assertTrue(True)
-        
+
     def test_kaBinding_plot(self):
         # Return the fit and binding data summary data set
         fitMean = StoneHelper.getFitMeasMergedSummarized(self.M, self.M.lb)
-        
+
         # Create the measured binding vs. ka plot
         StoneHelper.plotNormalizedBindingvsKA(fitMean)
-        
+
         self.assertTrue(True)
-        
+
     # Test LL plot
-    def test_kaBinding_plot(self):
+    def test_plotQuant_plot(self):
         # Create the data and fit frame based on the lower bounds values
-        fitFrame = StoneHelper.getFitMeasMerged(self.M, self.M.lb)
-        
+        fitFrame = StoneHelper.getFitMeasMergedSummarized(self.M, self.M.lb)
+
         # Create the LL of the fit plot
-        StoneHelper.plotQuant(fitFrame, 'LL')
-        
+        StoneHelper.plotQuant(fitFrame, 'Meas_mean', 'Meas_mean')
+
         self.assertTrue(True)
-        
+
     # Test mfiAdjMean plot
     def test_mfiAdjMean_figure(self):
         # Call the plotting function
         StoneHelper.mfiAdjMeanFigureMaker(self.M)
-        
+
         self.assertTrue(True)
 
 
