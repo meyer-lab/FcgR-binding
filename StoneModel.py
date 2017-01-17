@@ -217,12 +217,10 @@ class StoneModel:
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
                     logSqrErr = logSqrErr+tempm
 
-        corVal = (np.min([np.nanmin(outputReq[:,0] - outputReq[:,1]), 0]))
-
         if fullOutput:
             return (logSqrErr, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq)
 
-        return logSqrErr + corVal
+        return logSqrErr
 
     def NormalErrorCoef(self, x, fullOutput = False):
         # Return -inf for parameters out of bounds
