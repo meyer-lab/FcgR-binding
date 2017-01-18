@@ -137,7 +137,7 @@ def makeFcIgLegend():
 
     return patches
 
-def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
+def plotNormalizedBindingvsKA(fitMean):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
@@ -145,9 +145,8 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
     fitMean = fitMean.assign(Meas_mean = fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
     fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
 
-    if ax1 == None:
-        fig = plt.figure(figsize=(9,5))
-        ax1 = fig.add_subplot(1, 2, 1)
+    fig = plt.figure(figsize=(9,5))
+    ax = fig.add_subplot(1, 2, 1)
 
     for j in Igs:
         for f in FcgRs:
@@ -157,16 +156,15 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
             temp = temp[temp['TNP'] == 'TNP-4']
             mfcVal = 'None'
 
-            ax1.errorbar(temp['Ka'], temp['Meas_mean'],
+            ax.errorbar(temp['Ka'], temp['Meas_mean'],
                         yerr = temp['Meas_std'], marker = Igs[j],
                         mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
 
-    ax1.set_xscale('log')
+    ax.set_xscale('log')
     plt.ylabel('Measured TNP-4 binding')
     plt.xlabel('FcgR-IgG Ka')
 
-    if ax2 == None:
-        ax2 = fig.add_subplot(1, 2, 2)
+    ax = fig.add_subplot(1, 2, 2)
 
     for j in Igs:
         for f in FcgRs:
@@ -176,21 +174,20 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
             temp = temp[temp['TNP'] != 'TNP-4']
             mfcVal = FcgRs[f]
 
-            ax2.errorbar(temp['Ka'], temp['Meas_mean'],
+            ax.errorbar(temp['Ka'], temp['Meas_mean'],
                         yerr = temp['Meas_std'], marker = Igs[j],
                         mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
 
-    ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    ax.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
-    ax2.set_xscale('log')
+    ax.set_xscale('log')
     plt.xlabel('FcgR-IgG Ka')
 
-def plotFit(fitMean,ax=None):
+def plotFit(fitMean):
     # This should take a merged and summarized data frame
 
-    if ax == None:
-        fig = plt.figure(figsize=(8,6))
-        ax = fig.add_subplot(1, 1, 1)
+    fig = plt.figure(figsize=(8,6))
+    ax = fig.add_subplot(1, 1, 1)
 
     for j in Igs:
         for f in FcgRs:
@@ -222,12 +219,11 @@ def plotFit(fitMean,ax=None):
     plt.ylabel('Measured ligand binding')
 
 
-def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None):
+def plotQuant(fitMean, nameFieldX, nameFieldY):
     # This should take a merged and summarized data frame
 
-    if ax == None:
-        fig = plt.figure(figsize=(8,6))
-        ax = fig.add_subplot(1, 1, 1)
+    fig = plt.figure(figsize=(8,6))
+    ax = fig.add_subplot(1, 1, 1)
 
     for j in Igs:
         for f in FcgRs:
@@ -283,7 +279,7 @@ def read_chain(filename):
 
     return (StoneM, pdset)
 
-def mfiAdjMeanFigureMaker(StoneM, f=None):
+def mfiAdjMeanFigureMaker(StoneM):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
     ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
@@ -312,8 +308,7 @@ def mfiAdjMeanFigureMaker(StoneM, f=None):
     ## Generate a figure with a 2 X 4 array of subplots; the rightmost column exists
     ## only as a place to put the legend. The axes of these rightmost plots are whited
     ## out for de-facto invisibility.
-    if f == None:
-        f = plt.figure()
+    f = plt.figure()
     axarr = []
     for j in range(6):
        exec('axarr.append(f.add_subplot(24'+str(int(j+1+np.floor(j/3)))+'))')
@@ -363,7 +358,7 @@ def mfiAdjMeanFigureMaker(StoneM, f=None):
     ## Show figure
     plt.show()
 
-def FcgRQuantificationFigureMaker(StoneM,ax=None):
+def FcgRQuantificationFigureMaker(StoneM):
     ## Please see comments from mfiAdjMeanFigureMaker
     rc('text',usetex=False)
 
@@ -384,9 +379,8 @@ def FcgRQuantificationFigureMaker(StoneM,ax=None):
     species = ['IA','IIA-131R','IIA-131H','IIB','IIIA-158F','IIIA-158V']
 
     ## Create bars and error bars per species
-    if ax == None:
-        f = plt.figure()
-        ax = f.add_subplot(121)
+    f = plt.figure()
+    ax = f.add_subplot(121)
     rects = []
     for j in range(N):
         temp = [0]*(N-1)
@@ -402,8 +396,6 @@ def FcgRQuantificationFigureMaker(StoneM,ax=None):
     ax.grid(b=False)
     ax.set_yscale('log')
     ax.set_ylabel('Number of Receptors',fontsize=14)
-
-    f = ax.get_figure()
     f.suptitle('Receptor Quantification by Receptor Species',fontsize=18)
 
     ## Create legend
