@@ -283,7 +283,7 @@ def read_chain(filename):
 
     return (StoneM, pdset)
 
-def mfiAdjMeanFigureMaker(StoneM, f=None):
+def mfiAdjMeanFigureMaker(StoneM, axarr=None):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
     ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
@@ -312,11 +312,11 @@ def mfiAdjMeanFigureMaker(StoneM, f=None):
     ## Generate a figure with a 2 X 4 array of subplots; the rightmost column exists
     ## only as a place to put the legend. The axes of these rightmost plots are whited
     ## out for de-facto invisibility.
-    if f == None:
+    if axarr == None:
         f = plt.figure()
-    axarr = []
-    for j in range(6):
-       exec('axarr.append(f.add_subplot(24'+str(int(j+1+np.floor(j/3)))+'))')
+        axarr = []
+        for j in range(6):
+            exec('axarr.append(f.add_subplot(24'+str(int(j+1+np.floor(j/3)))+'))')
 
     ## Plotting mfiAdjMean
     for j in range(6):
@@ -358,10 +358,7 @@ def mfiAdjMeanFigureMaker(StoneM, f=None):
         titleEnd = ' (New Data)'
     else:
         titleEnd = ' (Old Data)'
-    f.suptitle('Mean-Adjusted MFIs'+titleEnd,fontsize=18)
-
-    ## Show figure
-    plt.show()
+##    axarr[1].set_title('Mean-Adjusted MFIs'+titleEnd,fontsize=18)
 
 def FcgRQuantificationFigureMaker(StoneM,ax=None):
     ## Please see comments from mfiAdjMeanFigureMaker
@@ -403,11 +400,7 @@ def FcgRQuantificationFigureMaker(StoneM,ax=None):
     ax.set_yscale('log')
     ax.set_ylabel('Number of Receptors',fontsize=14)
 
-    f = ax.get_figure()
-    f.suptitle('Receptor Quantification by Receptor Species',fontsize=18)
+    ax.set_title('Receptor Quantification by Receptor Species',fontsize=18)
 
     ## Create legend
     leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=(2,1))
-
-    ## Show figure
-    plt.show()
