@@ -86,47 +86,48 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
 
     return logReq
 
+def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
+    ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
+    ## receptors, granted each epitope of the ligand binds to the receptor
+    ## kind in question with dissociation constant Kd and cross-links with
+    ## other receptors with crosslinking constant Kx = 10^logKx. All
+    ## equations derived from Stone et al. (2001). Assumed that ligand is at
+    ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
+    ## for TNP-4-BSA in Lux et al. (2013).
+    v = np.int_(v)
+
+    ## Vector of binomial coefficients
+    Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
+    if np.isnan(Req):
+        return (np.nan, np.nan, np.nan, np.nan)
+
+    # Calculate vieq from equation 1
+    vieqIter = (L0*Ka*nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
+    vieq = np.fromiter(vieqIter, np.float, count = v)
+
+    ## Calculate L, according to equation 7
+    Lbound = np.sum(vieq)
+
+    # If we just need the amount of ligand bound, exit here.
+    if fullOutput == False:
+        return (Lbound, np.nan, np.nan, np.nan, Req)
+
+    # Calculate Rmulti from equation 5
+    RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
+    Rmulti = np.sum(np.fromiter(RmultiIter, np.float, count = v-1))
+
+    # Calculate Rbound
+    RbndIter = ((j+1)*vieq[j] for j in range(v))
+    Rbnd = np.sum(np.fromiter(RbndIter, np.float, count = v))
+
+    # Calculate numXlinks from equation 4
+    nXlinkIter = (j*vieq[j] for j in range(1,v))
+    nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
+
+    return (Lbound, Rbnd, Rmulti, nXlink, Req)
+
+
 class StoneModel:
-    def StoneMod(self,logR,Ka,v,Kx,L0,fullOutput = False):
-        ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
-        ## receptors, granted each epitope of the ligand binds to the receptor
-        ## kind in question with dissociation constant Kd and cross-links with
-        ## other receptors with crosslinking constant Kx = 10^logKx. All
-        ## equations derived from Stone et al. (2001). Assumed that ligand is at
-        ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
-        ## for TNP-4-BSA in Lux et al. (2013).
-        v = np.int_(v)
-
-        ## Vector of binomial coefficients
-        Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
-        if np.isnan(Req):
-            return (np.nan, np.nan, np.nan, np.nan)
-
-        # Calculate vieq from equation 1
-        vieqIter = (L0*Ka*nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
-        vieq = np.fromiter(vieqIter, np.float, count = v)
-
-        ## Calculate L, according to equation 7
-        Lbound = np.sum(vieq)
-
-        # If we just need the amount of ligand bound, exit here.
-        if fullOutput == False:
-            return (Lbound, np.nan, np.nan, np.nan, Req)
-
-        # Calculate Rmulti from equation 5
-        RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
-        Rmulti = np.sum(np.fromiter(RmultiIter, np.float, count = v-1))
-
-        # Calculate Rbound
-        RbndIter = ((j+1)*vieq[j] for j in range(v))
-        Rbnd = np.sum(np.fromiter(RbndIter, np.float, count = v))
-
-        # Calculate numXlinks from equation 4
-        nXlinkIter = (j*vieq[j] for j in range(1,v))
-        nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
-
-        return (Lbound, Rbnd, Rmulti, nXlink, Req)
-
     ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
     ## This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
     ## tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
@@ -185,7 +186,7 @@ class StoneModel:
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
 
                     ## Calculate the MFI which should result from this condition according to the model
-                    stoneModOut = self.StoneMod(logR,Ka,v,Kx,L0)
+                    stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
                     MFI = c*stoneModOut[0]
                     if np.isnan(MFI):
                         return -np.inf
@@ -201,7 +202,7 @@ class StoneModel:
 
                     # If the fit was requested output the model predictions
                     if fullOutput:
-                        stoneRes = self.StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
+                        stoneRes = StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
                         outputFit[4*k+l,j] = MFI
                         outputLL[4*k+l, j] = tempm
                         outputRbnd[4*k+l,j] = stoneRes[1]
