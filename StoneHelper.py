@@ -283,7 +283,7 @@ def read_chain(filename):
 
     return (StoneM, pdset)
 
-def mfiAdjMeanFigureMaker(StoneM, axarr=None):
+def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
     ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
@@ -342,16 +342,16 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None):
     for j in range(6):
         axarr[j].set_xlim(-0.5*width,len(ind)-1+1.5*width)
         axarr[j].xaxis.set_ticks(np.arange(-0.5*width,len(ind)-1+2.5*width,0.5))
-        axarr[j].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=10))
+        axarr[j].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=tnpbsafontsize))
         axarr[j].tick_params(axis='x', length=0)
         axarr[j].grid(b=False)
         axarr[j].set_ylim(0,5)
         if j%3 == 0:
-            axarr[j].set_ylabel('maMFIs',fontsize=14)
-        axarr[j].set_title(species[j],fontsize=16)
+            axarr[j].set_ylabel('maMFIs',fontsize=ylabelfontsize)
+        axarr[j].set_title(species[j],fontsize=subtitlefontsize)
 
     ## Add a legend denoting IgG species
-    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=(2,1))
+    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox)
 
     ## Set title for the set of plots
     if StoneM.newData:
@@ -360,7 +360,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None):
         titleEnd = ' (Old Data)'
 ##    axarr[1].set_title('Mean-Adjusted MFIs'+titleEnd,fontsize=18)
 
-def FcgRQuantificationFigureMaker(StoneM,ax=None):
+def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1)):
     ## Please see comments from mfiAdjMeanFigureMaker
     rc('text',usetex=False)
 
@@ -398,9 +398,9 @@ def FcgRQuantificationFigureMaker(StoneM,ax=None):
     ax.tick_params(axis='x',length=0)
     ax.grid(b=False)
     ax.set_yscale('log')
-    ax.set_ylabel('Number of Receptors',fontsize=14)
+    ax.set_ylabel('Number of Receptors',fontsize=ylabelfontsize)
 
-    ax.set_title('Receptor Quantification by Receptor Species',fontsize=18)
+    ax.set_title('Receptor Quantification by Receptor Species',fontsize=titlefontsize)
 
     ## Create legend
-    leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=(2,1))
+    leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=legbbox)
