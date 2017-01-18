@@ -1,0 +1,10 @@
+IgG,     FcgRIIB, FcgRIII, FcgRIV, FcgRI,   C1q
+IgG1+f,  3.3E6,     0.3E6,      0,     0,   nan
+IgG1-f,  1.3E6,     0.5E6,      0,     0,   nan
+IgG2a+f, 0.4E6,     0.7E6,  2.9E7, 1.6E8, 1.6E9
+IgG2a-f, 3.3E6,     1.5E6,  3.1E8, 1.8E8, 1.7E9
+IgG2b+f, 2.2E6,     0.6E6,  1.7E7,     0, 3.8E9
+IgG2b-f, 1.0E7,     1.1E6,  2.0E8,     0, 3.8E9
+IgG3,        0,         0,      0,     0,   nan
+# Binding data from Nimmerjahn and Ravetch, Science, 2005
+# f indicates fucose
