@@ -400,7 +400,7 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
     ax.set_yscale('log')
     ax.set_ylabel('Number of Receptors',fontsize=ylabelfontsize)
 
-    ax.set_title('Receptor Quantification by Receptor Species',fontsize=titlefontsize)
+    ax.set_title('Receptor Quantification by\nReceptor Species',fontsize=titlefontsize)
 
     ## Create legend
     leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=legbbox)
