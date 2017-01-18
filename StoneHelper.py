@@ -75,6 +75,30 @@ def mapMCMC(dFunction, pSet):
     # Concatenate all the dataframes vertically and return
     return pd.concat(retVals)
 
+# Reduce the collection of predictions to various summary statistics.
+def reduceMCMC(frameList, groupByC = ['Ig', 'FcgR', 'TNP'], dropC = ['Expression', 'pSetNum']):
+    # Drop indicated columns
+    frameList = frameList.drop(dropC, axis = 1).groupby(groupByC)
+
+    # Summarize the collections in various ways
+    frameListMean = frameList.mean().reset_index()
+    frameListStd = frameList.std().reset_index()
+    frameListMedian = frameList.median().reset_index()
+    frameListMin = frameList.min().reset_index()
+    frameListMax = frameList.max().reset_index()
+    frameListLowCI = frameList.quantile(0.025).reset_index()
+    frameListHighCI = frameList.quantile(0.975).reset_index()
+
+    # Merge each frame together with a suffix to indicate what each quantity is
+    frameAgg = frameListMean.merge(frameListStd, on = groupByC, suffixes = ('_mean', '_std'))
+    frameAgg = frameAgg.merge(frameListMedian, on = groupByC, suffixes = ('', '_median'))
+    frameAgg = frameAgg.merge(frameListMin, on = groupByC, suffixes = ('', '_min'))
+    frameAgg = frameAgg.merge(frameListMax, on = groupByC, suffixes = ('', '_max'))
+    frameAgg = frameAgg.merge(frameListLowCI, on = groupByC, suffixes = ('', '_lCI'))
+    frameAgg = frameAgg.merge(frameListHighCI, on = groupByC, suffixes = ('', '_uCI'))
+
+    return frameAgg
+
 # Return the fit and measured data merged into a single dataframe
 def getFitMeasMerged(self, x):
     fit = getFitPrediction(self, x)
