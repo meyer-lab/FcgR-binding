@@ -16,9 +16,6 @@ axarr = []
 for j in range(6):
     axarr.append(f.add_subplot(gs2[20+j+5*int(np.floor(j/3))]))
 mfiAdjMeanFigureMaker(StoneM,axarr,legbbox=(1.5,1),tnpbsafontsize=12)
-gs3 = gridspec.GridSpec(8,4,height_ratios=[1,1,1,1,1,4,1,4])
-axx = f.add_subplot(gs3[25])
-mfiAdjMeanFigureTitle(axx)
 ##plt.show()
 
 with PdfPages('test.pdf') as pdf:
