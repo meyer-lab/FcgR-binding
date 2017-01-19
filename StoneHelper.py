@@ -360,6 +360,12 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
         titleEnd = ' (Old Data)'
 ##    axarr[1].set_title('Mean-Adjusted MFIs'+titleEnd,fontsize=18)
 
+## For use in generating the title of the set of bar graphs showing mean-adjusted
+## MFI
+def mfiAdjMeanFigureTitle(ax):
+   ax.text(0.5,0.5,'test')
+   ax.ste_frame_on(False)
+
 def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1)):
     ## Please see comments from mfiAdjMeanFigureMaker
     rc('text',usetex=False)
