@@ -283,7 +283,7 @@ def read_chain(filename):
 
     return (StoneM, pdset)
 
-def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10):
+def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6)):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
     ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
@@ -358,7 +358,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
         titleEnd = ' (New Data)'
     else:
         titleEnd = ' (Old Data)'
-    axarr[1].text(-0.3,6,'Mean-Adjusted MFIs'+titleEnd,fontsize=18)
+    axarr[1].text(titlePos[0],titlePos[1],'Mean-Adjusted MFIs'+titleEnd,fontsize=titlefontsize)
 
 def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1)):
     ## Please see comments from mfiAdjMeanFigureMaker
