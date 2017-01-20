@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
@@ -7,20 +9,72 @@ from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 import h5py
 from tqdm import tqdm
+import seaborn as sns
+from StoneModel import StoneModel
 
 try:
    import cPickle as pickle
 except:
    import pickle
 
+# Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
+def read_chain(filename):
+    # Open hdf5 file
+    f = h5py.File(filename, 'r')
+
+    # Create pointer to main data set
+    dset = f['/data']
+
+    if dset == None:
+        raise AssertionError("Dataset from hdf5 was read as empty.")
+
+    # Read in StoneModel and unpickle
+    StoneMs = dset.attrs['class']
+    StoneM = pickle.loads(StoneMs.tobytes())
+
+    cNames = StoneM.pNames
+    cNames.insert(0, 'walker')
+    cNames.insert(0, 'LL')
+
+    # Read in dataset to Pandas frame
+    pdset = pd.DataFrame(dset.value, columns = cNames)
+
+    pdset['gnu1'] = np.floor(pdset['gnu1'])
+    pdset['gnu2'] = np.floor(pdset['gnu2'])
+
+    f.close()
+
+    return (StoneM, pdset)
+
 def rep(x, N):
   return [item for item in x for i in range(N)]
 
+colors = sns.color_palette('colorblind')
+
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
-FcgRs = {'FcgRI':'black', 'FcgRIIA-Arg':'blue',
-          'FcgRIIIA-Phe':'green', 'FcgRIIIA-Val':'red',
-          'FcgRIIA-His':'orange', 'FcgRIIB':'gray'}
+fcgrs = ['FcgRI','FcgRIIA-131R','FcgRIIA-131H','FcgRIIB','FcgRIIIA-158F','FcgRIIIA-158V']
+FcgRs = {}
+for j in range(len(fcgrs)):
+    FcgRs[fcgrs[j]] = colors[j]
+
+Rquant = StoneModel().Rquant
+
+M, dset = read_chain("mcmc_chain.h5")
+
+bestIDX = np.argmax(dset['LL'])
+
+p = dset.iloc[bestIDX,:][2:].as_matrix()
+
+# Trim the burn in period
+dset = dset.iloc[300::,:]
+
+##print(dset.columns)
+
+dset = dset.assign(sigDiff = lambda x: np.power(10, x.sigConv2 - x.sigConv1))
+dset = dset.assign(gnuDiff = lambda x: x.gnu2 / x.gnu1)
+
+dsett = dset.sort_values(by = 'LL')
 
 # Return a dataframe with the measured data labeled with the condition variables
 def getMeasuredDataFrame(self):
@@ -254,35 +308,6 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None):
     plt.ylabel(nameFieldY)
     plt.xlabel(nameFieldX)
 
-# Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
-def read_chain(filename):
-    # Open hdf5 file
-    f = h5py.File(filename, 'r')
-
-    # Create pointer to main data set
-    dset = f['/data']
-
-    if dset == None:
-        raise AssertionError("Dataset from hdf5 was read as empty.")
-
-    # Read in StoneModel and unpickle
-    StoneMs = dset.attrs['class']
-    StoneM = pickle.loads(StoneMs.tobytes())
-
-    cNames = StoneM.pNames
-    cNames.insert(0, 'walker')
-    cNames.insert(0, 'LL')
-
-    # Read in dataset to Pandas frame
-    pdset = pd.DataFrame(dset.value, columns = cNames)
-
-    pdset['gnu1'] = np.floor(pdset['gnu1'])
-    pdset['gnu2'] = np.floor(pdset['gnu2'])
-
-    f.close()
-
-    return (StoneM, pdset)
-
 def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6)):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
@@ -300,7 +325,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     width = 0.5
 
     ## Setting up strings useful for plotting
-    colors = ['red','blue','green','yellow']
+    colorz = [colors[3],colors[0],colors[4],colors[1]]
     species = [r'Fc$\gamma$RIA', r'Fc$\gamma$RIIA-131R', r'Fc$\gamma$RIIA-131H',
             r'Fc$\gamma$RIIB', r'Fc$\gamma$RIIIA-158F', r'Fc$\gamma$RIIIA-158V']
 
@@ -328,7 +353,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             stds = [0]*N
             stds.remove(0)
             stds.insert(k,np.nanstd(mfiAdjMean[4*(j-1)+k][1:4]))
-            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+            rects.append(axarr[j].bar(ind,temp,width,color=colorz[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
         for k in range(4):
             temp = [0]*N
             temp.remove(0)
@@ -336,7 +361,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             stds = [0]*N
             stds.remove(0)
             stds.insert(5+k,np.nanstd(mfiAdjMean[4*(j-1)+k][5:8]))
-            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+            rects.append(axarr[j].bar(ind,temp,width,color=colorz[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
 
     # axes and labels
     for j in range(6):
@@ -377,7 +402,6 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
 
     ## Set up strings necessary for the coloring and the legend
     ind = np.arange(N)
-    colors = ['red','orange','yellow','green','blue','purple']
     species = ['IA','IIA-131R','IIA-131H','IIB','IIIA-158F','IIIA-158V']
 
     ## Create bars and error bars per species
@@ -404,3 +428,53 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
 
     ## Create legend
     leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=legbbox)
+
+def histSubplots():
+    fig, axes = plt.subplots(nrows=3, ncols=2)
+
+    dset[['Kx1'     ]].plot.hist(ax=axes[0,0], bins = 100)
+    dset[['sigConv1', 'sigConv2']].plot.hist(ax=axes[0,1], bins = 100)
+    dset[['gnu1', 'gnu2'        ]].plot.hist(ax=axes[1,0], bins = 100)
+    dset[['sigma', 'sigma2'     ]].plot.hist(ax=axes[1,1], bins = 100)
+    ##for j in range(len(colors)):
+    ##    fcgr = Rquant[j]
+    ##    for meas in fcgr:
+    ##        axes[2,0].plot(np.repeat(meas,dset.shape[0]),np.arange(0,dset.shape[0]),color=colors[j])
+    ##dset[['Rexp'   ]].plot.hist(ax=axes[2,0], bins = 30, alpha=0.25)
+##    temp = dset[['Rexp'   ]].plot.hist(ax=axes[2,0], bins = 30)
+    temp = dset[['Rexp']].values
+    good = axes[2,0].hist(temp, bins=100)
+##    temp = dset[['Rexp']].values
+##    for j in range(temp.shape[1]):
+##       y = np.array([-j+5]*temp.shape[0])
+##    axes[2,0].set_ylim(0,12000)
+    print(good)
+    a = 1e3
+    b = 1e5
+    c = 1e3
+    d = 1e5
+##    h, l = axes[2,0].get_legend_handles_labels()
+##    h[0].get_bbox().set_points([[a,b],[c,d]])
+    ##print(h[0].get_bbox().get_points())
+    axes[2,1].set_axis_off()
+
+    plt.tight_layout()
+##    plt.gcf().show()
+
+def sigmaNuHists():
+    fig, axes = plt.subplots(nrows=2, ncols=1)
+
+    dset['sigDiff'].plot.hist(ax=axes[0], bins = 100).set_xlabel(r'$\frac{\sigma^*_{26}}{\sigma^*_4}$',fontsize=16)
+    dset['gnuDiff'].plot.hist(ax=axes[1], bins = 20).set_xlabel(r'$\frac{\nu_{26}}{\nu_4}$',fontsize=16)
+
+    plt.tight_layout()
+    plt.gcf().show()
+
+def LLscatter():
+    dset.plot('LL', 'gnu2', 'scatter')
+    plt.gcf().show()
+
+def gnuScatter():
+    dsett.plot(x = 'gnu1', y = 'gnu2', kind = 'scatter', c = 'LL', s = 50)
+    plt.xlabel('gnu1')
+    plt.gcf().show()
