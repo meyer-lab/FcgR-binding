@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
+import matplotlib.colors as mcolors
 from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 import h5py
@@ -16,6 +17,33 @@ try:
    import cPickle as pickle
 except:
    import pickle
+
+def tempfun(ax):
+    Rexps = dset[['Rexp']].values
+    binnum = 100
+    backColor = (234,234,242)
+    backColor = tuple((np.array(list(backColor))/255).tolist())
+    f = plt.figure()
+
+##    f.canvas.draw()
+##    rgb_data = np.fromstring(f.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+##    rgb_data = rgb_data.reshape((int(len(rgb_data)/3),3))
+##    for arr in rgb_data:
+##       if arr.tolist() != [255,255,255]:
+##           print(arr)
+##    f.clear()
+
+    for j in range(Rexps.shape[1]):
+        groot = np.array(np.transpose(Rexps).tolist()[j])
+        bins = np.histogram(groot,bins=binnum)
+        newbins = np.array([bins[1][0]+k*(bins[1][1]-bins[1][0]) for k in range(len(bins[1])-1)])
+        cdict = {}
+        cdict['red'] = ((0.0,backColor[0],backColor[0]),(1.0,colors[j][0],colors[j][0]))
+        cdict['green'] = ((0.0,backColor[1],backColor[1]),(1.0,colors[j][1],colors[j][1]))
+        cdict['blue'] = ((0.0,backColor[2],backColor[2]),(1.0,colors[j][2],colors[j][2]))
+        tempMap = mcolors.LinearSegmentedColormap('tempMap',cdict)
+        ax.scatter(newbins,(5-j)*np.ones(binnum),c=bins[0],cmap=tempMap, edgecolors='none', marker='|')
+    plt.show()
 
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
@@ -442,13 +470,17 @@ def histSubplots():
     ##        axes[2,0].plot(np.repeat(meas,dset.shape[0]),np.arange(0,dset.shape[0]),color=colors[j])
     ##dset[['Rexp'   ]].plot.hist(ax=axes[2,0], bins = 30, alpha=0.25)
 ##    temp = dset[['Rexp'   ]].plot.hist(ax=axes[2,0], bins = 30)
-    temp = dset[['Rexp']].values
-    good = axes[2,0].hist(temp, bins=100)
+
+##    temp = dset[['Rexp']].values
+##    good = axes[2,0].hist(temp, bins=100)
+
+    tempfun(axes[2,0])
+
 ##    temp = dset[['Rexp']].values
 ##    for j in range(temp.shape[1]):
 ##       y = np.array([-j+5]*temp.shape[0])
 ##    axes[2,0].set_ylim(0,12000)
-    print(good)
+##    print(good)
     a = 1e3
     b = 1e5
     c = 1e3
@@ -459,7 +491,7 @@ def histSubplots():
     axes[2,1].set_axis_off()
 
     plt.tight_layout()
-##    plt.gcf().show()
+    plt.gcf().show()
 
 def sigmaNuHists():
     fig, axes = plt.subplots(nrows=2, ncols=1)
