@@ -18,33 +18,6 @@ try:
 except:
    import pickle
 
-def tempfun(ax):
-    Rexps = dset[['Rexp']].values
-    binnum = 100
-    backColor = (234,234,242)
-    backColor = tuple((np.array(list(backColor))/255).tolist())
-    f = plt.figure()
-
-##    f.canvas.draw()
-##    rgb_data = np.fromstring(f.canvas.tostring_rgb(), dtype=np.uint8, sep='')
-##    rgb_data = rgb_data.reshape((int(len(rgb_data)/3),3))
-##    for arr in rgb_data:
-##       if arr.tolist() != [255,255,255]:
-##           print(arr)
-##    f.clear()
-
-    for j in range(Rexps.shape[1]):
-        groot = np.array(np.transpose(Rexps).tolist()[j])
-        bins = np.histogram(groot,bins=binnum)
-        newbins = np.array([bins[1][0]+k*(bins[1][1]-bins[1][0]) for k in range(len(bins[1])-1)])
-        cdict = {}
-        cdict['red'] = ((0.0,backColor[0],backColor[0]),(1.0,colors[j][0],colors[j][0]))
-        cdict['green'] = ((0.0,backColor[1],backColor[1]),(1.0,colors[j][1],colors[j][1]))
-        cdict['blue'] = ((0.0,backColor[2],backColor[2]),(1.0,colors[j][2],colors[j][2]))
-        tempMap = mcolors.LinearSegmentedColormap('tempMap',cdict)
-        ax.scatter(newbins,(5-j)*np.ones(binnum),c=bins[0],cmap=tempMap, edgecolors='none', marker='|')
-    plt.show()
-
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
     # Open hdf5 file
@@ -150,7 +123,11 @@ def mapMCMC(dFunction, pSet):
     retVals = list()
 
     # Iterate over each parameter set
-    for ii in tqdm(range(pSet.shape[0])):
+##    for ii in tqdm(range(pSet.shape[0])):
+    TQDM = tqdm(range(pSet.shape[0]))
+    TQDM.mininterval=60;
+    TQDM.maxinterval=120;
+    for ii in TQDM:
         # Call the passed function and add the output to the list
         retVals.append(dFunction(pSet[ii,:]).assign(pSetNum = ii))
 
@@ -471,10 +448,7 @@ def histSubplots():
     ##dset[['Rexp'   ]].plot.hist(ax=axes[2,0], bins = 30, alpha=0.25)
 ##    temp = dset[['Rexp'   ]].plot.hist(ax=axes[2,0], bins = 30)
 
-##    temp = dset[['Rexp']].values
-##    good = axes[2,0].hist(temp, bins=100)
-
-    tempfun(axes[2,0])
+    pseudoHist(axes[2,0])
 
 ##    temp = dset[['Rexp']].values
 ##    for j in range(temp.shape[1]):
@@ -488,10 +462,37 @@ def histSubplots():
 ##    h, l = axes[2,0].get_legend_handles_labels()
 ##    h[0].get_bbox().set_points([[a,b],[c,d]])
     ##print(h[0].get_bbox().get_points())
-    axes[2,1].set_axis_off()
 
     plt.tight_layout()
     plt.gcf().show()
+
+def pseudoHist(ax):
+    Rexps = dset[['Rexp']].values
+    binnum = 100
+    backColor = (234,234,242)
+    backColor = tuple((np.array(list(backColor))/255).tolist())
+    f = plt.figure()
+
+##    f.canvas.draw()
+##    rgb_data = np.fromstring(f.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+##    rgb_data = rgb_data.reshape((int(len(rgb_data)/3),3))
+##    for arr in rgb_data:
+##       if arr.tolist() != [255,255,255]:
+##           print(arr)
+##    f.clear()
+
+    for j in range(Rexps.shape[1]):
+        groot = np.array(np.transpose(Rexps).tolist()[j])
+        bins = np.histogram(groot,bins=binnum)
+        newbins = np.array([bins[1][0]+k*(bins[1][1]-bins[1][0]) for k in range(len(bins[1])-1)])
+        cdict = {}
+        cdict['red'] = ((0.0,backColor[0],backColor[0]),(1.0,colors[j][0],colors[j][0]))
+        cdict['green'] = ((0.0,backColor[1],backColor[1]),(1.0,colors[j][1],colors[j][1]))
+        cdict['blue'] = ((0.0,backColor[2],backColor[2]),(1.0,colors[j][2],colors[j][2]))
+        tempMap = mcolors.LinearSegmentedColormap('tempMap',cdict)
+        ax.scatter(newbins,(5-j)*np.ones(binnum),c=np.sqrt(bins[0]),cmap=tempMap, edgecolors='none', marker='|')
+    
+    plt.show()
 
 def sigmaNuHists():
     fig, axes = plt.subplots(nrows=2, ncols=1)
