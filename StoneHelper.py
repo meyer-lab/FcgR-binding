@@ -18,6 +18,18 @@ try:
 except:
    import pickle
 
+colors = sns.color_palette('colorblind')
+rc('lines', mew=0.05)
+
+Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
+
+fcgrs = ['FcgRI','FcgRIIA-131R','FcgRIIA-131H','FcgRIIB','FcgRIIIA-158F','FcgRIIIA-158V']
+FcgRs = {}
+for j in range(len(fcgrs)):
+    FcgRs[fcgrs[j]] = colors[j]
+
+Rquant = StoneModel().Rquant
+
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
     # Open hdf5 file
@@ -47,20 +59,6 @@ def read_chain(filename):
 
     return (StoneM, pdset)
 
-def rep(x, N):
-  return [item for item in x for i in range(N)]
-
-colors = sns.color_palette('colorblind')
-
-Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
-
-fcgrs = ['FcgRI','FcgRIIA-131R','FcgRIIA-131H','FcgRIIB','FcgRIIIA-158F','FcgRIIIA-158V']
-FcgRs = {}
-for j in range(len(fcgrs)):
-    FcgRs[fcgrs[j]] = colors[j]
-
-Rquant = StoneModel().Rquant
-
 M, dset = read_chain("mcmc_chain.h5")
 
 bestIDX = np.argmax(dset['LL'])
@@ -70,12 +68,10 @@ p = dset.iloc[bestIDX,:][2:].as_matrix()
 # Trim the burn in period
 dset = dset.iloc[300::,:]
 
-##print(dset.columns)
-
-dset = dset.assign(sigDiff = lambda x: np.power(10, x.sigConv2 - x.sigConv1))
-dset = dset.assign(gnuDiff = lambda x: x.gnu2 / x.gnu1)
-
 dsett = dset.sort_values(by = 'LL')
+
+def rep(x, N):
+  return [item for item in x for i in range(N)]
 
 # Return a dataframe with the measured data labeled with the condition variables
 def getMeasuredDataFrame(self):
@@ -123,7 +119,6 @@ def mapMCMC(dFunction, pSet):
     retVals = list()
 
     # Iterate over each parameter set
-##    for ii in tqdm(range(pSet.shape[0])):
     TQDM = tqdm(range(pSet.shape[0]))
     TQDM.mininterval=60;
     TQDM.maxinterval=120;
@@ -196,7 +191,9 @@ def makeFcIgLegend():
 
     return patches
 
-def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
+def plotNormalizedBindingvsKA(ax1=None, ax2=None):
+    fitMean = getFitMeasMergedSummarized(M,p)
+   
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
@@ -383,13 +380,6 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     ## Add a legend denoting IgG species
     leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox)
 
-    ## Set title for the set of plots
-    if StoneM.newData:
-        titleEnd = ' (New Data)'
-    else:
-        titleEnd = ' (Old Data)'
-    axarr[1].text(titlePos[0],titlePos[1],'Mean-Adjusted MFIs'+titleEnd,fontsize=titlefontsize)
-
 def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1)):
     ## Please see comments from mfiAdjMeanFigureMaker
     rc('text',usetex=False)
@@ -428,8 +418,6 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
     ax.grid(b=False)
     ax.set_yscale('log')
     ax.set_ylabel('Number of Receptors',fontsize=ylabelfontsize)
-
-    ax.set_title('Receptor Quantification by\nReceptor Species',fontsize=titlefontsize)
 
     ## Create legend
     leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=legbbox)
@@ -511,3 +499,11 @@ def gnuScatter():
     dsett.plot(x = 'gnu1', y = 'gnu2', kind = 'scatter', c = 'LL', s = 50)
     plt.xlabel('gnu1')
     plt.gcf().show()
+
+def mapStore():
+   frameList = mapMCMC(lambda x: getFitPrediction(M,x),dset.as_matrix()[:,2:])
+   frameList.to_pickle('mapped_chain.pkl')
+
+def reduce():
+   frameList = pd.read_pickle('mapped_chain.pkl')
+   return reduceMCMC(frameList)
