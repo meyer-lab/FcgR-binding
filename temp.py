@@ -8,5 +8,4 @@ from StoneHelper import *
 ##ax = plt.gca()
 ##pseudoHist(ax)
 
-##histSubplots()
-sigmaNuHists()
+gnuScatter()

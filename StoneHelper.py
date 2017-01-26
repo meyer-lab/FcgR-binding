@@ -222,7 +222,7 @@ def makeFcIgLegend():
 
     return patches
 
-def plotNormalizedBindingvsKA(ax1=None, ax2=None):
+def plotNormalizedBindingvsKA(ax1=None, ax2=None, backGray=True):
     fitMean = getFitMeasMergedSummarized(M,p)
    
     # Select the subset of data we want
@@ -255,11 +255,13 @@ def plotNormalizedBindingvsKA(ax1=None, ax2=None):
             ax2.errorbar(fitMean[8*j+k+4][3],fitMean[8*j+k+4][4],yerr=fitMean[8*j+k+4][5],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
 
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-
     ax2.set_xscale('log')
     plt.xlabel('FcgR-IgG Ka')
+    if backGray:
+        ax1.set_facecolor(backColor)
+        ax2.set_facecolor(backColor)
 
-def plotFit(fitMean=getFitMeasMergedSummarized(M,p),ax=None):
+def plotFit(fitMean=getFitMeasMergedSummarized(M,p),ax=None, backGray=True):
     # This should take a merged and summarized data frame
     fitMeanPre = fitMean[['Fit','Meas_mean','Meas_std']].as_matrix()
     if ax == None:
@@ -284,9 +286,10 @@ def plotFit(fitMean=getFitMeasMergedSummarized(M,p),ax=None):
     ax.set_xlim(0.08, 70)
     plt.xlabel('Fitted prediction')
     plt.ylabel('Measured ligand binding')
+    if backGray:
+        ax.set_facecolor(backColor)
 
-
-def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None):
+def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, backGray=True):
     # This should take a merged and summarized data frame
 
     if ax == None:
@@ -317,8 +320,10 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None):
     ax.set_xscale('log')
     plt.ylabel(nameFieldY)
     plt.xlabel(nameFieldX)
+    if backGray:
+        ax.set_facecolor(backColor)
 
-def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6)):
+def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), backGray=True):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
     ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
@@ -388,7 +393,12 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     ## Add a legend denoting IgG species
     leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox)
 
-def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1)):
+    ## Set axeses facecolors, if backGray
+    if backGray:
+        for ax in axarr:
+            ax.set_facecolor(backColor)
+        
+def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1), backGray=True, legend=True):
     ## Please see comments from mfiAdjMeanFigureMaker
     rc('text',usetex=False)
 
@@ -426,18 +436,21 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
     ax.grid(b=False)
     ax.set_yscale('log')
     ax.set_ylabel('Number of Receptors',fontsize=ylabelfontsize)
+    if backGray:
+        ax.set_facecolor(backColor)
 
     ## Create legend
-    leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=legbbox)
+    if legend:
+        leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=legbbox)
 
-def histSubplots(axes=None,tight_layout=True):
+def histSubplots(axes=None,tight_layout=False,backGray=True):
     if axes == None:
         fig, axes = plt.subplots(nrows=3, ncols=2)
 
-    dset[['Kx1'     ]].plot.hist(ax=axes[0,0], bins = 100)
-    dset[['sigConv1', 'sigConv2']].plot.hist(ax=axes[0,1], bins = 100)
-    dset[['gnu1', 'gnu2'        ]].plot.hist(ax=axes[1,0], bins = 100)
-    dset[['sigma', 'sigma2'     ]].plot.hist(ax=axes[1,1], bins = 100)
+    dset[['Kx1'     ]].plot.hist(ax=axes[0,0], bins = 100, color=colors[0])
+    dset[['sigConv1', 'sigConv2']].plot.hist(ax=axes[0,1], bins = 100, color=[colors[j] for j in range(2)])
+    dset[['gnu1', 'gnu2'        ]].plot.hist(ax=axes[1,0], bins = 100, color=[colors[j] for j in range(2)])
+    dset[['sigma', 'sigma2'     ]].plot.hist(ax=axes[1,1], bins = 100, color=[colors[j] for j in range(2)])
 
     RexpBoxplot(axes[2,0])
 
@@ -456,8 +469,10 @@ def histSubplots(axes=None,tight_layout=True):
 
     if tight_layout:
         plt.tight_layout()
-    for ax in axes:
-        ax.set_facecolor(backColor)
+    if backGray:
+        for elem in axes:
+            for ax in elem:
+                ax.set_facecolor(backColor)
     plt.show()
 
 def RexpBoxplot(ax=None):
@@ -476,34 +491,37 @@ def RexpBoxplot(ax=None):
     ax.semilogy()
     ax.set_xticks([])
     ax.set_ylabel(ylabel='Number of Receptors Expressed')
-    ax.set_facecolor(backColor)
-    plt.show()
 
-def sigmaNuHists(axes=None,tight_layout=True):
+def sigmaNuHists(axes=None,tight_layout=False,backGray=True):
     if axes == None:
         fig, axes = plt.subplots(nrows=2, ncols=1)
-    dset['sigDiff'].plot.hist(ax=axes[0], bins = 100).set_xlabel(r'$\frac{\sigma^*_{26}}{\sigma^*_4}$',fontsize=16)
-    dset['gnuDiff'].plot.hist(ax=axes[1], bins = 20).set_xlabel(r'$\frac{\nu_{26}}{\nu_4}$',fontsize=16)
-    for ax in axes:
-        ax.set_facecolor(backColor)
+    newdset = dset
+    newdset = newdset.assign(sigDiff = lambda x: np.power(10, x.sigConv2 - x.sigConv1))
+    newdset = newdset.assign(gnuDiff = lambda x: x.gnu2 / x.gnu1)
+    newdset['sigDiff'].plot.hist(ax=axes[0], bins = 100).set_xlabel(r'$\frac{\sigma^*_{26}}{\sigma^*_4}$',fontsize=16)
+    newdset['gnuDiff'].plot.hist(ax=axes[1], bins = 20).set_xlabel(r'$\frac{\nu_{26}}{\nu_4}$',fontsize=16)
+    if backGray:
+        for ax in axes:
+            ax.set_facecolor(backColor)
     if tight_layout:
         plt.tight_layout()
-    ax.set_facecolor(backColor)
     plt.show()
 
-def LLscatter(ax=None):
+def LLscatter(ax=None,backGray=True):
     if ax == None:
         ax = plt.gca()
     dset.plot('LL', 'gnu2', 'scatter',ax=ax)
-    ax.set_facecolor(backColor)
+    if backGray:
+        ax.set_facecolor(backColor)
     plt.show()
 
-def gnuScatter(ax=None):
+def gnuScatter(ax=None,backGray=True):
     if ax == None:
         ax = plt.gca()
     dsett.plot(x = 'gnu1', y = 'gnu2', kind = 'scatter', c = 'LL', s = 50,ax=ax)
     plt.xlabel('gnu1')
-    ax.set_facecolor(backColor)
+    if backGray:
+        ax.set_facecolor(backColor)
     plt.show()
 
 def mapStore():
