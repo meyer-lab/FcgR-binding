@@ -56,6 +56,8 @@ fcgrs = ['FcgRI','FcgRIIA-131R','FcgRIIA-131H','FcgRIIB','FcgRIIIA-158F','FcgRII
 FcgRs = {}
 for j in range(len(fcgrs)):
     FcgRs[fcgrs[j]] = colors[j]
+igs = [elem for elem in Igs]
+fcgrs = [elem for elem in FcgRs]
 
 Rquant = StoneModel.StoneModel().Rquant
 
@@ -221,9 +223,6 @@ def makeFcIgLegend():
     return patches
 
 def plotNormalizedBindingvsKA(ax1=None, ax2=None):
-    igs = [elem for elem in Igs]
-    fcgrs = [elem for elem in FcgRs]
-
     fitMean = getFitMeasMergedSummarized(M,p)
    
     # Select the subset of data we want
@@ -232,26 +231,12 @@ def plotNormalizedBindingvsKA(ax1=None, ax2=None):
     # Normalize the binding data to expression
     fitMean = fitMean.assign(Meas_mean = fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
     fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
-    print(fitMean.shape)
-    print(fitMean)
 
     fitMean = fitMean.as_matrix()
-##    print(gitMean[:,6])
     if ax1 == None:
         fig = plt.figure(figsize=(9,5))
         ax1 = fig.add_subplot(1, 2, 1)
 
-##    for j in Igs:
-##        for f in FcgRs:
-##            temp = fitMean[fitMean['Ig'] == j]
-##            
-##            temp = temp[temp['FcgR'] == f]
-##            temp = temp[temp['TNP'] == 'TNP-4']
-##            mfcVal = 'None'
-##
-##            ax1.errorbar(temp['Ka'], temp['Meas_mean'],
-##                        yerr = temp['Meas_std'], marker = Igs[j],
-##                        mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
     mfcVal = 'None'
     for j in range(len(Igs)):
         for k in range(len(FcgRs)):
@@ -264,17 +249,6 @@ def plotNormalizedBindingvsKA(ax1=None, ax2=None):
     if ax2 == None:
         ax2 = fig.add_subplot(1, 2, 2)
 
-##    for j in Igs:
-##        for f in FcgRs:
-##            temp = fitMean[fitMean['Ig'] == j]
-##            temp = temp[temp['FcgR'] == f]
-##
-##            temp = temp[temp['TNP'] != 'TNP-4']
-##            mfcVal = FcgRs[f]
-##
-##            ax2.errorbar(temp['Ka'], temp['Meas_mean'],
-##                        yerr = temp['Meas_std'], marker = Igs[j],
-##                        mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
     for j in range(len(Igs)):
         for k in range(len(FcgRs)):
             mfcVal = FcgRs[fcgrs[k]]
@@ -285,31 +259,40 @@ def plotNormalizedBindingvsKA(ax1=None, ax2=None):
     ax2.set_xscale('log')
     plt.xlabel('FcgR-IgG Ka')
 
-def plotFit(fitMean,ax=None):
+def plotFit(fitMean=getFitMeasMergedSummarized(M,p),ax=None):
     # This should take a merged and summarized data frame
+    fitMeanPre = fitMean[['Fit','Meas_mean','Meas_std']].as_matrix()
 
     if ax == None:
         fig = plt.figure(figsize=(8,6))
         ax = fig.add_subplot(1, 1, 1)
 
-    for j in Igs:
-        for f in FcgRs:
-            for x in range(2):
-                temp = fitMean[fitMean['Ig'] == j]
-                temp = temp[temp['FcgR'] == f]
-                color = FcgRs[f]
-
-                if x == 0:
-                    temp = temp[temp['TNP'] == 'TNP-4']
+##    for j in Igs:
+##        for f in FcgRs:
+##            for x in range(2):
+##                temp = fitMean[fitMean['Ig'] == j]
+##                temp = temp[temp['FcgR'] == f]
+##                color = FcgRs[f]
+##
+##                if x == 0:
+##                    temp = temp[temp['TNP'] == 'TNP-4']
+##                    mfcVal = 'None'
+##                else:
+##                    temp = temp[temp['TNP'] != 'TNP-4']
+##                    mfcVal = color
+##
+##                ax.errorbar(temp['Fit'], temp['Meas_mean']+0.01,
+##                            yerr = temp['Meas_std'], marker = Igs[j],
+##                            mfc = mfcVal, mec = color, ecolor = color,
+##                            linestyle = 'None')
+    for j in range(len(Igs)):
+        for k in range(len(FcgRs)):
+            for l in range(2):
+                if l == 0:
                     mfcVal = 'None'
                 else:
-                    temp = temp[temp['TNP'] != 'TNP-4']
-                    mfcVal = color
-
-                ax.errorbar(temp['Fit'], temp['Meas_mean']+0.01,
-                            yerr = temp['Meas_std'], marker = Igs[j],
-                            mfc = mfcVal, mec = color, ecolor = color,
-                            linestyle = 'None')
+                    mfcVal = FcgRs[fcgrs[k]]
+                ax.errorbar(fitMeanPre[8*j+k+4*l][0],fitMeanPre[8*j+k+4*l][1]+0.01,yerr=fitMeanPre[8*j+k+4*l][2],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
 
     ax.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
