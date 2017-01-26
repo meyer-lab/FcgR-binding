@@ -262,29 +262,10 @@ def plotNormalizedBindingvsKA(ax1=None, ax2=None):
 def plotFit(fitMean=getFitMeasMergedSummarized(M,p),ax=None):
     # This should take a merged and summarized data frame
     fitMeanPre = fitMean[['Fit','Meas_mean','Meas_std']].as_matrix()
-
     if ax == None:
         fig = plt.figure(figsize=(8,6))
         ax = fig.add_subplot(1, 1, 1)
 
-##    for j in Igs:
-##        for f in FcgRs:
-##            for x in range(2):
-##                temp = fitMean[fitMean['Ig'] == j]
-##                temp = temp[temp['FcgR'] == f]
-##                color = FcgRs[f]
-##
-##                if x == 0:
-##                    temp = temp[temp['TNP'] == 'TNP-4']
-##                    mfcVal = 'None'
-##                else:
-##                    temp = temp[temp['TNP'] != 'TNP-4']
-##                    mfcVal = color
-##
-##                ax.errorbar(temp['Fit'], temp['Meas_mean']+0.01,
-##                            yerr = temp['Meas_std'], marker = Igs[j],
-##                            mfc = mfcVal, mec = color, ecolor = color,
-##                            linestyle = 'None')
     for j in range(len(Igs)):
         for k in range(len(FcgRs)):
             for l in range(2):
@@ -449,21 +430,16 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
     ## Create legend
     leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=legbbox)
 
-def histSubplots():
-    fig, axes = plt.subplots(nrows=3, ncols=2)
+def histSubplots(axes=None,tight_layout=True):
+    if axes == None:
+        fig, axes = plt.subplots(nrows=3, ncols=2)
 
     dset[['Kx1'     ]].plot.hist(ax=axes[0,0], bins = 100)
     dset[['sigConv1', 'sigConv2']].plot.hist(ax=axes[0,1], bins = 100)
     dset[['gnu1', 'gnu2'        ]].plot.hist(ax=axes[1,0], bins = 100)
     dset[['sigma', 'sigma2'     ]].plot.hist(ax=axes[1,1], bins = 100)
-    ##for j in range(len(colors)):
-    ##    fcgr = Rquant[j]
-    ##    for meas in fcgr:
-    ##        axes[2,0].plot(np.repeat(meas,dset.shape[0]),np.arange(0,dset.shape[0]),color=colors[j])
-    ##dset[['Rexp'   ]].plot.hist(ax=axes[2,0], bins = 30, alpha=0.25)
-##    temp = dset[['Rexp'   ]].plot.hist(ax=axes[2,0], bins = 30)
 
-    pseudoHist(axes[2,0])
+    RexpBoxplot(axes[2,0])
 
 ##    temp = dset[['Rexp']].values
 ##    for j in range(temp.shape[1]):
@@ -478,54 +454,57 @@ def histSubplots():
 ##    h[0].get_bbox().set_points([[a,b],[c,d]])
     ##print(h[0].get_bbox().get_points())
 
-    plt.tight_layout()
-    plt.gcf().show()
-
-def pseudoHist(ax):
-    Rexps = dset[['Rexp']].values
-    binnum = 100
-    backColor = (234,234,242)
-    backColor = tuple((np.array(list(backColor))/255).tolist())
-    f = plt.figure()
-
-##    f.canvas.draw()
-##    rgb_data = np.fromstring(f.canvas.tostring_rgb(), dtype=np.uint8, sep='')
-##    rgb_data = rgb_data.reshape((int(len(rgb_data)/3),3))
-##    for arr in rgb_data:
-##       if arr.tolist() != [255,255,255]:
-##           print(arr)
-##    f.clear()
-
-    for j in range(Rexps.shape[1]):
-        groot = np.array(np.transpose(Rexps).tolist()[j])
-        bins = np.histogram(groot,bins=binnum)
-        newbins = np.array([bins[1][0]+k*(bins[1][1]-bins[1][0]) for k in range(len(bins[1])-1)])
-        cdict = {}
-        cdict['red'] = ((0.0,backColor[0],backColor[0]),(1.0,colors[j][0],colors[j][0]))
-        cdict['green'] = ((0.0,backColor[1],backColor[1]),(1.0,colors[j][1],colors[j][1]))
-        cdict['blue'] = ((0.0,backColor[2],backColor[2]),(1.0,colors[j][2],colors[j][2]))
-        tempMap = mcolors.LinearSegmentedColormap('tempMap',cdict)
-        ax.scatter(newbins,(5-j)*np.ones(binnum),c=np.sqrt(bins[0]),cmap=tempMap, edgecolors='none', marker='|')
-    
+    if tight_layout:
+        plt.tight_layout()
+    for ax in axes:
+        ax.set_facecolor(backColor)
     plt.show()
 
-def sigmaNuHists():
-    fig, axes = plt.subplots(nrows=2, ncols=1)
+def RexpBoxplot(ax=None):
+    if ax == None:
+        ax = plt.gca()
+    objs = ax.boxplot(10**dset[['Rexp']].as_matrix(),whis=[5,95],sym='')
+    for j in range(int(len(objs['caps'])/2)):
+        objs['caps'][2*j].set_color(FcgRs[fcgrs[j]])
+        objs['caps'][2*j+1].set_color(FcgRs[fcgrs[j]])
+        objs['boxes'][j].set_color(FcgRs[fcgrs[j]])
+        objs['medians'][j].set_color(FcgRs[fcgrs[j]])
+        objs['whiskers'][2*j].set_color(FcgRs[fcgrs[j]])
+        objs['whiskers'][2*j+1].set_color(FcgRs[fcgrs[j]])
+        for elem in Rquant[j]:
+            ax.plot(j+1,10**elem,color=FcgRs[fcgrs[j]],marker='x')
+    ax.semilogy()
+    ax.set_xticks([])
+    ax.set_ylabel(ylabel='Number of Receptors Expressed')
+    ax.set_facecolor(backColor)
+    plt.show()
 
+def sigmaNuHists(axes=None,tight_layout=True):
+    if axes == None:
+        fig, axes = plt.subplots(nrows=2, ncols=1)
     dset['sigDiff'].plot.hist(ax=axes[0], bins = 100).set_xlabel(r'$\frac{\sigma^*_{26}}{\sigma^*_4}$',fontsize=16)
     dset['gnuDiff'].plot.hist(ax=axes[1], bins = 20).set_xlabel(r'$\frac{\nu_{26}}{\nu_4}$',fontsize=16)
+    for ax in axes:
+        ax.set_facecolor(backColor)
+    if tight_layout:
+        plt.tight_layout()
+    ax.set_facecolor(backColor)
+    plt.show()
 
-    plt.tight_layout()
-    plt.gcf().show()
+def LLscatter(ax=None):
+    if ax == None:
+        ax = plt.gca()
+    dset.plot('LL', 'gnu2', 'scatter',ax=ax)
+    ax.set_facecolor(backColor)
+    plt.show()
 
-def LLscatter():
-    dset.plot('LL', 'gnu2', 'scatter')
-    plt.gcf().show()
-
-def gnuScatter():
-    dsett.plot(x = 'gnu1', y = 'gnu2', kind = 'scatter', c = 'LL', s = 50)
+def gnuScatter(ax=None):
+    if ax == None:
+        ax = plt.gca()
+    dsett.plot(x = 'gnu1', y = 'gnu2', kind = 'scatter', c = 'LL', s = 50,ax=ax)
     plt.xlabel('gnu1')
-    plt.gcf().show()
+    ax.set_facecolor(backColor)
+    plt.show()
 
 def mapStore():
    frameList = mapMCMC(lambda x: getFitPrediction(M,x),dset.as_matrix()[:,2:])
