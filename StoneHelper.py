@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import matplotlib
-
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
@@ -10,7 +9,7 @@ from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 import h5py
 from tqdm import tqdm
-import seaborn as sns
+##import seaborn as sns
 from StoneModel import StoneModel
 
 try:
@@ -18,8 +17,34 @@ try:
 except:
    import pickle
 
-colors = sns.color_palette('colorblind')
-rc('lines', mew=0.05)
+def seaborn_colorblindSteal():
+   # This function collects the collor palette settings used in seaborn-colorblind, so as
+   # to get all of seaborn's colors without the unwanted formatting effects of seaborn
+   # backColor is the background color used in seaborn's colorblind setting
+   backColor = (234,234,242)
+   backColor = tuple((np.array(backColor)/255).tolist())
+##   Colors = sns.color_palette('colorblind')
+   Colors = sns.color_palette('muted')
+   Colors.insert(0,backColor)
+   Colors = np.transpose(np.array(Colors))
+   Colors = pd.DataFrame(Colors,columns=(['back-color']+['color']*6))
+   # Store seaborn colors in a .pkl file
+   Colors.to_pickle('seaborn_colorblindColors.pkl')
+
+def seaborn_colorblindGet():
+   Colors = pd.read_pickle('seaborn_colorblindColors.pkl')
+   backColor = (float(Colors[['back-color']].values[j]) for j in range(3))
+   colorspre = np.transpose(Colors[['color']].values)
+   colors = []
+   for j in range(6):
+      pre = colorspre[j]
+      temp = []
+      for k in range(3):
+         temp.append(float(pre[k]))
+      colors.append(tuple(temp))
+   return colors, backColor
+
+colors, backColor = seaborn_colorblindGet()
 
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
