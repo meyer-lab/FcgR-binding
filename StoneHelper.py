@@ -10,12 +10,15 @@ from matplotlib.font_manager import FontProperties
 import h5py
 from tqdm import tqdm
 ##import seaborn as sns
-from StoneModel import StoneModel
+import StoneModel
+import importlib
 
 try:
    import cPickle as pickle
 except:
    import pickle
+
+importlib.reload(StoneModel)
 
 def seaborn_colorblindSteal():
    # This function collects the collor palette settings used in seaborn-colorblind, so as
@@ -45,6 +48,7 @@ def seaborn_colorblindGet():
    return colors, backColor
 
 colors, backColor = seaborn_colorblindGet()
+##colors = ['black']*6
 
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
@@ -53,7 +57,7 @@ FcgRs = {}
 for j in range(len(fcgrs)):
     FcgRs[fcgrs[j]] = colors[j]
 
-Rquant = StoneModel().Rquant
+Rquant = StoneModel.StoneModel().Rquant
 
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
@@ -217,6 +221,9 @@ def makeFcIgLegend():
     return patches
 
 def plotNormalizedBindingvsKA(ax1=None, ax2=None):
+    igs = [elem for elem in Igs]
+    fcgrs = [elem for elem in FcgRs]
+
     fitMean = getFitMeasMergedSummarized(M,p)
    
     # Select the subset of data we want
@@ -225,22 +232,30 @@ def plotNormalizedBindingvsKA(ax1=None, ax2=None):
     # Normalize the binding data to expression
     fitMean = fitMean.assign(Meas_mean = fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
     fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
+    print(fitMean.shape)
+    print(fitMean)
 
+    fitMean = fitMean.as_matrix()
+##    print(gitMean[:,6])
     if ax1 == None:
         fig = plt.figure(figsize=(9,5))
         ax1 = fig.add_subplot(1, 2, 1)
 
-    for j in Igs:
-        for f in FcgRs:
-            temp = fitMean[fitMean['Ig'] == j]
-            temp = temp[temp['FcgR'] == f]
-
-            temp = temp[temp['TNP'] == 'TNP-4']
-            mfcVal = 'None'
-
-            ax1.errorbar(temp['Ka'], temp['Meas_mean'],
-                        yerr = temp['Meas_std'], marker = Igs[j],
-                        mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
+##    for j in Igs:
+##        for f in FcgRs:
+##            temp = fitMean[fitMean['Ig'] == j]
+##            
+##            temp = temp[temp['FcgR'] == f]
+##            temp = temp[temp['TNP'] == 'TNP-4']
+##            mfcVal = 'None'
+##
+##            ax1.errorbar(temp['Ka'], temp['Meas_mean'],
+##                        yerr = temp['Meas_std'], marker = Igs[j],
+##                        mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
+    mfcVal = 'None'
+    for j in range(len(Igs)):
+        for k in range(len(FcgRs)):
+            ax1.errorbar(fitMean[8*j+k][3],fitMean[8*j+k][4],yerr=fitMean[8*j+k][5],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
 
     ax1.set_xscale('log')
     plt.ylabel('Measured TNP-4 binding')
@@ -249,17 +264,21 @@ def plotNormalizedBindingvsKA(ax1=None, ax2=None):
     if ax2 == None:
         ax2 = fig.add_subplot(1, 2, 2)
 
-    for j in Igs:
-        for f in FcgRs:
-            temp = fitMean[fitMean['Ig'] == j]
-            temp = temp[temp['FcgR'] == f]
-
-            temp = temp[temp['TNP'] != 'TNP-4']
-            mfcVal = FcgRs[f]
-
-            ax2.errorbar(temp['Ka'], temp['Meas_mean'],
-                        yerr = temp['Meas_std'], marker = Igs[j],
-                        mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
+##    for j in Igs:
+##        for f in FcgRs:
+##            temp = fitMean[fitMean['Ig'] == j]
+##            temp = temp[temp['FcgR'] == f]
+##
+##            temp = temp[temp['TNP'] != 'TNP-4']
+##            mfcVal = FcgRs[f]
+##
+##            ax2.errorbar(temp['Ka'], temp['Meas_mean'],
+##                        yerr = temp['Meas_std'], marker = Igs[j],
+##                        mfc = mfcVal, mec = FcgRs[f], ecolor = FcgRs[f], linestyle = 'None')
+    for j in range(len(Igs)):
+        for k in range(len(FcgRs)):
+            mfcVal = FcgRs[fcgrs[k]]
+            ax2.errorbar(fitMean[8*j+k+4][3],fitMean[8*j+k+4][4],yerr=fitMean[8*j+k+4][5],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
 
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
