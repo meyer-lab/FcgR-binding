@@ -1,6 +1,7 @@
 *.asv
 **/__pycache__/
 *.h5
+*.pkl
 .Rproj.user
 *.nb.html
 .Rhistory
