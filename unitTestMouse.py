@@ -13,7 +13,7 @@ import time
 from scipy.stats import norm
 import matplotlib
 
-import StoneHelper
+#import StoneHelper
 
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
