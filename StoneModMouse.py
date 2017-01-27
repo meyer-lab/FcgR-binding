@@ -80,3 +80,4 @@ class StoneModelMouse:
 
         if fullOutput:
             return (outputLbnd, outputRbnd, outputRmulti, outputnXlink, outputReq)
+        return (outputLbnd, outputRbnd, outputReq)
