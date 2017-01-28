@@ -6,7 +6,7 @@ python:
 install:
   - pip install numpy scipy pandas h5py
   - pip install memoize2 matplotlib tqdm coverage
-  - pip install codecov
+  - pip install codecov seaborn
 # command to run tests
 script: coverage run unitTest.py
 after_success:
