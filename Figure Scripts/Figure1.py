@@ -2,22 +2,10 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import gridspec
 import numpy as np
-##from os import getcwd, chdir
-####path = getcwd()
-####pathpop = False
-####loc = len(path)-1
-####while not pathpop:
-####    if path[loc] == '\\':
-####        pathpop = True
-####        path = path[0:loc]
-####    else:
-####        loc = loc-1
-####chdir(path)
-##chdir('..')
-####import sys
-####import os.path
-####sys.path.append(
-####    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+import sys
+
+sys.path.append('../')
+
 import StoneModel
 from StoneHelper import *
 
