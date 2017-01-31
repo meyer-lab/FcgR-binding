@@ -1,13 +1,11 @@
 language: python
 python:
-  - "3.5"
   - "3.6"
 # command to install dependencies
 install:
-  - pip install numpy scipy pandas h5py
-  - pip install memoize2 matplotlib tqdm coverage
+  - pip install numpy scipy pandas h5py memoize2 matplotlib tqdm coverage
   - pip install codecov seaborn
 # command to run tests
-script: coverage run unitTest.py
+script: coverage run -m unittest discover -p unitTest*.py
 after_success:
   - codecov
