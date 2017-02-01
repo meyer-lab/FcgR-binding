@@ -1,4 +1,8 @@
 import unittest
+import sys
+
+sys.path.append('../')
+
 import StoneModel
 import numpy as np
 import random
