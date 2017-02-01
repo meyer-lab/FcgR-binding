@@ -11,6 +11,8 @@ addons:
     - texlive-fonts-recommended
     - texlive-latex-recommended
     - lmodern
+    - texlive-xetex
+cache: pip
 # command to install dependencies
 install:
   - pip install numpy scipy pandas h5py memoize2 matplotlib tqdm coverage
@@ -18,6 +20,6 @@ install:
 # command to run tests
 script:
   - make -C ./Manuscript
-  - coverage run -m unittest discover -p unitTest*.py
+  - coverage run -m unittest discover
 after_success:
   - codecov

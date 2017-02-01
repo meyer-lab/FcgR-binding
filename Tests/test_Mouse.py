@@ -1,4 +1,8 @@
 import unittest
+import sys
+
+sys.path.append('../')
+
 import StoneModMouse
 import numpy as np
 import random
@@ -10,6 +14,10 @@ class TestStoneMouse(unittest.TestCase):
     def setUp(self):
         self.Mod = StoneModMouse.StoneModelMouse()
         self.startTime = time.time()
+
+    def tearDown(self):
+        t = time.time() - self.startTime
+        print("%s: %.3f" % (self.id(), t*1000))
 
     def test_dataImport_kaMouse(self):
         self.assertTrue(self.Mod.kaMouse.shape == (6,4))
