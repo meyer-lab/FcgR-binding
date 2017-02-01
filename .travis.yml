@@ -1,11 +1,18 @@
 language: python
 python:
   - "3.6"
+addons:
+  apt_packages:
+    - pandoc
+    - texlive-latex-base
+    - texlive-latex-extra
+    - texlive-fonts-recommended
+    - texlive-latex-recommended
+    - lmodern
 # command to install dependencies
 install:
   - pip install numpy scipy pandas h5py memoize2 matplotlib tqdm coverage
   - pip install codecov seaborn
-  - pip install pandoc
 # command to run tests
 script:
   - make -C ./Manuscript
