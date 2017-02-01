@@ -9,7 +9,7 @@ from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 import h5py
 from tqdm import tqdm
-##import seaborn as sns
+import seaborn as sns
 import StoneModel
 import importlib
 
@@ -20,22 +20,17 @@ except:
 
 importlib.reload(StoneModel)
 
-def seaborn_colorblindSteal():
+def seaborn_colorblindGet():
    # This function collects the collor palette settings used in seaborn-colorblind, so as
    # to get all of seaborn's colors without the unwanted formatting effects of seaborn
    # backColor is the background color used in seaborn's colorblind setting
    backColor = (234,234,242)
    backColor = tuple((np.array(backColor)/255).tolist())
-##   Colors = sns.color_palette('colorblind')
+   Colors = sns.color_palette('colorblind')
    Colors = sns.color_palette('muted')
    Colors.insert(0,backColor)
    Colors = np.transpose(np.array(Colors))
    Colors = pd.DataFrame(Colors,columns=(['back-color']+['color']*6))
-   # Store seaborn colors in a .pkl file
-   Colors.to_pickle('seaborn_colorblindColors.pkl')
-
-def seaborn_colorblindGet():
-   Colors = pd.read_pickle('seaborn_colorblindColors.pkl')
    backColor = (float(Colors[['back-color']].values[j]) for j in range(3))
    colorspre = np.transpose(Colors[['color']].values)
    colors = []
@@ -48,7 +43,6 @@ def seaborn_colorblindGet():
    return colors, backColor
 
 colors, backColor = seaborn_colorblindGet()
-##colors = ['black']*6
 
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
@@ -89,17 +83,6 @@ def read_chain(filename):
     f.close()
 
     return (StoneM, pdset)
-
-M, dset = read_chain("mcmc_chain.h5")
-
-bestIDX = np.argmax(dset['LL'])
-
-p = dset.iloc[bestIDX,:][2:].as_matrix()
-
-# Trim the burn in period
-dset = dset.iloc[300::,:]
-
-dsett = dset.sort_values(by = 'LL')
 
 def rep(x, N):
   return [item for item in x for i in range(N)]
@@ -222,9 +205,7 @@ def makeFcIgLegend():
 
     return patches
 
-def plotNormalizedBindingvsKA(ax1=None, ax2=None, backGray=True):
-    fitMean = getFitMeasMergedSummarized(M,p)
-   
+def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
@@ -261,7 +242,7 @@ def plotNormalizedBindingvsKA(ax1=None, ax2=None, backGray=True):
         ax1.set_facecolor(backColor)
         ax2.set_facecolor(backColor)
 
-def plotFit(fitMean=getFitMeasMergedSummarized(M,p),ax=None, backGray=True):
+def plotFit(fitMean,ax=None, backGray=True):
     # This should take a merged and summarized data frame
     fitMeanPre = fitMean[['Fit','Meas_mean','Meas_std']].as_matrix()
     if ax == None:
@@ -397,7 +378,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     if backGray:
         for ax in axarr:
             ax.set_facecolor(backColor)
-        
+
 def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1), backGray=True, legend=True):
     ## Please see comments from mfiAdjMeanFigureMaker
     rc('text',usetex=False)

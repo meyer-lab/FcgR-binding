@@ -4,6 +4,7 @@ python:
 addons:
   apt_packages:
     - pandoc
+    - pandoc-citeproc
     - texlive-latex-base
     - texlive-latex-extra
     - texlive-fonts-recommended
