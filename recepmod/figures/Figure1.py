@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy as np
 from ..StoneModel import StoneModel
-#from ..StoneHelper import *
+from ..StoneHelper import getFitMeasSummarized
 from .FigureCommon import *
 
 def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True):
