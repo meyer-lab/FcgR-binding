@@ -10,15 +10,12 @@ from matplotlib.font_manager import FontProperties
 import h5py
 from tqdm import tqdm
 import seaborn as sns
-import StoneModel
-import importlib
+from .StoneModel import StoneModel
 
 try:
    import cPickle as pickle
 except:
    import pickle
-
-importlib.reload(StoneModel)
 
 def seaborn_colorblindGet():
    # This function collects the collor palette settings used in seaborn-colorblind, so as
@@ -52,8 +49,6 @@ for j in range(len(fcgrs)):
     FcgRs[fcgrs[j]] = colors[j]
 igs = [elem for elem in Igs]
 fcgrs = [elem for elem in FcgRs]
-
-Rquant = StoneModel.StoneModel().Rquant
 
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
