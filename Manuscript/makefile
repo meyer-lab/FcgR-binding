@@ -1,16 +1,18 @@
-all: Manuscript.pdf Manuscript.html
+pan_common = --filter pandoc-crossref --filter pandoc-citeproc -f markdown ./Text/*.md
 
-Manuscript.pdf:
-	pandoc --template=default.latex --latex-engine=xelatex --filter pandoc-citeproc -o Manuscript.pdf ./Text/*.md
+all: Manuscript.html
 
-Manuscript.html:
-	pandoc -s -t html5 --mathml -c ./Templates/html-style.css --filter pandoc-citeproc -o Manuscript.html ./Text/*.md
+Manuscript.pdf: ./Text/*.md ./Figures/Figure*.pdf
+	pandoc $(pan_common) --template=default.latex --latex-engine=xelatex  -o Manuscript.pdf
 
-Manuscript.docx:
-	pandoc -s --filter pandoc-citeproc -o Manuscript.docx ./Text/*.md
+Manuscript.html: ./Text/*.md ./Figures/Figure*.pdf
+	pandoc -s $(pan_common) -t html5 --mathml -c ./Templates/kultiad.css --template=./Templates/html.template -o Manuscript.html
 
-Manuscript.tex:
-	pandoc -s --template=default.latex --latex-engine=xelatex --filter pandoc-citeproc -o Manuscript.tex ./Text/*.md
+Manuscript.docx: ./Text/*.md ./Figures/Figure*.pdf
+	pandoc -s $(pan_common) -o Manuscript.docx
+
+Manuscript.tex: ./Text/*.md ./Figures/Figure*.pdf
+	pandoc -s $(pan_common) --template=default.latex --latex-engine=xelatex -o Manuscript.tex
 
 clean:
 	rm -f Manuscript.pdf Manuscript.docx Manuscript.html Manuscript.tex
