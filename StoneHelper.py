@@ -270,7 +270,7 @@ def plotFit(fitMean,ax=None, backGray=True):
     if backGray:
         ax.set_facecolor(backColor)
 
-def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, backGray=True):
+def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, backGray=True, legend=True):
     # This should take a merged and summarized data frame
 
     if ax == None:
@@ -295,7 +295,8 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, backGray=True):
                             mfc = mfcVal, mec = color, ecolor = color,
                             linestyle = 'None')
 
-    #ax.legend(handles=makeFcIgLegend())
+    if legend:
+        ax.legend(handles=makeFcIgLegend())
 
     ax.set_yscale('log')
     ax.set_xscale('log')
@@ -512,3 +513,15 @@ def mapStore():
 def reduce():
    frameList = pd.read_pickle('mapped_chain.pkl')
    return reduceMCMC(frameList)
+
+def violinTest(ax=None):
+    if ax == None:
+        ax = plt.gca()
+    for j in range(len(FcgRs)):
+        toplot = np.full(dset[['Rexp']].values.shape,0.0)
+        toplot[:][j] = dset[['Rexp']].values[:][j]
+        objs = sns.violinplot(data=toplot,color=colors[0],ax=ax)
+    ax.set_xticks([])
+    ax.semilogy()
+    print(objs)
+    plt.show()
