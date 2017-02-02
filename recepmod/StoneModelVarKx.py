@@ -5,129 +5,51 @@ from memoize import memoize
 import warnings
 from os.path import join
 import pandas as pd
+from .StoneModel import logpdf_sum, nchoosek, normalizeData, ReqFuncSolver
 
 np.seterr(over = 'raise')
 
-# Normal distribution function. Sums over the likelihoods of points in x
-def logpdf_sum(x, loc, scale):
-    root2 = np.sqrt(2)
-    root2pi = np.sqrt(2*np.pi)
-    prefactor = - x.size * np.log(scale * root2pi)
-    summand = -np.square((x - loc)/(root2 * scale))
-    return  prefactor + np.nansum(summand)
-
-# A fast cached version of nchoosek
-@memoize
-def nchoosek(n, k):
-    return comb(n, k, exact=True)
-
-# Normalize the input data taking into account batch effects
-def normalizeData(filepath):
-    ## To begin, read in the MFI measurements from both of Lux's experiments from
-    ## their respective csvs. Then, subtract background MFIs from these nominal
-    ## MFIs. Then, normalize the data by replicate. For each step after the
-    ##reading, I manipulated the csv data in different ways, which are explained
-    ## in the comments. Please refer to these comments to understand what is
-    ## going on, especially with variables of the name "temp$." All
-    ## variables with such names are only meant to construct mfiAdjMean1 (from
-    ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
-
-    ## Read in the csv data for the first experiments.
-    Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
-
-    ## The first row in every set of five rows in Luxpre consists of background
-    ## MFIs. Lux is made by taking each of the four non-background MFIs from
-    ## reach cluster of 5 from Luxpre, subtracting the corresponding background
-    ## MFI from each, and then forming a NumPy array of shape (24,8) from all of
-    ## these collectively. The final result, Lux, will be a NumPy array of
-    ## shape (1,192).
-    Lux = np.array([])
-    for j in range(len(Luxpre)):
-        if j%5 == 0:
-            temp = np.array(Luxpre[j])
-        else:
-            temp2 = np.array(Luxpre[j])-temp
-            Lux = np.concatenate((Lux,temp2),axis=0)
-    ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
-    ## MFIs from Lux's original experiments.
-    Lux = np.reshape(Lux,(24,8))
-
-    # Normalize by the average intensity of each replicate
-    for j in range(4):
-        Lux[:,(j,j+4)] = Lux[:,(j,j+4)] / np.nanmean(np.nanmean(Lux[:,(j,j+4)]))
-
-    return(Lux)
-
-## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
-## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
-## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
-def ReqFuncSolver(R, ka, Li, vi, kx):
-    ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req) is necessarily lower than log10(R).
-    a = -40
-    b = np.log10(R)
-
-    ## Create anonymous function diffFunAnon which calls diffFun for parameters R, vi=v, kx=Kx, and viLikdi.
-    ## This function subtracts the right side of Equation 2 from Stone from the left side of the same Equation. The
-    ## bisection algorithm is run using this function so as to calculate log10(Req) which satisfies all parameters.
-    ## Each time this function is called: x is log10 of the value of Req being tested, R is R from Stone 2, vi is v from
-    ## Stone 2, kx is Kx from Stone 2, and viLikdi is a product which is constant over all iterations of the bisection
-    ## algorithm over diffFun for a single calling of ReqFuncSolver.
-    diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
-
-    try:
-        if diffFunAnon(a)*diffFunAnon(b) > 0:
-            return np.nan
-    except FloatingPointError:
-        return np.nan
-
-    ## Implement the bisection algorithm using SciPy's brentq. Please see SciPy documentation for rationale behind
-    ## input parameter not described beforehand. Brentq is ~2x faster than bisect
-    logReq = brentq(diffFunAnon, a, b, disp=False)
-
-    return logReq
-
-def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
-    ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
-    ## receptors, granted each epitope of the ligand binds to the receptor
-    ## kind in question with dissociation constant Kd and cross-links with
-    ## other receptors with crosslinking constant Kx = 10^logKx. All
-    ## equations derived from Stone et al. (2001). Assumed that ligand is at
-    ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
-    ## for TNP-4-BSA in Lux et al. (2013).
-    v = np.int_(v)
-
-    ## Vector of binomial coefficients
-    Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
-    if np.isnan(Req):
-        return (np.nan, np.nan, np.nan, np.nan)
-
-    # Calculate vieq from equation 1
-    vieqIter = (L0*Ka*nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
-    vieq = np.fromiter(vieqIter, np.float, count = v)
-
-    ## Calculate L, according to equation 7
-    Lbound = np.sum(vieq)
-
-    # If we just need the amount of ligand bound, exit here.
-    if fullOutput == False:
-        return (Lbound, np.nan, np.nan, np.nan, Req)
-
-    # Calculate Rmulti from equation 5
-    RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
-    Rmulti = np.sum(np.fromiter(RmultiIter, np.float, count = v-1))
-
-    # Calculate Rbound
-    RbndIter = ((j+1)*vieq[j] for j in range(v))
-    Rbnd = np.sum(np.fromiter(RbndIter, np.float, count = v))
-
-    # Calculate numXlinks from equation 4
-    nXlinkIter = (j*vieq[j] for j in range(1,v))
-    nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
-
-    return (Lbound, Rbnd, Rmulti, nXlink, Req)
-
-
 class StoneModel:
+    def StoneMod(self,logR,Ka,v,Kx,L0,fullOutput = False):
+        ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
+        ## receptors, granted each epitope of the ligand binds to the receptor
+        ## kind in question with dissociation constant Kd and cross-links with
+        ## other receptors with crosslinking constant Kx = 10^logKx. All
+        ## equations derived from Stone et al. (2001). Assumed that ligand is at
+        ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
+        ## for TNP-4-BSA in Lux et al. (2013).
+        v = np.int_(v)
+
+        ## Vector of binomial coefficients
+        Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
+        if np.isnan(Req):
+            return (np.nan, np.nan, np.nan, np.nan)
+
+        # Calculate vieq from equation 1
+        vieqIter = (L0*Ka*nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
+        vieq = np.fromiter(vieqIter, np.float, count = v)
+
+        ## Calculate L, according to equation 7
+        Lbound = np.sum(vieq)
+
+        # If we just need the amount of ligand bound, exit here.
+        if fullOutput == False:
+            return (Lbound, np.nan, np.nan, np.nan, Req)
+
+        # Calculate Rmulti from equation 5
+        RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
+        Rmulti = np.sum(np.fromiter(RmultiIter, np.float, count = v-1))
+
+        # Calculate Rbound
+        RbndIter = ((j+1)*vieq[j] for j in range(v))
+        Rbnd = np.sum(np.fromiter(RbndIter, np.float, count = v))
+
+        # Calculate numXlinks from equation 4
+        nXlinkIter = (j*vieq[j] for j in range(1,v))
+        nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
+
+        return (Lbound, Rbnd, Rmulti, nXlink, Req)
+
     ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
     ## This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
     ## tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
@@ -143,9 +65,6 @@ class StoneModel:
 
         ## Keep track of cumulative error
         logSqrErr = 0
-
-        ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
-        Kx = np.power(10, x[self.kxIDX])
 
         # Fill in Req values for evalutation
         outputReq = np.full((24,2), np.nan)
@@ -170,6 +89,7 @@ class StoneModel:
             ## Iterate over each kind of FcgR
             for k in range(6):
                 logR = x[k]
+                R = np.power(10, logR)
 
                 # If we have the receptor expression also fit that data
                 if self.newData:
@@ -185,8 +105,10 @@ class StoneModel:
                     # Setup the data
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
 
+                    Kx = np.power(10, x[self.kxIDX]) * (Ka / (Ka + np.power(10, x[self.KdxIDX[0]]))) * (R / (R + np.power(10, x[self.KdxIDX[1]])))
+
                     ## Calculate the MFI which should result from this condition according to the model
-                    stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
+                    stoneModOut = self.StoneMod(logR,Ka,v,Kx,L0)
                     MFI = c*stoneModOut[0]
                     if np.isnan(MFI):
                         return -np.inf
@@ -202,7 +124,7 @@ class StoneModel:
 
                     # If the fit was requested output the model predictions
                     if fullOutput:
-                        stoneRes = StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
+                        stoneRes = self.StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
                         outputFit[4*k+l,j] = MFI
                         outputLL[4*k+l, j] = tempm
                         outputRbnd[4*k+l,j] = stoneRes[1]
@@ -239,7 +161,7 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'Kdxa', 'KdxR']
 
         self.newData = newData
 
@@ -267,7 +189,7 @@ class StoneModel:
             self.mfiAdjMean = normalizeData(join(path,'New-Fig2B.csv'))
 
             # We only include a second sigma if new data
-            self.pNames.append('sigma2')
+            self.pNames.insert(12, 'sigma2')
         else:
             # Load and normalize dataset one
             self.mfiAdjMean = normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
@@ -301,12 +223,14 @@ class StoneModel:
         ubv = 35
         lbsigma = -4
         ubsigma = 1
+        lKdx = -10
+        uKdx = 10
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma], dtype = np.float64)
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma,lKdx,lKdx], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma,uKdx,uKdx], dtype = np.float64)
         else:
             self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
             self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
@@ -318,5 +242,6 @@ class StoneModel:
         self.cIDX = [7, 8]
         self.sigIDX = 11
         self.sig2IDX = 12
+        self.KdxIDX = [13, 14]
 
         self.Nparams = len(self.lb)
