@@ -3,11 +3,6 @@ import numpy as np
 from recepmod import StoneModel
 from recepmod.fitFuncs import *
 
-try:
-   import cPickle as pickle
-except:
-   import pickle
-
 newData = True
 bestLL = -np.inf
 
