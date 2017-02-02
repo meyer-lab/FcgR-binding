@@ -1,54 +1,16 @@
+## This function has a number of methods for combining data about predictions
+## and processing predictions from the StoneMod classes.
+
 import numpy as np
 import pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.lines as mlines
-import matplotlib.colors as mcolors
-from matplotlib import rc
-from matplotlib.font_manager import FontProperties
 import h5py
 from tqdm import tqdm
-import seaborn as sns
 from .StoneModel import StoneModel
 
 try:
    import cPickle as pickle
 except:
    import pickle
-
-def seaborn_colorblindGet():
-   # This function collects the collor palette settings used in seaborn-colorblind, so as
-   # to get all of seaborn's colors without the unwanted formatting effects of seaborn
-   # backColor is the background color used in seaborn's colorblind setting
-   backColor = (234,234,242)
-   backColor = tuple((np.array(backColor)/255).tolist())
-   Colors = sns.color_palette('colorblind')
-   Colors = sns.color_palette('muted')
-   Colors.insert(0,backColor)
-   Colors = np.transpose(np.array(Colors))
-   Colors = pd.DataFrame(Colors,columns=(['back-color']+['color']*6))
-   backColor = (float(Colors[['back-color']].values[j]) for j in range(3))
-   colorspre = np.transpose(Colors[['color']].values)
-   colors = []
-   for j in range(6):
-      pre = colorspre[j]
-      temp = []
-      for k in range(3):
-         temp.append(float(pre[k]))
-      colors.append(tuple(temp))
-   return colors, backColor
-
-colors, backColor = seaborn_colorblindGet()
-
-Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
-
-fcgrs = ['FcgRI','FcgRIIA-131R','FcgRIIA-131H','FcgRIIB','FcgRIIIA-158F','FcgRIIIA-158V']
-FcgRs = {}
-for j in range(len(fcgrs)):
-    FcgRs[fcgrs[j]] = colors[j]
-igs = [elem for elem in Igs]
-fcgrs = [elem for elem in FcgRs]
 
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
@@ -204,97 +166,6 @@ def getFitMeasSummarized(M):
                             suffixes = ['_mean', '_std'])
 
     return fitMean
-
-def makeFcIgLegend():
-    patches = list()
-
-    for f in FcgRs:
-        patches.append(mpatches.Patch(color=FcgRs[f], label=f))
-
-    for j in Igs:
-        patches.append(mlines.Line2D([], [], color='black', marker=Igs[j], markersize=7, label=j, linestyle='None'))
-
-    return patches
-
-def plotFit(fitMean,ax=None, backGray=True):
-    # This should take a merged and summarized data frame
-    fitMeanPre = fitMean[['Fit','Meas_mean','Meas_std']].as_matrix()
-    if ax == None:
-        fig = plt.figure(figsize=(8,6))
-        ax = fig.add_subplot(1, 1, 1)
-
-    for j in range(len(Igs)):
-        for k in range(len(FcgRs)):
-            for l in range(2):
-                if l == 0:
-                    mfcVal = 'None'
-                else:
-                    mfcVal = FcgRs[fcgrs[k]]
-                ax.errorbar(fitMeanPre[8*j+k+4*l][0],fitMeanPre[8*j+k+4*l][1]+0.01,yerr=fitMeanPre[8*j+k+4*l][2],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
-
-    ax.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    ax.plot([0.08, 10], [0.08, 10])
-    ax.set_ylim(0.01, 10)
-    ax.set_xlim(0.08, 70)
-    plt.xlabel('Fitted prediction')
-    plt.ylabel('Measured ligand binding')
-    if backGray:
-        ax.set_facecolor(backColor)
-
-def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, backGray=True, legend=True):
-    # This should take a merged and summarized data frame
-
-    if ax == None:
-        fig = plt.figure(figsize=(8,6))
-        ax = fig.add_subplot(1, 1, 1)
-
-    for j in Igs:
-        for f in FcgRs:
-            for x in range(2):
-                temp = fitMean[fitMean['Ig'] == j]
-                temp = temp[temp['FcgR'] == f]
-                color = FcgRs[f]
-
-                if x == 0:
-                    temp = temp[temp['TNP'] == 'TNP-4']
-                    mfcVal = 'None'
-                else:
-                    temp = temp[temp['TNP'] != 'TNP-4']
-                    mfcVal = color
-
-                ax.errorbar(temp[nameFieldX], temp[nameFieldY], marker = Igs[j],
-                            mfc = mfcVal, mec = color, ecolor = color,
-                            linestyle = 'None')
-
-    if legend:
-        ax.legend(handles=makeFcIgLegend())
-
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    plt.ylabel(nameFieldY)
-    plt.xlabel(nameFieldX)
-    if backGray:
-        ax.set_facecolor(backColor)
-
-def LLscatter(ax=None,backGray=True):
-    if ax == None:
-        ax = plt.gca()
-    dset.plot('LL', 'gnu2', 'scatter',ax=ax)
-    if backGray:
-        ax.set_facecolor(backColor)
-    plt.show()
-
-def gnuScatter(ax=None,backGray=True):
-    if ax == None:
-        ax = plt.gca()
-    dsett.plot(x = 'gnu1', y = 'gnu2', kind = 'scatter', c = 'LL', s = 50,ax=ax)
-    plt.xlabel('gnu1')
-    if backGray:
-        ax.set_facecolor(backColor)
-    plt.show()
 
 def mapStore():
    frameList = mapMCMC(lambda x: getFitPrediction(M,x),dset.as_matrix()[:,2:])

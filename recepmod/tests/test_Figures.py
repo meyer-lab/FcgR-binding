@@ -35,5 +35,25 @@ class TestFigMethods(unittest.TestCase):
 
         self.assertTrue(True)
 
+    # Test the predicted vs. measured plot
+    def test_plotFit_plot(self):
+        # Create the data and fit frame based on the lower bounds values
+        fitFrame = getFitMeasMergedSummarized(self.M, self.M.lb)
+
+        # Create fit of measured vs. predicted
+        Figure2.plotFit(fitFrame)
+
+        self.assertTrue(True)
+
+    # Test LL plot
+    def test_plotQuant_plot(self):
+        # Create the data and fit frame based on the lower bounds values
+        fitFrame = getFitMeasMergedSummarized(self.M, self.M.lb)
+
+        # Create the LL of the fit plot
+        Figure2.plotQuant(fitFrame, 'Meas_mean', 'Meas_mean')
+
+        self.assertTrue(True)
+
 if __name__ == '__main__':
     unittest.main()
