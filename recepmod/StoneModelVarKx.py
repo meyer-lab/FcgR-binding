@@ -3,9 +3,9 @@ from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
 import warnings
-from os.path import join
+import os
 import pandas as pd
-from .StoneModel import logpdf_sum, nchoosek, normalizeData, ReqFuncSolver
+from .StoneModel import logpdf_sum, nchoosek, normalizeData, ReqFuncSolver, StoneMod
 
 np.seterr(over = 'raise')
 
@@ -74,7 +74,7 @@ class StoneModel:
                     Kx = np.power(10, x[self.kxIDX]) * (Ka / (Ka + np.power(10, x[self.KdxIDX[0]]))) * (R / (R + np.power(10, x[self.KdxIDX[1]])))
 
                     ## Calculate the MFI which should result from this condition according to the model
-                    stoneModOut = self.StoneMod(logR,Ka,v,Kx,L0)
+                    stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
                     MFI = c*stoneModOut[0]
                     if np.isnan(MFI):
                         return -np.inf
@@ -123,7 +123,7 @@ class StoneModel:
 
     def __init__(self, newData = True):
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
-        path = './Nimmerjahn Lab and Bruhns Data'
+        path = os.path.dirname(os.path.abspath(__file__))
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
@@ -144,7 +144,7 @@ class StoneModel:
             ## is used to make the iterable object quant, each iterable element of
             ## which is a single-element list containing a string corresponding to
             ## a row in the original csv.
-            self.Rquant = np.loadtxt(join(path,'FcgRquant.csv'), delimiter=',', skiprows=1)
+            self.Rquant = np.loadtxt(os.path.join(path,'./data/FcgRquant.csv'), delimiter=',', skiprows=1)
             self.Rquant = np.log10(self.Rquant).transpose().tolist()
 
             # Remove nan entries from each array
@@ -152,13 +152,13 @@ class StoneModel:
                 self.Rquant[i] = np.delete(self.Rquant[i], np.where(np.isnan(self.Rquant[i])))
 
             # Load and normalize dataset two
-            self.mfiAdjMean = normalizeData(join(path,'New-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/New-Fig2B.csv'))
 
             # We only include a second sigma if new data
             self.pNames.insert(12, 'sigma2')
         else:
             # Load and normalize dataset one
-            self.mfiAdjMean = normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/Luxetal2013-Fig2B.csv'))
 
         ## Define the matrix of Ka values from Bruhns
         ## For accuracy, the Python implementation of this code will use
@@ -171,7 +171,7 @@ class StoneModel:
         ## First, read in the csv. It will result in an iterable object, wherein
         ## each element is a single-element list containing a single string, each
         ## string corresponding to a single row from the csv.
-        self.kaBruhns = np.loadtxt(join(path,'FcgR-Ka-Bruhns.csv'), delimiter=',')
+        self.kaBruhns = np.loadtxt(os.path.join(path,'./data/FcgR-Ka-Bruhns.csv'), delimiter=',')
 
         ## Define concentrations of TNP-4-BSA and TNP-26-BSA, respectively
         ## These are put into the numpy array "tnpbsa"

@@ -6,7 +6,6 @@ addons:
   apt_packages:
     - pandoc
     - pandoc-citeproc
-    - pandoc-crossref
     - texlive-latex-base
     - texlive-latex-extra
     - texlive-fonts-recommended

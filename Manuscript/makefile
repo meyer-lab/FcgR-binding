@@ -1,4 +1,4 @@
-pan_common = --filter pandoc-crossref --filter pandoc-citeproc -f markdown ./Text/*.md
+pan_common = --filter pandoc-citeproc -f markdown ./Text/*.md
 
 all: Manuscript.html
 
