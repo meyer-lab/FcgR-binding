@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import sys
 
 sys.path.append('../')
+sys.path.append('./')
 
 from StoneModel import StoneModel
 from StoneHelper import *
