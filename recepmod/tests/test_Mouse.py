@@ -1,9 +1,5 @@
 import unittest
-import sys
-
-sys.path.append('../')
-
-import StoneModMouse
+from ..StoneModMouse import StoneModelMouse
 import numpy as np
 import random
 import time
@@ -12,7 +8,7 @@ import matplotlib
 
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
-        self.Mod = StoneModMouse.StoneModelMouse()
+        self.Mod = StoneModelMouse()
         self.startTime = time.time()
 
     def tearDown(self):

@@ -3,7 +3,7 @@ from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
 import warnings
-from os.path import join
+import os
 import pandas as pd
 
 np.seterr(over = 'raise')
@@ -86,47 +86,48 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
 
     return logReq
 
+def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
+    ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
+    ## receptors, granted each epitope of the ligand binds to the receptor
+    ## kind in question with dissociation constant Kd and cross-links with
+    ## other receptors with crosslinking constant Kx = 10^logKx. All
+    ## equations derived from Stone et al. (2001). Assumed that ligand is at
+    ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
+    ## for TNP-4-BSA in Lux et al. (2013).
+    v = np.int_(v)
+
+    ## Vector of binomial coefficients
+    Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
+    if np.isnan(Req):
+        return (np.nan, np.nan, np.nan, np.nan)
+
+    # Calculate vieq from equation 1
+    vieqIter = (L0*Ka*nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
+    vieq = np.fromiter(vieqIter, np.float, count = v)
+
+    ## Calculate L, according to equation 7
+    Lbound = np.sum(vieq)
+
+    # If we just need the amount of ligand bound, exit here.
+    if fullOutput == False:
+        return (Lbound, np.nan, np.nan, np.nan, Req)
+
+    # Calculate Rmulti from equation 5
+    RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
+    Rmulti = np.sum(np.fromiter(RmultiIter, np.float, count = v-1))
+
+    # Calculate Rbound
+    RbndIter = ((j+1)*vieq[j] for j in range(v))
+    Rbnd = np.sum(np.fromiter(RbndIter, np.float, count = v))
+
+    # Calculate numXlinks from equation 4
+    nXlinkIter = (j*vieq[j] for j in range(1,v))
+    nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
+
+    return (Lbound, Rbnd, Rmulti, nXlink, Req)
+
+
 class StoneModel:
-    def StoneMod(self,logR,Ka,v,Kx,L0,fullOutput = False):
-        ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
-        ## receptors, granted each epitope of the ligand binds to the receptor
-        ## kind in question with dissociation constant Kd and cross-links with
-        ## other receptors with crosslinking constant Kx = 10^logKx. All
-        ## equations derived from Stone et al. (2001). Assumed that ligand is at
-        ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
-        ## for TNP-4-BSA in Lux et al. (2013).
-        v = np.int_(v)
-
-        ## Vector of binomial coefficients
-        Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
-        if np.isnan(Req):
-            return (np.nan, np.nan, np.nan, np.nan)
-
-        # Calculate vieq from equation 1
-        vieqIter = (L0*Ka*nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
-        vieq = np.fromiter(vieqIter, np.float, count = v)
-
-        ## Calculate L, according to equation 7
-        Lbound = np.sum(vieq)
-
-        # If we just need the amount of ligand bound, exit here.
-        if fullOutput == False:
-            return (Lbound, np.nan, np.nan, np.nan, Req)
-
-        # Calculate Rmulti from equation 5
-        RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
-        Rmulti = np.sum(np.fromiter(RmultiIter, np.float, count = v-1))
-
-        # Calculate Rbound
-        RbndIter = ((j+1)*vieq[j] for j in range(v))
-        Rbnd = np.sum(np.fromiter(RbndIter, np.float, count = v))
-
-        # Calculate numXlinks from equation 4
-        nXlinkIter = (j*vieq[j] for j in range(1,v))
-        nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
-
-        return (Lbound, Rbnd, Rmulti, nXlink, Req)
-
     ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
     ## This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
     ## tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
@@ -142,6 +143,9 @@ class StoneModel:
 
         ## Keep track of cumulative error
         logSqrErr = 0
+
+        ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
+        Kx = np.power(10, x[self.kxIDX])
 
         # Fill in Req values for evalutation
         outputReq = np.full((24,2), np.nan)
@@ -166,7 +170,6 @@ class StoneModel:
             ## Iterate over each kind of FcgR
             for k in range(6):
                 logR = x[k]
-                R = np.power(10, logR)
 
                 # If we have the receptor expression also fit that data
                 if self.newData:
@@ -182,10 +185,8 @@ class StoneModel:
                     # Setup the data
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
 
-                    Kx = np.power(10, x[self.kxIDX]) * (Ka / (Ka + np.power(10, x[self.KdxIDX[0]]))) * (R / (R + np.power(10, x[self.KdxIDX[1]])))
-
                     ## Calculate the MFI which should result from this condition according to the model
-                    stoneModOut = self.StoneMod(logR,Ka,v,Kx,L0)
+                    stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
                     MFI = c*stoneModOut[0]
                     if np.isnan(MFI):
                         return -np.inf
@@ -201,7 +202,7 @@ class StoneModel:
 
                     # If the fit was requested output the model predictions
                     if fullOutput:
-                        stoneRes = self.StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
+                        stoneRes = StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
                         outputFit[4*k+l,j] = MFI
                         outputLL[4*k+l, j] = tempm
                         outputRbnd[4*k+l,j] = stoneRes[1]
@@ -234,11 +235,11 @@ class StoneModel:
 
     def __init__(self, newData = True):
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
-        path = './Nimmerjahn Lab and Bruhns Data'
+        path = os.path.dirname(os.path.abspath(__file__))
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'Kdxa', 'KdxR']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
 
         self.newData = newData
 
@@ -255,7 +256,7 @@ class StoneModel:
             ## is used to make the iterable object quant, each iterable element of
             ## which is a single-element list containing a string corresponding to
             ## a row in the original csv.
-            self.Rquant = np.loadtxt(join(path,'FcgRquant.csv'), delimiter=',', skiprows=1)
+            self.Rquant = np.loadtxt(os.path.join(path,'./data/FcgRquant.csv'), delimiter=',', skiprows=1)
             self.Rquant = np.log10(self.Rquant).transpose().tolist()
 
             # Remove nan entries from each array
@@ -263,13 +264,13 @@ class StoneModel:
                 self.Rquant[i] = np.delete(self.Rquant[i], np.where(np.isnan(self.Rquant[i])))
 
             # Load and normalize dataset two
-            self.mfiAdjMean = normalizeData(join(path,'New-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/New-Fig2B.csv'))
 
             # We only include a second sigma if new data
-            self.pNames.insert(12, 'sigma2')
+            self.pNames.append('sigma2')
         else:
             # Load and normalize dataset one
-            self.mfiAdjMean = normalizeData(join(path,'Luxetal2013-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/Luxetal2013-Fig2B.csv'))
 
         ## Define the matrix of Ka values from Bruhns
         ## For accuracy, the Python implementation of this code will use
@@ -282,7 +283,7 @@ class StoneModel:
         ## First, read in the csv. It will result in an iterable object, wherein
         ## each element is a single-element list containing a single string, each
         ## string corresponding to a single row from the csv.
-        self.kaBruhns = np.loadtxt(join(path,'FcgR-Ka-Bruhns.csv'), delimiter=',')
+        self.kaBruhns = np.loadtxt(os.path.join(path,'./data/FcgR-Ka-Bruhns.csv'), delimiter=',')
 
         ## Define concentrations of TNP-4-BSA and TNP-26-BSA, respectively
         ## These are put into the numpy array "tnpbsa"
@@ -300,14 +301,12 @@ class StoneModel:
         ubv = 35
         lbsigma = -4
         ubsigma = 1
-        lKdx = -10
-        uKdx = 10
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         if newData:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma,lKdx,lKdx], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma,uKdx,uKdx], dtype = np.float64)
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma], dtype = np.float64)
         else:
             self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
             self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
@@ -319,6 +318,5 @@ class StoneModel:
         self.cIDX = [7, 8]
         self.sigIDX = 11
         self.sig2IDX = 12
-        self.KdxIDX = [13, 14]
 
         self.Nparams = len(self.lb)

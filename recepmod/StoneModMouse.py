@@ -1,19 +1,18 @@
-import StoneModel
+from .StoneModel import StoneMod
 import numpy as np
-from scipy.optimize import brentq
-from scipy.misc import comb
-from os.path import join
+import os
 
 np.seterr(over = 'raise')
 
 class StoneModelMouse:
     # Takes in a list of shape (9) for x: Rexp for FcgRs and TRIM21 logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):
-        path = './Other Binding Data'
+        path = os.path.dirname(os.path.abspath(__file__))
+
         self.Igs = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
         self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV', 'FcgRn', 'TRIM21']
         # Read in csv file of murine binding affinities
-        self.kaMouse = np.genfromtxt(join(path,'murine-affinities.csv'), delimiter=',', skip_header=1, usecols=list(range(1,5)))
+        self.kaMouse = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), delimiter=',', skip_header=1, usecols=list(range(1,5)))
         # Indices for elements in x
         self.IgIDX = 6
         self.kxIDX = 7
@@ -59,7 +58,7 @@ class StoneModelMouse:
                 continue
             Ka = float(Ka)
             ## Calculate the MFI which should result from this condition according to the model
-            stoneModOut = StoneModel.StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
+            stoneModOut = StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
             outputLbnd[k] = stoneModOut[0]
             outputRbnd[k] = stoneModOut[1]
             outputReq[k] = stoneModOut[4]
