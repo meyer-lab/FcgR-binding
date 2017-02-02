@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import gridspec
 import numpy as np
 from ..StoneModel import StoneModel
@@ -182,5 +181,4 @@ def makeFigure():
     mfiAdjMeanFigureMaker(StoneM,axarr,legbbox=(1.5,1),tnpbsafontsize=12)
     plt.show()
 
-    ##with PdfPages('fig1test.pdf') as pdf:
-    ##    pdf.savefig(f)
+    return f
