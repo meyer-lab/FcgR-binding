@@ -2,6 +2,7 @@ import unittest
 import random
 import time
 from ..StoneHelper import *
+from ..StoneModel import StoneModel
 
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
@@ -26,15 +27,6 @@ class TestStoneMethods(unittest.TestCase):
 
         self.assertTrue(True)
 
-    def test_kaBinding_plot(self):
-        # Return the fit and binding data summary data set
-        fitMean = getFitMeasMergedSummarized(self.M, self.M.lb)
-
-        # Create the measured binding vs. ka plot
-        plotNormalizedBindingvsKA(fitMean)
-
-        self.assertTrue(True)
-
     # Test LL plot
     def test_plotQuant_plot(self):
         # Create the data and fit frame based on the lower bounds values
@@ -44,14 +36,6 @@ class TestStoneMethods(unittest.TestCase):
         plotQuant(fitFrame, 'Meas_mean', 'Meas_mean')
 
         self.assertTrue(True)
-
-    # Test mfiAdjMean plot
-    def test_mfiAdjMean_figure(self):
-        # Call the plotting function
-        mfiAdjMeanFigureMaker(self.M)
-
-        self.assertTrue(True)
-
 
 if __name__ == '__main__':
     unittest.main()
