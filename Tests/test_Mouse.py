@@ -76,8 +76,20 @@ class TestStoneMouse(unittest.TestCase):
         tba = self.Mod.pdAvidityTable(x, 4, 7, fullOutput = False)
         self.assertTrue(tba.shape == (4,18))
         x2 = [logR, logR, logR, logR, logR, logR, 'IgG2a', kx, v, Li]
-        tba2 = self.Mod.pdAvidityTable(x2, v, v+2, fullOutput = False)
-        self.assertTrue(tba2.shape == (3,18))
+        tba2 = self.Mod.pdAvidityTable(x2, v, v+2, fullOutput = True)
+        self.assertTrue(tba2.shape == (3,30))
+    
+    def test_pdAvidityTable2(self):
+        logR = np.log10(10**5)
+        kx = 10**(-7)
+        v = 10
+        Li = 10**(-9)
+        if logR < 0 or kx < 0 or v < 0 or Li < 0:
+            raise ValueError('Negative input parameters')
+        x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
+        tbN = self.Mod.NimmerjahnEffectTable(x)
+        print(tbN.iloc[:, list(range(10,20))])
+        self.assertTrue(tbN.shape == (8,31))
         
 if __name__ == '__main__':
     unittest.main()
