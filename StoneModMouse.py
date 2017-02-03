@@ -135,4 +135,25 @@ class StoneModelMouse:
             idx.append(Ig+'-'+str(k))
         tb1.index = idx
         return tb1
-            
+        
+    def NimmerjahnEffectTable(self, x):
+        x1 = x[:]
+        tbN = pd.DataFrame()
+        idx = []
+        tv = self.pdOutputTable(x, fullOutput = True)
+        x1[self.uvIDX] = 1
+        t1 = self.pdOutputTable(x1, fullOutput = True)
+        for i in self.Igs:
+            for j in [1, x[self.uvIDX]]:
+                if j == 1:
+                    tbN = pd.concat([tbN, t1.loc[[i]]])
+                else:
+                    tbN = pd.concat([tbN, tv.loc[[i]]])
+                idx.append(i+'-'+str(j))
+        tbN.index = idx
+        tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
+        return tbN
+    
+#    def NimmerjahnMultiLinear(self, x):
+#        tbN = self.NimmerjahnEffectTable(x)
+        
