@@ -1,6 +1,12 @@
 ---
 title: Dissecting FcγR Regulation Through a Multivalent Binding Model
-author: Ryan A. Robinett, Ning Guan, Aaron S. Meyer
+author:
+- name: Ryan A. Robinett
+  affiliation: Koch Institute for Integrative Cancer Research
+- name: Ning Guan
+  affiliation: Koch Institute for Integrative Cancer Research
+- name: Aaron S. Meyer
+  affiliation: Koch Institute for Integrative Cancer Research
 keywords:
 - FcγR receptors
 - Immunology
