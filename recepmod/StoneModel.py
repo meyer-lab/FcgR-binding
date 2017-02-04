@@ -126,6 +126,11 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
 
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
 
+## Kx should be zero clearly when Ka is zero, and should approach a constant
+## when Ka is infinitely large. Therefore, using functions of the form
+## ax/(K + x) make the most sense. To expand upon what's described here,
+## one could create a series of those terms, and specify that each subsequent
+## term must have a K value greater than the previous.
 
 class StoneModel:
     ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
@@ -143,9 +148,6 @@ class StoneModel:
 
         ## Keep track of cumulative error
         logSqrErr = 0
-
-        ## Calculate the Kx value for the combination of FcgR and IgG in question. Then, take the common logarithm of this value.
-        Kx = np.power(10, x[self.kxIDX])
 
         # Fill in Req values for evalutation
         outputReq = np.full((24,2), np.nan)
@@ -170,6 +172,7 @@ class StoneModel:
             ## Iterate over each kind of FcgR
             for k in range(6):
                 logR = x[k]
+                R = np.power(10, logR)
 
                 # If we have the receptor expression also fit that data
                 if self.newData:
@@ -184,6 +187,8 @@ class StoneModel:
 
                     # Setup the data
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
+
+                    Kx = np.power(10, x[self.kxIDX]) * (Ka / (Ka + np.power(10, x[self.KdxIDX[0]]))) * (R / (R + np.power(10, x[self.KdxIDX[1]])))
 
                     ## Calculate the MFI which should result from this condition according to the model
                     stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
@@ -239,7 +244,7 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'Kdxa', 'KdxR']
 
         self.newData = newData
 
@@ -267,7 +272,7 @@ class StoneModel:
             self.mfiAdjMean = normalizeData(os.path.join(path,'./data/New-Fig2B.csv'))
 
             # We only include a second sigma if new data
-            self.pNames.append('sigma2')
+            self.pNames.insert(12, 'sigma2')
         else:
             # Load and normalize dataset one
             self.mfiAdjMean = normalizeData(os.path.join(path,'./data/Luxetal2013-Fig2B.csv'))
@@ -299,13 +304,15 @@ class StoneModel:
         ubc = 5
         lbsigma = -4
         ubsigma = 1
+        lKdx = 0
+        uKdx = 10
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         ## Lower and upper bounds for avidity are specified here
         if newData:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma,lbsigma], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma,ubsigma], dtype = np.float64)
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma,lbsigma,lKdx,lKdx], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma,ubsigma,uKdx,uKdx], dtype = np.float64)
         else:
             self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
             self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma], dtype = np.float64)
@@ -317,5 +324,6 @@ class StoneModel:
         self.cIDX = [7, 8]
         self.sigIDX = 11
         self.sig2IDX = 12
+        self.KdxIDX = [13, 14]
 
         self.Nparams = len(self.lb)
