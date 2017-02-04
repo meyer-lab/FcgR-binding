@@ -297,19 +297,18 @@ class StoneModel:
         ubKx = 3
         lbc = -10
         ubc = 5
-        lbv = 1
-        ubv = 35
         lbsigma = -4
         ubsigma = 1
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
+        ## Lower and upper bounds for avidity are specified here
         if newData:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma,lbsigma], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma,ubsigma], dtype = np.float64)
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma,lbsigma], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma,ubsigma], dtype = np.float64)
         else:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc,lbv,lbv,lbsigma], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc,ubv,ubv,ubsigma], dtype = np.float64)
+            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
+            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma], dtype = np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
