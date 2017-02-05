@@ -4,35 +4,40 @@
 
 All binding measurements were generously provided by Anja Lux of the Nimmerjahn Lab. Binding was measured using ELISA. The quantity of ligand bound in the original data is measured in terms of mean fluorescent intensity (MFI). Four replicates were used in the lab's assays. We normalized the data by replicate in our simulations.
 
-% TODO: The binding data will need to be described in the level of detail Lux et al has since we will be including original data.
 
 ## Equations
 
-The equilibrium binding of TNP-X-BSA to FcγRs was modeled using an equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm]\textsuperscript{b}.
+### Base model
+
+The equilibrium binding of TNP-X-BSA to FcγRs was modeled using an equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm].
 
 According to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{eq}$, can be found using the relation
 
 $$ v_{i,eq} = {v\choose i} (K_X)^{i-1} \frac{L_0}{K_D} (R_{eq})^i $$
 
-Here, $K_X$ is a cross-linking constant with units of # per cell\textsuperscript{b} (for our purposes, $K_X$ is assumed to be identical for all combinations of FcγR and IgG,) $L_0$ is the concentration of ligand, and $R_{eq}$ is the number of receptors bound at equilibrium.\textsuperscript{c} Consequently,
-\begin{equation}
-L_{bound} = \sum_{i=1}^{v} v_{i,eq} = \sum_{i=1}^{v} {v\choose i} (K_X)^{i-1} \frac{L_0}{K_D} (R_{eq})^i,
-\end{equation}
+Here, $K_X$ is a cross-linking constant with units of # per cell (for our purposes, $K_X$ is assumed to be identical for all combinations of FcγR and IgG,) $L_0$ is the concentration of ligand, and $R_{eq}$ is the number of receptors bound at equilibrium. Consequently,
+
+$$ L_{bound} = \sum_{i=1}^{v} v_{i,eq} = \sum_{i=1}^{v} {v\choose i} (K_X)^{i-1} \frac{L_0}{K_D} (R_{eq})^i $$
+
 where $L_{bound}$ is the total number of ligand bound at equilibrium and $v$ is the effective avidity of the ligand. It is important to distinguish between the effective avidity and the actual avidity of a multivalent ligand, as steric effects might prevent such a ligand from binding to $v_{actual}$ receptors at once. We will later show that this was the case in Lux's experiments. $R_{eq}$ is a function of $v$, $L_0$, $K_D$, $K_X$, and $Rtot$, the total number of receptors expressed on the cell surface, and can be approximated numerically using the following relationship when these parameters are known:
-\begin{equation}
-R_{tot} = R_{eq} \Big(1+v \frac{L_0}{K_D} (1+K_X R_{eq})^{v-1}\Big).
-\end{equation}
+
+$$ R_{tot} = R_{eq} \Big(1+v \frac{L_0}{K_D} (1+K_X R_{eq})^{v-1}\Big) $$
+
 Let $R_{eq}(R_{tot},v,L_0,K_D,K_X)$ be the numerical approximation of $R_{eq}$ given the parameters listed. Consequent of Equation (1), $R_{multi}$, the number of receptors that are clustered with at least one other receptor at equilibrium, can be found as follows:
-\begin{equation}
-R_{multi} = \sum_{i=2}^{v} iv_{i,eq}.
-\end{equation}
+
+$$ R_{multi} = \sum_{i=2}^{v} iv_{i,eq} $$
+
+### Specification for K~x~
+
+
+
 
 
 ## Calculations
 
 ### Parameters and Assumptions
 
-Association constants for all combinations of IgG and FcγR were obtained from previous experimental measurements [@Bruhns:2009kg].\textsuperscript{a} In each replicate of Lux's assay, cells were coincubated with 5 \textmu{}g/ml TNP-X-BSA. Because the molar masses of a 2,4,6-trinitrophenyl groups and of BSA are approximately 173 Da and 66430 Da, respectively, we represented the molar concentrations of TNP-4-BSA and TNP-26-BSA as 74 nM and 70 nM.\textsuperscript{f} For the sake of parsimony, we assumed that the cross-linking constant $K_X$ is identical for all combinations of FcγR and IgG. We also assumed that there was a conversion factor between the number of ICs bound and MFI for both TNP-4-BSA and TNP-26-BSA and that these two conversion factors were likely different. Lastly, we assumed that, due to steric effects, the effective avidities of TNP-4-BSA and (especially) TNP-26-BSA might be different that their actual avidities. This required us, in total, to fit 11 parameters: the total expression level $R_{tot}$ for each FcγR, $K_X$, conversion factors from ligand bound to MFI for both TNP-BSAs ($c_{4}$ and $c_{26}$, respectively), and effective avidities for both TNP-BSAs ($f_{4}$ and $f_{26}$, respectively).
+Association constants for all combinations of IgG and FcγR were obtained from previous experimental measurements [@Bruhns:2009kg].\textsuperscript{a} In each replicate of Lux's assay, cells were coincubated with 5 µg/ml TNP-X-BSA. Because the molar masses of a 2,4,6-trinitrophenyl groups and of BSA are approximately 173 Da and 66430 Da, respectively, we represented the molar concentrations of TNP-4-BSA and TNP-26-BSA as 74 nM and 70 nM.\textsuperscript{f} For the sake of parsimony, we assumed that the cross-linking constant $K_X$ is identical for all combinations of FcγR and IgG. We also assumed that there was a conversion factor between the number of ICs bound and MFI for both TNP-4-BSA and TNP-26-BSA and that these two conversion factors were likely different. Lastly, we assumed that, due to steric effects, the effective avidities of TNP-4-BSA and (especially) TNP-26-BSA might be different that their actual avidities. This required us, in total, to fit 11 parameters: the total expression level $R_{tot}$ for each FcγR, $K_X$, conversion factors from ligand bound to MFI for both TNP-BSAs ($c_{4}$ and $c_{26}$, respectively), and effective avidities for both TNP-BSAs ($f_{4}$ and $f_{26}$, respectively).
 
 Based on the order of magnitude of cross-linking constant values presented in the aforementioned paper by Stone et al., we assumed that our cross-linking constant $K_X$ should be between
 
