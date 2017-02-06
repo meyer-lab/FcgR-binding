@@ -2,7 +2,7 @@ pan_common = --filter pandoc-citeproc -f markdown ./Text/*.md
 
 .PHONY: clean upload
 
-all: index.html Manuscript.pdf
+all: index.html
 
 ./Figures/Figure%.png: ./Figures/Figure%.pdf
 	convert -density 450 ./Figures/Figure$*.pdf -quality 90 ./Figures/Figure$*.png
