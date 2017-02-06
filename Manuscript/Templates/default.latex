@@ -10,13 +10,11 @@
 \usepackage{microtype}
 
 \PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
-$if(verbatim-in-note)$
-\usepackage{fancyvrb}
-$endif$
+
 \usepackage[unicode=true]{hyperref}
-$if(colorlinks)$
+
 \PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
-$endif$
+
 \hypersetup{
 $if(title-meta)$
             pdftitle={$title-meta$},
@@ -37,45 +35,18 @@ $else$
 $endif$
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
-$if(verbatim-in-note)$
-\VerbatimFootnotes % allows verbatim text in footnotes
-$endif$
-$if(geometry)$
+
 \usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
-$endif$
-$if(lang)$
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
-  \usepackage[shorthands=off,$for(babel-otherlangs)$$babel-otherlangs$,$endfor$main=$babel-lang$]{babel}
-$if(babel-newcommands)$
-  $babel-newcommands$
-$endif$
-\else
-  \usepackage{polyglossia}
-  \setmainlanguage[$polyglossia-lang.options$]{$polyglossia-lang.name$}
-$for(polyglossia-otherlangs)$
-  \setotherlanguage[$polyglossia-otherlangs.options$]{$polyglossia-otherlangs.name$}
-$endfor$
-\fi
-$endif$
-$if(natbib)$
-\usepackage{natbib}
-\bibliographystyle{$if(biblio-style)$$biblio-style$$else$plainnat$endif$}
-$endif$
-$if(biblatex)$
+
 \usepackage[$if(biblio-style)$style=$biblio-style$,$endif$$for(biblatexoptions)$$biblatexoptions$$sep$,$endfor$]{biblatex}
 $for(bibliography)$
 \addbibresource{$bibliography$}
 $endfor$
-$endif$
+
 $if(listings)$
 \usepackage{listings}
 $endif$
-$if(lhs)$
-\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small\ttfamily}}{}
-$endif$
-$if(highlighting-macros)$
-$highlighting-macros$
-$endif$
+
 $if(tables)$
 \usepackage{longtable,booktabs}
 % Fix footnotes in tables (requires footnote package)
@@ -153,10 +124,6 @@ $endif$
 \def\fps@figure{htbp}
 \makeatother
 
-$for(header-includes)$
-$header-includes$
-$endfor$
-
 $if(title)$
 \title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
 $endif$
@@ -174,14 +141,12 @@ $endif$
 \date{$date$}
 
 \begin{document}
-$if(title)$
 \maketitle
-$endif$
-$if(abstract)$
+
+
 \begin{abstract}
 $abstract$
 \end{abstract}
-$endif$
 
 $for(include-before)$
 $include-before$
@@ -196,31 +161,11 @@ $endif$
 \tableofcontents
 }
 $endif$
-$if(lot)$
-\listoftables
-$endif$
-$if(lof)$
-\listoffigures
-$endif$
+
 $body$
 
-$if(natbib)$
-$if(bibliography)$
-$if(biblio-title)$
-$if(book-class)$
-\renewcommand\bibname{$biblio-title$}
-$else$
-\renewcommand\refname{$biblio-title$}
-$endif$
-$endif$
-\bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
-
-$endif$
-$endif$
-$if(biblatex)$
 \printbibliography$if(biblio-title)$[title=$biblio-title$]$endif$
 
-$endif$
 $for(include-after)$
 $include-after$
 
