@@ -215,10 +215,6 @@ class StoneModel:
                         outputnXlink[4*k+l,j] = stoneRes[3]
                         outputLbnd[4*k+l,j] = stoneRes[0]
 
-                    # Skip IIIA-Phe Ig2 and Ig4, because the affinity values seem inconsistent
-                    if k == 4 and l % 2 > 0:
-                        continue
-
                     ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
                     logSqrErr = logSqrErr+tempm
