@@ -13,7 +13,7 @@ The measured binding closely recapitulated that measured previously [@Lux:2013iv
 
 ## A multivalent binding model accounts for variation in IgG-FcγR binding
 
-![**A multivalent binding model accounts for IgG-FcγR binding.** A) XXX. B) XXX. C) XXX.](./Figures/Foo.png){#fig:Fit}
+![**A multivalent binding model accounts for IgG-FcγR binding.** A) Schematic of the multivalent binding model for interaction of an immune complex with FcγRs. B) XXX. C) XXX.](./Figures/Foo.png){#fig:Fit}
 
 
 

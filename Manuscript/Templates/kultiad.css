@@ -4,7 +4,7 @@
    ---------------------------------------------------------------
    Title: Kultiad
    Author: Peter Sziebig - @bigpe; Modified by Kieran Healy - @kjhealy
-   Description: Easy to read. Pandoc style elements. 
+   Description: Easy to read. Pandoc style elements.
 */
 
 
@@ -168,7 +168,7 @@ blockquote {
 }
 
 figure {
-	margin-left: -4.5rem;
+	  margin-left: -4.5rem;
     margin-right: -4.5rem;
     margin-bottom: 2em;
     margin-top: 2em;
@@ -189,7 +189,7 @@ hr {
 
 
 img {
-    max-width: 100%;
+    max-width: 90%;
     display: block;
     border: 0 none;
 }
