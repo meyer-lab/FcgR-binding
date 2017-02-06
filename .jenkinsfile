@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'make -C ./Manuscript'
+            }
+        }
+        stage('Test'){
+            steps {
+                sh 'python3 -m unittest discover'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'make upload -C ./Manuscript'
+            }
+        }
+    }
+}
