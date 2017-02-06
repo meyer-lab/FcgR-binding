@@ -5,7 +5,7 @@ pan_common = --filter pandoc-citeproc -f markdown ./Text/*.md
 all: index.html Manuscript.pdf
 
 ./Figures/Figure%.png: ./Figures/Figure%.pdf
-	/usr/local/bin/convert -density 450 ./Figures/Figure$*.pdf -quality 90 ./Figures/Figure$*.png
+	convert -density 450 ./Figures/Figure$*.pdf -quality 90 ./Figures/Figure$*.png
 
 Manuscript.pdf: ./Text/*.md ./Figures/Figure*.pdf
 	pandoc $(pan_common) --template=default.latex --latex-engine=xelatex  -o Manuscript.pdf
@@ -24,4 +24,4 @@ clean:
 	rm -f ./Figures/Figure*.png
 
 upload:
-	/usr/local/bin/lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./; mirror --reverse --delete --ignore-time --verbose"
+	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./; mirror --reverse --delete --ignore-time --verbose"
