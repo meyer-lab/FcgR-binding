@@ -9,7 +9,7 @@ from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 #import h5py
 #from tqdm import tqdm
-import seaborn as sns
+##import seaborn as sns
 
 def seaborn_colorblindGet():
    # This function collects the collor palette settings used in seaborn-colorblind, so as
@@ -17,8 +17,11 @@ def seaborn_colorblindGet():
    # backColor is the background color used in seaborn's colorblind setting
    backColor = (234,234,242)
    backColor = tuple((np.array(backColor)/255).tolist())
-   Colors = sns.color_palette('colorblind')
-   Colors = sns.color_palette('muted')
+   Colors = pd.read_pickle('seaborn_colorblindColors.pkl')
+   print(type(Colors))
+   print(Colors)
+##   Colors = sns.color_palette('colorblind')
+##   Colors = sns.color_palette('muted')
    Colors.insert(0,backColor)
    Colors = np.transpose(np.array(Colors))
    Colors = pd.DataFrame(Colors,columns=(['back-color']+['color']*6))

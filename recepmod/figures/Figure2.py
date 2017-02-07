@@ -9,7 +9,8 @@ import os
 
 def makeFigure():
     # Retrieve model and fit from hdf5 file
-    M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/mcmc_chain.h5"))
+##    M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/mcmc_chain.h5"))
+    M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
 
     pBest = dset.iloc[np.argmax(dset['LL']),:][2:].as_matrix()
 
