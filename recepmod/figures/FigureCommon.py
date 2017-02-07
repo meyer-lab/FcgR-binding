@@ -15,25 +15,11 @@ def seaborn_colorblindGet():
    # This function collects the collor palette settings used in seaborn-colorblind, so as
    # to get all of seaborn's colors without the unwanted formatting effects of seaborn
    # backColor is the background color used in seaborn's colorblind setting
-   backColor = (234,234,242)
-   backColor = tuple((np.array(backColor)/255).tolist())
-   Colors = pd.read_pickle('seaborn_colorblindColors.pkl')
-   print(type(Colors))
-   print(Colors)
-##   Colors = sns.color_palette('colorblind')
-##   Colors = sns.color_palette('muted')
-   Colors.insert(0,backColor)
-   Colors = np.transpose(np.array(Colors))
-   Colors = pd.DataFrame(Colors,columns=(['back-color']+['color']*6))
-   backColor = (float(Colors[['back-color']].values[j]) for j in range(3))
-   colorspre = np.transpose(Colors[['color']].values)
+   Colors = pd.read_pickle('seaborn_colorblindColors.pkl').values
+   backColor = tuple([Colors[j][0] for j in range(3)])
    colors = []
-   for j in range(6):
-      pre = colorspre[j]
-      temp = []
-      for k in range(3):
-         temp.append(float(pre[k]))
-      colors.append(tuple(temp))
+   for j in range(1,7):
+       colors.append(tuple([Colors[k][j] for k in range(3)]))
    return colors, backColor
 
 colors, backColor = seaborn_colorblindGet()
