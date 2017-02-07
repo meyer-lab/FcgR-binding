@@ -1,7 +1,6 @@
 *.asv
 **/__pycache__/
 *mcmc_chain.h5
-*.pkl
 .Rproj.user
 *.nb.html
 .Rhistory
