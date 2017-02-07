@@ -180,6 +180,5 @@ def makeFigure():
     for j in range(6):
         axarr.append(f.add_subplot(gs2[20+j+5*int(np.floor(j/3))]))
     mfiAdjMeanFigureMaker(StoneM,axarr,legbbox=(1.5,1),tnpbsafontsize=12)
-    plt.show()
 
     return f

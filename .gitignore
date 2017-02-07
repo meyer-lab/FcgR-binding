@@ -1,6 +1,6 @@
 *.asv
 **/__pycache__/
-*.h5
+*mcmc_chain.h5
 *.pkl
 .Rproj.user
 *.nb.html
@@ -9,5 +9,4 @@ Manuscript/.texpadtmp
 
 Manuscript/Manuscript.pdf
 .ipynb_checkpoints
-*.plist
 .coverage

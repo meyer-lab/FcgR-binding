@@ -6,14 +6,16 @@ from ..figures import Figure4
 from ..figures import Figure5
 import numpy as np
 import random
+import os
 import time
 from ..StoneModel import StoneModel
-from ..StoneHelper import getFitMeasMergedSummarized
+from ..StoneHelper import getFitMeasMergedSummarized, read_chain
 
 class TestFigMethods(unittest.TestCase):
     def setUp(self):
         self.M = StoneModel()
         self.startTime = time.time()
+        self.Mread, self.dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -36,7 +38,7 @@ class TestFigMethods(unittest.TestCase):
         self.assertTrue(True)
 
     # Test the predicted vs. measured plot
-    def test_plotFit_plot(self):
+    def test_Fig2_plotFit_plot(self):
         # Create the data and fit frame based on the lower bounds values
         fitFrame = getFitMeasMergedSummarized(self.M, self.M.lb)
 
@@ -46,12 +48,19 @@ class TestFigMethods(unittest.TestCase):
         self.assertTrue(True)
 
     # Test LL plot
-    def test_plotQuant_plot(self):
+    def test_Fig2_plotQuant_plot(self):
         # Create the data and fit frame based on the lower bounds values
         fitFrame = getFitMeasMergedSummarized(self.M, self.M.lb)
 
         # Create the LL of the fit plot
         Figure2.plotQuant(fitFrame, 'Meas_mean', 'Meas_mean')
+
+        self.assertTrue(True)
+
+    # Test hist subplots
+    def test_Fig2_histSubplots(self):
+
+        Figure2.histSubplots(self.dset)
 
         self.assertTrue(True)
 
