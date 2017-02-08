@@ -14,9 +14,10 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True, legfon
     fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
 
     fitMean = fitMean.as_matrix()
-    if ax1 == None:
+    if ax1 == None or ax2 == None:
         fig = plt.figure(figsize=(9,5))
         ax1 = fig.add_subplot(1, 2, 1)
+        ax2 = fig.add_subplot(1, 2, 2)
 
     mfcVal = 'None'
     for j in range(len(Igs)):
@@ -27,9 +28,6 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True, legfon
     ax1.set_ylabel('Measured TNP-BSA binding')
     ax1.set_xlabel(r'Fc$\gamma$R-IgG Ka')
     ax2.set_xlabel(r'Fc$\gamma$R-IgG Ka')
-
-    if ax2 == None:
-        ax2 = fig.add_subplot(1, 2, 2)
 
     for j in range(len(Igs)):
         for k in range(len(FcgRs)):
