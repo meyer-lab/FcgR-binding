@@ -6,17 +6,17 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'make -C ./Manuscript'
+                sh 'make'
             }
         }
         stage('Test'){
             steps {
-                sh 'python3 -m unittest discover'
+                sh 'make test'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'make upload -C ./Manuscript'
+                sh 'make upload'
             }
         }
     }
