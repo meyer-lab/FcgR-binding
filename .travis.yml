@@ -23,11 +23,3 @@ script:
   - make -C ./Manuscript
 after_success:
   - codecov
-notifications:
-  email:
-    recipients:
-      - aa-travis@asmlab.org
-      - rrobinet@mit.edu
-      - ningguan@MIT.EDU
-    on_success: change
-    on_failure: always
