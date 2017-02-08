@@ -20,6 +20,6 @@ install:
 # command to run tests
 script:
   - coverage run -m unittest discover
-  - make -C ./Manuscript
+  - make
 after_success:
   - codecov
