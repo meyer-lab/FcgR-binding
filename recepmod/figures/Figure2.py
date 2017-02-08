@@ -44,7 +44,7 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, backGray=True, legend=Tr
     # This should take a merged and summarized data frame
 
     if ax == None:
-        fig = plt.figure(figsize=(8,6))
+        fig = plt.figure(figsize=(7,6))
         ax = fig.add_subplot(1, 1, 1)
 
     for j in Igs:
@@ -77,7 +77,6 @@ def violinPlot(dset, ax=None):
     # If no axis was provided make our own
     if ax == None:
         ax = plt.gca()
-
 
     for j in range(len(FcgRs)):
         toplot = np.full(dset[['Rexp']].values.shape,0.0)
