@@ -5,7 +5,7 @@ from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized
 from .FigureCommon import *
 
-def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True):
+def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True, legfontsize=10):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
@@ -24,8 +24,9 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True):
             ax1.errorbar(fitMean[8*j+k][3],fitMean[8*j+k][4],yerr=fitMean[8*j+k][5],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
 
     ax1.set_xscale('log')
-    plt.ylabel('Measured TNP-4 binding')
-    plt.xlabel('FcgR-IgG Ka')
+    ax1.set_ylabel('Measured TNP-BSA binding')
+    ax1.set_xlabel(r'Fc$\gamma$R-IgG Ka')
+    ax2.set_xlabel(r'Fc$\gamma$R-IgG Ka')
 
     if ax2 == None:
         ax2 = fig.add_subplot(1, 2, 2)
@@ -35,16 +36,15 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True):
             mfcVal = FcgRs[fcgrs[k]]
             ax2.errorbar(fitMean[8*j+k+4][3],fitMean[8*j+k+4][4],yerr=fitMean[8*j+k+4][5],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
 
-    ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,fontsize=legfontsize)
     ax2.set_xscale('log')
-    plt.xlabel('FcgR-IgG Ka')
     if backGray:
         ax1.set_facecolor(backColor)
         ax2.set_facecolor(backColor)
 
 def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1), backGray=True, legend=True):
     ## Please see comments from mfiAdjMeanFigureMaker
-    rc('text',usetex=False)
+##    rc('text',usetex=False)
 
     Rquant = StoneM.Rquant
 
@@ -79,15 +79,11 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
     ax.tick_params(axis='x',length=0)
     ax.grid(b=False)
     ax.set_yscale('log')
-    ax.set_ylabel('Number of Receptors',fontsize=ylabelfontsize)
+    ax.set_ylabel(r"Number of Receptors",fontsize=ylabelfontsize)
     if backGray:
         ax.set_facecolor(backColor)
 
-    ## Create legend
-    if legend:
-        leg = ax.legend((rects[j][0] for j in range(N)),(r'Fc$\gamma$R'+species[j] for j in range(N)),bbox_to_anchor=legbbox)
-
-def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), backGray=True):
+def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), backGray=True, legfontsize=10):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
     ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
@@ -104,7 +100,6 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     width = 0.5
 
     ## Setting up strings useful for plotting
-    colorz = [colors[3],colors[0],colors[4],colors[1]]
     species = [r'Fc$\gamma$RIA', r'Fc$\gamma$RIIA-131R', r'Fc$\gamma$RIIA-131H',
             r'Fc$\gamma$RIIB', r'Fc$\gamma$RIIIA-158F', r'Fc$\gamma$RIIIA-158V']
 
@@ -132,7 +127,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             stds = [0]*N
             stds.remove(0)
             stds.insert(k,np.nanstd(mfiAdjMean[4*(j-1)+k][1:4]))
-            rects.append(axarr[j].bar(ind,temp,width,color=colorz[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+            rects.append(axarr[j].bar(ind,temp,width,color=colors2[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
         for k in range(4):
             temp = [0]*N
             temp.remove(0)
@@ -140,7 +135,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             stds = [0]*N
             stds.remove(0)
             stds.insert(5+k,np.nanstd(mfiAdjMean[4*(j-1)+k][5:8]))
-            rects.append(axarr[j].bar(ind,temp,width,color=colorz[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+            rects.append(axarr[j].bar(ind,temp,width,color=colors2[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
 
     # axes and labels
     for j in range(6):
@@ -151,11 +146,11 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
         axarr[j].grid(b=False)
         axarr[j].set_ylim(0,5)
         if j%3 == 0:
-            axarr[j].set_ylabel('maMFIs',fontsize=ylabelfontsize)
+            axarr[j].set_ylabel('mean-adjusted MFIs',fontsize=ylabelfontsize)
         axarr[j].set_title(species[j],fontsize=subtitlefontsize)
 
     ## Add a legend denoting IgG species
-    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox)
+    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox,fontsize=legfontsize)
 
     ## Set axeses facecolors, if backGray
     if backGray:
@@ -166,19 +161,19 @@ def makeFigure():
     StoneM = StoneModel()
 
     f = plt.figure(figsize=(8.5,11))
-    gs1 = gridspec.GridSpec(2,3,height_ratios=[1,3],width_ratios=[2,3,3])
+    gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,2,6,1,6,1])
     ax = f.add_subplot(gs1[0])
-    FcgRQuantificationFigureMaker(StoneM,ax,legbbox=(1.75,1),titlefontsize=16)
-    ax2 = f.add_subplot(gs1[1])
-    ax3 = f.add_subplot(gs1[2])
+    FcgRQuantificationFigureMaker(StoneM,ax,legbbox=(1.75,1),titlefontsize=16,ylabelfontsize=10)
+    ax2 = f.add_subplot(gs1[2])
+    ax3 = f.add_subplot(gs1[4])
 
     fitMean = getFitMeasSummarized(StoneM)
 
-    plotNormalizedBindingvsKA(fitMean, ax2, ax3)
+    plotNormalizedBindingvsKA(fitMean, ax2, ax3, legfontsize=8)
     gs2 = gridspec.GridSpec(8,4,height_ratios=[1,1,1,1,1,4,1,4])
     axarr = []
     for j in range(6):
         axarr.append(f.add_subplot(gs2[20+j+5*int(np.floor(j/3))]))
-    mfiAdjMeanFigureMaker(StoneM,axarr,legbbox=(1.5,1),tnpbsafontsize=12)
+    mfiAdjMeanFigureMaker(StoneM,axarr,legbbox=(1.75,1),tnpbsafontsize=8,subtitlefontsize=10,ylabelfontsize=10,legfontsize=8)
 
     return f
