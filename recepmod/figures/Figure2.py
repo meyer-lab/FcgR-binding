@@ -10,10 +10,11 @@ import seaborn as sns
 
 def makeFigure():
     # Retrieve model and fit from hdf5 file
-##    M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/mcmc_chain.h5"))
     M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
 
     pBest = dset.iloc[np.argmax(dset['LL']),:][2:].as_matrix()
+
+    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
     # Setup plotting space
     f = plt.figure(figsize=(7,5))
@@ -78,15 +79,10 @@ def violinPlot(dset, ax=None):
     if ax == None:
         ax = plt.gca()
 
-    for j in range(len(FcgRs)):
-        toplot = np.full(dset[['Rexp']].values.shape,0.0)
-        toplot[:][j] = dset[['Rexp']].values[:][j]
-        objs = sns.violinplot(data=toplot,color=colors[0],ax=ax)
+    dset = dset[['Rexp']]
+    dset.columns = fcgrs
 
-    print(toplot)
-
-    ax.set_xticks([])
-    ax.set_facecolor('white')
+    objs = sns.violinplot(data=dset,cut=0,ax=ax) # ,color=colors[0]
 
 def LLplot(dset, ax = None):
     if ax == None:
@@ -102,9 +98,6 @@ def histSubplots(dset, axes=None):
     dset[['sigConv1', 'sigConv2']].plot.hist(ax=axes[1], bins = 100, color=[colors[j] for j in range(2)])
     dset[['gnu1', 'gnu2']].plot.hist(ax=axes[2], bins = 100, color=[colors[j] for j in range(2)])
     dset[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 100, color=[colors[j] for j in range(2)])
-
-    for x in axes:
-        x.set_facecolor('white')
 
 def plotFit(fitMean,ax=None, backGray=True):
     # This should take a merged and summarized data frame
@@ -131,5 +124,3 @@ def plotFit(fitMean,ax=None, backGray=True):
     ax.set_xlim(0.08, 70)
     plt.xlabel('Fitted prediction')
     plt.ylabel('Measured ligand binding')
-    if backGray:
-        ax.set_facecolor(backColor)
