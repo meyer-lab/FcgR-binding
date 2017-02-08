@@ -6,6 +6,7 @@ from ..StoneModel import StoneModel
 from ..StoneHelper import *
 from .FigureCommon import *
 import os
+import seaborn as sns
 
 def makeFigure():
     # Retrieve model and fit from hdf5 file
