@@ -4,8 +4,9 @@ import numpy as np
 from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized
 from .FigureCommon import *
+import seaborn as sns
 
-def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True, legfontsize=10):
+def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
@@ -36,11 +37,8 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, backGray=True, legfon
 
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,fontsize=legfontsize)
     ax2.set_xscale('log')
-    if backGray:
-        ax1.set_facecolor(backColor)
-        ax2.set_facecolor(backColor)
 
-def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1), backGray=True, legend=True):
+def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1), legend=True):
     ## Please see comments from mfiAdjMeanFigureMaker
 ##    rc('text',usetex=False)
 
@@ -78,10 +76,8 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
     ax.grid(b=False)
     ax.set_yscale('log')
     ax.set_ylabel(r"Number of Receptors",fontsize=ylabelfontsize)
-    if backGray:
-        ax.set_facecolor(backColor)
 
-def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), backGray=True, legfontsize=10):
+def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), legfontsize=10):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
     ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
@@ -125,7 +121,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             stds = [0]*N
             stds.remove(0)
             stds.insert(k,np.nanstd(mfiAdjMean[4*(j-1)+k][1:4]))
-            rects.append(axarr[j].bar(ind,temp,width,color=colors2[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
         for k in range(4):
             temp = [0]*N
             temp.remove(0)
@@ -133,7 +129,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             stds = [0]*N
             stds.remove(0)
             stds.insert(5+k,np.nanstd(mfiAdjMean[4*(j-1)+k][5:8]))
-            rects.append(axarr[j].bar(ind,temp,width,color=colors2[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
 
     # axes and labels
     for j in range(6):
@@ -150,13 +146,10 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     ## Add a legend denoting IgG species
     leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox,fontsize=legfontsize)
 
-    ## Set axeses facecolors, if backGray
-    if backGray:
-        for ax in axarr:
-            ax.set_facecolor(backColor)
-
 def makeFigure():
     StoneM = StoneModel()
+
+    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
     f = plt.figure(figsize=(7,6))
     gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,2,6,1,6,1])
