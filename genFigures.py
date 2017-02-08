@@ -6,10 +6,8 @@ from recepmod.figures import Figure3
 from recepmod.figures import Figure4
 from recepmod.figures import Figure5
 
-##with PdfPages('Figure1.pdf') as pdf:
-##    pdf.savefig(Figure1.makeFigure())
-##
+with PdfPages('Figure1.pdf') as pdf:
+    pdf.savefig(Figure1.makeFigure())
+
 ##with PdfPages('Figure2.pdf') as pdf:
 ##    pdf.savefig(Figure2.makeFigure())
-f = Figure1.makeFigure()
-plt.show()
