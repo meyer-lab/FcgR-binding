@@ -12,6 +12,7 @@ $(fdir)/Figure%.png: $(fdir)/Figure%.pdf
 	convert -density 450 $(fdir)/Figure$*.pdf -quality 90 $(fdir)/Figure$*.png
 
 $(fdir)/Figure1%pdf $(fdir)/Figure2%pdf: genFigures.py
+	mkdir -p ./Manuscript/Figures
 	python3 genFigures.py
 
 Manuscript.pdf: ./Manuscript/Text/*.md
