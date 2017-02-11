@@ -87,7 +87,7 @@ class TestStoneMouse(unittest.TestCase):
         #print(tbN.iloc[:, list(range(10,20))])
         self.assertTrue(tbN.shape == (8,31))
 		
-	def test_NimmerjahnMultiLinear(self):
+    def test_NimmerjahnMultiLinear(self):
         # Prints coefficients of multi-linear regression model
         logR = np.log10(10**5)
         kx = 10**(-7)

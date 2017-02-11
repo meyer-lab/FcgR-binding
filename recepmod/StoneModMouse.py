@@ -161,7 +161,7 @@ class StoneModelMouse:
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
         return tbN
     
-	def NimmerjahnMultiLinear(self, x, fullOutput = True):
+    def NimmerjahnMultiLinear(self, x, fullOutput = True):
         # Multi-Linear regression of FcgR binding predictions for effectiveness of IgG therapy
         reg = linear_model.LinearRegression()
         tbN = self.NimmerjahnEffectTable(x)
