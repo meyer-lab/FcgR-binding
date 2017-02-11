@@ -4,6 +4,8 @@ import os
 import pandas as pd
 from scipy.optimize import brentq
 from scipy.misc import comb
+from sklearn import linear_model
+import matplotlib.pyplot as plt
 
 np.seterr(over = 'raise')
 
@@ -138,12 +140,15 @@ class StoneModelMouse:
         return tb1
 
     def NimmerjahnEffectTable(self, x):
+        # Initiate variables
         x1 = x[:]
         tbN = pd.DataFrame()
         idx = []
+        # create pandas tables
         tv = self.pdOutputTable(x, fullOutput = True)
         x1[self.uvIDX] = 1
         t1 = self.pdOutputTable(x1, fullOutput = True)
+        # Compose a table of shape (8,30), 2 rows for each IgG
         for i in self.Igs:
             for j in [1, x[self.uvIDX]]:
                 if j == 1:
@@ -152,8 +157,24 @@ class StoneModelMouse:
                     tbN = pd.concat([tbN, tv.loc[[i]]])
                 idx.append(i+'-'+str(j))
         tbN.index = idx
+        # Append effectiveness data on the 31 column
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
         return tbN
-
-#    def NimmerjahnMultiLinear(self, x):
-#        tbN = self.NimmerjahnEffectTable(x)
+    
+	def NimmerjahnMultiLinear(self, x, fullOutput = True):
+        # Multi-Linear regression of FcgR binding predictions for effectiveness of IgG therapy
+        reg = linear_model.LinearRegression()
+        tbN = self.NimmerjahnEffectTable(x)
+        # Assign independent variables and dependent variable "effect"
+		# Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
+        independent = np.array(tbN.iloc[list(range(2,6)), list(range(1,21,5))])
+        independent = independent.reshape(4,4)
+        effect = np.array(tbN.iloc[list(range(2,6)),30])
+        effect = effect.reshape(4,1)
+        # Linear regression and plot result
+        result = reg.fit(independent, effect)
+        plt.scatter(effect, reg.predict(independent), color='black')
+        plt.plot(effect, reg.predict(independent), color='blue',
+         linewidth=3)
+        plt.show()
+        return result

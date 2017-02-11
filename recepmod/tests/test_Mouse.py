@@ -86,6 +86,18 @@ class TestStoneMouse(unittest.TestCase):
         tbN = self.Mod.NimmerjahnEffectTable(x)
         #print(tbN.iloc[:, list(range(10,20))])
         self.assertTrue(tbN.shape == (8,31))
+		
+	def test_NimmerjahnMultiLinear(self):
+        # Prints coefficients of multi-linear regression model
+        logR = np.log10(10**5)
+        kx = 10**(-7)
+        v = 10
+        Li = 10**(-9)
+        if logR < 0 or kx < 0 or v < 0 or Li < 0:
+            raise ValueError('Negative input parameters')
+        xN = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
+        result = self.Mod.NimmerjahnMultiLinear(xN)
+        print(result.coef_)
 
 if __name__ == '__main__':
     unittest.main()
