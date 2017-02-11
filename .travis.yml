@@ -16,7 +16,7 @@ cache: pip
 # command to install dependencies
 install:
   - pip install numpy scipy pandas h5py memoize2 matplotlib tqdm coverage
-  - pip install codecov seaborn
+  - pip install codecov seaborn scikit-learn
 # command to run tests
 script:
   - coverage run -m unittest discover
