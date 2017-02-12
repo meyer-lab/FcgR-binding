@@ -51,10 +51,15 @@ def StoneRbnd(vGrid):
 
     return np.array((np.sum(vGridSone), np.sum(vGridStwo)))
 
-# This calculates the Rbnd quantity from a v_ij grid
-def StoneRbndDist(vGrid):
+# This calculates the RmultiAll quantity from a v_ij grid
+# This is the number of receptors multimerized with self or non-self
+def StoneRmultiAll(vGrid):
     # We can calculate gnu from the size of the v_ij grid
     gnu = vGrid.shape[0] - 1
+
+    # Erase species that are bound all on their own
+    vGrid[1,0] = 0.0
+    vGrid[0,1] = 0.0
 
     # Sum along each axis to get the number of receptors in each pool
     vGridSone = np.sum(vGrid, axis = 0)
@@ -64,7 +69,7 @@ def StoneRbndDist(vGrid):
     vGridSone = np.multiply(vGridSone, np.arange(gnu+1))
     vGridStwo = np.multiply(vGridStwo, np.arange(gnu+1))
 
-    return (vGridSone, vGridStwo)
+    return np.array((np.sum(vGridSone), np.sum(vGridStwo)))
 
 # Solve for Req
 def reqSolver(logR,Ka,gnu,Kx,L0):

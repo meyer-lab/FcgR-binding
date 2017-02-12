@@ -67,18 +67,21 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
     def test_StoneRbnd(self):
         gnu = 4
 
-        vGrid = np.ones((gnu, gnu), dtype = np.float64)
+        vGrid = np.ones([gnu+1, gnu+1], dtype = np.float64)
         vGrid[0,0] = 0
 
         for ii in range(vGrid.shape[0]):
             for jj in range(vGrid.shape[0]):
-                if ii+jj > vGrid.shape[0]:
+                if ii+jj > gnu:
                     vGrid[ii,jj] = 0
 
         output = StoneRbnd(vGrid)
+        outputmulti = StoneRmultiAll(vGrid)
 
-        self.assertEqual(output[0], 16)
-        self.assertEqual(output[1], 16)
+        self.assertEqual(output[0], 20)
+        self.assertEqual(output[1], 20)
+        self.assertEqual(outputmulti[0], 19)
+        self.assertEqual(outputmulti[1], 19)
 
 if __name__ == '__main__':
     unittest.main()
