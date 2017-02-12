@@ -64,6 +64,21 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
         # Check that detailed balance holds
         self.assertTrue(np.all(np.equal(output, np.transpose(output2))))
 
+    def test_StoneRbnd(self):
+        gnu = 4
+
+        vGrid = np.ones((gnu, gnu), dtype = np.float64)
+        vGrid[0,0] = 0
+
+        for ii in range(vGrid.shape[0]):
+            for jj in range(vGrid.shape[0]):
+                if ii+jj > vGrid.shape[0]:
+                    vGrid[ii,jj] = 0
+
+        output = StoneRbnd(vGrid)
+
+        self.assertEqual(output[0], 16)
+        self.assertEqual(output[1], 16)
 
 if __name__ == '__main__':
     unittest.main()
