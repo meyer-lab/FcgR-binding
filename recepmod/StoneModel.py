@@ -188,7 +188,7 @@ class StoneModel:
                     # Setup the data
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
 
-                    Kx = np.power(10, x[self.kxIDX]) * (Ka / (Ka + np.power(10, x[self.KdxIDX[0]]))) * (R / (R + np.power(10, x[self.KdxIDX[1]])))
+                    Kx = np.power(10, x[self.kxIDX]) * (Ka / (Ka + np.power(10, x[self.KdxIDX])))
 
                     ## Calculate the MFI which should result from this condition according to the model
                     stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
@@ -240,12 +240,51 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'Kdxa', 'KdxR']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'Kdxa']
 
         self.newData = newData
 
         for i in range(6):
             self.pNames.insert(0, 'Rexp')
+
+        ## Define the matrix of Ka values from Bruhns
+        ## For accuracy, the Python implementation of this code will use
+        ## Ka values as opposed to Kd, as these were the values which Bruhns
+        ## gives in his experiments. These are read in from a csv in the
+        ## folder Nimmerjahn Lab and Bruhns Data. Each row represents a particular
+        ## FcgR (FcgRIA, FcgRIIA-H, FcgRIIA-R, FcgRIIB, FcgRIIIA-F, FcgRIIIA-V)
+        ## and each column represents a particular IgG(1, 2, 3, 4).
+
+        ## First, read in the csv. It will result in an iterable object, wherein
+        ## each element is a single-element list containing a single string, each
+        ## string corresponding to a single row from the csv.
+        self.kaBruhns = np.loadtxt(os.path.join(path,'./data/FcgR-Ka-Bruhns.csv'), delimiter=',')
+
+        ## Define concentrations of TNP-4-BSA and TNP-26-BSA, respectively
+        ## These are put into the numpy array "tnpbsa"
+        self.tnpbsa = np.array([1/67122,1/70928])*1e-3*5
+
+        # Set upper and lower bounds
+        ## Upper and lower bounds of the 12 parameters
+        lbR, ubR = 3, 8
+        lbKx, ubKx = -25, 3
+        lbc, ubc = -10, 5
+        lbsigma, ubsigma = -4, 1
+        lKdx, uKdx = 0, 10
+
+        ## Create vectors for upper and lower bounds
+        ## Only allow sampling of TNP-4 up to double its expected avidity.
+        ## Lower and upper bounds for avidity are specified here
+        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma,lKdx], dtype = np.float64)
+        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma,uKdx], dtype = np.float64)
+
+        # Indices for the various elements. Remember that for the new data the receptor
+        # expression is concatted
+        self.uvIDX = [9, 10]
+        self.kxIDX = 6
+        self.cIDX = [7, 8]
+        self.sigIDX = 11
+        self.KdxIDX = 12
 
         if newData:
             ## Create the NumPy array Rquant, where each row represents a particular
@@ -268,58 +307,13 @@ class StoneModel:
             self.mfiAdjMean = normalizeData(os.path.join(path,'./data/New-Fig2B.csv'))
 
             # We only include a second sigma if new data
-            self.pNames.insert(12, 'sigma2')
+            self.sig2IDX = 12
+            self.KdxIDX = self.KdxIDX + 1
+            self.lb = np.insert(self.lb, self.sig2IDX, lbsigma)
+            self.ub = np.insert(self.ub, self.sig2IDX, ubsigma)
+            self.pNames.insert(self.sig2IDX, 'sigma2')
         else:
             # Load and normalize dataset one
             self.mfiAdjMean = normalizeData(os.path.join(path,'./data/Luxetal2013-Fig2B.csv'))
-
-        ## Define the matrix of Ka values from Bruhns
-        ## For accuracy, the Python implementation of this code will use
-        ## Ka values as opposed to Kd, as these were the values which Bruhns
-        ## gives in his experiments. These are read in from a csv in the
-        ## folder Nimmerjahn Lab and Bruhns Data. Each row represents a particular
-        ## FcgR (FcgRIA, FcgRIIA-H, FcgRIIA-R, FcgRIIB, FcgRIIIA-F, FcgRIIIA-V)
-        ## and each column represents a particular IgG(1, 2, 3, 4).
-
-        ## First, read in the csv. It will result in an iterable object, wherein
-        ## each element is a single-element list containing a single string, each
-        ## string corresponding to a single row from the csv.
-        self.kaBruhns = np.loadtxt(os.path.join(path,'./data/FcgR-Ka-Bruhns.csv'), delimiter=',')
-
-        ## Define concentrations of TNP-4-BSA and TNP-26-BSA, respectively
-        ## These are put into the numpy array "tnpbsa"
-        self.tnpbsa = np.array([1/67122,1/70928])*1e-3*5
-
-        # Set upper and lower bounds
-        ## Upper and lower bounds of the 12 parameters
-        lbR = 3
-        ubR = 8
-        lbKx = -25
-        ubKx = 3
-        lbc = -10
-        ubc = 5
-        lbsigma = -4
-        ubsigma = 1
-        lKdx = 0
-        uKdx = 10
-
-        ## Create vectors for upper and lower bounds
-        ## Only allow sampling of TNP-4 up to double its expected avidity.
-        ## Lower and upper bounds for avidity are specified here
-        if newData:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma,lbsigma,lKdx,lKdx], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma,ubsigma,uKdx,uKdx], dtype = np.float64)
-        else:
-            self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
-            self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma], dtype = np.float64)
-
-        # Indices for the various elements. Remember that for the new data the receptor
-        # expression is concatted
-        self.uvIDX = [9, 10]
-        self.kxIDX = [6]
-        self.cIDX = [7, 8]
-        self.sigIDX = 11
-        self.sig2IDX = 12
-        self.KdxIDX = [13, 14]
 
         self.Nparams = len(self.lb)
