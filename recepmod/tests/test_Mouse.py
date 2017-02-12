@@ -97,7 +97,7 @@ class TestStoneMouse(unittest.TestCase):
             raise ValueError('Negative input parameters')
         xN = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
         result = self.Mod.NimmerjahnMultiLinear(xN)
-        print(result.coef_)
+        #print(result.coef_)
 
 if __name__ == '__main__':
     unittest.main()
