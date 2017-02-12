@@ -88,7 +88,7 @@ def LLplot(dset, ax = None):
     if ax == None:
         ax = plt.gca()
 
-    plt.plot(dset['LL'], axes = ax)
+    plt.plot(dset['LL'][::10], axes = ax)
 
 def histSubplots(dset, axes=None):
     if axes == None:
