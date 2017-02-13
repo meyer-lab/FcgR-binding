@@ -5,6 +5,8 @@
 *.nb.html
 .Rhistory
 Manuscript/.texpadtmp
+*.py~
+*.gitignore~
 
 Manuscript/Manuscript.pdf
 .ipynb_checkpoints
