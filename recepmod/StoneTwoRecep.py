@@ -109,16 +109,20 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
 class StoneTwo:
     def getRbnd(self, gnu, L0):
-        reqOut = reqSolver(logR,Ka,gnu,Kx,L0)
+        Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
 
-        return StoneRbnd(reqOut)
+        vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
+
+        return StoneRbnd(vgridOut)
 
     def getRmultiAll(self, gnu, L0):
-        reqOut = reqSolver(logR,Ka,gnu,Kx,L0)
+        Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
 
-        return StoneRmultiAll(reqOut)
+        vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
+
+        return StoneRmultiAll(vgridOut)
 
     def __init__(self, logR, Ka, Kx):
-        self.logR = logR
-        self.Ka = Ka
-        self.Kx = Kx
+        self.logR = np.array(logR, dtype=np.float64, copy=True)
+        self.Ka = np.array(Ka, dtype=np.float64, copy=True)
+        self.Kx = np.array(Kx, dtype=np.float64, copy=True)
