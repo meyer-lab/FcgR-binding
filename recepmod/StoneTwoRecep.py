@@ -108,5 +108,17 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
     return np.array([np.nan, np.nan], dtype = np.float64)
 
 class StoneTwo:
-    def __init__(self):
-        print("Starting up")
+    def getRbnd(self, gnu, L0):
+        reqOut = reqSolver(logR,Ka,gnu,Kx,L0)
+
+        return StoneRbnd(reqOut)
+
+    def getRmultiAll(self, gnu, L0):
+        reqOut = reqSolver(logR,Ka,gnu,Kx,L0)
+
+        return StoneRmultiAll(reqOut)
+
+    def __init__(self, logR, Ka, Kx):
+        self.logR = logR
+        self.Ka = Ka
+        self.Kx = Kx
