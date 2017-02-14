@@ -21,18 +21,16 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     for ii in range(gnu+1):
         # jj is the number of receptor two bound
         for jj in range(gnu+1):
-            if ii+jj > gnu:
+            if ii+jj > gnu or (ii == 0 and jj == 0):
                 continue
 
             nmk = L0 * nmultichoosek(gnu,ii,jj)
-            ReqPenalty = Req[0]**jj * Req[1]**ii
 
-            if ii > 0:
-                KxPenalty = Kx**(ii+jj-1) * (Ka[1]/Ka[0])**jj
-                vGrid[ii, jj] = Ka[0]*nmk*KxPenalty*ReqPenalty
-            elif jj > 0:
-                KxPenalty = Kx**(ii+jj-1) * (Ka[1]/Ka[0])**(jj-1)
-                vGrid[ii, jj] = Ka[1]*nmk*KxPenalty*ReqPenalty
+            ReqPenalty = Req[0]**ii * Req[1]**jj
+
+            KxPenalty = Kx**(ii+jj-1) * (Ka[1]/Ka[0])**jj
+
+            vGrid[ii, jj] = Ka[0]*nmk*KxPenalty*ReqPenalty
 
     return vGrid
 
@@ -42,8 +40,8 @@ def StoneRbnd(vGrid):
     gnu = vGrid.shape[0] - 1
 
     # Sum along each axis to get the number of receptors in each pool
-    vGridSone = np.sum(vGrid, axis = 0)
-    vGridStwo = np.sum(vGrid, axis = 1)
+    vGridSone = np.sum(vGrid, axis = 1)
+    vGridStwo = np.sum(vGrid, axis = 0)
 
     # Multiply by number of receptors in each case
     vGridSone = np.multiply(vGridSone, np.arange(gnu+1))
@@ -54,6 +52,8 @@ def StoneRbnd(vGrid):
 # This calculates the RmultiAll quantity from a v_ij grid
 # This is the number of receptors multimerized with self or non-self
 def StoneRmultiAll(vGrid):
+    vGrid = np.copy(vGrid)
+
     # We can calculate gnu from the size of the v_ij grid
     gnu = vGrid.shape[0] - 1
 
@@ -62,8 +62,8 @@ def StoneRmultiAll(vGrid):
     vGrid[0,1] = 0.0
 
     # Sum along each axis to get the number of receptors in each pool
-    vGridSone = np.sum(vGrid, axis = 0)
-    vGridStwo = np.sum(vGrid, axis = 1)
+    vGridSone = np.sum(vGrid, axis = 1)
+    vGridStwo = np.sum(vGrid, axis = 0)
 
     # Multiply by number of receptors in each case
     vGridSone = np.multiply(vGridSone, np.arange(gnu+1))
@@ -90,38 +90,39 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
         return R - x - Rbnd
 
     curReq = np.array((-40, -40), dtype = np.float64)
+    prevReq = np.array(curReq, copy = True)
+
+    if np.max(np.multiply(rootF(curReq),rootF(logR))) > 0:
+        return np.array([np.nan, np.nan], dtype = np.float64)
 
     # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
-    for ii in range(5):
-        curReq[0] = brentq(lambda x: rootF(np.array((x, curReq[1])))[0], -40, logR[0], disp=False)
+    for ii in range(50):
         curReq[1] = brentq(lambda x: rootF(np.array((curReq[0], x)))[1], -40, logR[1], disp=False)
+        curReq[0] = brentq(lambda x: rootF(np.array((x, curReq[1])))[0], -40, logR[0], disp=False)
 
-        if np.max(rootF(curReq)) < 2.0E-12:
+        if np.max(np.abs(rootF(curReq))) < 1.0E-6 and ii > 3 and np.max(np.abs(curReq - prevReq)) < 1E-6:
             return curReq
+        else:
+            prevReq = curReq
 
     return np.array([np.nan, np.nan], dtype = np.float64)
 
 class StoneTwo:
-    def __init__(self):
-        print("Starting up")
+    def getRbnd(self, gnu, L0):
+        Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
 
+        vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
 
-if __name__ == "__main__":
-    M = StoneTwo()
+        return StoneRbnd(vgridOut)
 
-    Kd = 1.0E-8
-    L = 1E-7
-    Kx = 1.0E-7
+    def getRmultiAll(self, gnu, L0):
+        Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
 
-    logR = np.array((3, 2), dtype = np.float64)
+        vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
 
-    Req = reqSolver(logR, 1/Kd, 9, Kx, L)
+        return StoneRmultiAll(vgridOut)
 
-    gridd = StoneVgrid(np.power(10, Req), 1/Kd, 9, Kx, L)
-
-    Rbnd = StoneRbndDist(gridd)
-
-    np.set_printoptions(precision=1, linewidth=125)
-
-    print(Rbnd[0])
-    print(Rbnd[1])
+    def __init__(self, logR, Ka, Kx):
+        self.logR = np.array(logR, dtype=np.float64, copy=True)
+        self.Ka = np.array(Ka, dtype=np.float64, copy=True)
+        self.Kx = np.array(Kx, dtype=np.float64, copy=True)
