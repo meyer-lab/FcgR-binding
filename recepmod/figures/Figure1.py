@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib import gridspec
+from matplotlib import gridspec, rcParams
 import numpy as np
 from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized
@@ -156,6 +156,7 @@ def makeFigure():
     StoneM = StoneModel()
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
+    rcParams['lines.markeredgewidth'] = 1.0
 
     f = plt.figure(figsize=(7,6))
     gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,2,6,1,6,1])
