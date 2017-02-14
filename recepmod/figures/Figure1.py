@@ -38,7 +38,7 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,fontsize=legfontsize)
     ax2.set_xscale('log')
 
-def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1), legend=True):
+def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1), legend=True, yaxisfontsize=10):
     ## Please see comments from mfiAdjMeanFigureMaker
 ##    rc('text',usetex=False)
 
@@ -75,6 +75,12 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefonts
     ax.tick_params(axis='x',length=0)
     ax.grid(b=False)
     ax.set_yscale('log')
+    ax.set_yticks([float(10**j) for j in range(7)])
+##    ax.set_yticklabels([str('$10^{'+str(j)+'}$') for j in range(7)],fontsize=yaxisfontsize)
+    ticknames = []
+    for j in range(7):
+        exec("ticknames.append(r'$10^"+str(j)+"$')")
+    ax.set_yticklabels(ticknames)
     ax.set_ylabel(r"Number of Receptors",fontsize=ylabelfontsize)
 
 def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), legfontsize=10):
