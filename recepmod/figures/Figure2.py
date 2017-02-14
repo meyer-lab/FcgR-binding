@@ -1,4 +1,4 @@
-from matplotlib import gridspec
+from matplotlib import gridspec, rcParams
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,6 +15,7 @@ def makeFigure():
     pBest = dset.iloc[np.argmax(dset['LL']),:][2:].as_matrix()
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
+    rcParams['lines.markeredgewidth'] = 1.0
 
     # Setup plotting space
     f = plt.figure(figsize=(7,5))
