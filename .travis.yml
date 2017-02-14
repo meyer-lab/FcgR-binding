@@ -4,8 +4,6 @@ python:
 dist: trusty
 addons:
   apt_packages:
-    - pandoc
-    - pandoc-citeproc
     - texlive-latex-base
     - texlive-latex-extra
     - texlive-fonts-recommended
@@ -26,6 +24,8 @@ install:
   - pip install numpy scipy pandas h5py memoize2 matplotlib tqdm coverage
   - pip install codecov seaborn scikit-learn
   - cabal update
+  - cabal install pandoc
+  - cabal install pandoc-citeproc
   - cabal install pandoc-crossref
   - export PATH=$HOME/.cabal/bin:$PATH
 # command to run tests
