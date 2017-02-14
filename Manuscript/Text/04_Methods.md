@@ -12,15 +12,15 @@ The equilibrium binding of TNP-X-BSA to FcγRs was modeled using a two-parameter
 
 Therefore, according to the model, the number of ligand bound i-valently to the cell at equilibrium, v~eq~, can be found using the relation:
 
-$$ v_{i,eq} = {v\choose i} (K_x)^{i-1} {L_0}{K_a} \left(R_{eq}\right)^i $$ {#eq:vieq}
+$$ v_{i,eq} = \left( v\choose i \right) (K_x)^{i-1} {L_0}{K_a} \left(R_{eq}\right)^i $$ {#eq:vieq}
 
 Here, K~x~ is a cross-linking constant with units of # per cell, L~0~ is the concentration of ligand, and R~eq~ is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is:
 
-$$ L_{bound} = \sum_{i=1}^{v} v_{i,eq} = \sum_{i=1}^{v} {v\choose i} (K_x)^{i-1} {L_0}{K_a} (R_{eq})^i $$ {#eq:lbound}
+$$ L_{bound} = \sum_{i=1}^{v} v_{i,eq} = \sum_{i=1}^{v} \left( v\choose i \right) (K_x)^{i-1} {L_0}{K_a} (R_{eq})^i $$ {#eq:lbound}
 
 where v is the effective avidity of the ligand. R~eq~ represents the quantity of unbound receptors, and is a function of v, L~0~, K~a~, K~x~, and R~tot~, the total number of receptors expressed on the cell surface. R~eq~ can be approximated numerically using the following relationship when these parameters are known:
 
-$$ R_{tot} = R_{eq} \Big(1+v {L_0}{K_D} (1+K_x R_{eq})^{v-1}\Big) $$ {#eq:rtot}
+$$ R_{tot} = R_{eq} \left(1+v {L_0}{K_D} (1+K_x R_{eq})^{v-1}\right) $$ {#eq:rtot}
 
 As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium (R~multi~) can be found as follows:
 

@@ -14,13 +14,20 @@ addons:
     - texlive-xetex
     - cabal-install
     - ghc
-cache: pip
+# Caching so the next build will be fast too.
+cache:
+  directories:
+  - $HOME/.ghc
+  - $HOME/.cabal
+  - $HOME/.stack
+  - $HOME/.cache/pip
 # command to install dependencies
 install:
   - pip install numpy scipy pandas h5py memoize2 matplotlib tqdm coverage
   - pip install codecov seaborn scikit-learn
   - cabal update
   - cabal install pandoc-crossref
+  - export PATH=$HOME/.cabal/bin:$PATH
 # command to run tests
 script:
   - coverage run -m unittest discover
