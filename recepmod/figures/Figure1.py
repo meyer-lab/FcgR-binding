@@ -118,39 +118,52 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             exec('axarr.append(f.add_subplot(24'+str(int(j+1+np.floor(j/3)))+'))')
 
     ## Plotting mfiAdjMean
+##    for j in range(6):
+##        rects = []
+##        for k in range(4):
+##            temp = [0]*N
+##            temp.remove(0)
+##            temp.insert(k,np.nanmean(mfiAdjMean[4*(j-1)+k][1:4]))
+##            stds = [0]*N
+##            stds.remove(0)
+##            stds.insert(k,np.nanstd(mfiAdjMean[4*(j-1)+k][1:4]))
+##            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+##        for k in range(4):
+##            temp = [0]*N
+##            temp.remove(0)
+##            temp.insert(5+k,np.nanmean(mfiAdjMean[4*(j-1)+k][5:8]))
+##            stds = [0]*N
+##            stds.remove(0)
+##            stds.insert(5+k,np.nanstd(mfiAdjMean[4*(j-1)+k][5:8]))
+##            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
     for j in range(6):
         rects = []
+        temp = [[0]]*N
         for k in range(4):
-            temp = [0]*N
-            temp.remove(0)
-            temp.insert(k,np.nanmean(mfiAdjMean[4*(j-1)+k][1:4]))
-            stds = [0]*N
-            stds.remove(0)
-            stds.insert(k,np.nanstd(mfiAdjMean[4*(j-1)+k][1:4]))
-            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
-        for k in range(4):
-            temp = [0]*N
-            temp.remove(0)
-            temp.insert(5+k,np.nanmean(mfiAdjMean[4*(j-1)+k][5:8]))
-            stds = [0]*N
-            stds.remove(0)
-            stds.insert(5+k,np.nanstd(mfiAdjMean[4*(j-1)+k][5:8]))
-            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
-
+            temp.insert(k,[np.nanmean(mfiAdjMean[4*(j-1)+k][1:4])])
+            temp.insert(5+k,[np.nanmean(mfiAdjMean[4*(j-1)+k][5:8])])
+            print(temp)
+            print(' ')
+            if j == 6 and k == 4:
+                for elem in temp:
+                    print(elem)
+##            rects.append(sns.barplot(data=temp,color=sns.set_palette(sns.color_palette(colors)),ax=axarr[j]))
+        sns.barplot(data=temp,color=sns.set_palette('colorblind'),ax=axarr[j])
+    
     # axes and labels
-    for j in range(6):
-        axarr[j].set_xlim(-0.5*width,len(ind)-1+1.5*width)
-        axarr[j].xaxis.set_ticks(np.arange(-0.5*width,len(ind)-1+2.5*width,0.5))
-        axarr[j].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=tnpbsafontsize))
-        axarr[j].tick_params(axis='x', length=0)
-        axarr[j].grid(b=False)
-        axarr[j].set_ylim(0,5)
-        if j%3 == 0:
-            axarr[j].set_ylabel('mean-adjusted MFIs',fontsize=ylabelfontsize)
-        axarr[j].set_title(species[j],fontsize=subtitlefontsize)
-
+##    for j in range(6):
+##        axarr[j].set_xlim(-0.5*width,len(ind)-1+1.5*width)
+##        axarr[j].xaxis.set_ticks(np.arange(-0.5*width,len(ind)-1+2.5*width,0.5))
+##        axarr[j].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=tnpbsafontsize))
+##        axarr[j].tick_params(axis='x', length=0)
+##        axarr[j].grid(b=False)
+##        axarr[j].set_ylim(0,5)
+##        if j%3 == 0:
+##            axarr[j].set_ylabel('mean-adjusted MFIs',fontsize=ylabelfontsize)
+##        axarr[j].set_title(species[j],fontsize=subtitlefontsize)
+    
     ## Add a legend denoting IgG species
-    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox,fontsize=legfontsize)
+##    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox,fontsize=legfontsize)
 
 def makeFigure():
     StoneM = StoneModel()
