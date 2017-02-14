@@ -12,11 +12,14 @@ addons:
     - texlive-latex-recommended
     - lmodern
     - texlive-xetex
+    - cabal-install
 cache: pip
 # command to install dependencies
 install:
   - pip install numpy scipy pandas h5py memoize2 matplotlib tqdm coverage
   - pip install codecov seaborn scikit-learn
+  - cabal update
+  - cabal install pandoc-crossref
 # command to run tests
 script:
   - coverage run -m unittest discover
