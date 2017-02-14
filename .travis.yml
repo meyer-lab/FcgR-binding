@@ -12,7 +12,6 @@ addons:
   - texlive-xetex
   - cabal-install
   - ghc
-  - lftp
 cache:
   directories:
   - $HOME/.ghc
@@ -32,10 +31,3 @@ script:
 - make
 after_success:
 - codecov
-- make upload
-- if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then
-- make upload
-- fi
-env:
-  matrix:
-    secure: JmHsQ0vNWWDFqb+UgAjs07SguUAFD/jOBJsdTvngtWeAkUdrVb10ErbDc9+kh1SlV0qd9Ugdty4/7RC0A3MlTjhb6IisoSigtvaOjt0bR4Bq7IkJxkYDhydRKtlVfTub4bHiN5u4VP0lYRdeAeRE/XbhxuhTixfAu6Qg237QV03OkxpJYgAscH80wEWnoWCi0oyi+DzrooHHr8XQGyRPIaU/BXVkFOvRvb9eDFCPW9kBJqRfTviJrx5Vkhz4Co7aDzyQufSMkyolUFxew/rVXbGrZbwHwAbTvG70PYD/mFT4Oaw/NfICiMQl9P22vLMFNkfcbvkANC9geZhAPIrkVW31HuuhR0bd5pxCPh8bZfVvLjN+maRLm4tSyAmTXTcHsKyhyB2zd2mpEGzbwl7e9pJ3qR5AlfP4YiCGW9KJ0+XS953AARyS5cb2sFummjrpboQBTtU03zF3J9P6NPeXcCjMavZQIlivaJsjGxN6umwJ0pBztEEXLCrkS8YEAQyIWWgn6alP2/BHM+kU7ldK8kc81+syiKeArHTY2j3/UMg0WaD2xC61VcOl/unlc6AUHm5XqInMzrZFbxI7aOd9us1LwRCE0UmG5O0MKnXIC7nC8tNwE1uySLMraA9bs8kLsblvJvuoZNizB99cL8ryVxQ58Hz+/xnhpdLrLzpjKZw=

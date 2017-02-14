@@ -35,4 +35,4 @@ test:
 	python3 -m unittest discover
 
 upload:
-	lftp -c "set ftp:list-options -a; open $(LFTP_URL); cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
+	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
