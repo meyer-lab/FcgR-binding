@@ -13,6 +13,7 @@ addons:
     - lmodern
     - texlive-xetex
     - cabal-install
+    - ghc
 cache: pip
 # command to install dependencies
 install:

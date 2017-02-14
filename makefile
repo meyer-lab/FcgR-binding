@@ -1,6 +1,6 @@
 NPROCS := 8
 
-pan_common = --filter pandoc-citeproc -f markdown ./Manuscript/Text/*.md
+pan_common = -F pandoc-crossref -F pandoc-citeproc -f markdown ./Manuscript/Text/*.md
 fdir = ./Manuscript/Figures
 
 .PHONY: clean upload test
