@@ -1,4 +1,4 @@
-from .StoneModel import StoneMod
+from StoneModel import StoneMod
 import numpy as np
 import os
 import pandas as pd
@@ -6,6 +6,8 @@ from scipy.optimize import brentq
 from scipy.misc import comb
 from sklearn import linear_model
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(style="ticks")
 
 np.seterr(over = 'raise')
 
@@ -61,7 +63,7 @@ class StoneModelMouse:
             logR = x1[k]
             ## Set the affinity for the binding of the FcgR and IgG in question
             Ka = self.kaMouse[k][l]
-            if Ka == '+' or Ka == 0 or np.isnan(Ka):
+            if Ka == '+' or np.isnan(Ka):
                 continue
             Ka = float(Ka)
             ## Calculate the MFI which should result from this condition according to the model
@@ -166,15 +168,35 @@ class StoneModelMouse:
         reg = linear_model.LinearRegression()
         tbN = self.NimmerjahnEffectTable(x)
         # Assign independent variables and dependent variable "effect"
-		# Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
-        independent = np.array(tbN.iloc[list(range(2,6)), list(range(1,21,5))])
+        # Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
+        independent = np.array(tbN.iloc[list(range(2,6)), list(range(1,21,5))].apply(np.log10))
         independent = independent.reshape(4,4)
         effect = np.array(tbN.iloc[list(range(2,6)),30])
         effect = effect.reshape(4,1)
         # Linear regression and plot result
         result = reg.fit(independent, effect)
         plt.scatter(effect, reg.predict(independent), color='black')
-        plt.plot(effect, reg.predict(independent), color='blue',
-         linewidth=3)
+        plt.plot(effect, reg.predict(independent), color='blue', linewidth=3)
         plt.show()
         return result
+
+    def NimmerjahnLasso(self, x, fullOutput = True):
+        las = linear_model.Lasso()
+        tbN = self.NimmerjahnEffectTable(x)
+        # Assign independent variables and dependent variable "effect"
+        # Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
+        independent = np.array(tbN.iloc[list(range(6)), list(range(20))])
+        independent = independent.reshape(6,20)
+        effect = np.array(tbN.iloc[list(range(0,6)),30])
+        effect = effect.reshape(6,1)
+        # Linear regression and plot result
+        res = las.fit(independent, effect, normalize=True)
+        plt.scatter(effect, las.predict(independent), color='red')
+        plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
+        plt.show()
+        return res
+    
+    def FcgRPlots(self, x):
+        tbN = self.NimmerjahnEffectTable(x)
+        for i in range(20):
+            sns.lmplot(tbN.columns[i], tbN.columns[30], data=tbN, size = 4)

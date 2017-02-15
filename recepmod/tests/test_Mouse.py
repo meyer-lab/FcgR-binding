@@ -98,6 +98,8 @@ class TestStoneMouse(unittest.TestCase):
         xN = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
         result = self.Mod.NimmerjahnMultiLinear(xN)
         #print(result.coef_)
+        res = self.Mod.NimmerjahnLasso(xN)
+        #print(res.coef_)
 
 if __name__ == '__main__':
     unittest.main()
