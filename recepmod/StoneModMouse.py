@@ -1,4 +1,4 @@
-from StoneModel import StoneMod
+from recepmod.StoneModel import StoneMod
 import numpy as np
 import os
 import pandas as pd
