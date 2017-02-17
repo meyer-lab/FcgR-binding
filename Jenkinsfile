@@ -15,8 +15,7 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when { currentBuild.result == 'SUCCESS' }
-            when { env.BRANCH_NAME == 'master' || env.BRANCH_NAME.contains('writing') }
+            when { currentBuild.result == 'SUCCESS' && (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.contains('writing')) }
             steps {
                 sh 'make upload'
             }
