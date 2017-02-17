@@ -15,10 +15,9 @@ pipeline {
       }
     }
     stage('Deploy') {
+      when { currentBuild.result == 'SUCCESS' }
       steps {
-        if (currentBuild.result == 'SUCCESS') {
-          sh 'make upload'
-        }
+        sh 'make upload'
       }
     }
   }
