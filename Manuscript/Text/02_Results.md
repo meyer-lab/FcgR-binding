@@ -39,6 +39,8 @@ In order to interpret the complex variation in binding we observed with variatio
 
 
 
+
+
 ## The parameterized binding model provides specific predictions for the coordinate effects of immune complex abundance, avidity, and class
 
 ![**Specific predictions regarding the coordinate effects of immune complex parameters.** A) XXX. B) XXX. C) XXX.](./Figures/Foo.png){#fig:ParamModel}
