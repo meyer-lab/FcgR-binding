@@ -15,7 +15,7 @@ pipeline {
       }
     }
     stage('Deploy') {
-      when { currentBuild.result == 'SUCCESS' }
+      when { expression { currentBuild.result == 'SUCCESS' } }
       steps {
         sh 'make upload'
       }
