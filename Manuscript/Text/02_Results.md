@@ -4,15 +4,11 @@
 
 ![**FcγR binding changes with FcγR-IgG pair and avidity.** A) Quantification of human IgG subclass TNP-4-BSA and TNP-26-BSA immune complex binding to CHO cells expressing the indicated human FcγRs (N = 4). Background binding of the immune complexes to CHO cells expressing no human FcγR was subtracted from the mean fluorescence intensity (MFI) obtained for binding to CHO cells expressing individual human FcγRs. B) Receptor expression quantification for each CHO cell line expressing individual FcγRs. C) Measured TNP-4-BSA immune complex binding, normalized to the receptor expression within each CHO cell line, as a function of the measured FcγR-IgG subclass affinity [@Bruhns:2009kg]. D) Measured TNP-26-BSA immune complex binding, normalized to the receptor expression within each CHO cell line, as a function of the measured FcγR-IgG subclass affinity [@Bruhns:2009kg].](./Figures/Figure1.png){#fig:Binding}
 
-Building upon earlier work, we wished to examine the influence of immune complex avidity and composition on binding and subsequent activation of different FcγRs [@Lux:2013iv]. In a similar manner to before, we assessed the immune complex binding for each pair of four IgG and six FcγR subclasses at a single concentration. To do so, we utilized a panel of CHO cell lines stably expressing each FcgR and immune complexes assembled by use of BSA with 2,4,6-trinitrophenol (TNP) covalently attached at an average avidity of 4 or 26. anti-TNP antibodies of differing IgG class were then bound to the BSA complexes prior to treatment.
+Building upon earlier work, we wished to examine the influence of immune complex avidity and composition on binding and subsequent activation of different FcγRs [@Lux:2013iv]. In a similar manner to before, we assessed the immune complex binding for each pair of four IgG and six FcγR subclasses at a single concentration. To do so, we utilized a panel of CHO cell lines stably expressing each FcγR and immune complexes assembled by use of BSA with 2,4,6-trinitrophenol (TNP) covalently attached at an average avidity of 4 or 26. anti-TNP antibodies of differing IgG class were then bound to the BSA complexes prior to treatment.
 
-In order to verify its contribution to variation in measured binding, receptor abundance was measured quantitatively for each FcgR expressing cell line. This measurement revealed 20-fold variation in the amount of each FcγR expressed ([@Fig:Binding]A). Therefore, to interpret these measurements, we normalized the amount of binding measured to the amount of FcγR expressed, and plotted each measurement with respect to the measured affinity of the individual FcγR-IgG monovalent interaction ([@Fig:Binding]B). The measured binding and variation in binding with avidity closely recapitulated that measured previously [@Lux:2013iv].
+In order to verify its contribution to variation in measured binding, receptor abundance was measured quantitatively for each FcγR expressing cell line. This measurement revealed 20-fold variation in the amount of each FcγR expressed ([@Fig:Binding]A). Therefore, to interpret these measurements, we normalized the amount of binding measured to the amount of FcγR expressed, and plotted each measurement with respect to the measured affinity of the individual FcγR-IgG monovalent interaction ([@Fig:Binding]B). The measured binding and variation in binding with avidity closely recapitulated that measured previously [@Lux:2013iv].
 
-By comparing the normalized binding to the affinity of each FcgR-IgG interaction,
-
-
-
-
+By comparing the normalized binding to the affinity of each FcγR-IgG interaction, we observed a strong correlation between the affinity of the relevant FcγR-IgG pair and measured binding.
 
 
 
