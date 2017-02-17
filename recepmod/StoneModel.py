@@ -2,7 +2,6 @@ import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
-import warnings
 import os
 import pandas as pd
 

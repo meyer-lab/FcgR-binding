@@ -1,13 +1,11 @@
-from matplotlib import gridspec, rcParams
+from matplotlib import gridspec
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from ..StoneModel import StoneModel
 from ..StoneHelper import *
 from .FigureCommon import *
-import os
 import seaborn as sns
-
 
 def makeFigure():
     # Setup plotting space
