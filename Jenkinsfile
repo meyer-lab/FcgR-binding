@@ -12,6 +12,7 @@ pipeline {
     stage('Test'){
       steps {
         sh 'make test'
+        echo currentBuild.result
       }
     }
     stage('Deploy') {
