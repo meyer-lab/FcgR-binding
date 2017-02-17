@@ -19,7 +19,22 @@ By comparing the normalized binding to the affinity of each FcγR-IgG interactio
 
 ![**A multivalent binding model accounts for IgG-FcγR binding.** A) Schematic of the multivalent binding model for interaction of an immune complex with FcγRs. B) Trace for MCMC chain during fitting process. C) Predicted versus measured binding for each FcγR-IgG pair at each avidity. D) Marginal distribution for the crosslinking constant Kx. E) Marginal distribution for the constants to convert immune complex binding to normalized fluorescence signal. Note that each TNP-BSA experiment was normalized to the average signal across the experiment, and so TNP-26-BSA need not necessarily have 26/4-fold greater signal than TNP-4-BSA. F) Marginal distribution for the avidity of TNP-4-BSA and TNP-26-BSA. G) Marginal distribution for each distribution spread parameter. H) The marginal distributions for receptor expression within each cell line expressing a signal FcγR. Experimental measurements of receptor expression are individually overlaid. I) Marginal distribution of Kx.](./Figures/Figure2.png){#fig:Fit}
 
-Especially as
+In order to interpret the complex variation in binding we observed with variation in IgG-FcγR pair (and thus affinity), receptor expression, and immune complex avidity, we employed an equilibrium model of multivalent ligand/monovalent receptor binding [@Stone:2001fm]. Within the model, an initial binding event occurs with the kinetics of the monovalent interaction. Subsequent multivalent binding events occur with a partition coefficient K~x~. Thus, for K~x~ values much greater than 1, binding events lead to highly multivalent interactions, and for K~x~ values much less than 1 lead to mostly monovalent binding.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
