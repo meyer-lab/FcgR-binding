@@ -1,24 +1,25 @@
 pipeline {
-    agent any
-    environment {
-        PATH = "/bin:/usr/sbin:/usr/bin:/usr/local/bin"
+  agent any
+  environment {
+    PATH = "/bin:/usr/sbin:/usr/bin:/usr/local/bin"
+  }
+  stages {
+    stage('Build') {
+      steps {
+        sh 'make'
+      }
     }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'make'
-            }
-        }
-        stage('Test'){
-            steps {
-                sh 'make test'
-            }
-        }
-        stage('Deploy') {
-            when { currentBuild.result == 'SUCCESS' }
-            steps {
-                sh 'make upload'
-            }
-        }
+    stage('Test'){
+      steps {
+        sh 'make test'
+      }
     }
+    stage('Deploy') {
+      steps {
+        if (currentBuild.result == 'SUCCESS') {
+          sh 'make upload'
+        }
+      }
+    }
+  }
 }
