@@ -1,3 +1,19 @@
+[REPORTS]
+
+# Set the output format. Available formats are text, parseable, colorized, msvs
+# (visual studio) and html
+output-format=parseable
+
+# Tells whether to display a full report or only the messages
+reports=no
+
+
 [TYPECHECK]
 
 ignored-modules = numpy
+
+
+[MISCELLANEOUS]
+
+# List of note tags to take in consideration, separated by a comma.
+notes=FIXME,XXX,TODO
