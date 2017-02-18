@@ -1,23 +1,40 @@
 pipeline {
-    agent any
-    environment {
-        PATH = "/bin:/usr/sbin:/usr/bin:/usr/local/bin"
+  agent any
+  environment {
+    PATH = "/bin:/usr/sbin:/usr/bin:/usr/local/bin"
+  }
+  stages {
+    stage('Build') {
+      steps {
+        sh 'make'
+      }
     }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'make'
-            }
-        }
-        stage('Test'){
-            steps {
-                sh 'make test'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                sh 'make upload'
-            }
-        }
+    stage('Test'){
+      steps {
+        sh 'coverage run -m unittest discover'
+        sh 'coverage html --omit=/usr/local/lib/*'
+        publishHTML (target: [allowMissing: false,
+          alwaysLinkToLastBuild: false, keepAll: true,
+          reportDir: 'htmlcov', reportFiles: 'index.html',
+          reportName: "Coverage Report"])
+
+        sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
+
+        step([
+          $class                     : 'WarningsPublisher',
+          parserConfigurations       : [[
+          parserName: 'PYLint',
+          pattern   : 'pylint.log'
+          ]],
+          unstableTotalAll           : '1000',
+          usePreviousBuildAsReference: true
+          ])
+      }
     }
+    stage('Deploy') {
+      steps {
+        sh 'make upload'
+      }
+    }
+  }
 }

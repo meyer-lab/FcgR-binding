@@ -18,7 +18,7 @@ $(fdir)/Figure1%pdf $(fdir)/Figure2%pdf: genFigures.py
 Manuscript.pdf: ./Manuscript/Text/*.md
 	pandoc $(pan_common) --template=default.latex --latex-engine=xelatex  -o ./Manuscript/Manuscript.pdf
 
-index.html: ./Manuscript/Text/*.md $(fdir)/Figure1.png $(fdir)/Figure2.png
+index.html: ./Manuscript/Text/*.md $(fdir)/Figure1.png $(fdir)/Figure2.png $(fdir)/Figure3.png
 	pandoc -s $(pan_common) -t html5 --mathjax -c ./Templates/kultiad.css --template=./Manuscript/Templates/html.template -o ./Manuscript/index.html
 
 Manuscript.docx: ./Manuscript/Text/*.md

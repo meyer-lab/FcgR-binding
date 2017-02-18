@@ -5,12 +5,11 @@ import numpy as np
 import pandas as pd
 import h5py
 from tqdm import tqdm
-from .StoneModel import StoneModel
 
 try:
-   import cPickle as pickle
-except:
-   import pickle
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 # Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
@@ -42,7 +41,7 @@ def read_chain(filename):
     return (StoneM, pdset)
 
 def rep(x, N):
-  return [item for item in x for i in range(N)]
+    return [item for item in x for i in range(N)]
 
 # Return a dataframe with the measured data labeled with the condition variables
 def getMeasuredDataFrame(self):
@@ -61,7 +60,7 @@ def getMeasuredDataFrame(self):
 
 # Return a dataframe with the fit data labeled with the condition variables
 def getFitPrediction(self, x):
-    logSqrErr, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = self.NormalErrorCoef(x, fullOutput = True)
+    _, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = self.NormalErrorCoef(x, fullOutput = True)
 
     outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
 
@@ -91,8 +90,9 @@ def mapMCMC(dFunction, pSet):
 
     # Iterate over each parameter set
     TQDM = tqdm(range(pSet.shape[0]))
-    TQDM.mininterval=60;
-    TQDM.maxinterval=120;
+    TQDM.mininterval=60
+    TQDM.maxinterval=120
+
     for ii in TQDM:
         # Call the passed function and add the output to the list
         retVals.append(dFunction(pSet[ii,:]).assign(pSetNum = ii))
@@ -167,10 +167,10 @@ def getFitMeasSummarized(M):
 
     return fitMean
 
-def mapStore():
-   frameList = mapMCMC(lambda x: getFitPrediction(M,x),dset.as_matrix()[:,2:])
-   frameList.to_pickle('mapped_chain.pkl')
+def mapStore(dset, M):
+    frameList = mapMCMC(lambda x: getFitPrediction(M,x),dset.as_matrix()[:,2:])
+    frameList.to_pickle('mapped_chain.pkl')
 
 def reduce():
-   frameList = pd.read_pickle('mapped_chain.pkl')
-   return reduceMCMC(frameList)
+    frameList = pd.read_pickle('mapped_chain.pkl')
+    return reduceMCMC(frameList)
