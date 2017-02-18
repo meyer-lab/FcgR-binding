@@ -158,12 +158,19 @@ def makeFigure():
     gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,2,6,1,6,1])
     ax = f.add_subplot(gs1[0])
     FcgRQuantificationFigureMaker(StoneM,ax)
+
+    subplotLabel(ax, 'A')
+
     ax2 = f.add_subplot(gs1[2])
     ax3 = f.add_subplot(gs1[4])
 
     fitMean = getFitMeasSummarized(StoneM)
 
     plotNormalizedBindingvsKA(fitMean, ax2, ax3, legfontsize=8)
+
+    subplotLabel(ax2, 'B')
+    subplotLabel(ax3, 'C')
+
     gs2 = gridspec.GridSpec(8,4,height_ratios=[1,1,1,1,1,4,1,4])
     axarr = []
     for j in range(6):

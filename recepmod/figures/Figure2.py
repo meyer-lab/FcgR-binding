@@ -7,6 +7,7 @@ from ..StoneHelper import *
 from .FigureCommon import *
 import os
 import seaborn as sns
+import string
 
 def makeFigure():
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
@@ -24,23 +25,23 @@ def makeFigure():
 
     # Make grid
     gs1 = gridspec.GridSpec(3,3)
-    ax1 = f.add_subplot(gs1[0])
 
-    LLplot(dset, f.add_subplot(gs1[1]))
+    # Get list of axis objects
+    ax = [ f.add_subplot(gs1[x]) for x in range(9) ]
 
-    ax4 = f.add_subplot(gs1[3])
-    ax5 = f.add_subplot(gs1[4])
-    ax6 = f.add_subplot(gs1[5])
-    ax7 = f.add_subplot(gs1[6])
-    ax8 = f.add_subplot(gs1[7])
-    ax9 = f.add_subplot(gs1[8])
+    # Place likelihood plot
+    LLplot(dset, ax[1])
 
-    plotFit(getFitMeasMergedSummarized(M, pBest), ax = f.add_subplot(gs1[2]))
+    # Show predicted versus actual
+    plotFit(getFitMeasMergedSummarized(M, pBest), ax = ax[2])
 
+    # Make histogram subplots
+    histSubplots(dset, axes = [ax[3], ax[4], ax[5], ax[6]])
 
-    histSubplots(dset, axes = [ax4, ax5, ax6, ax7])
+    violinPlot(dset, ax = ax[7])
 
-    violinPlot(dset, ax = ax8)
+    for ii in range(len(ax)):
+        subplotLabel(ax[ii], string.ascii_uppercase[ii])
 
     return f
 
@@ -139,8 +140,8 @@ def plotFit(fitMean,ax=None, backGray=True):
 
     ax.set_yscale('log')
     ax.set_xscale('log')
-    ax.plot([0.08, 10], [0.08, 10])
+    ax.plot([0.01, 10], [0.01, 10])
     ax.set_ylim(0.01, 10)
-    ax.set_xlim(0.08, 70)
+    ax.set_xlim(0.01, 10)
     plt.xlabel('Fitted prediction')
     plt.ylabel('Measured ligand binding')

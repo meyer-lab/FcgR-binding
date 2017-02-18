@@ -6,6 +6,7 @@ from ..StoneModel import StoneModel
 from ..StoneHelper import *
 from .FigureCommon import *
 import seaborn as sns
+import string
 
 def makeFigure():
     # Setup plotting space
@@ -13,11 +14,19 @@ def makeFigure():
 
     # Make grid
     gs1 = gridspec.GridSpec(2,3)
-    ax1 = f.add_subplot(gs1[0])
-    ax2 = f.add_subplot(gs1[1])
-    ax3 = f.add_subplot(gs1[2])
-    ax4 = f.add_subplot(gs1[3])
-    ax5 = f.add_subplot(gs1[4])
-    ax6 = f.add_subplot(gs1[5])
+
+    # Get list of axis objects
+    ax = [ f.add_subplot(gs1[x]) for x in range(6) ]
+
+    # Plot subplot A
+    FirstFigure(ax[0])
+
+    for ii in range(len(ax)):
+        subplotLabel(ax[ii], string.ascii_uppercase[ii])
 
     return f
+
+def FirstFigure(ax = None):
+    # If no axis was provided make our own
+    if ax == None:
+        ax = plt.gca()
