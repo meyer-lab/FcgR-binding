@@ -11,7 +11,24 @@ pipeline {
     }
     stage('Test'){
       steps {
-        sh 'make test'
+        sh 'coverage run -m unittest discover'
+        sh 'coverage html'
+        publishHTML (target: [allowMissing: false,
+          alwaysLinkToLastBuild: false, keepAll: true,
+          reportDir: 'htmlcov', reportFiles: 'index.html',
+          reportName: "Coverage Report"])
+
+        sh 'pylint --output-format=parseable --reports=no recepmod > pylint.log || echo "pylint exited with $?")'
+
+        step([
+          $class                     : 'WarningsPublisher',
+          parserConfigurations       : [[
+          parserName: 'PYLint',
+          pattern   : 'pylint.log'
+          ]],
+          unstableTotalAll           : '0',
+          usePreviousBuildAsReference: true
+          ])
       }
     }
     stage('Deploy') {
