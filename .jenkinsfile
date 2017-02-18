@@ -26,7 +26,7 @@ pipeline {
           parserName: 'PYLint',
           pattern   : 'pylint.log'
           ]],
-          unstableTotalAll           : '0',
+          unstableTotalAll           : '1000',
           usePreviousBuildAsReference: true
           ])
       }
