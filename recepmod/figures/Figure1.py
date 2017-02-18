@@ -155,7 +155,6 @@ def makeFigure():
     rcParams['lines.markeredgewidth'] = 1.0
 
     f = plt.figure(figsize=(7,6))
-    f.tight_layout()
     gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,2,6,1,6,1])
     ax = f.add_subplot(gs1[0])
     FcgRQuantificationFigureMaker(StoneM,ax)

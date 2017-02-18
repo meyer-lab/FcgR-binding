@@ -9,6 +9,8 @@ import os
 import seaborn as sns
 
 def makeFigure():
+    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
+
     # Retrieve model and fit from hdf5 file
     M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
 
@@ -86,19 +88,36 @@ def violinPlot(dset, ax=None):
     objs = sns.violinplot(data=dset,cut=0,ax=ax) # ,color=colors[0]
 
 def LLplot(dset, ax = None):
+    # TODO: Should this maybe be a plot of the autocorrelation or geweke criterion instead?
     if ax == None:
         ax = plt.gca()
 
-    plt.plot(dset['LL'][::10], axes = ax)
+    # Find out how many walkers we had
+    nwalkers = int(np.max(dset['walker'])) + 1
+
+    # Make an index for what step values came from
+    dset = dset.assign(IDX = np.repeat(range(int(dset.shape[0]/nwalkers)), nwalkers))
+
+    # Reorganize data for plotting
+    dset = dset[['LL', 'walker', 'IDX']].pivot(index = 'IDX', columns = 'walker', values = 'LL')
+
+    # Plot LL values
+    dset.plot(ax = ax, legend = False, ylim = (-100, -50))
+
+    # Try and fix overlapping elements
+    plt.tight_layout()
+
 
 def histSubplots(dset, axes=None):
     if axes == None:
         fig, axes = plt.subplots(nrows=1, ncols=4)
 
-    dset[['Kx1']].plot.hist(ax=axes[0], bins = 100, color=colors[0])
-    dset[['sigConv1', 'sigConv2']].plot.hist(ax=axes[1], bins = 100, color=[colors[j] for j in range(2)])
-    dset[['gnu1', 'gnu2']].plot.hist(ax=axes[2], bins = 100, color=[colors[j] for j in range(2)])
-    dset[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 100, color=[colors[j] for j in range(2)])
+    dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 10)),:]
+
+    dsetFilter[['Kx1']].plot.hist(ax=axes[0], bins = 100, color=colors[0])
+    dsetFilter[['sigConv1', 'sigConv2']].plot.hist(ax=axes[1], bins = 100, color=[colors[j] for j in range(2)])
+    dsetFilter[['gnu1', 'gnu2']].plot.hist(ax=axes[2], bins = 100, color=[colors[j] for j in range(2)])
+    dsetFilter[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 100, color=[colors[j] for j in range(2)])
 
 def plotFit(fitMean,ax=None, backGray=True):
     # This should take a merged and summarized data frame
