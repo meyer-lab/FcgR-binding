@@ -11,3 +11,6 @@ with PdfPages('./Manuscript/Figures/Figure1.pdf') as pdf:
 
 with PdfPages('./Manuscript/Figures/Figure2.pdf') as pdf:
     pdf.savefig(Figure2.makeFigure())
+
+with PdfPages('./Manuscript/Figures/Figure3.pdf') as pdf:
+    pdf.savefig(Figure3.makeFigure())

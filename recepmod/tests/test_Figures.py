@@ -5,7 +5,7 @@ from ..figures import Figure3
 from ..figures import Figure4
 from ..figures import Figure5
 import numpy as np
-import random
+import pandas
 import os
 import time
 from ..StoneModel import StoneModel
@@ -25,6 +25,9 @@ class TestFigMethods(unittest.TestCase):
         # Return the fit and binding data summary data set
         fitMean = getFitMeasMergedSummarized(self.M, self.M.lb)
 
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(fitMean, pandas.core.frame.DataFrame)
+
         # Create the measured binding vs. ka plot
         Figure1.plotNormalizedBindingvsKA(fitMean)
 
@@ -38,19 +41,15 @@ class TestFigMethods(unittest.TestCase):
         self.assertTrue(True)
 
     # Test the predicted vs. measured plot
-    def test_Fig2_plotFit_plot(self):
+    def test_Fig2_plots(self):
         # Create the data and fit frame based on the lower bounds values
         fitFrame = getFitMeasMergedSummarized(self.M, self.M.lb)
+
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(fitFrame, pandas.core.frame.DataFrame)
 
         # Create fit of measured vs. predicted
         Figure2.plotFit(fitFrame)
-
-        self.assertTrue(True)
-
-    # Test LL plot
-    def test_Fig2_plotQuant_plot(self):
-        # Create the data and fit frame based on the lower bounds values
-        fitFrame = getFitMeasMergedSummarized(self.M, self.M.lb)
 
         # Create the LL of the fit plot
         Figure2.plotQuant(fitFrame, 'Meas_mean', 'Meas_mean')
