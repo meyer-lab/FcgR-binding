@@ -171,7 +171,6 @@ class StoneModel:
             ## Iterate over each kind of FcgR
             for k in range(6):
                 logR = x[k]
-                R = np.power(10, logR)
 
                 # If we have the receptor expression also fit that data
                 if self.newData:

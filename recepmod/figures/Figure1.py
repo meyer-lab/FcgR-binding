@@ -39,26 +39,31 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     ax2.set_xscale('log')
 
 def FcgRQuantificationFigureMaker(StoneM, ax=None):
+    # Put receptor expression measurements into a dataframe
     df = pd.DataFrame(StoneM.Rquant).T
 
-    df.columns = ['IA','IIA-131R','IIA-131H','IIB','IIIA-158F','IIIA-158V']
+    # Assign the names of the receptors
+    df.columns = fcgrs
 
+    # Melt the dataframe
     dfm = pd.melt(df)
 
+    # Remove nan values and transform to absolute scale
     dfm = dfm[np.isfinite(dfm['value'])]
     dfm['value'] = dfm['value'].apply(lambda x: np.power(10,x))
 
     ## Create bars and error bars per species
     if ax == None:
-        f = plt.figure()
-        ax = f.add_subplot(121)
+        ax = plt.figure().add_subplot(121)
 
+    # Plot everything
     axx = sns.barplot(x = "variable", y = "value", data = dfm, ax = ax)
 
     ## Set up axes
     axx.set_yscale('log')
-    axx.set_ylim(1.0E4, 1.0E7)
-    axx.set_ylabel(r"Number of Receptors")
+    axx.set_ylim(1.0E5, 1.0E7)
+    axx.set_ylabel("Number of Receptors")
+    axx.set_xlabel("")
 
 def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), legfontsize=10):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
@@ -150,6 +155,7 @@ def makeFigure():
     rcParams['lines.markeredgewidth'] = 1.0
 
     f = plt.figure(figsize=(7,6))
+    f.tight_layout()
     gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,2,6,1,6,1])
     ax = f.add_subplot(gs1[0])
     FcgRQuantificationFigureMaker(StoneM,ax)
