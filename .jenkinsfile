@@ -18,7 +18,7 @@ pipeline {
           reportDir: 'htmlcov', reportFiles: 'index.html',
           reportName: "Coverage Report"])
 
-        sh 'pylint --output-format=parseable --reports=no recepmod > pylint.log || echo "pylint exited with $?")'
+        sh '(pylint --output-format=parseable --reports=no recepmod > pylint.log || echo "pylint exited with $?")'
 
         step([
           $class                     : 'WarningsPublisher',
