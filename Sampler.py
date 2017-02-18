@@ -38,4 +38,3 @@ for p, lnprob, lnlike in sampler.sample(p0, iterations=niters, storechain=False)
 
         print((dset.shape, bestLL))
         thinTrack = 1
-    pass

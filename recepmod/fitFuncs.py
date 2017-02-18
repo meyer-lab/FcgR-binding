@@ -2,9 +2,9 @@ import numpy as np
 import h5py
 
 try:
-   import cPickle as pickle
-except:
-   import pickle
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 def startH5File(StoneM, filename):
     # Dump class to a string to store with MCMC chain

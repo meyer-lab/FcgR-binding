@@ -2,7 +2,6 @@ import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
-import warnings
 import os
 import pandas as pd
 
@@ -172,7 +171,6 @@ class StoneModel:
             ## Iterate over each kind of FcgR
             for k in range(6):
                 logR = x[k]
-                R = np.power(10, logR)
 
                 # If we have the receptor expression also fit that data
                 if self.newData:
