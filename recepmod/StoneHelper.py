@@ -167,7 +167,7 @@ def getFitMeasSummarized(M):
 
     return fitMean
 
-def mapStore():
+def mapStore(dset, M):
    frameList = mapMCMC(lambda x: getFitPrediction(M,x),dset.as_matrix()[:,2:])
    frameList.to_pickle('mapped_chain.pkl')
 
