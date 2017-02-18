@@ -17,3 +17,8 @@ ignored-modules = numpy, numpy.random
 
 # List of note tags to take in consideration, separated by a comma.
 notes=FIXME,XXX,TODO
+
+[MESSAGES CONTROL]
+# Disable the following PyLint messages:
+# C0103 - Invalid argument name
+disable-msg=C0103
