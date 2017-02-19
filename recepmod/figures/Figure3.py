@@ -9,7 +9,7 @@ import seaborn as sns
 import string
 import os
 from itertools import product
-from ..StoneTwoRecep import StoneTwo
+from ..StoneTwoRecep import StoneTwo, StoneVgrid
 from cycler import cycler
 
 # Figure 3: Specific predictions regarding the coordinate effects of immune
@@ -116,8 +116,6 @@ def TwoRecep(dset, ax = None):
     #ax[1].set_ylim(0, 1000)
 
 
-
-
 def Kdplot(dset, ax = None):
     # If no axis was provided make our own
     if ax == None:
@@ -133,3 +131,39 @@ def Kdplot(dset, ax = None):
     dset = dset.apply(calculate, axis = 1)
 
     dset.hist(column = "Kx", ax = ax, bins = 50)
+
+
+def runTwoRecepPredict(ax):
+    # Active, inhibitory
+    Req = [1.0E4, 0]
+    Kx = np.power(10, -6.7)
+
+    # Ka
+    Ka = [2.0E6, 1.2E5]
+    L0 = 1E-4
+
+
+    output = np.zeros((30,1), dtype = np.float64)
+
+    def process(gnu):
+        multGrid = np.zeros((gnu+1, gnu+1), dtype = np.float64)
+
+        for ii in range(gnu+1):
+            for jj in range(gnu+1):
+                if ii > jj:
+                    multGrid[ii,jj] = ii-jj-1
+
+        gridd = StoneVgrid(Req,Ka,gnu,Kx,L0)
+
+        gridd = gridd / np.sum(np.sum(gridd))
+
+        gridd = np.multiply(gridd, multGrid)
+
+        return np.sum(np.sum(gridd))
+
+    for ii in range(2, 30):
+        output[ii] = process(ii)
+
+
+
+    ax.plot(output)
