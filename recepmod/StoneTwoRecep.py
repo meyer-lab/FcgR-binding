@@ -2,7 +2,6 @@ import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
-import pandas as pd
 
 # A fast cached version of nchoosek
 @memoize
