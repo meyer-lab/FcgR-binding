@@ -14,7 +14,7 @@ def nmultichoosek(n, k, i):
 # Req should be a tuple of size 2
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
     # Initialize the grid of possibilities
-    vGrid = np.zeros([gnu+1, gnu+1], dtype = np.float64)
+    vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float64)
 
     # ii is the number of receptor one bound
     for ii in range(gnu+1):
@@ -39,8 +39,8 @@ def StoneRbnd(vGrid):
     gnu = vGrid.shape[0] - 1
 
     # Sum along each axis to get the number of receptors in each pool
-    vGridSone = np.sum(vGrid, axis = 1)
-    vGridStwo = np.sum(vGrid, axis = 0)
+    vGridSone = np.sum(vGrid, axis=1)
+    vGridStwo = np.sum(vGrid, axis=0)
 
     # Multiply by number of receptors in each case
     vGridSone = np.multiply(vGridSone, np.arange(gnu+1))
@@ -61,8 +61,8 @@ def StoneRmultiAll(vGrid):
     vGrid[0,1] = 0.0
 
     # Sum along each axis to get the number of receptors in each pool
-    vGridSone = np.sum(vGrid, axis = 1)
-    vGridStwo = np.sum(vGrid, axis = 0)
+    vGridSone = np.sum(vGrid, axis=1)
+    vGridStwo = np.sum(vGrid, axis=0)
 
     # Multiply by number of receptors in each case
     vGridSone = np.multiply(vGridSone, np.arange(gnu+1))
@@ -89,10 +89,10 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
         return R - x - Rbnd
 
     curReq = np.array((-40, -40), dtype = np.float64)
-    prevReq = np.array(curReq, copy = True)
+    prevReq = np.array(curReq, copy=True)
 
     if np.max(np.multiply(rootF(curReq),rootF(logR))) > 0:
-        return np.array([np.nan, np.nan], dtype = np.float64)
+        return np.array([np.nan, np.nan], dtype=np.float64)
 
     # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
     for ii in range(50):
