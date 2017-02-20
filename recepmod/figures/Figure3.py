@@ -2,9 +2,9 @@ from matplotlib import gridspec
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from ..StoneModel import *
-from ..StoneHelper import *
-from .FigureCommon import *
+from ..StoneModel import StoneMod
+from ..StoneHelper import read_chain
+from .FigureCommon import subplotLabel
 import seaborn as sns
 import string
 import os
