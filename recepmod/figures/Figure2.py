@@ -1,13 +1,11 @@
 from matplotlib import gridspec, rcParams
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-from ..StoneModel import StoneModel
-from ..StoneHelper import *
-from .FigureCommon import *
 import os
 import seaborn as sns
 import string
+from ..StoneHelper import read_chain, getFitMeasMergedSummarized
+from .FigureCommon import Igs, FcgRs, igs, fcgrs, makeFcIgLegend, colors, subplotLabel
 
 def makeFigure():
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
