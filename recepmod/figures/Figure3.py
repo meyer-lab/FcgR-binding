@@ -2,15 +2,15 @@ from matplotlib import gridspec
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from ..StoneModel import StoneMod
-from ..StoneHelper import read_chain
-from .FigureCommon import subplotLabel
 import seaborn as sns
 import string
 import os
 from itertools import product
-from ..StoneTwoRecep import StoneTwo, StoneVgrid
 from cycler import cycler
+from ..StoneModel import StoneMod
+from ..StoneHelper import read_chain
+from .FigureCommon import subplotLabel
+from ..StoneTwoRecep import StoneTwo, StoneVgrid
 
 # Figure 3: Specific predictions regarding the coordinate effects of immune
 # complex parameters.
