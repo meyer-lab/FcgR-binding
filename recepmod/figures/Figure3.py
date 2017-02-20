@@ -37,7 +37,7 @@ def makeFigure():
     ax = [ f.add_subplot(gs1[x]) for x in range(6) ]
 
     # Plot subplot A
-    PredictionVersusAvidity(dsetFilter, ax[0:4])
+    PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
     TwoRecep(dset, ax = ax[4:6])
@@ -56,6 +56,7 @@ def PredictionVersusAvidity(ax):
     Rexp = 3.0
     avidity = [1, 2, 4, 8, 16, 32]
     Ka = 1.0E5
+    # TODO: Have Kx set from data for the given Ka
     Kx = np.power(10, -6.7)
     ligand = np.logspace(start = -9, stop = -5, num = 40)
 
