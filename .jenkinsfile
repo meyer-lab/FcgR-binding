@@ -12,13 +12,12 @@ pipeline {
     stage('Test'){
       steps {
         sh 'coverage run -m unittest discover'
-        sh 'coverage html --omit=/usr/local/lib/*'
-        publishHTML (target: [allowMissing: false,
-          alwaysLinkToLastBuild: false, keepAll: true,
-          reportDir: 'htmlcov', reportFiles: 'index.html',
-          reportName: "Coverage Report"])
+        sh 'coverage xml -o coverage.xml --omit=/usr/local/lib/*'
+        sh 'cobertura-clover-transform coverage.xml > clover.xml'
 
         sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
+
+        step([$class: 'CloverPublisher', cloverReportDir: 'reports', cloverReportFileName: 'clover.xml'])
 
         step([
           $class                     : 'WarningsPublisher',
