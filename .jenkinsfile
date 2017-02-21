@@ -17,7 +17,7 @@ pipeline {
 
         sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
 
-        step([$class: 'CloverPublisher', cloverReportDir: 'reports', cloverReportFileName: 'clover.xml'])
+        step([$class: 'CloverPublisher', cloverReportDir: '.', cloverReportFileName: 'clover.xml'])
 
         step([
           $class                     : 'WarningsPublisher',
