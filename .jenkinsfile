@@ -12,13 +12,13 @@ pipeline {
     stage('Test'){
       steps {
         sh 'coverage run -m unittest discover'
-        sh 'coverage xml -o coverage.xml --omit=/usr/local/lib/*'
-        sh 'mkdir -p ./report'
-        sh 'cobertura-clover-transform coverage.xml > ./report/clover.xml'
+        //sh 'coverage xml -o coverage.xml --omit=/usr/local/lib/*'
+        //sh 'mkdir -p ./report'
+        //sh 'cobertura-clover-transform coverage.xml > ./report/clover.xml'
 
         sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
 
-        step([$class: 'CloverPublisher', cloverReportDir: 'report', cloverReportFileName: 'clover.xml'])
+        //step([$class: 'CloverPublisher', cloverReportDir: 'report', cloverReportFileName: 'clover.xml'])
 
         step([
           $class                     : 'WarningsPublisher',
