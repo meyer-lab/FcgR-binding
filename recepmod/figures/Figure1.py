@@ -63,7 +63,9 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None):
     axx.set_yscale('log')
     axx.set_ylim(1.0E5, 1.0E7)
     axx.set_ylabel("Number of Receptors")
+    ax.set_xlabel("")
     axx.set_xlabel("")
+    axx.set_xticklabels(axx.get_xticklabels(),rotation=90)
 
 def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), legfontsize=10):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
