@@ -125,30 +125,15 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
         temp = [[0]]*N
         for k in range(4):
             temp.insert(k,[np.nanmean(mfiAdjMean[4*(j-1)+k][1:4])])
+            temp.pop(4)
             temp.insert(5+k,[np.nanmean(mfiAdjMean[4*(j-1)+k][5:8])])
-            #print(temp)
-            #print(' ')
+            temp.pop(-1)
             if j == 6 and k == 4:
                 for elem in temp:
                     a = 1
-                    #print(elem)
-##            rects.append(sns.barplot(data=temp,color=sns.set_palette(sns.color_palette(colors)),ax=axarr[j]))
+
         sns.barplot(data=temp,color=sns.set_palette('colorblind'),ax=axarr[j])
-
-    # axes and labels
-##    for j in range(6):
-##        axarr[j].set_xlim(-0.5*width,len(ind)-1+1.5*width)
-##        axarr[j].xaxis.set_ticks(np.arange(-0.5*width,len(ind)-1+2.5*width,0.5))
-##        axarr[j].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=tnpbsafontsize))
-##        axarr[j].tick_params(axis='x', length=0)
-##        axarr[j].grid(b=False)
-##        axarr[j].set_ylim(0,5)
-##        if j%3 == 0:
-##            axarr[j].set_ylabel('mean-adjusted MFIs',fontsize=ylabelfontsize)
-##        axarr[j].set_title(species[j],fontsize=subtitlefontsize)
-
-    ## Add a legend denoting IgG species
-##    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox,fontsize=legfontsize)
+        axarr[j].set_xticklabels(['' for j in range(len(axarr[j].get_xticklabels()))])
 
 def makeFigure():
     StoneM = StoneModel()
