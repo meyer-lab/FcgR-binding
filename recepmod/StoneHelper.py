@@ -19,7 +19,7 @@ def read_chain(filename):
     # Create pointer to main data set
     dset = f['/data']
 
-    if dset == None:
+    if dset is None:
         raise AssertionError("Dataset from hdf5 was read as empty.")
 
     # Read in StoneModel and unpickle
@@ -65,18 +65,18 @@ def getFitPrediction(self, x):
     outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
 
     dd = (pd.DataFrame(data = outputFit, columns = ['Fit'])
-            .assign(LL = np.reshape(np.transpose(outputLL), (-1, 1)))
-            .assign(Ig = self.Igs*12)
-            .assign(FcgR = rep(self.FcgRs, 4)*2)
-            .assign(TNP = rep(self.TNPs, 24))
-            .assign(Expression = rep(self.Rquant, 4)*2)
-            .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (2, 1)))
-            .assign(RbndPred = np.reshape(np.transpose(outputRbnd), (-1, 1)))
-            .assign(RmultiPred = np.reshape(np.transpose(outputRmulti), (-1, 1)))
-            .assign(nXlinkPred = np.reshape(np.transpose(outputnXlink), (-1, 1)))
-            .assign(LbndPred = np.reshape(np.transpose(outputLbnd), (-1, 1)))
-            .assign(Req = np.reshape(np.transpose(outputReq), (-1, 1)))
-            )
+          .assign(LL = np.reshape(np.transpose(outputLL), (-1, 1)))
+          .assign(Ig = self.Igs*12)
+          .assign(FcgR = rep(self.FcgRs, 4)*2)
+          .assign(TNP = rep(self.TNPs, 24))
+          .assign(Expression = rep(self.Rquant, 4)*2)
+          .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (2, 1)))
+          .assign(RbndPred = np.reshape(np.transpose(outputRbnd), (-1, 1)))
+          .assign(RmultiPred = np.reshape(np.transpose(outputRmulti), (-1, 1)))
+          .assign(nXlinkPred = np.reshape(np.transpose(outputnXlink), (-1, 1)))
+          .assign(LbndPred = np.reshape(np.transpose(outputLbnd), (-1, 1)))
+          .assign(Req = np.reshape(np.transpose(outputReq), (-1, 1)))
+          )
 
     return dd
 
