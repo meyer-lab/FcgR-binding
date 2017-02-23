@@ -98,9 +98,11 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
 
     if axarr == None:
         f = plt.figure()
-        axarr = []
-        for j in range(6):
-            exec('axarr.append(f.add_subplot(24'+str(int(j+1+temp.floor(j/3)))+'))')
+
+        # Make grid
+        gs1 = gridspec.GridSpec(2,3)
+
+        axarr = [ f.add_subplot(gs1[x]) for x in range(6) ]
 
     ## Find nanmeans of experimental groups; each index j is an FcgR, while each k is an IgG. temp is a list of length 9, for that there are two species of TNP-BSA per FcgR and IgG, and there needs to be a single blank bar in between the bars of these two species
     for j in range(6):
