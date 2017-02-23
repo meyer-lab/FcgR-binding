@@ -92,6 +92,10 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     tnpbsaLabels.insert(4,'TNP-4-BSA')
     tnpbsaLabels.insert(14,'TNP-26-BSA')
 
+    ## Set up repeating color palette
+    preColor = sns.color_palette('Set1',n_colors=5)
+    color = preColor+[preColor[j] for j in range(4)]
+
     ## Generate a figure with a 2 X 4 array of subplots; the rightmost column exists
     ## only as a place to put the legend. The axes of these rightmost plots are whited
     ## out for de-facto invisibility.
@@ -99,27 +103,11 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
         f = plt.figure()
         axarr = []
         for j in range(6):
-            exec('axarr.append(f.add_subplot(24'+str(int(j+1+np.floor(j/3)))+'))')
+            exec('axarr.append(f.add_subplot(24'+str(int(j+1+temp.floor(j/3)))+'))')
 
-    ## Plotting mfiAdjMean
-##    for j in range(6):
-##        rects = []
-##        for k in range(4):
-##            temp = [0]*N
-##            temp.remove(0)
-##            temp.insert(k,np.nanmean(mfiAdjMean[4*(j-1)+k][1:4]))
-##            stds = [0]*N
-##            stds.remove(0)
-##            stds.insert(k,np.nanstd(mfiAdjMean[4*(j-1)+k][1:4]))
-##            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
-##        for k in range(4):
-##            temp = [0]*N
-##            temp.remove(0)
-##            temp.insert(5+k,np.nanmean(mfiAdjMean[4*(j-1)+k][5:8]))
-##            stds = [0]*N
-##            stds.remove(0)
-##            stds.insert(5+k,np.nanstd(mfiAdjMean[4*(j-1)+k][5:8]))
-##            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+    temp = sns.set_palette('colorblind')
+    print(type(temp))
+
     for j in range(6):
         rects = []
         temp = [[0]]*N
@@ -128,12 +116,15 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             temp.pop(4)
             temp.insert(5+k,[np.nanmean(mfiAdjMean[4*(j-1)+k][5:8])])
             temp.pop(-1)
-            if j == 6 and k == 4:
-                for elem in temp:
-                    a = 1
 
-        sns.barplot(data=temp,color=sns.set_palette('colorblind'),ax=axarr[j])
+##        sns.barplot(data=temp,color=sns.set_palette('colorblind'),ax=axarr[j],capsize=1.0)
+        sns.barplot(data=temp,palette=color,ax=axarr[j])
         axarr[j].set_xticklabels(['' for j in range(len(axarr[j].get_xticklabels()))])
+##    print(axarr[0].get_children())
+##    axarr[0].get_children()[0].set_edgecolor((1,1,1,1))
+##    axarr[0].get_children()[20].set_color((0,0,0))
+##    book = getstate(axarr[0].get_children()[20])
+##    axarr[0].get_children()[20].update()
 
 def makeFigure():
     StoneM = StoneModel()
