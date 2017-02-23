@@ -96,35 +96,35 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     preColor = sns.color_palette('Set1',n_colors=5)
     color = preColor+[preColor[j] for j in range(4)]
 
-    ## Generate a figure with a 2 X 4 array of subplots; the rightmost column exists
-    ## only as a place to put the legend. The axes of these rightmost plots are whited
-    ## out for de-facto invisibility.
     if axarr == None:
         f = plt.figure()
         axarr = []
         for j in range(6):
             exec('axarr.append(f.add_subplot(24'+str(int(j+1+temp.floor(j/3)))+'))')
 
-    temp = sns.set_palette('colorblind')
-    print(type(temp))
-
+    ## Find nanmeans of experimental groups; each index j is an FcgR, while each k is an IgG. temp is a list of length 9, for that there are two species of TNP-BSA per FcgR and IgG, and there needs to be a single blank bar in between the bars of these two species
     for j in range(6):
-        rects = []
         temp = [[0]]*N
         for k in range(4):
-            temp.insert(k,[np.nanmean(mfiAdjMean[4*(j-1)+k][1:4])])
+            temp.insert(k,[np.nanmean(mfiAdjMean[4*(j-1)+k][1:5])])
             temp.pop(4)
-            temp.insert(5+k,[np.nanmean(mfiAdjMean[4*(j-1)+k][5:8])])
+            temp.insert(5+k,[np.nanmean(mfiAdjMean[4*(j-1)+k][5:9])])
             temp.pop(-1)
 
-##        sns.barplot(data=temp,color=sns.set_palette('colorblind'),ax=axarr[j],capsize=1.0)
+    ## Create bar plot, and remove xticklabels
         sns.barplot(data=temp,palette=color,ax=axarr[j])
         axarr[j].set_xticklabels(['' for j in range(len(axarr[j].get_xticklabels()))])
-##    print(axarr[0].get_children())
-##    axarr[0].get_children()[0].set_edgecolor((1,1,1,1))
-##    axarr[0].get_children()[20].set_color((0,0,0))
-##    book = getstate(axarr[0].get_children()[20])
-##    axarr[0].get_children()[20].update()
+
+    ## Color the bar edges
+    for j in range(6):
+        tnp4bsaBars = axarr[j].get_children()[0:4]
+        for bar in tnp4bsaBars:
+            bar.set_edgecolor((1,0.5,0.5))
+            bar.set_linewidth(1.5)
+        tnp26bsaBars = axarr[j].get_children()[5:9]
+        for bar in tnp26bsaBars:
+            bar.set_edgecolor('black')
+            bar.set_linewidth(1.5)
 
 def makeFigure():
     StoneM = StoneModel()
@@ -133,7 +133,7 @@ def makeFigure():
     rcParams['lines.markeredgewidth'] = 1.0
 
     f = plt.figure(figsize=(7,6))
-    gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,2,6,1,6,1])
+    gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,1,5,1,5,1])
     ax = f.add_subplot(gs1[0])
     FcgRQuantificationFigureMaker(StoneM,ax)
 
@@ -149,10 +149,10 @@ def makeFigure():
     subplotLabel(ax2, 'B')
     subplotLabel(ax3, 'C')
 
-    gs2 = gridspec.GridSpec(8,4,height_ratios=[1,1,1,1,1,4,1,4])
+    gs2 = gridspec.GridSpec(7,7,height_ratios=[1,1,1,1,2,4,4],width_ratios=[4,1,4,1,4,1,2])
     axarr = []
     for j in range(6):
-        axarr.append(f.add_subplot(gs2[20+j+5*int(np.floor(j/3))]))
+        axarr.append(f.add_subplot(gs2[35+2*j+int(np.floor(j/3))]))
     mfiAdjMeanFigureMaker(StoneM,axarr,legbbox=(1.75,1),tnpbsafontsize=7,subtitlefontsize=7,ylabelfontsize=7,legfontsize=7)
 
     return f
