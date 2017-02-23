@@ -30,4 +30,4 @@ def makeFcIgLegend():
     return patches
 
 def subplotLabel(ax, letter):
-    ax.text(-0.1, 1.1, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
+    ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
