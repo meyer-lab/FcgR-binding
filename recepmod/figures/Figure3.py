@@ -1,16 +1,16 @@
+import os
+import string
+from itertools import product
 from matplotlib import gridspec
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from ..StoneModel import *
-from ..StoneHelper import *
-from .FigureCommon import *
 import seaborn as sns
-import string
-import os
-from itertools import product
-from ..StoneTwoRecep import StoneTwo, StoneVgrid
 from cycler import cycler
+from ..StoneModel import StoneMod
+from ..StoneHelper import read_chain
+from .FigureCommon import subplotLabel
+from ..StoneTwoRecep import StoneTwo, StoneVgrid
 
 # Figure 3: Specific predictions regarding the coordinate effects of immune
 # complex parameters.
@@ -19,7 +19,7 @@ def makeFigure():
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
     # Retrieve model and fit from hdf5 file
-    M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
+    _, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
 
     # Only keep good samples
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 4)),:]
@@ -37,7 +37,7 @@ def makeFigure():
     ax = [ f.add_subplot(gs1[x]) for x in range(6) ]
 
     # Plot subplot A
-    PredictionVersusAvidity(dsetFilter, ax[0:4])
+    PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
     TwoRecep(dset, ax = ax[4:6])
@@ -51,11 +51,12 @@ def makeFigure():
 # multimerized FcgR v conc of IC for varying avidity. C) # of xlinks v conc of IC for varying avidity.
 # D) The amount of binding versus number of crosslinks for two
 # different affinities, with varied avidities.
-def PredictionVersusAvidity(dset, ax):
+def PredictionVersusAvidity(ax):
     # Receptor expression
     Rexp = 3.0
     avidity = [1, 2, 4, 8, 16, 32]
     Ka = 1.0E5
+    # TODO: Have Kx set from data for the given Ka
     Kx = np.power(10, -6.7)
     ligand = np.logspace(start = -9, stop = -5, num = 40)
 
@@ -102,8 +103,11 @@ def TwoRecep(dset, ax = None):
 
         oo = acl.getRmultiAll(int(x['avidity']), x['ligand'])
 
-        return pd.Series(dict(ratio = oo[0]*oo[0]/(oo[0] + oo[1]), RmultiOne = oo[0], RmultiTwo = oo[1], ligand = x['ligand'], avidity = x['avidity']))
-
+        return pd.Series(dict(ratio = oo[0]*oo[0]/(oo[0] + oo[1]),
+                              RmultiOne = oo[0],
+                              RmultiTwo = oo[1],
+                              ligand = x['ligand'],
+                              avidity = x['avidity']))
 
     inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
@@ -118,7 +122,7 @@ def TwoRecep(dset, ax = None):
 
 def Kdplot(dset, ax = None):
     # If no axis was provided make our own
-    if ax == None:
+    if ax is None:
         ax = plt.gca()
 
     Ka = 1.0E6
