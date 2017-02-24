@@ -24,6 +24,8 @@ To interpret the complex variation in binding we observed with IgG-FcγR pair (i
 
 
 
+
+
 ## The parameterized binding model provides specific predictions for the coordinate effects of immune complex abundance, avidity, and class
 
 ![**Specific predictions regarding the coordinate effects of immune complex parameters.** A) Predicted binding versus concentration of immune complex for varying avidity. B) Predicted multimerized FcgR versus concentration of immune complex for varying avidity. C) The number of receptor crosslinks versus concentration of immune complex for varying avidity. D) The amount of binding versus number of crosslinks for two different affinities, with varied avidities. E) The predicted amount of multimerized receptor versus avidity for a cell expressing XXXX and XXXX simultaneously. F) The predicted ratio of multimerized activating to inhibitory FcgR for a cell expressing XXXX and XXXX simultaneously.](./Figures/Figure3.png){#fig:ParamModel}
