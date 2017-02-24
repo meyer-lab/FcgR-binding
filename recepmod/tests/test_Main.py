@@ -1,5 +1,5 @@
 import unittest
-from ..StoneModel import *
+from ..StoneModel import StoneModel, nchoosek, ReqFuncSolver, logpdf_sum, StoneMod
 import numpy as np
 import random
 import time

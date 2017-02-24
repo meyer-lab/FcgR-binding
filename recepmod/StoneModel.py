@@ -109,7 +109,7 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     Lbound = np.sum(vieq)
 
     # If we just need the amount of ligand bound, exit here.
-    if fullOutput == False:
+    if fullOutput is False:
         return (Lbound, np.nan, np.nan, np.nan, Req)
 
     # Calculate Rmulti from equation 5
