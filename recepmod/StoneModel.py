@@ -1,9 +1,8 @@
+import os
 import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
-import os
-import pandas as pd
 
 np.seterr(over = 'raise')
 
@@ -41,11 +40,11 @@ def normalizeData(filepath):
     ## these collectively. The final result, Lux, will be a NumPy array of
     ## shape (1,192).
     Lux = np.array([])
-    for j in range(len(Luxpre)):
+    for j, item in enumerate(Luxpre):
         if j%5 == 0:
-            temp = np.array(Luxpre[j])
+            temp = np.array(item)
         else:
-            temp2 = np.array(Luxpre[j])-temp
+            temp2 = np.array(item)-temp
             Lux = np.concatenate((Lux,temp2),axis=0)
     ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
     ## MFIs from Lux's original experiments.
@@ -55,13 +54,15 @@ def normalizeData(filepath):
     for j in range(4):
         Lux[:,(j,j+4)] = Lux[:,(j,j+4)] / np.nanmean(np.nanmean(Lux[:,(j,j+4)]))
 
-    return(Lux)
+    return Lux
 
-## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
-## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
-## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
+## The purpose of this function is to calculate the value of Req (from Eq  1
+## from Stone) given parameters R, kai=Ka,Li=L, vi=v, and kx=Kx. It does this
+## by performing the bisction algorithm on Eq 2 from Stone. The bisection
+## algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
 def ReqFuncSolver(R, ka, Li, vi, kx):
-    ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req) is necessarily lower than log10(R).
+    ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
+    ## is necessarily lower than log10(R).
     a = -40
     b = np.log10(R)
 
