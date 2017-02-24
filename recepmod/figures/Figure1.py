@@ -7,6 +7,7 @@ from .FigureCommon import *
 import seaborn as sns
 
 # TODO: Add a plot of TNP-26/TNP-4 signal vs Ka
+# TODO: Add a line on top of the MFI vs. Ka plots of the monovalent binding
 
 def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     # Select the subset of data we want
@@ -41,8 +42,8 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,fontsize=legfontsize)
     ax2.set_xscale('log')
     ax2.set_yscale('log')
-    ax1.set_ylim(1.0E-4, 1.0E-1)
-    ax2.set_ylim(1.0E-4, 1.0E-1)
+    ax1.set_ylim(1.0E-3, 1.0E-1)
+    ax2.set_ylim(1.0E-3, 1.0E-1)
 
 def FcgRQuantificationFigureMaker(StoneM, ax=None):
     # Put receptor expression measurements into a dataframe

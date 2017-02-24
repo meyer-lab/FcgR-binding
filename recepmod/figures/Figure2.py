@@ -84,7 +84,12 @@ def violinPlot(dset, ax=None):
     dset = dset[['Rexp']]
     dset.columns = fcgrs
 
-    objs = sns.violinplot(data=dset,cut=0,ax=ax) # ,color=colors[0]
+    objs = sns.violinplot(data=dset,cut=0,ax=ax)
+
+    ax.set_xticklabels(ax.get_xticklabels(),
+                       rotation=40,
+                       rotation_mode="anchor",
+                       ha="right")
 
 def LLplot(dset, ax = None):
     # TODO: Should this maybe be a plot of the autocorrelation or geweke criterion instead?
