@@ -1,9 +1,9 @@
-import unittest
-from ..StoneModel import StoneModel, nchoosek, ReqFuncSolver, logpdf_sum, StoneMod
-import numpy as np
 import random
 import time
+import unittest
+import numpy as np
 from scipy.stats import norm
+from ..StoneModel import StoneModel, nchoosek, ReqFuncSolver, logpdf_sum, StoneMod
 
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
@@ -22,32 +22,32 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(nchoosek(8,3) == 56)
         self.assertTrue(nchoosek(9,3) == 84)
 
+    def get_random_vars(self):
+        kai = random.random()
+        kx = random.random()
+        vi = random.randint(1, 30)
+        R = random.random()
+        Li = random.random()
+
+        return (kai, kx, vi, R, Li)
+
     def test_reqFuncSolver(self):
-        for xx in range(100):
-            kai = random.random()
-            kx = random.random()
-            vi = random.randint(1, 30)
-            R = random.random()
-            Li = random.random()
+        kai, kx, vi, R, Li = self.get_random_vars()
 
-            diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*kai*(1+kx*(10**x))**(vi-1))
+        diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*kai*(1+kx*(10**x))**(vi-1))
 
-            output = ReqFuncSolver(R, kai, Li, vi, kx)
+        output = ReqFuncSolver(R, kai, Li, vi, kx)
 
-            self.assertTrue(abs(diffFunAnon(output)) < 1E-8)
+        self.assertTrue(abs(diffFunAnon(output)) < 1E-8)
 
         self.assertTrue(np.isnan(ReqFuncSolver(R, kai, Li, -10, kx)))
 
     def test_StoneMod(self):
         # This test should check that the model output satisfies Rbound = Rtot - Req
-        kai = random.random()
-        kx = random.random()
-        v = random.randint(1, 30)
-        R = random.random()
-        Li = random.random()
+        kai, kx, vi, R, Li = self.get_random_vars()
 
-        StoneRet = StoneMod(np.log10(R),kai,v,kx,Li,fullOutput = True)
-        Req = 10**ReqFuncSolver(R,kai,Li,v,kx)
+        StoneRet = StoneMod(np.log10(R),kai,vi,kx,Li,fullOutput = True)
+        Req = 10**ReqFuncSolver(R,kai,Li,vi,kx)
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
 
