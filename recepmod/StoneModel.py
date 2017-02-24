@@ -33,28 +33,21 @@ def normalizeData(filepath):
     ## Read in the csv data for the first experiments.
     Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
 
-    ## The first row in every set of five rows in Luxpre consists of background
-    ## MFIs. Lux is made by taking each of the four non-background MFIs from
-    ## reach cluster of 5 from Luxpre, subtracting the corresponding background
-    ## MFI from each, and then forming a NumPy array of shape (24,8) from all of
-    ## these collectively. The final result, Lux, will be a NumPy array of
-    ## shape (1,192).
-    Lux = np.array([])
-    for j, item in enumerate(Luxpre):
-        if j%5 == 0:
-            temp = np.array(item)
-        else:
-            temp2 = np.array(item)-temp
-            Lux = np.concatenate((Lux,temp2),axis=0)
-    ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
-    ## MFIs from Lux's original experiments.
-    Lux = np.reshape(Lux,(24,8))
+    # Copy the data to a new matrix
+    newLux = np.copy(Luxpre)
+
+    # Subtract off the corresponding blank measurement
+    for (ii,jj) in np.ndindex(Luxpre.shape):
+            newLux[ii,jj] = Luxpre[ii,jj] - Luxpre[ii - (ii%5),jj]
+
+    # Filter out the blank measurements
+    newLux = newLux[np.mod(range(newLux.shape[0]), 5) > 0,:]
 
     # Normalize by the average intensity of each replicate
     for j in range(4):
-        Lux[:,(j,j+4)] = Lux[:,(j,j+4)] / np.nanmean(np.nanmean(Lux[:,(j,j+4)]))
+        newLux[:,(j,j+4)] = newLux[:,(j,j+4)] / np.nanmean(newLux[:,(j,j+4)])
 
-    return Lux
+    return newLux
 
 ## The purpose of this function is to calculate the value of Req (from Eq  1
 ## from Stone) given parameters R, kai=Ka,Li=L, vi=v, and kx=Kx. It does this
