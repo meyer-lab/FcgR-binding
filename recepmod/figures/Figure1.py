@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 from matplotlib import gridspec, rcParams
 import numpy as np
+import seaborn as sns
 from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized
-from .FigureCommon import *
-import seaborn as sns
+from .FigureCommon import makeFcIgLegend, rc, Igs, FcgRs, igs, fcgrs
 
 # TODO: Add a plot of TNP-26/TNP-4 signal vs Ka
 # TODO: Add a line on top of the MFI vs. Ka plots of the monovalent binding
@@ -18,7 +18,7 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
 
     fitMean = fitMean.as_matrix()
-    if ax1 == None or ax2 == None:
+    if ax1 is None or ax2 is None:
         fig = plt.figure(figsize=(9,5))
         ax1 = fig.add_subplot(1, 2, 1)
         ax2 = fig.add_subplot(1, 2, 2)
@@ -60,7 +60,7 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None):
     dfm['value'] = dfm['value'].apply(lambda x: np.power(10,x))
 
     ## Create bars and error bars per species
-    if ax == None:
+    if ax is None:
         ax = plt.figure().add_subplot(121)
 
     # Plot everything
@@ -103,7 +103,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     preColor = sns.color_palette('Set1',n_colors=5)
     color = preColor+[preColor[j] for j in range(4)]
 
-    if axarr == None:
+    if axarr is None:
         f = plt.figure()
 
         # Make grid
