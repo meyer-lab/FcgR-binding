@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec, rcParams
 import numpy as np
 import seaborn as sns
+import pandas as pd
 from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized
 from .FigureCommon import makeFcIgLegend, rc, Igs, FcgRs, igs, fcgrs
