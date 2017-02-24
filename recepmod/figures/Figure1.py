@@ -41,6 +41,8 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,fontsize=legfontsize)
     ax2.set_xscale('log')
     ax2.set_yscale('log')
+    ax1.set_ylim(1.0E-4, 1.0E-1)
+    ax2.set_ylim(1.0E-4, 1.0E-1)
 
 def FcgRQuantificationFigureMaker(StoneM, ax=None):
     # Put receptor expression measurements into a dataframe
