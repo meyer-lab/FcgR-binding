@@ -5,7 +5,7 @@ import seaborn as sns
 import pandas as pd
 from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized
-from .FigureCommon import makeFcIgLegend, rc, Igs, FcgRs, igs, fcgrs
+from .FigureCommon import makeFcIgLegend, rc, Igs, FcgRs, igs, fcgrs, subplotLabel
 
 # TODO: Add a plot of TNP-26/TNP-4 signal vs Ka
 # TODO: Add a line on top of the MFI vs. Ka plots of the monovalent binding
