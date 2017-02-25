@@ -1,7 +1,6 @@
 import unittest
 import sys
-sys.path.append('../')
-from StoneModMouse import StoneModelMouse
+from ..StoneModMouse import StoneModelMouse
 import numpy as np
 import random
 import time
@@ -88,7 +87,7 @@ class TestStoneMouse(unittest.TestCase):
         tbN = self.Mod.NimmerjahnEffectTable(x)
         #print(tbN.iloc[:, list(range(20))])
         self.assertTrue(tbN.shape == (8,31))
-		
+
     def test_NimmerjahnMultiLinear(self):
         # Prints coefficients of multi-linear regression model
         logR = np.log10(10**5)
