@@ -123,6 +123,13 @@ def histSubplots(dset, axes=None):
     dsetFilter[['gnu1', 'gnu2']].plot.hist(ax=axes[2], bins = 100, color=[colors[j] for j in range(2)])
     dsetFilter[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 100, color=[colors[j] for j in range(2)])
 
+    sigConvCalc = dsetFilter[['sigConv1', 'sigConv2']]
+
+    sigConvCalc['sigDiff'] = np.power(10, sigConvCalc['sigConv2'] - sigConvCalc['sigConv1'])
+
+    print(np.mean(sigConvCalc['sigDiff']))
+
+
 def plotFit(fitMean,ax=None, backGray=True):
     # This should take a merged and summarized data frame
     fitMeanPre = fitMean[['Fit','Meas_mean','Meas_std']].as_matrix()
