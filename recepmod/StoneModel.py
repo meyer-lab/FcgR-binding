@@ -180,7 +180,7 @@ class StoneModel:
                     # Setup the data
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
 
-                    Kx = np.power(10, x[self.kxIDX]) * (Ka / (Ka + np.power(10, x[self.KdxIDX])))
+                    Kx = np.power(10, x[self.kxIDX]) * Ka
 
                     ## Calculate the MFI which should result from this condition according to the model
                     stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
@@ -232,7 +232,7 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'Kdxa']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
 
         self.newData = newData
 
@@ -262,13 +262,12 @@ class StoneModel:
         lbKx, ubKx = -25, 3
         lbc, ubc = -10, 5
         lbsigma, ubsigma = -4, 1
-        lKdx, uKdx = 0, 10
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         ## Lower and upper bounds for avidity are specified here
-        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma,lKdx], dtype = np.float64)
-        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma,uKdx], dtype = np.float64)
+        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
+        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma], dtype = np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
@@ -276,7 +275,6 @@ class StoneModel:
         self.kxIDX = 6
         self.cIDX = [7, 8]
         self.sigIDX = 11
-        self.KdxIDX = 12
 
         if newData:
             ## Create the NumPy array Rquant, where each row represents a particular
@@ -300,7 +298,6 @@ class StoneModel:
 
             # We only include a second sigma if new data
             self.sig2IDX = 12
-            self.KdxIDX = self.KdxIDX + 1
             self.lb = np.insert(self.lb, self.sig2IDX, lbsigma)
             self.ub = np.insert(self.ub, self.sig2IDX, ubsigma)
             self.pNames.insert(self.sig2IDX, 'sigma2')
