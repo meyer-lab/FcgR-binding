@@ -1,5 +1,7 @@
 import unittest
-from ..StoneModMouse import StoneModelMouse
+import sys
+sys.path.append('../')
+from StoneModMouse import StoneModelMouse
 import numpy as np
 import random
 import time
@@ -84,7 +86,7 @@ class TestStoneMouse(unittest.TestCase):
             raise ValueError('Negative input parameters')
         x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
         tbN = self.Mod.NimmerjahnEffectTable(x)
-        #print(tbN.iloc[:, list(range(10,20))])
+        #print(tbN.iloc[:, list(range(20))])
         self.assertTrue(tbN.shape == (8,31))
 		
     def test_NimmerjahnMultiLinear(self):
@@ -98,6 +100,19 @@ class TestStoneMouse(unittest.TestCase):
         xN = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
         result = self.Mod.NimmerjahnMultiLinear(xN)
         #print(result.coef_)
+        res = self.Mod.NimmerjahnLasso(xN)
+        #print(res.coef_)
+
+    def test_FcgRPlots(self):
+        # Plots effectiveness vs. each FcgR binding parameter
+        logR = np.log10(10**5)
+        kx = 10**(-7)
+        v = 10
+        Li = 10**(-9)
+        if logR < 0 or kx < 0 or v < 0 or Li < 0:
+            raise ValueError('Negative input parameters')
+        xN = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
+        plots = self.Mod.FcgRPlots(xN)
 
 if __name__ == '__main__':
     unittest.main()
