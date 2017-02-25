@@ -1,4 +1,4 @@
-from recepmod.StoneModel import StoneMod
+from StoneModel import StoneMod
 import numpy as np
 import os
 import pandas as pd
@@ -175,28 +175,54 @@ class StoneModelMouse:
         effect = effect.reshape(4,1)
         # Linear regression and plot result
         result = reg.fit(independent, effect)
-        plt.scatter(effect, reg.predict(independent), color='black')
-        plt.plot(effect, reg.predict(independent), color='blue', linewidth=3)
-        plt.show()
+#        plt.scatter(effect, reg.predict(independent), color='black')
+#        plt.plot(effect, reg.predict(independent), color='blue', linewidth=3)
+        #plt.show()
         return result
 
     def NimmerjahnLasso(self, x, fullOutput = True):
-        las = linear_model.Lasso()
+        # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
+        las = linear_model.Lasso(alpha = 0.005, normalize = True)
         tbN = self.NimmerjahnEffectTable(x)
         # Assign independent variables and dependent variable "effect"
         # Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
         independent = np.array(tbN.iloc[list(range(6)), list(range(20))])
         independent = independent.reshape(6,20)
-        effect = np.array(tbN.iloc[list(range(0,6)),30])
+        effect = np.array(tbN.iloc[list(range(6)),30])
         effect = effect.reshape(6,1)
         # Linear regression and plot result
-        res = las.fit(independent, effect, normalize=True)
+        res = las.fit(independent, effect)
+        coe = res.coef_
+        coe = coe.reshape(4,5)
+        print(las.score(independent, effect))
+        print(coe)
         plt.scatter(effect, las.predict(independent), color='red')
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
         plt.show()
         return res
     
     def FcgRPlots(self, x):
+        # Plot effectiveness vs. all FcgR binding parameters
         tbN = self.NimmerjahnEffectTable(x)
+        tbNparam = tbN.iloc[:, list(range(30))]
+        tbN_norm = (tbNparam - tbNparam.mean()) / (tbNparam.max() - tbNparam.min())
+        # Initiate variables
+        bndParam = []
+        eff = []
+        # Set up binding parameters column
+        for j in range(20):
+            bndParam += list(tbN_norm.iloc[list(range(6)),j])
+        # Set up effectiveness column
         for i in range(20):
-            sns.lmplot(tbN.columns[i], tbN.columns[30], data=tbN, size = 4)
+            eff += list(tbN.iloc[list(range(6)),30])
+        index = []
+        # Set index for 20 plots
+        for k in range(4):
+            for l in range(5):
+                for n in range(6):
+                    index.append(int(str(k+1)+str(l+1)))
+        # Plot effectiveness vs. each binding parameter
+        plotTb = np.array([index, bndParam, eff])
+        plotTb = np.transpose(plotTb)
+        table = pd.DataFrame(plotTb, columns = ['index', 'bndParam', 'eff'])
+        sns.lmplot(x="bndParam", y="eff", col = 'index', hue = 'index', col_wrap=2, ci=None, palette="muted", data=table, size = 3)
