@@ -38,50 +38,34 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,fontsize=legfontsize)
     ax2.set_xscale('log')
 
-def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelfontsize=14, titlefontsize=18, legbbox=(2,1), legend=True, yaxisfontsize=10):
-    ## Please see comments from mfiAdjMeanFigureMaker
-##    rc('text',usetex=False)
+def FcgRQuantificationFigureMaker(StoneM, ax=None):
+    # Put receptor expression measurements into a dataframe
+    df = pd.DataFrame(StoneM.Rquant).T
 
-    Rquant = StoneM.Rquant
+    # Assign the names of the receptors
+    df.columns = fcgrs
 
-    ## Number of bars
-    N = len(Rquant)
-    ## Relative width of bars
-    width = 0.5
-    ## List of 6 tuples, one tuple per FcgR species. The tuple's first element is the
-    ## (nan)mean expression for that species, while the second element is the (nan)std
-    ## of the distribution of receptor expressions measured
-    iterable = [(np.nanmean(10**Rquant[j]),np.nanstd(10**Rquant[j])) for j in range(N)]
+    # Melt the dataframe
+    dfm = pd.melt(df)
 
-    ## Set up strings necessary for the coloring and the legend
-    ind = np.arange(N)
-    species = ['IA','IIA-131R','IIA-131H','IIB','IIIA-158F','IIIA-158V']
+    # Remove nan values and transform to absolute scale
+    dfm = dfm[np.isfinite(dfm['value'])]
+    dfm['value'] = dfm['value'].apply(lambda x: np.power(10,x))
 
     ## Create bars and error bars per species
     if ax == None:
-        f = plt.figure()
-        ax = f.add_subplot(121)
-    rects = []
-    for j in range(N):
-        temp = [0]*(N-1)
-        temp.insert(j,iterable[j][0])
-        stds = [0]*(N-1)
-        stds.insert(j,iterable[j][1])
-        rects.append(ax.bar(ind,temp,color=colors[j],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+        ax = plt.figure().add_subplot(121)
+
+    # Plot everything
+    axx = sns.barplot(x = "variable", y = "value", data = dfm, ax = ax)
 
     ## Set up axes
-    ax.xaxis.set_visible(False)
-    ax.set_xlim(-0.5*width,len(ind)+0.2*width)
-    ax.tick_params(axis='x',length=0)
-    ax.grid(b=False)
-    ax.set_yscale('log')
-    ax.set_yticks([float(10**j) for j in range(7)])
-##    ax.set_yticklabels([str('$10^{'+str(j)+'}$') for j in range(7)],fontsize=yaxisfontsize)
-    ticknames = []
-    for j in range(7):
-        exec("ticknames.append(r'$10^"+str(j)+"$')")
-    ax.set_yticklabels(ticknames)
-    ax.set_ylabel(r"Number of Receptors",fontsize=ylabelfontsize)
+    axx.set_yscale('log')
+    axx.set_ylim(1.0E5, 1.0E7)
+    axx.set_ylabel("Number of Receptors")
+    ax.set_xlabel("")
+    axx.set_xlabel("")
+    axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
 def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), legfontsize=10):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
@@ -108,62 +92,41 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     tnpbsaLabels.insert(4,'TNP-4-BSA')
     tnpbsaLabels.insert(14,'TNP-26-BSA')
 
-    ## Generate a figure with a 2 X 4 array of subplots; the rightmost column exists
-    ## only as a place to put the legend. The axes of these rightmost plots are whited
-    ## out for de-facto invisibility.
+    ## Set up repeating color palette
+    preColor = sns.color_palette('Set1',n_colors=5)
+    color = preColor+[preColor[j] for j in range(4)]
+
     if axarr == None:
         f = plt.figure()
-        axarr = []
-        for j in range(6):
-            exec('axarr.append(f.add_subplot(24'+str(int(j+1+np.floor(j/3)))+'))')
 
-    ## Plotting mfiAdjMean
-##    for j in range(6):
-##        rects = []
-##        for k in range(4):
-##            temp = [0]*N
-##            temp.remove(0)
-##            temp.insert(k,np.nanmean(mfiAdjMean[4*(j-1)+k][1:4]))
-##            stds = [0]*N
-##            stds.remove(0)
-##            stds.insert(k,np.nanstd(mfiAdjMean[4*(j-1)+k][1:4]))
-##            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
-##        for k in range(4):
-##            temp = [0]*N
-##            temp.remove(0)
-##            temp.insert(5+k,np.nanmean(mfiAdjMean[4*(j-1)+k][5:8]))
-##            stds = [0]*N
-##            stds.remove(0)
-##            stds.insert(5+k,np.nanstd(mfiAdjMean[4*(j-1)+k][5:8]))
-##            rects.append(axarr[j].bar(ind,temp,width,color=colors[k],yerr=stds,error_kw=dict(elinewidth=2,ecolor='black')))
+        # Make grid
+        gs1 = gridspec.GridSpec(2,3)
+
+        axarr = [ f.add_subplot(gs1[x]) for x in range(6) ]
+
+    ## Find nanmeans of experimental groups; each index j is an FcgR, while each k is an IgG. temp is a list of length 9, for that there are two species of TNP-BSA per FcgR and IgG, and there needs to be a single blank bar in between the bars of these two species
     for j in range(6):
-        rects = []
         temp = [[0]]*N
         for k in range(4):
-            temp.insert(k,[np.nanmean(mfiAdjMean[4*(j-1)+k][1:4])])
-            temp.insert(5+k,[np.nanmean(mfiAdjMean[4*(j-1)+k][5:8])])
-            print(temp)
-            print(' ')
-            if j == 6 and k == 4:
-                for elem in temp:
-                    print(elem)
-##            rects.append(sns.barplot(data=temp,color=sns.set_palette(sns.color_palette(colors)),ax=axarr[j]))
-        sns.barplot(data=temp,color=sns.set_palette('colorblind'),ax=axarr[j])
-    
-    # axes and labels
-##    for j in range(6):
-##        axarr[j].set_xlim(-0.5*width,len(ind)-1+1.5*width)
-##        axarr[j].xaxis.set_ticks(np.arange(-0.5*width,len(ind)-1+2.5*width,0.5))
-##        axarr[j].set_xticklabels(tnpbsaLabels,fontproperties=FontProperties(size=tnpbsafontsize))
-##        axarr[j].tick_params(axis='x', length=0)
-##        axarr[j].grid(b=False)
-##        axarr[j].set_ylim(0,5)
-##        if j%3 == 0:
-##            axarr[j].set_ylabel('mean-adjusted MFIs',fontsize=ylabelfontsize)
-##        axarr[j].set_title(species[j],fontsize=subtitlefontsize)
-    
-    ## Add a legend denoting IgG species
-##    leg = axarr[2].legend((rects[i][0] for i in range(4)),('IgG'+str(i+1) for i in range(4)),bbox_to_anchor=legbbox,fontsize=legfontsize)
+            temp.insert(k,[np.nanmean(mfiAdjMean[4*(j-1)+k][1:5])])
+            temp.pop(4)
+            temp.insert(5+k,[np.nanmean(mfiAdjMean[4*(j-1)+k][5:9])])
+            temp.pop(-1)
+
+    ## Create bar plot, and remove xticklabels
+        sns.barplot(data=temp,palette=color,ax=axarr[j])
+        axarr[j].set_xticklabels(['' for j in range(len(axarr[j].get_xticklabels()))])
+
+    ## Color the bar edges
+    for j in range(6):
+        tnp4bsaBars = axarr[j].get_children()[0:4]
+        for bar in tnp4bsaBars:
+            bar.set_edgecolor((1,0.5,0.5))
+            bar.set_linewidth(1.5)
+        tnp26bsaBars = axarr[j].get_children()[5:9]
+        for bar in tnp26bsaBars:
+            bar.set_edgecolor('black')
+            bar.set_linewidth(1.5)
 
 def makeFigure():
     StoneM = StoneModel()
@@ -172,19 +135,26 @@ def makeFigure():
     rcParams['lines.markeredgewidth'] = 1.0
 
     f = plt.figure(figsize=(7,6))
-    gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,2,6,1,6,1])
+    gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,1,5,1,5,1])
     ax = f.add_subplot(gs1[0])
-    FcgRQuantificationFigureMaker(StoneM,ax,legbbox=(1.75,1),titlefontsize=7,ylabelfontsize=7)
+    FcgRQuantificationFigureMaker(StoneM,ax)
+
+    subplotLabel(ax, 'A')
+
     ax2 = f.add_subplot(gs1[2])
     ax3 = f.add_subplot(gs1[4])
 
     fitMean = getFitMeasSummarized(StoneM)
 
     plotNormalizedBindingvsKA(fitMean, ax2, ax3, legfontsize=8)
-    gs2 = gridspec.GridSpec(8,4,height_ratios=[1,1,1,1,1,4,1,4])
+
+    subplotLabel(ax2, 'B')
+    subplotLabel(ax3, 'C')
+
+    gs2 = gridspec.GridSpec(7,7,height_ratios=[1,1,1,1,2,4,4],width_ratios=[4,1,4,1,4,1,2])
     axarr = []
     for j in range(6):
-        axarr.append(f.add_subplot(gs2[20+j+5*int(np.floor(j/3))]))
+        axarr.append(f.add_subplot(gs2[35+2*j+int(np.floor(j/3))]))
     mfiAdjMeanFigureMaker(StoneM,axarr,legbbox=(1.75,1),tnpbsafontsize=7,subtitlefontsize=7,ylabelfontsize=7,legfontsize=7)
 
     return f

@@ -28,3 +28,6 @@ def makeFcIgLegend():
         patches.append(mlines.Line2D([], [], color='black', marker=Igs[j], markersize=7, label=j, linestyle='None'))
 
     return patches
+
+def subplotLabel(ax, letter):
+    ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')

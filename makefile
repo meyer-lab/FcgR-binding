@@ -1,6 +1,6 @@
 NPROCS := 8
 
-pan_common = --filter pandoc-citeproc -f markdown ./Manuscript/Text/*.md
+pan_common = -F pandoc-crossref -F pandoc-citeproc -f markdown ./Manuscript/Text/*.md
 fdir = ./Manuscript/Figures
 
 .PHONY: clean upload test
@@ -18,8 +18,8 @@ $(fdir)/Figure1%pdf $(fdir)/Figure2%pdf: genFigures.py
 Manuscript.pdf: ./Manuscript/Text/*.md
 	pandoc $(pan_common) --template=default.latex --latex-engine=xelatex  -o ./Manuscript/Manuscript.pdf
 
-index.html: ./Manuscript/Text/*.md $(fdir)/Figure1.png $(fdir)/Figure2.png
-	pandoc -s $(pan_common) -t html5 --mathml -c ./Templates/kultiad.css --template=./Manuscript/Templates/html.template -o ./Manuscript/index.html
+index.html: ./Manuscript/Text/*.md $(fdir)/Figure1.png $(fdir)/Figure2.png $(fdir)/Figure3.png
+	pandoc -s $(pan_common) -t html5 --mathjax -c ./Templates/kultiad.css --template=./Manuscript/Templates/html.template -o ./Manuscript/index.html
 
 Manuscript.docx: ./Manuscript/Text/*.md
 	pandoc -s $(pan_common) -o ./Manuscript/Manuscript.docx
