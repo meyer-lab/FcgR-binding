@@ -1,4 +1,4 @@
-from StoneModel import StoneMod
+from .StoneModel import StoneMod
 import numpy as np
 import os
 import pandas as pd
@@ -39,9 +39,6 @@ class StoneModelMouse:
             if self.Igs[i] == x[self.IgIDX]:
                 x1[self.IgIDX] = np.nan
                 l = i
-#        if type(x[self.IgIDX]) != int:
-#            return (np.nan, np.nan, np.nan)
-        #print(x[self.IgIDX])
 
         # Assign inputs for StoneMod
         x1 = np.array(x1)
@@ -162,7 +159,7 @@ class StoneModelMouse:
         # Append effectiveness data on the 31 column
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
         return tbN
-    
+
     def NimmerjahnMultiLinear(self, x, fullOutput = True):
         # Multi-Linear regression of FcgR binding predictions for effectiveness of IgG therapy
         reg = linear_model.LinearRegression()
@@ -175,9 +172,7 @@ class StoneModelMouse:
         effect = effect.reshape(4,1)
         # Linear regression and plot result
         result = reg.fit(independent, effect)
-#        plt.scatter(effect, reg.predict(independent), color='black')
-#        plt.plot(effect, reg.predict(independent), color='blue', linewidth=3)
-        #plt.show()
+
         return result
 
     def NimmerjahnLasso(self, x, fullOutput = True):
@@ -200,7 +195,7 @@ class StoneModelMouse:
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
         plt.show()
         return res
-    
+
     def FcgRPlots(self, x):
         # Plot effectiveness vs. all FcgR binding parameters
         tbN = self.NimmerjahnEffectTable(x)
