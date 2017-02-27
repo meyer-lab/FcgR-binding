@@ -9,7 +9,7 @@ import pandas
 import os
 import time
 from ..StoneModel import StoneModel
-from ..StoneHelper import getFitMeasMergedSummarized, read_chain
+from ..StoneHelper import getFitMeasMergedSummarized, read_chain, getMeasuredDataFrame
 
 class TestFigMethods(unittest.TestCase):
     def setUp(self):
@@ -36,7 +36,7 @@ class TestFigMethods(unittest.TestCase):
     # Test mfiAdjMean plot
     def test_mfiAdjMean_figure(self):
         # Call the plotting function
-        Figure1.mfiAdjMeanFigureMaker(self.M)
+        Figure1.mfiAdjMeanFigureMaker(getMeasuredDataFrame(self.M))
 
         self.assertTrue(True)
 

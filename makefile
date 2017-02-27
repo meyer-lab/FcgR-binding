@@ -4,21 +4,17 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc -f markdown ./Manuscript/Text
 fdir = ./Manuscript/Figures
 
 .PHONY: clean upload test
-.PRECIOUS: Manuscript/Figures/Figure1.pdf
 
 all: index.html
 
-$(fdir)/Figure%.png: $(fdir)/Figure%.pdf
-	convert -density 450 $(fdir)/Figure$*.pdf -quality 90 $(fdir)/Figure$*.png
-
-$(fdir)/Figure1%pdf $(fdir)/Figure2%pdf: genFigures.py
+$(fdir)/Figure1%pdf $(fdir)/Figure2%pdf $(fdir)/Figure3%pdf $(fdir)/Figure1%svg $(fdir)/Figure2%svg $(fdir)/Figure3%svg: genFigures.py
 	mkdir -p ./Manuscript/Figures
 	python3 genFigures.py
 
 Manuscript.pdf: ./Manuscript/Text/*.md
 	pandoc $(pan_common) --template=default.latex --latex-engine=xelatex  -o ./Manuscript/Manuscript.pdf
 
-index.html: ./Manuscript/Text/*.md $(fdir)/Figure1.png $(fdir)/Figure2.png $(fdir)/Figure3.png
+index.html: ./Manuscript/Text/*.md $(fdir)/Figure1.svg $(fdir)/Figure2.svg $(fdir)/Figure3.svg
 	pandoc -s $(pan_common) -t html5 --mathjax -c ./Templates/kultiad.css --template=./Manuscript/Templates/html.template -o ./Manuscript/index.html
 
 Manuscript.docx: ./Manuscript/Text/*.md

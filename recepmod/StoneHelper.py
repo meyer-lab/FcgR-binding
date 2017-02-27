@@ -54,7 +54,7 @@ def getMeasuredDataFrame(self):
                 .assign(FcgR = rep(self.FcgRs, 4)*8)
                 .assign(Expression = rep(self.Rquant, 4)*8)
                 .assign(Ka = np.tile(np.reshape(self.kaBruhns, (-1,1)), (8, 1)))
-                )
+               )
 
     return normData
 
@@ -76,7 +76,7 @@ def getFitPrediction(self, x):
           .assign(nXlinkPred = np.reshape(np.transpose(outputnXlink), (-1, 1)))
           .assign(LbndPred = np.reshape(np.transpose(outputLbnd), (-1, 1)))
           .assign(Req = np.reshape(np.transpose(outputReq), (-1, 1)))
-          )
+         )
 
     return dd
 
@@ -142,7 +142,10 @@ def getFitMeasMergedSummarized(M, x):
 
     # Massage data frame into mean and sem of measured values
     fitMean = fitFrame.groupby(['Ig', 'TNP', 'FcgR']).mean().reset_index()
-    fitSTD = (fitFrame[['Ig', 'TNP', 'FcgR', 'Meas']].groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
+    fitSTD = (fitFrame[['Ig', 'TNP', 'FcgR', 'Meas']]
+              .groupby(['Ig', 'TNP', 'FcgR'])
+              .sem()
+              .reset_index())
 
     # Reunite the mean and sem summarized values
     fitMean = fitMean.merge(fitSTD, how = 'outer',
