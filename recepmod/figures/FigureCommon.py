@@ -5,24 +5,23 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 import matplotlib.colors as mcolors
+import seaborn as sns
 from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
-colors = ['r', 'g', 'b', 'y', 'k', 'm']
 
-fcgrs = [r'Fc$\gamma$RI',r'Fc$\gamma$RIIA-131R',r'Fc$\gamma$RIIA-131H',r'Fc$\gamma$RIIB',r'Fc$\gamma$RIIIA-158F',r'Fc$\gamma$RIIIA-158V']
-FcgRs = {}
-for j in range(len(fcgrs)):
-    FcgRs[fcgrs[j]] = colors[j]
-igs = [elem for elem in Igs]
-fcgrs = [elem for elem in FcgRs]
+FcgRidx = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
+FcgRidx = dict(zip(FcgRidx, sns.color_palette()))
+
+FcgRidxL = [r'Fc$\gamma$RI',r'Fc$\gamma$RIIA-131R',r'Fc$\gamma$RIIA-131H',r'Fc$\gamma$RIIB',r'Fc$\gamma$RIIIA-158F',r'Fc$\gamma$RIIIA-158V']
+FcgRidxL = dict(zip(FcgRidxL, sns.color_palette()))
 
 def makeFcIgLegend():
     patches = list()
 
-    for f in FcgRs:
-        patches.append(mpatches.Patch(color=FcgRs[f], label=f))
+    for f in FcgRidxL:
+        patches.append(mpatches.Patch(color=FcgRidxL[f], label=f))
 
     for j in Igs:
         patches.append(mlines.Line2D([], [], color='black', marker=Igs[j], markersize=7, label=j, linestyle='None'))
