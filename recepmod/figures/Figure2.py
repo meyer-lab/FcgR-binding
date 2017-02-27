@@ -25,18 +25,18 @@ def makeFigure():
     gs1 = gridspec.GridSpec(3,3)
 
     # Get list of axis objects
-    ax = [ f.add_subplot(gs1[x]) for x in range(9) ]
+    ax = [ f.add_subplot(gs1[x]) for x in range(1,9) ]
 
     # Place likelihood plot
-    LLplot(dset, ax[1])
+    LLplot(dset, ax[0])
 
     # Show predicted versus actual
-    plotFit(getFitMeasMergedSummarized(M, pBest), ax = ax[2])
+    plotFit(getFitMeasMergedSummarized(M, pBest), ax = ax[1])
 
     # Make histogram subplots
-    histSubplots(dset, axes = [ax[3], ax[4], ax[5], ax[6]])
+    histSubplots(dset, axes = [ax[2], ax[3], ax[4], ax[5]])
 
-    violinPlot(dset, ax = ax[7])
+    violinPlot(dset, ax = ax[6])
 
     for ii in range(len(ax)):
         subplotLabel(ax[ii], string.ascii_uppercase[ii])
@@ -129,11 +129,7 @@ def histSubplots(dset, axes=None):
     axes[2].set_xlabel('Effective Avidity')
     axes[3].set_xlabel('Deviation Parameter')
 
-    sigConvCalc = dsetFilter[['sigConv1', 'sigConv2']]
-
-    sigConvCalc['sigDiff'] = np.power(10, sigConvCalc['sigConv2'] - sigConvCalc['sigConv1'])
-
-    print(np.mean(sigConvCalc['sigDiff']))
+    print(np.mean(np.power(10, dsetFilter.sigConv2 - dsetFilter.sigConv1)))
 
 
 def plotFit(fitMean,ax=None, backGray=True):
