@@ -6,11 +6,14 @@ from recepmod.figures import Figure3
 from recepmod.figures import Figure4
 from recepmod.figures import Figure5
 
-with PdfPages('./Manuscript/Figures/Figure1.pdf') as pdf:
-    pdf.savefig(Figure1.makeFigure())
+def runFunc(figClass, nameOut):
+    with PdfPages('./Manuscript/Figures/' + nameOut + '.pdf') as pdf:
+        ff = figClass.makeFigure()
+        ff.savefig('./Manuscript/Figures/' + nameOut + '.svg')
+        pdf.savefig(ff)
 
-with PdfPages('./Manuscript/Figures/Figure2.pdf') as pdf:
-    pdf.savefig(Figure2.makeFigure())
+runFunc(Figure1, 'Figure1')
 
-with PdfPages('./Manuscript/Figures/Figure3.pdf') as pdf:
-    pdf.savefig(Figure3.makeFigure())
+runFunc(Figure2, 'Figure2')
+
+runFunc(Figure3, 'Figure3')
