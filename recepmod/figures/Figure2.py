@@ -39,7 +39,7 @@ def makeFigure():
     violinPlot(dset, ax = ax[6])
 
     for ii in range(len(ax)):
-        subplotLabel(ax[ii], string.ascii_uppercase[ii])
+        subplotLabel(ax[ii], string.ascii_uppercase[ii+1])
 
     return f
 
@@ -128,6 +128,9 @@ def histSubplots(dset, axes=None):
     axes[1].set_xlabel('Log10(Conversion Factor)')
     axes[2].set_xlabel('Effective Avidity')
     axes[3].set_xlabel('Deviation Parameter')
+
+    # Try and fix overlapping elements
+    plt.tight_layout()
 
     print(np.mean(np.power(10, dsetFilter.sigConv2 - dsetFilter.sigConv1)))
 
