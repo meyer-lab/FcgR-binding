@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 import pandas as pd
 from ..StoneModel import StoneModel
-from ..StoneHelper import getFitMeasSummarized
+from ..StoneHelper import getFitMeasSummarized, getMeasuredDataFrame
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRidxL
 
 # TODO: Add a plot of TNP-26/TNP-4 signal vs Ka
@@ -32,17 +32,20 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
                         marker=Igs[row['Ig']],
                         mfc=colorr,
                         mec=colorr,
-                        ms=3,
+                        ms=5,
                         ecolor=colorr,
                         linestyle='None')
 
         axInt.loglog()
-        ax1.set_ylabel('Measured TNP-BSA binding')
         axInt.set_xlabel(r'Fc$\gamma$R-IgG Ka')
-        ax1.set_ylim(1.0E-3, 1.0E-1)
+        axInt.set_ylabel('Measured TNP-BSA binding')
+        axInt.set_ylim(1.0E-3, 1.0E-1)
 
     plotF(ax1, fitMean.loc[fitMean['TNP'] == 4,:])
     plotF(ax2, fitMean.loc[fitMean['TNP'] == 26,:])
+
+    ax1.set_title('TNP-4-BSA')
+    ax2.set_title('TNP-26-BSA')
 
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
@@ -75,58 +78,31 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None):
     axx.set_xlabel("")
     axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
-def mfiAdjMeanFigureMaker(StoneM, axarr=None):
-    ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
-    ## Inputting usetex = True causes an error; this is a bug I found online
-    ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
-    plt.rc('text',usetex=False)
-
-    ## Our data
-    mfiAdjMean = StoneM.mfiAdjMean
-
-    ## Number of bars, including an "empty" bar between TNP-4-BSA and TNP-26-BSA data
-    N = 9
-
-    ind = np.arange(N)
-    ## Width of bars
-    width = 0.5
-
-    units = int((3*width+len(ind)-1)/0.25)
-    tnpbsaLabels = ['']*int((3*width+len(ind)-1)/0.25)
-    tnpbsaLabels.insert(4,'TNP-4-BSA')
-    tnpbsaLabels.insert(14,'TNP-26-BSA')
-
+def mfiAdjMeanFigureMaker(measAll, axarr=None):
     if axarr is None:
         f = plt.figure()
 
         # Make grid
         gs1 = gridspec.GridSpec(2,3)
 
+        # Create 6 axes for each FcgR
         axarr = [ f.add_subplot(gs1[x]) for x in range(6) ]
 
-    ## Find nanmeans of experimental groups; each index j is an FcgR, while each k is an IgG. temp is a list of length 9, for that there are two species of TNP-BSA per FcgR and IgG, and there needs to be a single blank bar in between the bars of these two species
-    for j in range(6):
-        temp = [[0]]*N
-        for k in range(4):
-            temp.insert(k,[np.nanmean(mfiAdjMean[4*(j-1)+k][1:5])])
-            temp.pop(4)
-            temp.insert(5+k,[np.nanmean(mfiAdjMean[4*(j-1)+k][5:9])])
-            temp.pop(-1)
+    fcIter = zip(axarr, FcgRidx.keys())
 
-    ## Create bar plot, and remove xticklabels
-        sns.barplot(data=temp,ax=axarr[j])
-        axarr[j].set_xticklabels(['' for j in range(len(axarr[j].get_xticklabels()))])
+    # TODO: Redo this code using seaborn
+    # What's below here isn't at all correct, but is a placeholder to provide
+    # some idea
+    for axx, fcr in fcIter:
+        sns.barplot(x="Ig",
+                    y = "Meas",
+                    hue="TNP",
+                    data=measAll.loc[measAll['FcgR'] == fcr,:],
+                    ax = axx,
+                    ci = 68)
 
-    ## Color the bar edges
-    for j in range(6):
-        tnp4bsaBars = axarr[j].get_children()[0:4]
-        for bar in tnp4bsaBars:
-            bar.set_edgecolor((1,0.5,0.5))
-            bar.set_linewidth(1.5)
-        tnp26bsaBars = axarr[j].get_children()[5:9]
-        for bar in tnp26bsaBars:
-            bar.set_edgecolor('black')
-            bar.set_linewidth(1.5)
+        axx.legend_.remove()
+        axx.set_title(fcr)
 
 def makeFigure():
     StoneM = StoneModel()
@@ -144,17 +120,20 @@ def makeFigure():
     ax3 = f.add_subplot(gs1[4])
 
     fitMean = getFitMeasSummarized(StoneM)
+    measAll = getMeasuredDataFrame(StoneM)
 
     plotNormalizedBindingvsKA(fitMean, ax2, ax3)
 
-    subplotLabel(ax2, 'B')
-    subplotLabel(ax3, 'C')
+    subplotLabel(ax2, 'C')
+    subplotLabel(ax3, 'D')
 
     gs2 = gridspec.GridSpec(7,7,height_ratios=[1,1,1,1,2,4,4],width_ratios=[4,1,4,1,4,1,2])
     axarr = []
     for j in range(6):
         axarr.append(f.add_subplot(gs2[35+2*j+int(np.floor(j/3))]))
 
-    mfiAdjMeanFigureMaker(StoneM,axarr)
+    subplotLabel(axarr[0], 'B')
+
+    mfiAdjMeanFigureMaker(measAll,axarr)
 
     return f
