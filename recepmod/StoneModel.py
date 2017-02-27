@@ -1,9 +1,8 @@
+import os
 import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
-import os
-import pandas as pd
 
 np.seterr(over = 'raise')
 
@@ -34,34 +33,29 @@ def normalizeData(filepath):
     ## Read in the csv data for the first experiments.
     Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
 
-    ## The first row in every set of five rows in Luxpre consists of background
-    ## MFIs. Lux is made by taking each of the four non-background MFIs from
-    ## reach cluster of 5 from Luxpre, subtracting the corresponding background
-    ## MFI from each, and then forming a NumPy array of shape (24,8) from all of
-    ## these collectively. The final result, Lux, will be a NumPy array of
-    ## shape (1,192).
-    Lux = np.array([])
-    for j in range(len(Luxpre)):
-        if j%5 == 0:
-            temp = np.array(Luxpre[j])
-        else:
-            temp2 = np.array(Luxpre[j])-temp
-            Lux = np.concatenate((Lux,temp2),axis=0)
-    ## Reshape book5 into a NumPy array of shape (24,8), the actual shape of the
-    ## MFIs from Lux's original experiments.
-    Lux = np.reshape(Lux,(24,8))
+    # Copy the data to a new matrix
+    newLux = np.copy(Luxpre)
+
+    # Subtract off the corresponding blank measurement
+    for (ii,jj) in np.ndindex(Luxpre.shape):
+            newLux[ii,jj] = Luxpre[ii,jj] - Luxpre[ii - (ii%5),jj]
+
+    # Filter out the blank measurements
+    newLux = newLux[np.mod(range(newLux.shape[0]), 5) > 0,:]
 
     # Normalize by the average intensity of each replicate
     for j in range(4):
-        Lux[:,(j,j+4)] = Lux[:,(j,j+4)] / np.nanmean(np.nanmean(Lux[:,(j,j+4)]))
+        newLux[:,(j,j+4)] = newLux[:,(j,j+4)] / np.nanmean(newLux[:,(j,j+4)])
 
-    return(Lux)
+    return newLux
 
-## The purpose of this function is to calculate the value of Req (from Equation 1 from Stone) given parameters R,
-## kai=Ka,Li=L, vi=v, and kx=Kx. It does this by performing the bisction algorithm on Equation 2 from Stone. The
-## bisection algorithm is used to find the value of log10(Req) which satisfies Equation 2 from Stone.
+## The purpose of this function is to calculate the value of Req (from Eq  1
+## from Stone) given parameters R, kai=Ka,Li=L, vi=v, and kx=Kx. It does this
+## by performing the bisction algorithm on Eq 2 from Stone. The bisection
+## algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
 def ReqFuncSolver(R, ka, Li, vi, kx):
-    ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req) is necessarily lower than log10(R).
+    ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
+    ## is necessarily lower than log10(R).
     a = -40
     b = np.log10(R)
 
@@ -108,7 +102,7 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     Lbound = np.sum(vieq)
 
     # If we just need the amount of ligand bound, exit here.
-    if fullOutput == False:
+    if fullOutput is False:
         return (Lbound, np.nan, np.nan, np.nan, Req)
 
     # Calculate Rmulti from equation 5
@@ -186,7 +180,7 @@ class StoneModel:
                     # Setup the data
                     temp = self.mfiAdjMean[4*k+l][4*j:4*j+4]
 
-                    Kx = np.power(10, x[self.kxIDX]) * (Ka / (Ka + np.power(10, x[self.KdxIDX])))
+                    Kx = np.power(10, x[self.kxIDX]) * Ka
 
                     ## Calculate the MFI which should result from this condition according to the model
                     stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
@@ -238,7 +232,7 @@ class StoneModel:
         self.TNPs = ['TNP-4', 'TNP-26']
         self.Igs = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
         self.FcgRs = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma', 'Kdxa']
+        self.pNames = ['Kx1', 'sigConv1', 'sigConv2', 'gnu1', 'gnu2', 'sigma']
 
         self.newData = newData
 
@@ -268,13 +262,12 @@ class StoneModel:
         lbKx, ubKx = -25, 3
         lbc, ubc = -10, 5
         lbsigma, ubsigma = -4, 1
-        lKdx, uKdx = 0, 10
 
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         ## Lower and upper bounds for avidity are specified here
-        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma,lKdx], dtype = np.float64)
-        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma,uKdx], dtype = np.float64)
+        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
+        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 8 , 32,ubsigma], dtype = np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
@@ -282,7 +275,6 @@ class StoneModel:
         self.kxIDX = 6
         self.cIDX = [7, 8]
         self.sigIDX = 11
-        self.KdxIDX = 12
 
         if newData:
             ## Create the NumPy array Rquant, where each row represents a particular
@@ -306,7 +298,6 @@ class StoneModel:
 
             # We only include a second sigma if new data
             self.sig2IDX = 12
-            self.KdxIDX = self.KdxIDX + 1
             self.lb = np.insert(self.lb, self.sig2IDX, lbsigma)
             self.ub = np.insert(self.ub, self.sig2IDX, ubsigma)
             self.pNames.insert(self.sig2IDX, 'sigma2')

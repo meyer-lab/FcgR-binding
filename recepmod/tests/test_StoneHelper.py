@@ -1,6 +1,5 @@
 import unittest
 import time
-from ..StoneHelper import *
 from ..StoneModel import StoneModel
 
 class TestStoneMethods(unittest.TestCase):
