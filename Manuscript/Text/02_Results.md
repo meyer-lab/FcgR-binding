@@ -16,9 +16,15 @@ By comparing the normalized binding to the affinity of each FcγR-IgG interactio
 
 To interpret the complex variation in binding we observed with IgG-FcγR pair (i.e. affinity), receptor expression, and immune complex avidity, we employed an equilibrium model of multivalent ligand/monovalent receptor binding [@Stone:2001fm]. Within the model, an initial binding event occurs with the kinetics of the monovalent interaction ([@Fig:Fit]A). Subsequent multivalent binding events occur with a partition coefficient K~x~. Thus, K~x~ values much greater than 1 lead to highly multivalent interactions while K~x~ values much less than 1 lead to predominantly monovalent binding.
 
-While previous applications of this model have assumed K~x~ to be constant, those have not dealt with large variation in the affinity of the receptor-ligand interaction [@Stone:2001fm]. Treating this parameter as constant for interactions of different affinity may be reasonable for interactions of similar affinity, but clearly breaks down at the extremes. For example, for an FcγR-IgG interaction of barely measurable affinity, one would not expect to see multimer binding to occur with the same partitioning as an extremely high affinity interaction. Most concerning given the assumption of equilibrium, an assumption of constant K~x~ violates detailed balance when this model is extended to include expression of two FcγRs. Therefore, to solve these issues we assumed that K~x~ is proportional to K~a~. With this assumption, detailed balance is preserved (see methods), and at the limit of low K~a~, K~x~ is reduced as expected.
+While previous applications of this model have assumed K~x~ to be constant, those have not dealt with large variation in the affinity of the receptor-ligand interaction [@Stone:2001fm]. Treating this parameter as constant for interactions of different affinity may be reasonable for interactions of similar affinity, but clearly breaks down at the extremes. For example, for an FcγR-IgG interaction of barely measurable affinity, one would not expect to see multimer binding to occur with the same partitioning as an extremely high affinity interaction. Most concerning given the assumption of equilibrium, an assumption of constant K~x~ violates detailed balance when this model is extended to include expression of two FcγRs. Therefore, to solve these issues we assumed that K~x~ is proportional to K~a~. With this assumption, detailed balance is preserved (see methods), and K~x~ is reduced at the limit of low K~a~ as expected.
 
 We utilized Markov Chain Monte Carlo to fit the model to our measurements of FcγR-IgG binding. Both inspection of the sample autocorrelation and Geweke diagnostic indicated convergence ([@Fig:Fit]B). Comparing the prediction of each condition to our measured values, we observed extremely close agreement ([@Fig:Fit]C). Inspecting the fit of each parameter revealed that all of the parameters were well-specified, and that many of the parameter fits closely agreed with prior expectations. The fit values of each conversion coefficient indicated a 1.6-fold difference in the relationship between the number of immune complexes bound and output fluorescence signal ([@Fig:Fit]E).
+
+
+
+
+
+
 
 
 
