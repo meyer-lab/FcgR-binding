@@ -7,7 +7,7 @@
 Manuscript/.texpadtmp
 *.py~
 *.gitignore~
-Manuscript/Figures/*.pdf
+Manuscript/Figures/Figure*
 
 Manuscript/Manuscript.pdf
 .ipynb_checkpoints
