@@ -5,12 +5,12 @@ import seaborn as sns
 import pandas as pd
 from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized
-from .FigureCommon import makeFcIgLegend, rc, Igs, FcgRs, igs, fcgrs, subplotLabel
+from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRidxL
 
 # TODO: Add a plot of TNP-26/TNP-4 signal vs Ka
 # TODO: Add a line on top of the MFI vs. Ka plots of the monovalent binding
 
-def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
+def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
@@ -18,40 +18,40 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, legfontsize=10):
     fitMean = fitMean.assign(Meas_mean = fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
     fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
 
-    fitMean = fitMean.as_matrix()
     if ax1 is None or ax2 is None:
         fig = plt.figure(figsize=(9,5))
         ax1 = fig.add_subplot(1, 2, 1)
         ax2 = fig.add_subplot(1, 2, 2)
 
-    mfcVal = 'None'
-    for j in range(len(Igs)):
-        for k in range(len(FcgRs)):
-            ax1.errorbar(fitMean[8*j+k][3],fitMean[8*j+k][4],yerr=fitMean[8*j+k][5],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
+    def plotF(axInt, data):
+        for index, row in fitMean.iterrows():
+            colorr = FcgRidx[row['FcgR']]
+            axInt.errorbar(x=row['Ka'],
+                        y=row['Meas_mean'],
+                        yerr=row['Meas_std'],
+                        marker=Igs[row['Ig']],
+                        mfc=colorr,
+                        mec=colorr,
+                        ms=3,
+                        ecolor=colorr,
+                        linestyle='None')
 
-    ax1.set_xscale('log')
-    ax1.set_yscale('log')
-    ax1.set_ylabel('Measured TNP-BSA binding')
-    ax1.set_xlabel(r'Fc$\gamma$R-IgG Ka')
-    ax2.set_xlabel(r'Fc$\gamma$R-IgG Ka')
+        axInt.loglog()
+        ax1.set_ylabel('Measured TNP-BSA binding')
+        axInt.set_xlabel(r'Fc$\gamma$R-IgG Ka')
+        ax1.set_ylim(1.0E-3, 1.0E-1)
 
-    for j in range(len(Igs)):
-        for k in range(len(FcgRs)):
-            mfcVal = FcgRs[fcgrs[k]]
-            ax2.errorbar(fitMean[8*j+k+4][3],fitMean[8*j+k+4][4],yerr=fitMean[8*j+k+4][5],marker=Igs[igs[j]],mfc=mfcVal,mec=FcgRs[fcgrs[k]],ecolor=FcgRs[fcgrs[k]],linestyle='None')
+    plotF(ax1, fitMean.loc[fitMean['TNP'] == 4,:])
+    plotF(ax2, fitMean.loc[fitMean['TNP'] == 26,:])
 
-    ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,fontsize=legfontsize)
-    ax2.set_xscale('log')
-    ax2.set_yscale('log')
-    ax1.set_ylim(1.0E-3, 1.0E-1)
-    ax2.set_ylim(1.0E-3, 1.0E-1)
+    ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
 def FcgRQuantificationFigureMaker(StoneM, ax=None):
     # Put receptor expression measurements into a dataframe
     df = pd.DataFrame(StoneM.Rquant).T
 
     # Assign the names of the receptors
-    df.columns = fcgrs
+    df.columns = FcgRidxL.keys()
 
     # Melt the dataframe
     dfm = pd.melt(df)
@@ -75,11 +75,11 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None):
     axx.set_xlabel("")
     axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
-def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsize=16, legbbox=(2,1), tnpbsafontsize=10, titlefontsize=18, titlePos=(-3,6), legfontsize=10):
+def mfiAdjMeanFigureMaker(StoneM, axarr=None):
     ## Use LaTex to render text; though usetex is input as False, it causes LaTex to be used.
     ## Inputting usetex = True causes an error; this is a bug I found online
     ## (http://matplotlib.1069221.n5.nabble.com/tk-pylab-and-unicode-td10458.html)
-    rc('text',usetex=False)
+    plt.rc('text',usetex=False)
 
     ## Our data
     mfiAdjMean = StoneM.mfiAdjMean
@@ -91,18 +91,10 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
     ## Width of bars
     width = 0.5
 
-    ## Setting up strings useful for plotting
-    species = [r'Fc$\gamma$RIA', r'Fc$\gamma$RIIA-131R', r'Fc$\gamma$RIIA-131H',
-            r'Fc$\gamma$RIIB', r'Fc$\gamma$RIIIA-158F', r'Fc$\gamma$RIIIA-158V']
-
     units = int((3*width+len(ind)-1)/0.25)
     tnpbsaLabels = ['']*int((3*width+len(ind)-1)/0.25)
     tnpbsaLabels.insert(4,'TNP-4-BSA')
     tnpbsaLabels.insert(14,'TNP-26-BSA')
-
-    ## Set up repeating color palette
-    preColor = sns.color_palette('Set1',n_colors=5)
-    color = preColor+[preColor[j] for j in range(4)]
 
     if axarr is None:
         f = plt.figure()
@@ -122,7 +114,7 @@ def mfiAdjMeanFigureMaker(StoneM, axarr=None, ylabelfontsize=14, subtitlefontsiz
             temp.pop(-1)
 
     ## Create bar plot, and remove xticklabels
-        sns.barplot(data=temp,palette=color,ax=axarr[j])
+        sns.barplot(data=temp,ax=axarr[j])
         axarr[j].set_xticklabels(['' for j in range(len(axarr[j].get_xticklabels()))])
 
     ## Color the bar edges
@@ -140,7 +132,6 @@ def makeFigure():
     StoneM = StoneModel()
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
-    rcParams['lines.markeredgewidth'] = 1.0
 
     f = plt.figure(figsize=(7,6))
     gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,1,5,1,5,1])
@@ -154,7 +145,7 @@ def makeFigure():
 
     fitMean = getFitMeasSummarized(StoneM)
 
-    plotNormalizedBindingvsKA(fitMean, ax2, ax3, legfontsize=8)
+    plotNormalizedBindingvsKA(fitMean, ax2, ax3)
 
     subplotLabel(ax2, 'B')
     subplotLabel(ax3, 'C')
@@ -163,6 +154,7 @@ def makeFigure():
     axarr = []
     for j in range(6):
         axarr.append(f.add_subplot(gs2[35+2*j+int(np.floor(j/3))]))
-    mfiAdjMeanFigureMaker(StoneM,axarr,legbbox=(1.75,1),tnpbsafontsize=7,subtitlefontsize=7,ylabelfontsize=7,legfontsize=7)
+
+    mfiAdjMeanFigureMaker(StoneM,axarr)
 
     return f
