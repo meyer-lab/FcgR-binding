@@ -144,7 +144,7 @@ def makeFigure():
 
     f = plt.figure(figsize=(7,6))
     gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,1,5,1,5,1])
-    ax = f.add_subplot(gs1[0])
+    #ax = f.add_subplot(gs1[0])
     FcgRQuantificationFigureMaker(StoneM,ax)
 
     subplotLabel(ax, 'A')

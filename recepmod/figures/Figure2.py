@@ -124,10 +124,10 @@ def histSubplots(dset, axes=None):
     dsetFilter[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 100, color=[colors[j] for j in range(2)])
 
     # Set all the x-labels based on which histogram is displayed
-    axes[0].xlabel('Log10(Kx)')
-    axes[1].xlabel('Log10(Conversion Factor)')
-    axes[2].xlabel('Effective Avidity')
-    axes[3].xlabel('Deviation Parameter')
+    axes[0].set_xlabel('Log10(Kx)')
+    axes[1].set_xlabel('Log10(Conversion Factor)')
+    axes[2].set_xlabel('Effective Avidity')
+    axes[3].set_xlabel('Deviation Parameter')
 
     sigConvCalc = dsetFilter[['sigConv1', 'sigConv2']]
 
