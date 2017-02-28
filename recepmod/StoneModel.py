@@ -266,8 +266,8 @@ class StoneModel:
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         ## Lower and upper bounds for avidity are specified here
-        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma,lKdx], dtype = np.float64)
-        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 12, 32,ubsigma,uKdx], dtype = np.float64)
+        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
+        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 12, 32,ubsigma], dtype = np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
