@@ -117,10 +117,13 @@ def histSubplots(dset, axes=None):
 
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 10)),:]
 
-    dsetFilter[['Kx1']].plot.hist(ax=axes[0], bins = 100, color=sns.color_palette()[0])
-    dsetFilter[['sigConv1', 'sigConv2']].plot.hist(ax=axes[1], bins = 100, color=sns.color_palette()[0:2])
-    dsetFilter[['gnu1', 'gnu2']].plot.hist(ax=axes[2], bins = 100, color=sns.color_palette()[0:2])
-    dsetFilter[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 100, color=sns.color_palette()[0:2])
+    dsetFilter[['Kx1']].plot.hist(ax=axes[0], bins = 20, color=sns.color_palette()[0])
+    dsetFilter[['sigConv1', 'sigConv2']].plot.hist(ax=axes[1], bins = 20, color=sns.color_palette()[0:2])
+    dsetFilter[['gnu1', 'gnu2']].plot.hist(ax=axes[2],
+                                           bins = np.arange(-0.5, 32.5, 1.0),
+                                           color=sns.color_palette()[0:2],
+                                           xlim = (-0.5, 32.5))
+    dsetFilter[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
 
     # Set all the x-labels based on which histogram is displayed
     axes[0].set_xlabel('Log10(Kx)')
