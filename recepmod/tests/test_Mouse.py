@@ -99,8 +99,8 @@ class TestStoneMouse(unittest.TestCase):
         result = self.Mod.NimmerjahnMultiLinear(zN)
         #print(result.coef_)
         res = self.Mod.NimmerjahnLasso(zN)
-        #print(res.coef_)
-    
+        res2 = self.Mod.NimmerjahnLassoCrossVal(zN)
+        
     def test_FcgRPlots(self):
         # Plots effectiveness vs. each FcgR binding parameter
         logR = np.log10(10**5)
@@ -126,6 +126,17 @@ class TestStoneMouse(unittest.TestCase):
         RmultivTb = self.Mod.RmultiAvidityTable(z)
         #print(RmultivTb)
         self.assertTrue(Rmultiv.shape == (6,v))
+
+    def test_NimmerjahnTb_Knockdown(self):
+        logR = np.log10(10**5)
+        kx = 10**(-7)
+        v = 10
+        Li = 10**(-9)
+        if logR < 0 or kx < 0 or v < 0 or Li < 0:
+            raise ValueError('Negative input parameters')
+        z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
+        tbNK = self.Mod.NimmerjahnTb_Knockdown(z)
+        self.assertTrue(tbNK.shape == (18,25))
 
 if __name__ == '__main__':
     unittest.main()
