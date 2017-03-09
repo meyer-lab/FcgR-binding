@@ -6,6 +6,7 @@ from memoize import memoize
 from scipy.optimize import brentq
 from scipy.misc import comb
 from sklearn import linear_model
+from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(style="ticks")
@@ -191,7 +192,7 @@ class StoneModelMouse:
         #plt.show()
         return result
 
-    def NimmerjahnLasso(self, z, fullOutput = True):
+    def NimmerjahnLasso(self, z):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
         las = linear_model.Lasso(alpha = 0.005, normalize = True)
         tbN = self.NimmerjahnEffectTable(z)
@@ -212,7 +213,21 @@ class StoneModelMouse:
         plt.scatter(effect, las.predict(independent), color='red')
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
         plt.show()
-        return res
+        return independent
+    
+    def NimmerjahnLassoCrossVal(self, z):
+         las = linear_model.Lasso(alpha = 0.005, normalize = True)
+         tbN = self.NimmerjahnEffectTable(z)
+         independent = self.NimmerjahnLasso(z)
+         effect = np.array(tbN.iloc[list(range(6)),30])
+         effect = effect.reshape(6,1)
+         x_train, x_test, y_train, y_test = train_test_split(independent, effect, test_size=5/6, random_state=0)
+         res = las.fit(x_train, y_train)
+         print(las.score(x_test, y_test))
+         coe = res.coef_
+         coe = coe.reshape(4,5)
+         print(coe)
+         return res
     
     def FcgRPlots(self, z):
         # Plot effectiveness vs. all FcgR binding parameters
@@ -327,5 +342,84 @@ class StoneModelMouse:
         tbv.loc[:,'Effectiveness'] = pd.Series([0,0.95,0.20,0], index=tbv.index)
         return tbv
     
-#    def RmultiAvidityLasso(self, x):
-#        
+    def NimmerjahnTb_Knockdown(self, z):
+        tbK = self.NimmerjahnEffectTable(z)
+        # remove Req columns
+        l = list(range(31))
+        for i in range(6):
+            col = 5*(5-i)+4
+            l.pop(col)
+        tbK = tbK.iloc[list(range(6)), l]
+        
+        # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
+        tbK1 = tbK.iloc[:, list(range(24))]
+        idx1 = []
+        for i in tbK1.index:
+            idx1.append(i+'-FcgRIIB-/-')
+        tbK1.index = idx1
+        FcgRIIBcol = tbK.columns[4:8]
+        l1 = list(range(24))
+        for i in range(4):
+            l1.pop(7-i)
+        tbK1 = tbK1.iloc[:, l1]
+        for j in range(4):
+            tbK1.insert((4+j), FcgRIIBcol[j], 0)
+        tbK1.loc[:,'Effectiveness'] = pd.Series([0,.70,0,1,0,0.75], index=tbK1.index)
+        
+        # set up tbK2 for FcgRI knockdown, IgG2a treatment
+        tbK2 = tbK.iloc[(4,5), list(range(24))]
+        idx2 = []
+        for i in tbK2.index:
+            idx2.append(i+'-FcgRI-/-')
+        tbK2.index = idx2
+        FcgRIcol = tbK.columns[0:4]
+        l2 = list(range(24))
+        for i in range(4):
+            l2.pop(0)
+        tbK2 = tbK2.iloc[:, l2]
+        for j in range(4):
+            tbK2.insert(j, FcgRIcol[j], 0)
+        tbK2.loc[:,'Effectiveness'] = pd.Series([0,0.80], index=tbK2.index)
+        
+        # set up tbK3 for FcgRIII knockdown, IgG2a treatment
+        tbK3 = tbK.iloc[(4,5), list(range(24))]
+        idx3 = []
+        for i in tbK3.index:
+            idx3.append(i+'-FcgRIII-/-')
+        tbK3.index = idx3
+        FcgRIIIcol = tbK.columns[8:12]
+        l3 = list(range(24))
+        for i in range(4):
+            l3.pop(11-i)
+        tbK3 = tbK3.iloc[:, l3]
+        for j in range(4):
+            tbK3.insert(8+j, FcgRIIIcol[j], 0)
+        tbK3.loc[:,'Effectiveness'] = pd.Series([0,0.93], index=tbK3.index)
+        
+        # set up tbK4 table for FcgRI knockdown, FcgRIV blocking, IgG2a treatment
+        tbK4 = tbK.iloc[(4,5), list(range(24))]
+        idx4 = []
+        for i in tbK4.index:
+            idx4.append(i+'-FcgRI,IV-/-')
+        tbK4.index = idx4
+        FcgRIcol2 = tbK.columns[0:4]
+        FcgRIVcol = tbK.columns[12:16]
+        l4 = list(range(24))
+        for i in range(4):
+            l4.pop(15-i)
+        for i in range(4):
+            l4.pop(3-i)
+        tbK4 = tbK4.iloc[:, l4]
+        for j in range(4):
+            tbK4.insert(j, FcgRIcol2[j], 0)
+        for j in range(4):
+            tbK4.insert(12+j, FcgRIVcol[j], 0)
+        tbK4.loc[:,'Effectiveness'] = pd.Series([0,0.35], index=tbK4.index)
+        
+        # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
+        tbNK = tbK.append(tbK1)
+        tbNK = tbNK.append(tbK2)
+        tbNK = tbNK.append(tbK3)
+        tbNK = tbNK.append(tbK4)
+        
+        return tbNK
