@@ -86,7 +86,7 @@ class TestStoneMouse(unittest.TestCase):
         tbN = self.Mod.NimmerjahnEffectTable(z)
         #print(tbN.iloc[:, list(range(10,20))])
         self.assertTrue(tbN.shape == (8,31))
-		
+
     def test_NimmerjahnMultiLinear(self):
         # Prints coefficients of multi-linear regression model
         logR = np.log10(10**5)
@@ -100,7 +100,7 @@ class TestStoneMouse(unittest.TestCase):
         #print(result.coef_)
         res = self.Mod.NimmerjahnLasso(zN)
         res2 = self.Mod.NimmerjahnLassoCrossVal(zN)
-        
+
     def test_FcgRPlots(self):
         # Plots effectiveness vs. each FcgR binding parameter
         logR = np.log10(10**5)
@@ -112,20 +112,20 @@ class TestStoneMouse(unittest.TestCase):
         zN = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         plots = self.Mod.FcgRPlots(zN)
 
-    def test_RmultiAvidityTable(self):
-        # Plots effectiveness vs. each FcgR binding parameter
-        logR = np.log10(10**5)
-        kx = 10**(-7)
-        v = 5
-        Li = 10**(-9)
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
-        z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        Rmultiv = self.Mod.RmultiAvidity(x)
-        RmultivTb = self.Mod.RmultiAvidityTable(z)
-        #print(RmultivTb)
-        self.assertTrue(Rmultiv.shape == (6,v))
+    # def test_RmultiAvidityTable(self):
+    #     # Plots effectiveness vs. each FcgR binding parameter
+    #     logR = np.log10(10**5)
+    #     kx = 10**(-7)
+    #     v = 5
+    #     Li = 10**(-9)
+    #     if logR < 0 or kx < 0 or v < 0 or Li < 0:
+    #         raise ValueError('Negative input parameters')
+    #     x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
+    #     z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
+    #     Rmultiv = self.Mod.RmultiAvidity(x)
+    #     RmultivTb = self.Mod.RmultiAvidityTable(z)
+    #     #print(RmultivTb)
+    #     self.assertTrue(Rmultiv.shape == (6,v))
 
     def test_NimmerjahnTb_Knockdown(self):
         logR = np.log10(10**5)
