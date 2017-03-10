@@ -24,7 +24,8 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
         ax2 = fig.add_subplot(1, 2, 2)
 
     def plotF(axInt, data):
-        for index, row in fitMean.iterrows():
+        print(data)
+        for index, row in data.iterrows():
             colorr = FcgRidx[row['FcgR']]
             axInt.errorbar(x=row['Ka'],
                         y=row['Meas_mean'],
@@ -41,13 +42,54 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
         axInt.set_ylabel('Measured TNP-BSA binding')
         axInt.set_ylim(1.0E-3, 1.0E-1)
 
-    plotF(ax1, fitMean.loc[fitMean['TNP'] == 4,:])
-    plotF(ax2, fitMean.loc[fitMean['TNP'] == 26,:])
+    plotF(ax1, fitMean.loc[fitMean['TNP'] == "TNP-4",:])
+    plotF(ax2, fitMean.loc[fitMean['TNP'] == "TNP-26",:])
 
     ax1.set_title('TNP-4-BSA')
     ax2.set_title('TNP-26-BSA')
 
     ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+def plotAvidityEffectVsKA(fitMean, ax1=None):
+    # Make axes if none exist
+    if ax1 is None:
+        ax1 = plt.figure().add_subplot(121)
+
+    # Select the subset of data we want
+    fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std']]
+
+    # Reorder dataframe for processing
+    fitMean = pd.pivot_table(fitMean, index = ['Ig', 'FcgR', 'Ka'], columns = ['TNP'])
+
+    # Calculate the ratio of binding
+    fitMean = fitMean.assign(Ratio = fitMean[('Meas_mean', 'TNP-26')] / fitMean[('Meas_mean', 'TNP-4')])
+
+    # Calculate the error in the ratio
+    fitMean = fitMean.assign(STD = fitMean['Ratio'] * np.sqrt(np.power(fitMean[('Meas_std', 'TNP-26')]/fitMean[('Meas_mean', 'TNP-26')], 2) + np.power(fitMean[('Meas_std', 'TNP-4')]/fitMean[('Meas_mean', 'TNP-4')], 2)))
+
+    # Reset index
+    fitMean = fitMean.reset_index()
+    fitMean.columns = fitMean.columns.droplevel(1)
+
+    for index, row in fitMean.iterrows():
+        colorr = FcgRidx[row['FcgR']]
+        ax1.errorbar(x=row['Ka'],
+                    y=row['Ratio'],
+                    yerr=row['STD'],
+                    marker=Igs[row['Ig']],
+                    mfc=colorr,
+                    mec=colorr,
+                    ms=5,
+                    ecolor=colorr,
+                    linestyle='None')
+
+    ax1.loglog()
+    ax1.set_xlabel(r'Fc$\gamma$R-IgG Ka')
+    ax1.set_ylabel('TNP-26 / TNP-4 Binding')
+    ax1.set_ylim(1, 20)
+
+    ax1.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
 
 def FcgRQuantificationFigureMaker(StoneM, ax=None):
     # Put receptor expression measurements into a dataframe
