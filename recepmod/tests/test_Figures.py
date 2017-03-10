@@ -31,6 +31,9 @@ class TestFigMethods(unittest.TestCase):
         # Create the measured binding vs. ka plot
         Figure1.plotNormalizedBindingvsKA(fitMean)
 
+        # Create avidity effect vs. Ka plot
+        Figure1.plotAvidityEffectVsKA(fitMean)
+
         self.assertTrue(True)
 
     # Test mfiAdjMean plot
