@@ -32,11 +32,11 @@ Association constants for all combinations of IgG and FcγR were obtained from p
 
 ### Specification for K~x~
 
-We allowed K~x~ to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While K~x~ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of K~x~ must break down under certain regimes. Specifically, a constant value for K~x~ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, K~x~ must ultimately be reduced, and K~x~ for interactions with zero affinity must equal zero. Therefore, we specified an effective K~x~, equal to:
+We allowed K~x~ to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While K~x~ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of K~x~ must break down under certain regimes. Specifically, a constant value for K~x~ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, K~x~ must ultimately be reduced, and K~x~ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when proportional to affinity. Therefore, we specified an effective K~x~, equal to:
 
-$$ K_x = K_{x,\infty} \left( \frac{K_a}{K_{D,a} + K_a} \right) $$ {#eq:kx}
+$$ K_{x,eff} = K_x K_a $$ {#eq:kx}
 
-As a consequence of this construction, K~x~ becomes constant for high affinity interactions, but for some lower range of affinity is reduced, and satisfies the requirement that K~x~ be zero in the absence of binding.
+As a consequence of this construction, K~x~ becomes zero in the absence of binding and satisfies detailed balance.
 
 ### Model Fitting
 
@@ -46,6 +46,26 @@ In addition to the measured immune complex binding data, the receptor expression
 
 ### Two Receptor Model
 
-In order to account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of two receptors. To satisfy detailed balance it was necessary to assume K~x~ for each receptor was proportional to K~a~.
+In order to account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of two receptors. Assuming K~x~ for each receptor was proportional to K~a~ was necessary to fulfill detailed balance.
 
 $$ v_{i,j,eq} = {v \choose i}{v-i\choose j} L_0 K_{a,a}^{1-j} R_{eq,a}^i K_x^{i+j-1} (R_{eq,b}K_{a,b})^j $$ {#eq:vieqTwo}
+
+Therefore,
+
+
+
+
+
+
+
+
+
+$$ L_{bound} =  $$ {#eq:mlbound}
+
+
+
+$$ R_{tot} =  $$ {#eq:mrtot}
+
+As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium (R~multi~) can be found as follows:
+
+$$ R_{multi} =  $$ {#eq:mrmulti}
