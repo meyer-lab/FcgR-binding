@@ -50,13 +50,13 @@ To account for cells expressing multiple FcγRs, we extended the model to accoun
 
 $$ v_{i,j,eq} = {v \choose i}{v-i\choose j} L_0 K_{a,a}^{1-j} R_{eq,a}^i K_x^{i+j-1} (R_{eq,b}K_{a,b})^j $$ {#eq:vieqTwo}
 
-Where i and j are the number of the first and second receptors bound to the immune complex, respectively. As a consequence, $0 < i + j < v$. Therefore, the amount of ligand bound to either receptor is calculated by:
+Where i and j are the number of the first and second receptors bound to the immune complex, respectively. As a consequence, $0 \leq i + j < v$. Therefore, the amount of ligand bound to either receptor is calculated by:
 
 $$ L_{bound} = \sum_{\forall i + j > 0} v_{i,j,eq}  $$ {#eq:mlbound}
 
 The amount of receptor bound to ligand is calculated differently depending upon the receptor in question:
 
-$$ R_{bnd,i} = \sum_{i=1}^{v} \sum_{j=1}^{v-i} i v_{i,j,eq} $$ {#eq:mrtot}
+$$ R_{bnd,i} = \sum_{i=1}^{v} \sum_{\forall j} i v_{i,j,eq} $$ {#eq:mrtot}
 
 $$ R_{bnd,j} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mmrtot}
 
