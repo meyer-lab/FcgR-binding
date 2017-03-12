@@ -54,18 +54,16 @@ Therefore,
 
 
 
+$$ L_{bound} = \sum_{i=1}^{v} \sum_{j=1}^{v-i} v_{i,j,eq}  $$ {#eq:mlbound}
 
 
 
 
 
+$$ R_{tot,1} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mrtot}
 
-$$ L_{bound} =  $$ {#eq:mlbound}
-
-
-
-$$ R_{tot} =  $$ {#eq:mrtot}
+$$ R_{tot,2} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mmrtot}
 
 As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium (R~multi~) can be found as follows:
 
-$$ R_{multi} =  $$ {#eq:mrmulti}
+$$ R_{multi} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mrmulti}
