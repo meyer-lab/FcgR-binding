@@ -46,24 +46,19 @@ In addition to the measured immune complex binding data, the receptor expression
 
 ### Two Receptor Model
 
-In order to account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of two receptors. Assuming K~x~ for each receptor was proportional to K~a~ was necessary to fulfill detailed balance.
+To account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of two receptors. Assuming K~x~ for each receptor was proportional to K~a~ was necessary to fulfill detailed balance.
 
 $$ v_{i,j,eq} = {v \choose i}{v-i\choose j} L_0 K_{a,a}^{1-j} R_{eq,a}^i K_x^{i+j-1} (R_{eq,b}K_{a,b})^j $$ {#eq:vieqTwo}
 
-Therefore,
+Where i and j are the number of the first and second receptors bound to the immune complex, respectively. As a consequence, $0 < i + j < v$. Therefore, the amount of ligand bound to either receptor is calculated by:
+
+$$ L_{bound} = \sum_{\forall i + j > 0} v_{i,j,eq}  $$ {#eq:mlbound}
+
+The amount of receptor bound to ligand is calculated differently depending upon the receptor in question:
+
+$$ R_{bnd,i} = \sum_{i=1}^{v} \sum_{j=1}^{v-i} i v_{i,j,eq} $$ {#eq:mrtot}
+
+$$ R_{bnd,j} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mmrtot}
 
 
-
-$$ L_{bound} = \sum_{i=1}^{v} \sum_{j=1}^{v-i} v_{i,j,eq}  $$ {#eq:mlbound}
-
-
-
-
-
-$$ R_{tot,1} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mrtot}
-
-$$ R_{tot,2} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mmrtot}
-
-As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium (R~multi~) can be found as follows:
-
-$$ R_{multi} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mrmulti}
+TODO: Add any other quantities as they become relevant.
