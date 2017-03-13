@@ -177,3 +177,15 @@ def mapStore(dset, M):
 def reduce():
     frameList = pd.read_pickle('mapped_chain.pkl')
     return reduceMCMC(frameList)
+
+# Calculate expected ligand binding in the case of monovalent ligand,
+# given an amount of ligand, a receptor quantification, and a Ka
+def monovalentL(M):
+    L = M.tnpbsa
+    Ka = M.kaBruhns
+    Rquant = M.Rquant
+    print(L.shape)
+    print(Ka.shape)
+    for elem in Rquant:
+        print(elem.shape)
+    return "good"
