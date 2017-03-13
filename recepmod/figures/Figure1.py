@@ -147,73 +147,41 @@ def mfiAdjMeanFigureMaker(measAll, axarr=None):
         axx.set_title(fcr)
 
 def makeFigure(goober=True):
-    if goober:
-        StoneM = StoneModel()
+    StoneM = StoneModel()
 
-        sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
+    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
-        f = plt.figure(figsize=(7,6))
-        gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,1,5,1,5,1])
-        ax = f.add_subplot(gs1[0])
-        FcgRQuantificationFigureMaker(StoneM,ax)
+    f = plt.figure(figsize=(7,6))
+    gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[16,4,20,4,20,0])
+    ax = f.add_subplot(gs1[0])
+    FcgRQuantificationFigureMaker(StoneM,ax)
 
-        subplotLabel(ax, 'A')
+    subplotLabel(ax, 'A')
 
-        ax2 = f.add_subplot(gs1[2])
-        ax3 = f.add_subplot(gs1[4])
+    ax2 = f.add_subplot(gs1[2])
+    ax3 = f.add_subplot(gs1[4])
 
-        fitMean = getFitMeasSummarized(StoneM)
-        measAll = getMeasuredDataFrame(StoneM)
+    fitMean = getFitMeasSummarized(StoneM)
+    measAll = getMeasuredDataFrame(StoneM)
 
-        plotNormalizedBindingvsKA(fitMean, ax2, ax3)
+    plotNormalizedBindingvsKA(fitMean, ax2, ax3)
 
-        subplotLabel(ax2, 'B')
-        subplotLabel(ax3, 'C')
+    subplotLabel(ax2, 'B')
+    subplotLabel(ax3, 'C')
 
-        gs2 = gridspec.GridSpec(8,7,height_ratios=[4,4,4,6,8,12,8,12],width_ratios=[4,1,4,1,4,1,5])
-        axarr = []
-        for j in range(6):
-            axarr.append(f.add_subplot(gs2[35+2*j+8*int(np.floor(j/3))]))
+    gs2 = gridspec.GridSpec(8,7,height_ratios=[4,4,4,6,8,12,7,12],width_ratios=[4,1,4,1,4,1,5])
+    axarr = []
+    for j in range(6):
+        axarr.append(f.add_subplot(gs2[35+2*j+8*int(np.floor(j/3))]))
 
-        subplotLabel(axarr[0], 'D')
+    subplotLabel(axarr[0], 'D')
 
-        mfiAdjMeanFigureMaker(measAll,axarr)
+    mfiAdjMeanFigureMaker(measAll,axarr)
 
-        gs3 = gridspec.GridSpec(4,3,height_ratios=[26,12,6,6],width_ratios=[15,2,5])
-        ax4 = f.add_subplot(gs3[5])
-        plotAvidityEffectVsKA(fitMean,ax4)
+    gs3 = gridspec.GridSpec(4,3,height_ratios=[26,12,6,6],width_ratios=[15,2,5])
+    ax4 = f.add_subplot(gs3[5])
+    plotAvidityEffectVsKA(fitMean,ax4)
 
-        subplotLabel(ax4, 'E')
-    else:
-        StoneM = StoneModel()
-
-        sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
-
-        f = plt.figure(figsize=(7,6))
-        gs1 = gridspec.GridSpec(3,6,height_ratios=[4,1,6],width_ratios=[4,1,5,1,5,1])
-        ax = f.add_subplot(gs1[0])
-        FcgRQuantificationFigureMaker(StoneM,ax)
-
-        subplotLabel(ax, 'A')
-
-        ax2 = f.add_subplot(gs1[2])
-        ax3 = f.add_subplot(gs1[4])
-
-        fitMean = getFitMeasSummarized(StoneM)
-        measAll = getMeasuredDataFrame(StoneM)
-
-        plotNormalizedBindingvsKA(fitMean, ax2, ax3)
-
-        subplotLabel(ax2, 'B')
-        subplotLabel(ax3, 'C')
-
-        gs2 = gridspec.GridSpec(8,7,height_ratios=[4,4,4,6,8,12,8,12],width_ratios=[4,1,4,1,4,1,5])
-        axarr = []
-        for j in range(6):
-            axarr.append(f.add_subplot(gs2[35+2*j+8*int(np.floor(j/3))]))
-
-        subplotLabel(axarr[0], 'D')
-
-        mfiAdjMeanFigureMaker(measAll,axarr)
-
+    subplotLabel(ax4, 'E')
+    
     return f
