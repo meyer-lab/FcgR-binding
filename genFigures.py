@@ -7,14 +7,9 @@ from recepmod.figures import Figure4
 from recepmod.figures import Figure5
 
 def runFunc(figClass, nameOut):
-    if figClass != Figure1:
-        ff = figClass.makeFigure()
-        ff.savefig('./Manuscript/Figures/' + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
-        ff.savefig('./Manuscript/Figures/' + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
-    else:
-        ff = figClass.makeFigure()
-        ff.savefig('./Manuscript/Figures/' + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
-        ff.savefig('./Manuscript/Figures/' + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+    ff = figClass.makeFigure()
+    ff.savefig('./Manuscript/Figures/' + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+    ff.savefig('./Manuscript/Figures/' + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
 runFunc(Figure1, 'Figure1')
 
 runFunc(Figure2, 'Figure2')
