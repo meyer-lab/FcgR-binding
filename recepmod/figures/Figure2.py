@@ -18,7 +18,7 @@ def makeFigure():
     rcParams['lines.markeredgewidth'] = 1.0
 
     # Setup plotting space
-    f = plt.figure(figsize=(7,5))
+    f = plt.figure(figsize=(7,6))
 
     # Make grid
     gs1 = gridspec.GridSpec(3,3)

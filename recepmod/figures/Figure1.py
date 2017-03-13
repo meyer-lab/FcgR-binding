@@ -146,7 +146,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr=None):
         axx.legend_.remove()
         axx.set_title(fcr)
 
-def makeFigure(goober=True):
+def makeFigure():
     StoneM = StoneModel()
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
