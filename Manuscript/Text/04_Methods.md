@@ -58,7 +58,7 @@ The amount of receptor bound to ligand is calculated differently depending upon 
 
 $$ R_{bnd,i} = \sum_{i=1}^{v} \sum_{\forall j} i v_{i,j,eq} $$ {#eq:mrtot}
 
-$$ R_{bnd,j} = \sum_{i=1}^{v-j}_{j} v_{i,j,eq} $$ {#eq:mmrtot}
+$$ R_{bnd,j} = \sum_{j=1}^{v} \sum_{\forall i} j v_{i,j,eq} $$ {#eq:mmrtot}
 
 
 TODO: Add any other quantities as they become relevant.
