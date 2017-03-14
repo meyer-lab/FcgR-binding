@@ -3,9 +3,6 @@
 \usepackage{libertine}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
-%\usepackage{fontspec}
-%\usepackage{mathspec}
-%\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
 \usepackage{microtype}
 
 \PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
