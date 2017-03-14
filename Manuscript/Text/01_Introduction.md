@@ -19,10 +19,10 @@ csl: ./Manuscript/Templates/nature.csl
 
 # Summary points
 
+- Avidity most prominently modulates low-affinity FcγR-immune complex binding
 - A multivalent binding model can quantitatively predict FcγR-immune complex binding
 - Immune complex avidity has an outsized contribution to FcγR multimerization as compared to binding
-- C
-- D
+- A binding model deconvoles the influence of interventions modulating *in vivo* FcγR-driven effector function
 
 # Introduction
 
