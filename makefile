@@ -13,7 +13,7 @@ $(fdir)/Figure1%pdf $(fdir)/Figure2%pdf $(fdir)/Figure3%pdf $(fdir)/Figure1%svg 
 	python3 genFigures.py
 
 Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex
-	(cd ./Manuscript && latexmk -xelatex -f)
+	(cd ./Manuscript && latexmk -xelatex -f -quiet)
 
 Manuscript/index.html: Manuscript/Text/*.md $(fdir)/Figure1.svg $(fdir)/Figure2.svg $(fdir)/Figure3.svg
 	pandoc -s $(pan_common) -t html5 --mathjax -c ./Templates/kultiad.css --template=$(tdir)/html.template -o ./Manuscript/index.html
