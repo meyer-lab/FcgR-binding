@@ -144,6 +144,8 @@ def plotFit(fitMean, ax=None):
         fig = plt.figure(figsize=(8,6))
         ax = fig.add_subplot(1, 1, 1)
 
+    ax.plot([0.01, 5], [0.01, 5], color='k', linestyle='-', linewidth=1)
+
     for index, row in fitMean.iterrows():
         colorr = FcgRidx[row['FcgR']]
         ax.errorbar(x=row['Fit'],
