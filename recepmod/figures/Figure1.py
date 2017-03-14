@@ -7,9 +7,6 @@ from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized, getMeasuredDataFrame
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRidxL
 
-# TODO: Add a plot of TNP-26/TNP-4 signal vs Ka
-# TODO: Add a line on top of the MFI vs. Ka plots of the monovalent binding
-
 def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
@@ -24,7 +21,6 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
         ax2 = fig.add_subplot(1, 2, 2)
 
     def plotF(axInt, data):
-        print(data)
         for index, row in data.iterrows():
             colorr = FcgRidx[row['FcgR']]
             axInt.errorbar(x=row['Ka'],

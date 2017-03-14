@@ -3,10 +3,6 @@
 \usepackage{libertine}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
-\usepackage{fixltx2e} % provides \textsubscript
-\usepackage{mathspec}
-\usepackage{fontspec}
-\defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
 \usepackage{microtype}
 
 \PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
@@ -36,7 +32,7 @@ $endif$
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
 
-\usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+\usepackage[margin=1in, letterpaper]{geometry}
 
 \usepackage[$if(biblio-style)$style=$biblio-style$,$endif$$for(biblatexoptions)$$biblatexoptions$$sep$,$endfor$]{biblatex}
 $for(bibliography)$
@@ -152,15 +148,6 @@ $for(include-before)$
 $include-before$
 
 $endfor$
-$if(toc)$
-{
-$if(colorlinks)$
-\hypersetup{linkcolor=$if(toccolor)$$toccolor$$else$black$endif$}
-$endif$
-\setcounter{tocdepth}{$toc-depth$}
-\tableofcontents
-}
-$endif$
 
 $body$
 
