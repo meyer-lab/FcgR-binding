@@ -21,17 +21,17 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
         ax2 = fig.add_subplot(1, 2, 2)
 
     def plotF(axInt, data):
-        for index, row in data.iterrows():
+        for _, row in data.iterrows():
             colorr = FcgRidx[row['FcgR']]
             axInt.errorbar(x=row['Ka'],
-                        y=row['Meas_mean'],
-                        yerr=row['Meas_std'],
-                        marker=Igs[row['Ig']],
-                        mfc=colorr,
-                        mec=colorr,
-                        ms=5,
-                        ecolor=colorr,
-                        linestyle='None')
+                           y=row['Meas_mean'],
+                           yerr=row['Meas_std'],
+                           marker=Igs[row['Ig']],
+                           mfc=colorr,
+                           mec=colorr,
+                           ms=5,
+                           ecolor=colorr,
+                           linestyle='None')
 
         axInt.loglog()
         axInt.set_xlabel(r'Fc$\gamma$R-IgG Ka')
@@ -67,17 +67,17 @@ def plotAvidityEffectVsKA(fitMean, ax1=None):
     fitMean = fitMean.reset_index()
     fitMean.columns = fitMean.columns.droplevel(1)
 
-    for index, row in fitMean.iterrows():
+    for _, row in fitMean.iterrows():
         colorr = FcgRidx[row['FcgR']]
         ax1.errorbar(x=row['Ka'],
-                    y=row['Ratio'],
-                    yerr=row['STD'],
-                    marker=Igs[row['Ig']],
-                    mfc=colorr,
-                    mec=colorr,
-                    ms=5,
-                    ecolor=colorr,
-                    linestyle='None')
+                     y=row['Ratio'],
+                     yerr=row['STD'],
+                     marker=Igs[row['Ig']],
+                     mfc=colorr,
+                     mec=colorr,
+                     ms=5,
+                     ecolor=colorr,
+                     linestyle='None')
 
     ax1.loglog()
     ax1.set_xlabel(r'Fc$\gamma$R-IgG Ka')
