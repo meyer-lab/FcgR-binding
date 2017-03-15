@@ -214,18 +214,18 @@ class StoneModelMouse:
         return independent
 
     def NimmerjahnLassoCrossVal(self, z):
-         las = linear_model.Lasso(alpha = 0.005, normalize = True)
-         tbN = self.NimmerjahnEffectTable(z)
-         independent = self.NimmerjahnLasso(z)
-         effect = np.array(tbN.iloc[list(range(6)),30])
-         effect = effect.reshape(6,1)
-         x_train, x_test, y_train, y_test = train_test_split(independent, effect, test_size=5/6, random_state=0)
-         res = las.fit(x_train, y_train)
-         print(las.score(x_test, y_test))
-         coe = res.coef_
-         coe = coe.reshape(4,5)
-         print(coe)
-         return res
+        las = linear_model.Lasso(alpha = 0.005, normalize = True)
+        tbN = self.NimmerjahnEffectTable(z)
+        independent = self.NimmerjahnLasso(z)
+        effect = np.array(tbN.iloc[list(range(6)),30])
+        effect = effect.reshape(6,1)
+        x_train, x_test, y_train, y_test = train_test_split(independent, effect, test_size=5/6, random_state=0)
+        res = las.fit(x_train, y_train)
+        print(las.score(x_test, y_test))
+        coe = res.coef_
+        coe = coe.reshape(4,5)
+        print(coe)
+        return res
 
     def FcgRPlots(self, z):
         # Plot effectiveness vs. all FcgR binding parameters
