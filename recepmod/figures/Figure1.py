@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib import gridspec, rcParams
+from matplotlib import gridspec
 import numpy as np
 import seaborn as sns
 import pandas as pd
@@ -179,5 +179,5 @@ def makeFigure():
     plotAvidityEffectVsKA(fitMean,ax4)
 
     subplotLabel(ax4, 'E')
-    
+
     return f
