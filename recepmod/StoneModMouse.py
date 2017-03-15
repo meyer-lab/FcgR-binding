@@ -1,14 +1,12 @@
-from .StoneModel import StoneMod
-import numpy as np
 import os
+import numpy as np
 import pandas as pd
-from memoize import memoize
-from scipy.optimize import brentq
 from scipy.misc import comb
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
+from .StoneModel import StoneMod
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -82,7 +80,7 @@ class StoneModelMouse:
         if fullOutput:
             return (outputLbnd, outputRbnd, outputRmulti, outputnXlink, outputReq)
         return (outputLbnd, outputRbnd, outputReq)
-        
+
     def pdOutputTable(self, z, fullOutput = False):
         # Takes in a list of shape (8) for z in the format of [logR, logR, logR, logR, logR, logR, kx, v, Li]
         # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
@@ -174,7 +172,7 @@ class StoneModelMouse:
         # Append effectiveness data on the 31 column
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
         return tbN
-    
+
     def NimmerjahnMultiLinear(self, z, fullOutput = True):
         # Multi-Linear regression of FcgR binding predictions for effectiveness of IgG therapy
         reg = linear_model.LinearRegression()
@@ -214,7 +212,7 @@ class StoneModelMouse:
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
         plt.show()
         return independent
-    
+
     def NimmerjahnLassoCrossVal(self, z):
          las = linear_model.Lasso(alpha = 0.005, normalize = True)
          tbN = self.NimmerjahnEffectTable(z)
@@ -228,7 +226,7 @@ class StoneModelMouse:
          coe = coe.reshape(4,5)
          print(coe)
          return res
-    
+
     def FcgRPlots(self, z):
         # Plot effectiveness vs. all FcgR binding parameters
         tbN = self.NimmerjahnEffectTable(z)
@@ -254,13 +252,13 @@ class StoneModelMouse:
         plotTb = np.transpose(plotTb)
         table = pd.DataFrame(plotTb, columns = ['index', 'bndParam', 'eff'])
         sns.lmplot(x="bndParam", y="eff", col = 'index', hue = 'index', col_wrap=2, ci=None, palette="muted", data=table, size = 3)
-    
+
     def Rmulti_v(self, kx, ka, L0, logR0, v):
         # Returns the number of receptors bond at or above each avidity
         # Initiate variables
         R0 = np.power(10,logR0)
         sigma = 0.001
-        Req = R0/2 
+        Req = R0/2
         high = R0
         low = 0
         L_bound = 0
@@ -313,7 +311,7 @@ class StoneModelMouse:
             outputRmultiv[k] = RmultivOut
         outputRmultiv = outputRmultiv.reshape(6,int(v))
         return outputRmultiv
-    
+
     def RmultiAvidityTable(self,z):
         # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
         # Outputs a pandas table of binding prediction
@@ -341,7 +339,7 @@ class StoneModelMouse:
         # Append effectiveness data on the last column
         tbv.loc[:,'Effectiveness'] = pd.Series([0,0.95,0.20,0], index=tbv.index)
         return tbv
-    
+
     def NimmerjahnTb_Knockdown(self, z):
         tbK = self.NimmerjahnEffectTable(z)
         # remove Req columns
@@ -350,7 +348,7 @@ class StoneModelMouse:
             col = 5*(5-i)+4
             l.pop(col)
         tbK = tbK.iloc[list(range(6)), l]
-        
+
         # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
         tbK1 = tbK.iloc[:, list(range(24))]
         idx1 = []
@@ -365,7 +363,7 @@ class StoneModelMouse:
         for j in range(4):
             tbK1.insert((4+j), FcgRIIBcol[j], 0)
         tbK1.loc[:,'Effectiveness'] = pd.Series([0,.70,0,1,0,0.75], index=tbK1.index)
-        
+
         # set up tbK2 for FcgRI knockdown, IgG2a treatment
         tbK2 = tbK.iloc[(4,5), list(range(24))]
         idx2 = []
@@ -380,7 +378,7 @@ class StoneModelMouse:
         for j in range(4):
             tbK2.insert(j, FcgRIcol[j], 0)
         tbK2.loc[:,'Effectiveness'] = pd.Series([0,0.80], index=tbK2.index)
-        
+
         # set up tbK3 for FcgRIII knockdown, IgG2a treatment
         tbK3 = tbK.iloc[(4,5), list(range(24))]
         idx3 = []
@@ -395,7 +393,7 @@ class StoneModelMouse:
         for j in range(4):
             tbK3.insert(8+j, FcgRIIIcol[j], 0)
         tbK3.loc[:,'Effectiveness'] = pd.Series([0,0.93], index=tbK3.index)
-        
+
         # set up tbK4 table for FcgRI knockdown, FcgRIV blocking, IgG2a treatment
         tbK4 = tbK.iloc[(4,5), list(range(24))]
         idx4 = []
@@ -415,11 +413,11 @@ class StoneModelMouse:
         for j in range(4):
             tbK4.insert(12+j, FcgRIVcol[j], 0)
         tbK4.loc[:,'Effectiveness'] = pd.Series([0,0.35], index=tbK4.index)
-        
+
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         tbNK = tbK.append(tbK1)
         tbNK = tbNK.append(tbK2)
         tbNK = tbNK.append(tbK3)
         tbNK = tbNK.append(tbK4)
-        
+
         return tbNK
