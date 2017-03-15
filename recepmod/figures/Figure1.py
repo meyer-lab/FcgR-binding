@@ -57,13 +57,11 @@ def plotAvidityEffectVsKA(fitMean, ax1=None):
     # Reorder dataframe for processing
     fitMean = pd.pivot_table(fitMean, index = ['Ig', 'FcgR', 'Ka'], columns = ['TNP'])
 
-    # Calculate the ratio of binding
+    # Calculate the ratio of binding and error
     rratio = fitMean[('Meas_mean', 'TNP-26')] / fitMean[('Meas_mean', 'TNP-4')]
+    sstd = rratio * np.sqrt(np.power(fitMean[('Meas_std', 'TNP-26')]/fitMean[('Meas_mean', 'TNP-26')], 2) + np.power(fitMean[('Meas_std', 'TNP-4')]/fitMean[('Meas_mean', 'TNP-4')], 2))
 
-    fitMean = fitMean.assign(Ratio = rratio)
-
-    # Calculate the error in the ratio
-    fitMean = fitMean.assign(STD = fitMean['Ratio'] * np.sqrt(np.power(fitMean[('Meas_std', 'TNP-26')]/fitMean[('Meas_mean', 'TNP-26')], 2) + np.power(fitMean[('Meas_std', 'TNP-4')]/fitMean[('Meas_mean', 'TNP-4')], 2)))
+    fitMean = fitMean.assign(Ratio = rratio, STD = sstd)
 
     # Reset index
     fitMean = fitMean.reset_index()
