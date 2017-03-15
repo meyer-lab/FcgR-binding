@@ -128,9 +128,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr=None):
 
     fcIter = zip(axarr, FcgRidx.keys())
 
-    # TODO: Redo this code using seaborn
-    # What's below here isn't at all correct, but is a placeholder to provide
-    # some idea
+    # Loop through receptors creating plot
     for axx, fcr in fcIter:
         sns.barplot(x="Ig",
                     y = "Meas",
