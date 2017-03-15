@@ -1,12 +1,16 @@
-import os
+from .StoneModel import StoneMod
 import numpy as np
+import os
 import pandas as pd
+from memoize import memoize
+from scipy.optimize import brentq
 from scipy.misc import comb
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
-from .StoneModel import StoneMod
+import random 
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -80,7 +84,7 @@ class StoneModelMouse:
         if fullOutput:
             return (outputLbnd, outputRbnd, outputRmulti, outputnXlink, outputReq)
         return (outputLbnd, outputRbnd, outputReq)
-
+        
     def pdOutputTable(self, z, fullOutput = False):
         # Takes in a list of shape (8) for z in the format of [logR, logR, logR, logR, logR, logR, kx, v, Li]
         # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
@@ -128,7 +132,7 @@ class StoneModelMouse:
         Ig = y[self.IgIDX]
         idx = []
         # Concatenating a pandas table for a range of avidity
-        if fullOutput is False:
+        if fullOutput == False:
             for i in range(vl, vu+1):
                 x = y[:]
                 x.insert(self.uvIDX, i)
@@ -136,7 +140,7 @@ class StoneModelMouse:
                 z = x
                 tb = self.pdOutputTable(z, fullOutput = False)
                 tb1 = pd.concat([tb1, tb.loc[[Ig]]])
-        elif fullOutput is True:
+        elif fullOutput == True:
             for j in range(vl, vu+1):
                 x = y[:]
                 x.insert(self.uvIDX, j)
@@ -172,7 +176,7 @@ class StoneModelMouse:
         # Append effectiveness data on the 31 column
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
         return tbN
-
+    
     def NimmerjahnMultiLinear(self, z, fullOutput = True):
         # Multi-Linear regression of FcgR binding predictions for effectiveness of IgG therapy
         reg = linear_model.LinearRegression()
@@ -212,21 +216,21 @@ class StoneModelMouse:
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
         plt.show()
         return independent
-
+    
     def NimmerjahnLassoCrossVal(self, z):
         las = linear_model.Lasso(alpha = 0.005, normalize = True)
         tbN = self.NimmerjahnEffectTable(z)
         independent = self.NimmerjahnLasso(z)
         effect = np.array(tbN.iloc[list(range(6)),30])
         effect = effect.reshape(6,1)
-        x_train, x_test, y_train, y_test = train_test_split(independent, effect, test_size=5/6, random_state=0)
+        x_train, x_test, y_train, y_test = train_test_split(independent, effect, test_size=1/6, random_state=0)
         res = las.fit(x_train, y_train)
         print(las.score(x_test, y_test))
         coe = res.coef_
         coe = coe.reshape(4,5)
         print(coe)
         return res
-
+    
     def FcgRPlots(self, z):
         # Plot effectiveness vs. all FcgR binding parameters
         tbN = self.NimmerjahnEffectTable(z)
@@ -239,26 +243,26 @@ class StoneModelMouse:
         for j in range(20):
             bndParam += list(tbN_norm.iloc[list(range(6)),j])
         # Set up effectiveness column
-        for _ in range(20):
+        for i in range(20):
             eff += list(tbN.iloc[list(range(6)),30])
         index = []
         # Set index for 20 plots
         for k in range(4):
             for l in range(5):
-                for _ in range(6):
+                for n in range(6):
                     index.append(int(str(k+1)+str(l+1)))
         # Plot effectiveness vs. each binding parameter
         plotTb = np.array([index, bndParam, eff])
         plotTb = np.transpose(plotTb)
         table = pd.DataFrame(plotTb, columns = ['index', 'bndParam', 'eff'])
         sns.lmplot(x="bndParam", y="eff", col = 'index', hue = 'index', col_wrap=2, ci=None, palette="muted", data=table, size = 3)
-
+    
     def Rmulti_v(self, kx, ka, L0, logR0, v):
         # Returns the number of receptors bond at or above each avidity
         # Initiate variables
         R0 = np.power(10,logR0)
         sigma = 0.001
-        Req = R0/2
+        Req = R0/2 
         high = R0
         low = 0
         L_bound = 0
@@ -311,7 +315,7 @@ class StoneModelMouse:
             outputRmultiv[k] = RmultivOut
         outputRmultiv = outputRmultiv.reshape(6,int(v))
         return outputRmultiv
-
+    
     def RmultiAvidityTable(self,z):
         # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
         # Outputs a pandas table of binding prediction
@@ -339,7 +343,7 @@ class StoneModelMouse:
         # Append effectiveness data on the last column
         tbv.loc[:,'Effectiveness'] = pd.Series([0,0.95,0.20,0], index=tbv.index)
         return tbv
-
+    
     def NimmerjahnTb_Knockdown(self, z):
         tbK = self.NimmerjahnEffectTable(z)
         # remove Req columns
@@ -348,7 +352,7 @@ class StoneModelMouse:
             col = 5*(5-i)+4
             l.pop(col)
         tbK = tbK.iloc[list(range(6)), l]
-
+        
         # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
         tbK1 = tbK.iloc[:, list(range(24))]
         idx1 = []
@@ -363,9 +367,9 @@ class StoneModelMouse:
         for j in range(4):
             tbK1.insert((4+j), FcgRIIBcol[j], 0)
         tbK1.loc[:,'Effectiveness'] = pd.Series([0,.70,0,1,0,0.75], index=tbK1.index)
-
+        
         # set up tbK2 for FcgRI knockdown, IgG2a treatment
-        tbK2 = tbK.iloc[(4,5), list(range(24))]
+        tbK2 = tbK.iloc[(2,3), list(range(24))]
         idx2 = []
         for i in tbK2.index:
             idx2.append(i+'-FcgRI-/-')
@@ -378,9 +382,9 @@ class StoneModelMouse:
         for j in range(4):
             tbK2.insert(j, FcgRIcol[j], 0)
         tbK2.loc[:,'Effectiveness'] = pd.Series([0,0.80], index=tbK2.index)
-
+        
         # set up tbK3 for FcgRIII knockdown, IgG2a treatment
-        tbK3 = tbK.iloc[(4,5), list(range(24))]
+        tbK3 = tbK.iloc[(2,3), list(range(24))]
         idx3 = []
         for i in tbK3.index:
             idx3.append(i+'-FcgRIII-/-')
@@ -393,9 +397,9 @@ class StoneModelMouse:
         for j in range(4):
             tbK3.insert(8+j, FcgRIIIcol[j], 0)
         tbK3.loc[:,'Effectiveness'] = pd.Series([0,0.93], index=tbK3.index)
-
+        
         # set up tbK4 table for FcgRI knockdown, FcgRIV blocking, IgG2a treatment
-        tbK4 = tbK.iloc[(4,5), list(range(24))]
+        tbK4 = tbK.iloc[(2,3), list(range(24))]
         idx4 = []
         for i in tbK4.index:
             idx4.append(i+'-FcgRI,IV-/-')
@@ -413,11 +417,93 @@ class StoneModelMouse:
         for j in range(4):
             tbK4.insert(12+j, FcgRIVcol[j], 0)
         tbK4.loc[:,'Effectiveness'] = pd.Series([0,0.35], index=tbK4.index)
-
+        
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         tbNK = tbK.append(tbK1)
         tbNK = tbNK.append(tbK2)
         tbNK = tbNK.append(tbK3)
         tbNK = tbNK.append(tbK4)
-
+        
         return tbNK
+
+    def NimmerjahnKnockdownLasso(self, z):
+        # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
+        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+        tbN = self.NimmerjahnTb_Knockdown(z)
+        tbNparam = tbN.iloc[:, list(range(24))]
+        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        # Assign independent variables and dependent variable "effect"
+        independent = np.array(tbN_norm.iloc[:, list(range(16))])
+        independent = independent.reshape(18,16)
+        effect = np.array(tbN.iloc[:,24])
+        effect = effect.reshape(18,1)
+        # Linear regression and plot result
+        res = las.fit(independent, effect)
+        coe = res.coef_
+        coe = coe.reshape(4,4)
+        print(las.score(independent, effect))
+        print(coe)
+        plt.scatter(effect, las.predict(independent), color='red')
+        plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
+        #plt.show()
+        return independent
+   
+    def KnockdownLassoCrossVal(self, z):
+        # Cross validate KnockdownLasso by using a pair of rows as test set
+        # Fails when the test sets are IgG1, IgG2b, IgG1-IIB-/-, IgG2a-I-/-, IgG2a-III-/-
+        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+        tbN = self.NimmerjahnTb_Knockdown(z)
+        independent = self.NimmerjahnKnockdownLasso(z)
+        for r in range(9):
+            print(r)
+            ls = list(range(18))
+            ls.pop(2*r+1)
+            ls.pop(2*r)
+            x_train = independent[ls,:]
+            y_train = np.array(tbN.iloc[ls,24])
+            x_test = independent[[2*r,2*r+1],:]
+            y_test = np.array(tbN.iloc[[2*r,2*r+1],24])
+            res = las.fit(x_train, y_train)
+            print(las.score(x_train,y_train))
+            #plt.scatter(y_train, las.predict(x_train), color='red')
+            #plt.plot(y_train, las.predict(x_train), color='blue', linewidth=3)
+            #plt.show()
+            print(las.score(x_test, y_test))
+            coe = res.coef_
+            coe = coe.reshape(4,4)
+            print(coe)
+        return res
+    
+    def KnockdownPCA(self,z):
+        pca = PCA(n_components=5)
+        tbN = self.NimmerjahnTb_Knockdown(z)
+        tbNparam = tbN.iloc[:, list(range(24))]
+        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        # Assign independent variables and dependent variable "effect"
+        independent = np.array(tbN_norm.iloc[:, list(range(16))])
+        independent = independent.reshape(18,16)
+        effect = np.array(tbN.iloc[:,24])
+        effect = effect.reshape(18,1)
+        
+        # Plot explained variance ratio
+        result = pca.fit(independent, effect)
+        print(pca.explained_variance_ratio_)
+        plt.figure(1, figsize=(4, 3))
+        plt.clf()
+        plt.axes([.2, .2, .7, .7])
+        plt.plot(pca.explained_variance_, linewidth=2)
+        plt.axis('tight')
+        plt.xlabel('n_components')
+        plt.ylabel('explained_variance_')
+        plt.show()
+        
+        # Plot loading
+        trans = PCA(n_components=2).fit_transform(independent, effect)
+        plt.scatter(trans[:, 0], trans[:, 1], color='red')
+        #plt.plot(trans[:, 0], trans[:, 1], color='blue', linewidth=3)
+        plt.title("First 2 PCA directions")
+        plt.xlabel("PC1")
+        plt.ylabel("PC2")
+        plt.show()
+        print(trans)
+        return result
