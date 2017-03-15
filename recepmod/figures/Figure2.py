@@ -1,9 +1,9 @@
+import os
+import string
 from matplotlib import gridspec, rcParams
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 import seaborn as sns
-import string
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
 
@@ -92,7 +92,7 @@ def violinPlot(dset, ax=None):
 
 def LLplot(dset, ax = None):
     # TODO: Should this maybe be a plot of the autocorrelation or geweke criterion instead?
-    if ax == None:
+    if ax is None:
         ax = plt.gca()
 
     # Find out how many walkers we had
@@ -112,7 +112,7 @@ def LLplot(dset, ax = None):
 
 
 def histSubplots(dset, axes=None):
-    if axes == None:
+    if axes is None:
         fig, axes = plt.subplots(nrows=1, ncols=4)
 
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 10)),:]
@@ -140,7 +140,7 @@ def histSubplots(dset, axes=None):
 
 
 def plotFit(fitMean, ax=None):
-    if ax == None:
+    if ax is None:
         fig = plt.figure(figsize=(8,6))
         ax = fig.add_subplot(1, 1, 1)
 
