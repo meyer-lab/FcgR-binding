@@ -1,8 +1,8 @@
 import os
 import string
 from matplotlib import gridspec, rcParams
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
@@ -45,7 +45,7 @@ def makeFigure():
 def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True):
     # This should take a merged and summarized data frame
 
-    if ax == None:
+    if ax is None:
         fig = plt.figure(figsize=(7,6))
         ax = fig.add_subplot(1, 1, 1)
 
@@ -77,13 +77,13 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True):
 
 def violinPlot(dset, ax=None):
     # If no axis was provided make our own
-    if ax == None:
+    if ax is None:
         ax = plt.gca()
 
     dset = dset[['Rexp']]
     dset.columns = FcgRidx.keys()
 
-    objs = sns.violinplot(data=dset,cut=0,ax=ax)
+    objs = sns.violinplot(data=dset, cut=0, ax=ax)
 
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
@@ -113,7 +113,7 @@ def LLplot(dset, ax = None):
 
 def histSubplots(dset, axes=None):
     if axes is None:
-        fig, axes = plt.subplots(nrows=1, ncols=4)
+        _, axes = plt.subplots(nrows=1, ncols=4)
 
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 10)),:]
 
@@ -146,7 +146,7 @@ def plotFit(fitMean, ax=None):
 
     ax.plot([0.01, 5], [0.01, 5], color='k', linestyle='-', linewidth=1)
 
-    for index, row in fitMean.iterrows():
+    for _, row in fitMean.iterrows():
         colorr = FcgRidx[row['FcgR']]
         ax.errorbar(x=row['Fit'],
                     y=row['Meas_mean'],
