@@ -128,7 +128,7 @@ class StoneModelMouse:
         Ig = y[self.IgIDX]
         idx = []
         # Concatenating a pandas table for a range of avidity
-        if fullOutput == False:
+        if fullOutput is False:
             for i in range(vl, vu+1):
                 x = y[:]
                 x.insert(self.uvIDX, i)
@@ -136,7 +136,7 @@ class StoneModelMouse:
                 z = x
                 tb = self.pdOutputTable(z, fullOutput = False)
                 tb1 = pd.concat([tb1, tb.loc[[Ig]]])
-        elif fullOutput == True:
+        elif fullOutput is True:
             for j in range(vl, vu+1):
                 x = y[:]
                 x.insert(self.uvIDX, j)
@@ -239,13 +239,13 @@ class StoneModelMouse:
         for j in range(20):
             bndParam += list(tbN_norm.iloc[list(range(6)),j])
         # Set up effectiveness column
-        for i in range(20):
+        for _ in range(20):
             eff += list(tbN.iloc[list(range(6)),30])
         index = []
         # Set index for 20 plots
         for k in range(4):
             for l in range(5):
-                for n in range(6):
+                for _ in range(6):
                     index.append(int(str(k+1)+str(l+1)))
         # Plot effectiveness vs. each binding parameter
         plotTb = np.array([index, bndParam, eff])
