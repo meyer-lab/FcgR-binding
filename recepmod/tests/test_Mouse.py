@@ -1,10 +1,9 @@
 import unittest
-from ..StoneModMouse import StoneModelMouse
 import numpy as np
 import random
 import time
 from scipy.stats import norm
-import matplotlib
+from ..StoneModMouse import StoneModelMouse
 
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
