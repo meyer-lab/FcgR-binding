@@ -44,8 +44,6 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None):
     ax1.set_title('TNP-4-BSA')
     ax2.set_title('TNP-26-BSA')
 
-    ax2.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-
 def plotAvidityEffectVsKA(fitMean, ax1=None):
     # Make axes if none exist
     if ax1 is None:
@@ -111,7 +109,7 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None):
     ## Set up axes
     axx.set_yscale('log')
     axx.set_ylim(1.0E5, 1.0E7)
-    axx.set_ylabel("Number of Receptors")
+    axx.set_ylabel("Receptors/Cell")
     ax.set_xlabel("")
     axx.set_xlabel("")
     axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
@@ -137,6 +135,8 @@ def mfiAdjMeanFigureMaker(measAll, axarr=None):
                     ax = axx,
                     ci = 68)
 
+        axx.set_ylabel("Binding (RU)")
+        axx.set_xlabel("")
         axx.legend_.remove()
         axx.set_title(fcr)
 
@@ -160,15 +160,15 @@ def makeFigure():
 
     plotNormalizedBindingvsKA(fitMean, ax2, ax3)
 
-    subplotLabel(ax2, 'B')
-    subplotLabel(ax3, 'C')
+    subplotLabel(ax2, 'C')
+    subplotLabel(ax3, 'D')
 
     gs2 = gridspec.GridSpec(8,7,height_ratios=[4,4,4,6,8,12,7,12],width_ratios=[4,1,4,1,4,1,5])
     axarr = []
     for j in range(6):
         axarr.append(f.add_subplot(gs2[35+2*j+8*int(np.floor(j/3))]))
 
-    subplotLabel(axarr[0], 'D')
+    subplotLabel(axarr[0], 'B')
 
     mfiAdjMeanFigureMaker(measAll,axarr)
 
