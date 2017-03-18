@@ -1,10 +1,8 @@
 import unittest
-from ..StoneModMouse import StoneModelMouse
-import numpy as np
 import random
 import time
-from scipy.stats import norm
-import matplotlib
+import numpy as np
+from ..StoneModMouse import StoneModelMouse
 
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
@@ -84,9 +82,9 @@ class TestStoneMouse(unittest.TestCase):
             raise ValueError('Negative input parameters')
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         tbN = self.Mod.NimmerjahnEffectTable(z)
-        #print(tbN.iloc[:, list(range(10,20))])
+
         self.assertTrue(tbN.shape == (8,31))
-		
+
     def test_NimmerjahnMultiLinear(self):
         # Prints coefficients of multi-linear regression model
         logR = np.log10(10**5)
@@ -97,10 +95,12 @@ class TestStoneMouse(unittest.TestCase):
             raise ValueError('Negative input parameters')
         zN = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         result = self.Mod.NimmerjahnMultiLinear(zN)
-        #print(result.coef_)
         res = self.Mod.NimmerjahnLasso(zN)
         res2 = self.Mod.NimmerjahnLassoCrossVal(zN)
-        
+
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(res, np.ndarray)
+
     def test_FcgRPlots(self):
         # Plots effectiveness vs. each FcgR binding parameter
         logR = np.log10(10**5)
@@ -124,7 +124,7 @@ class TestStoneMouse(unittest.TestCase):
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         Rmultiv = self.Mod.RmultiAvidity(x)
         RmultivTb = self.Mod.RmultiAvidityTable(z)
-        #print(RmultivTb)
+
         self.assertTrue(Rmultiv.shape == (6,v))
 
     def test_NimmerjahnTb_Knockdown(self):
@@ -141,6 +141,6 @@ class TestStoneMouse(unittest.TestCase):
         cross2 = self.Mod.KnockdownLassoCrossVal2(z)
         result = self.Mod.KnockdownPCA(z)
         self.assertTrue(tbNK.shape == (18,25))
-        
+
 if __name__ == '__main__':
     unittest.main()
