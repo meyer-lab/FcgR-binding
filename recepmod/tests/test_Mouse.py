@@ -138,6 +138,7 @@ class TestStoneMouse(unittest.TestCase):
         tbNK = self.Mod.NimmerjahnTb_Knockdown(z)
         res = self.Mod.NimmerjahnKnockdownLasso(z)
         cross = self.Mod.KnockdownLassoCrossVal(z)
+        cross2 = self.Mod.KnockdownLassoCrossVal2(z)
         result = self.Mod.KnockdownPCA(z)
         self.assertTrue(tbNK.shape == (18,25))
         
