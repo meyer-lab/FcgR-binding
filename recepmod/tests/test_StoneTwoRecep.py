@@ -1,6 +1,7 @@
 import unittest
 import time
-from ..StoneTwoRecep import *
+import numpy as np
+from ..StoneTwoRecep import StoneVgrid, StoneRmultiAll, nmultichoosek, reqSolver, StoneRbnd
 
 class TestStoneTwoRecpMethods(unittest.TestCase):
     def setUp(self):
@@ -169,23 +170,23 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
         Ka = np.array([1E5, 1E4], dtype=np.float64)
 
 
-        output, vGrid, Rbnd = self.retReqDebug(logR, Ka)
+        output, vGrid, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[1], output[0])
 
         # Flip Ka around and see the relationship still applies
         Ka[0:2] = [1.0E2, 1.0E6]
-        output, vGrid, Rbnd = self.retReqDebug(logR, Ka)
+        output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[0], output[1])
 
         # Now keep Ka equal but have asymmetric expression
         Ka[0:2] = 1.0E5
         logR[0:2] = [4.0, 5.0]
-        output, vGrid, Rbnd = self.retReqDebug(logR, Ka)
+        output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[1], output[0])
 
         # And perform same with expression switched
         logR[0:2] = [5.0, 4.0]
-        output, vGrid, Rbnd = self.retReqDebug(logR, Ka)
+        output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[0], output[1])
 
 if __name__ == '__main__':
