@@ -1,10 +1,4 @@
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.lines as mlines
-import matplotlib.colors as mcolors
 import seaborn as sns
-from matplotlib.font_manager import FontProperties
 
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
@@ -15,6 +9,9 @@ FcgRidxL = [r'Fc$\gamma$RI',r'Fc$\gamma$RIIA-131R',r'Fc$\gamma$RIIA-131H',r'Fc$\
 FcgRidxL = dict(zip(FcgRidxL, sns.color_palette()))
 
 def makeFcIgLegend():
+    import matplotlib.lines as mlines
+    import matplotlib.patches as mpatches
+
     patches = list()
 
     for f in FcgRidxL:
