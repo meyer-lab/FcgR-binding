@@ -2,9 +2,9 @@ import os
 import string
 from itertools import product
 from matplotlib import gridspec
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
 from cycler import cycler
 from ..StoneModel import StoneMod
@@ -42,8 +42,8 @@ def makeFigure():
     # Plot from two receptor model
     TwoRecep(dset, ax = ax[4:6])
 
-    for ii in range(len(ax)):
-        subplotLabel(ax[ii], string.ascii_uppercase[ii])
+    for ii, item in enumerate(ax):
+        subplotLabel(item, string.ascii_uppercase[ii])
 
     return f
 
@@ -86,7 +86,7 @@ def PredictionVersusAvidity(ax):
 # E) The predicted amount of multimerized receptor versus avidity for a cell
 # expressing RIII and RIIB simultaneously. F) The predicted ratio (E)
 # TODO: Examine distribution of receptor bound numbers over avidity
-def TwoRecep(dset, ax = None):
+def TwoRecep(_, ax = None):
     # Active, inhibitory
     Rexp = [3.0, 4.0]
     Ka = [2.0E6, 1.2E5]
