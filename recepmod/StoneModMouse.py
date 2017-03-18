@@ -210,8 +210,8 @@ class StoneModelMouse:
         res = las.fit(independent, effect)
         coe = res.coef_
         coe = coe.reshape(4,5)
-        print(las.score(independent, effect))
-        print(coe)
+#        print(las.score(independent, effect))
+#        print(coe)
         plt.scatter(effect, las.predict(independent), color='red')
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
         plt.show()
@@ -225,10 +225,10 @@ class StoneModelMouse:
         effect = effect.reshape(6,1)
         x_train, x_test, y_train, y_test = train_test_split(independent, effect, test_size=1/6, random_state=0)
         res = las.fit(x_train, y_train)
-        print(las.score(x_test, y_test))
+#        print(las.score(x_test, y_test))
         coe = res.coef_
         coe = coe.reshape(4,5)
-        print(coe)
+#        print(coe)
         return res
     
     def FcgRPlots(self, z):
@@ -295,7 +295,7 @@ class StoneModelMouse:
 
         # Assign inputs for Rmulti_v
         x1 = np.array(x1)
-        v = x1[self.uvIDX]
+        v = int(x1[self.uvIDX])
         Kx = np.power(10, x1[self.kxIDX])
         L0 = x1[self.L0IDX]
 
@@ -441,11 +441,13 @@ class StoneModelMouse:
         res = las.fit(independent, effect)
         coe = res.coef_
         coe = coe.reshape(4,4)
-        print(las.score(independent, effect))
-        print(coe)
+#        print(las.score(independent, effect))
+#        print(coe)
         plt.scatter(effect, las.predict(independent), color='red')
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
-        #plt.show()
+        plt.xlabel("Effectiveness")
+        plt.ylabel("Prediction")
+        plt.show()
         return independent
    
     def KnockdownLassoCrossVal(self, z):
@@ -455,23 +457,60 @@ class StoneModelMouse:
         tbN = self.NimmerjahnTb_Knockdown(z)
         independent = self.NimmerjahnKnockdownLasso(z)
         for r in range(9):
-            print(r)
+#            print(r)
             ls = list(range(18))
             ls.pop(2*r+1)
             ls.pop(2*r)
             x_train = independent[ls,:]
             y_train = np.array(tbN.iloc[ls,24])
             x_test = independent[[2*r,2*r+1],:]
+            #x_test.reshape(2,16)
             y_test = np.array(tbN.iloc[[2*r,2*r+1],24])
+            #y_test.reshape(2,1)
             res = las.fit(x_train, y_train)
-            print(las.score(x_train,y_train))
-            #plt.scatter(y_train, las.predict(x_train), color='red')
-            #plt.plot(y_train, las.predict(x_train), color='blue', linewidth=3)
-            #plt.show()
-            print(las.score(x_test, y_test))
+#            print(las.score(x_train,y_train))
+#            print(las.score(x_test, y_test))
+            y1 = y_test[1]
+            y1 = np.array(y1)
+#            print(1-abs(las.predict(x_test[1,:])-y1)/y1)
+#            plt.scatter(y_train, las.predict(x_train), color='red')
+#            plt.scatter(y_test, las.predict(x_test), color='green')
+#            plt.plot(y_train, las.predict(x_train), color='blue', linewidth=3)
+#            plt.xlabel("Effectiveness")
+#            plt.ylabel("Prediction")
+#            plt.show()
             coe = res.coef_
             coe = coe.reshape(4,4)
-            print(coe)
+#            print(coe)
+        return res
+
+    def KnockdownLassoCrossVal2(self, z):
+        # Cross validate KnockdownLasso(v=10) by using a row as test set
+        # Predictive when test sets are (IgG2a,) IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-FcgRI,IV-/-
+        las = linear_model.Lasso(alpha = 0.008, normalize = True)
+        tbN = self.NimmerjahnTb_Knockdown(z)
+        independent = self.NimmerjahnKnockdownLasso(z)
+        for r in range(9):
+#            print(r)
+            l = [2*x+1 for x in range(9)]
+            l.pop(r)
+            x_train = independent[l,:]
+            y_train = np.array(tbN.iloc[l,24])
+            x_test = independent[[2*r+1],:]
+            y_test = np.array(tbN.iloc[[2*r+1],24])
+            res = las.fit(x_train, y_train)
+#            print(las.score(x_train,y_train))
+#            if y_test != 0:
+#                print(1-abs(las.predict(x_test)-y_test)/y_test)
+#            plt.scatter(y_train, las.predict(x_train), color='red')
+#            plt.scatter(y_test, las.predict(x_test), color='green')
+#            plt.plot(y_train, las.predict(x_train), color='blue', linewidth=3)
+#            plt.xlabel("Effectiveness")
+#            plt.ylabel("Prediction")
+#            plt.show()
+            coe = res.coef_
+            coe = coe.reshape(4,4)
+#            print(coe)
         return res
     
     def KnockdownPCA(self,z):
@@ -487,7 +526,7 @@ class StoneModelMouse:
         
         # Plot explained variance ratio
         result = pca.fit(independent, effect)
-        print(pca.explained_variance_ratio_)
+#        print(pca.explained_variance_ratio_)
         plt.figure(1, figsize=(4, 3))
         plt.clf()
         plt.axes([.2, .2, .7, .7])
@@ -505,5 +544,5 @@ class StoneModelMouse:
         plt.xlabel("PC1")
         plt.ylabel("PC2")
         plt.show()
-        print(trans)
+#        print(trans)
         return result
