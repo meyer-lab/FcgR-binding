@@ -38,7 +38,7 @@ def normalizeData(filepath):
 
     # Subtract off the corresponding blank measurement
     for (ii,jj) in np.ndindex(Luxpre.shape):
-            newLux[ii,jj] = Luxpre[ii,jj] - Luxpre[ii - (ii%5),jj]
+        newLux[ii,jj] = Luxpre[ii,jj] - Luxpre[ii - (ii%5),jj]
 
     # Filter out the blank measurements
     newLux = newLux[np.mod(range(newLux.shape[0]), 5) > 0,:]

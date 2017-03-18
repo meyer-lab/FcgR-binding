@@ -170,7 +170,7 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
         Ka = np.array([1E5, 1E4], dtype=np.float64)
 
 
-        output, vGrid, _ = self.retReqDebug(logR, Ka)
+        output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[1], output[0])
 
         # Flip Ka around and see the relationship still applies
