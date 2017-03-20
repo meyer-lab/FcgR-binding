@@ -42,7 +42,7 @@ def makeFigure():
 
     return f
 
-def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True):
+def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True, ylabelpad=-5):
     # This should take a merged and summarized data frame
 
     if ax is None:
@@ -72,7 +72,7 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True):
 
     ax.set_yscale('log')
     ax.set_xscale('log')
-    plt.ylabel(nameFieldY)
+    plt.ylabel(nameFieldY,labelpad=ylabelpad)
     plt.xlabel(nameFieldX)
 
 def violinPlot(dset, ax=None):
