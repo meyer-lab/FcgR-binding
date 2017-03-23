@@ -16,17 +16,15 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     # Initialize the grid of possibilities
     vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float64)
 
-    # ii is the number of receptor one bound
-    for ii in range(1, gnu+1):
-        # jj is the number of receptor two bound
-        for jj in range(1, gnu+1-ii):
-            nmk = L0 * nmultichoosek(gnu,ii,jj)
+    # ii, jj is the number of receptor one, two bound
+    for jj in range(gnu+1):
+        jPen = L0 * Ka[0] * (Ka[1]/Ka[0]*Req[1])**jj
 
-            ReqPenalty = Req[0]**ii * Req[1]**jj
+        for ii in range(gnu+1-jj):
+            if ii == 0 and jj == 0:
+                continue
 
-            KxPenalty = Kx**(ii+jj-1) * (Ka[1]/Ka[0])**jj
-
-            vGrid[ii, jj] = Ka[0]*nmk*KxPenalty*ReqPenalty
+            vGrid[ii, jj] = jPen*nmultichoosek(gnu,ii,jj)*Kx**(ii+jj-1)*Req[0]**ii
 
     return vGrid
 
