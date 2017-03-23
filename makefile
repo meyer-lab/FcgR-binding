@@ -4,7 +4,7 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc -f markdown ./Manuscript/Text
 fdir = ./Manuscript/Figures
 tdir = ./Manuscript/Templates
 
-.PHONY: clean upload test
+.PHONY: clean upload test profile
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf
 
@@ -30,6 +30,10 @@ clean:
 
 test:
 	python3 -m unittest discover
+
+profile:
+	python3 -m cProfile -o output.pstats genFigures.py
+	python3 -m gprof2dot -f pstats output.pstats | dot -Tpng -o output.png
 
 upload:
 	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
