@@ -89,7 +89,7 @@ def plotAvidityEffectVsKA(fitMean, ax1=None, ylabelpad=-0.3, ytickx = 0.08):
         ax1.get_yticklabels()[j].set_x(ytickx)
     ax1.set_ylim(1, 20)
 
-    ax1.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    ax1.legend(handles=makeFcIgLegend(), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
 
 def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelpad=0, ytickx=0):
@@ -155,14 +155,14 @@ def makeFigure():
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
     f = plt.figure(figsize=(7,6))
-    gs1 = gridspec.GridSpec(3,8,height_ratios=[4,1,6],width_ratios=[20,4,20,4,20,4,20,16])
+    gs1 = gridspec.GridSpec(3,4)
     ax = f.add_subplot(gs1[0])
     FcgRQuantificationFigureMaker(StoneM,ax)
 
     subplotLabel(ax, 'A')
 
-    ax2 = f.add_subplot(gs1[2])
-    ax3 = f.add_subplot(gs1[4])
+    ax2 = f.add_subplot(gs1[1])
+    ax3 = f.add_subplot(gs1[2])
 
     fitMean = getFitMeasSummarized(StoneM)
     measAll = getMeasuredDataFrame(StoneM)
@@ -172,20 +172,22 @@ def makeFigure():
     subplotLabel(ax2, 'B')
     subplotLabel(ax3, 'C')
 
-    ax4 = f.add_subplot(gs1[6])
+    ax4 = f.add_subplot(gs1[3])
     plotAvidityEffectVsKA(fitMean,ax4)
 
     subplotLabel(ax4, 'D')
 
-    gs2 = gridspec.GridSpec(8,5,height_ratios=[4,4,4,6,8,12,7,12],width_ratios=[4,1,4,1,4])
     axarr = []
     for j in range(6):
-        axarr.append(f.add_subplot(gs2[25+2*j+4*int(np.floor(j/3))]))
+        if j < 3:
+            axarr.append(f.add_subplot(gs1[j+4]))
+        else:
+            axarr.append(f.add_subplot(gs1[j+5]))
 
     subplotLabel(axarr[0], 'E')
 
     mfiAdjMeanFigureMaker(measAll,axarr)
 
-    gs3 = gridspec.GridSpec(4,3,height_ratios=[26,12,6,6],width_ratios=[15,2,5])
+    f.tight_layout()
 
     return f
