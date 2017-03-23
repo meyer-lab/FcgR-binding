@@ -62,7 +62,7 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
         output2 = StoneVgrid(np.flipud(Req),np.flipud(Ka),gnu,Kx,L0)
 
         # Check that detailed balance holds
-        self.assertTrue(np.all(np.equal(output, np.transpose(output2))))
+        self.assertTrue(np.all(np.isclose(output, np.transpose(output2))))
 
     # Test that varying Req and Ka provides the expected results
     def test_vGridVar(self):
