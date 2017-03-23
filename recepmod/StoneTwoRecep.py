@@ -17,12 +17,9 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float64)
 
     # ii is the number of receptor one bound
-    for ii in range(gnu+1):
+    for ii in range(1, gnu+1):
         # jj is the number of receptor two bound
-        for jj in range(gnu+1):
-            if ii+jj > gnu or (ii == 0 and jj == 0):
-                continue
-
+        for jj in range(1, gnu+1-ii):
             nmk = L0 * nmultichoosek(gnu,ii,jj)
 
             ReqPenalty = Req[0]**ii * Req[1]**jj
