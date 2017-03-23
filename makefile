@@ -27,13 +27,14 @@ Manuscript/Manuscript.tex: Manuscript/Text/*.md
 clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html
 	rm -f $(fdir)/Figure*
+	rm -f profile.p*
 
 test:
 	python3 -m unittest discover
 
 profile:
-	python3 -m cProfile -o output.pstats genFigures.py
-	python3 -m gprof2dot -f pstats output.pstats | dot -Tpng -o output.png
+	python3 -m cProfile -o profile.pstats genFigures.py
+	python3 -m gprof2dot -f pstats profile.pstats | dot -Tpng -o profile.png
 
 upload:
 	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
