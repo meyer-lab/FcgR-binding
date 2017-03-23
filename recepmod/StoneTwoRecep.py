@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
-from memoize import memoize
 from .StoneModel import nchoosek
 
 # This function takes in the relevant parameters and creates the v_ij grid
@@ -10,17 +9,20 @@ from .StoneModel import nchoosek
 # Req should be a tuple of size 2
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
     # Initialize the grid of possibilities
-    vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float64)
+    vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float)
 
     # ii, jj is the number of receptor one, two bound
     for jj in range(gnu+1):
-        jPen = L0 * Ka[0] * (Ka[1]/Ka[0]*Req[1])**jj * nchoosek(gnu, jj)
+        # Terms that only depend on jj
+        jPen = L0 * Ka[0] * (Ka[1]/Ka[0]*Req[1]*Kx)**jj * nchoosek(gnu, jj) / Kx
 
-        for ii in range(gnu+1-jj):
-            if ii == 0 and jj == 0:
-                continue
+        # Setup iterator for inner loop
+        iterable = (jPen*nchoosek(gnu-jj,ii)*(Req[0]*Kx)**ii for ii in range(gnu+1-jj))
 
-            vGrid[ii, jj] = jPen*nchoosek(gnu-jj,ii)*Kx**(ii+jj-1)*Req[0]**ii
+        # Assign output of inner loop
+        vGrid[0:(gnu+1-jj), jj] = np.transpose(np.fromiter(iterable, np.float))
+
+    vGrid[0, 0] = 0
 
     return vGrid
 
