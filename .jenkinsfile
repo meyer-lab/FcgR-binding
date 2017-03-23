@@ -13,13 +13,7 @@ pipeline {
     stage('Test'){
       steps {
         sh 'coverage run -m unittest discover'
-        //sh 'coverage xml -o coverage.xml --omit=/usr/local/lib/*'
-        //sh 'mkdir -p ./report'
-        //sh 'cobertura-clover-transform coverage.xml > ./report/clover.xml'
-
         sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
-
-        //step([$class: 'CloverPublisher', cloverReportDir: 'report', cloverReportFileName: 'clover.xml'])
 
         step([
           $class                     : 'WarningsPublisher',
@@ -30,6 +24,12 @@ pipeline {
           unstableTotalAll           : '1000',
           usePreviousBuildAsReference: true
           ])
+      }
+    }
+    stage('Profile') {
+      steps {
+        sh 'make profile'
+        archiveArtifacts artifacts: 'profile.png', onlyIfSuccessful: true
       }
     }
     stage('Deploy') {
