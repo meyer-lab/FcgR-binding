@@ -2,11 +2,7 @@ import numpy as np
 from scipy.optimize import brentq
 from scipy.misc import comb
 from memoize import memoize
-
-# A fast cached version of nchoosek
-@memoize
-def nmultichoosek(n, k, i):
-    return comb(n, k, exact=True)*comb(n-k, i, exact=True)
+from .StoneModel import nchoosek
 
 # This function takes in the relevant parameters and creates the v_ij grid
 # Kx should be the Kx of Ka[0]
@@ -18,13 +14,13 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
 
     # ii, jj is the number of receptor one, two bound
     for jj in range(gnu+1):
-        jPen = L0 * Ka[0] * (Ka[1]/Ka[0]*Req[1])**jj
+        jPen = L0 * Ka[0] * (Ka[1]/Ka[0]*Req[1])**jj * nchoosek(gnu, jj)
 
         for ii in range(gnu+1-jj):
             if ii == 0 and jj == 0:
                 continue
 
-            vGrid[ii, jj] = jPen*nmultichoosek(gnu,ii,jj)*Kx**(ii+jj-1)*Req[0]**ii
+            vGrid[ii, jj] = jPen*nchoosek(gnu-jj,ii)*Kx**(ii+jj-1)*Req[0]**ii
 
     return vGrid
 

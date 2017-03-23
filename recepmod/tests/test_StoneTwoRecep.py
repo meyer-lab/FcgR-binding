@@ -1,7 +1,7 @@
 import unittest
 import time
 import numpy as np
-from ..StoneTwoRecep import StoneVgrid, StoneRmultiAll, nmultichoosek, reqSolver, StoneRbnd
+from ..StoneTwoRecep import StoneVgrid, StoneRmultiAll, reqSolver, StoneRbnd
 
 class TestStoneTwoRecpMethods(unittest.TestCase):
     def setUp(self):
@@ -10,31 +10,6 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
     def tearDown(self):
         t = time.time() - self.startTime
         print("%s: %.3f" % (self.id(), t*1000))
-
-    def test_nmultichoosek(self):
-        # Check that the case with avidity 2 works as expected
-        self.assertTrue(nmultichoosek(2,0,0) == 1)
-        self.assertTrue(nmultichoosek(2,1,0) == 2)
-        self.assertTrue(nmultichoosek(2,0,1) == 2)
-        self.assertTrue(nmultichoosek(2,2,0) == 1)
-        self.assertTrue(nmultichoosek(2,0,2) == 1)
-        self.assertTrue(nmultichoosek(2,1,1) == 2)
-
-        # Check that avidity 3 works
-        self.assertTrue(nmultichoosek(3,0,0) == 1)
-        self.assertTrue(nmultichoosek(3,1,0) == 3)
-        self.assertTrue(nmultichoosek(3,0,1) == 3)
-        self.assertTrue(nmultichoosek(3,2,0) == 3)
-        self.assertTrue(nmultichoosek(3,0,2) == 3)
-        self.assertTrue(nmultichoosek(3,1,1) == 6)
-
-        # Check that avidity 4 works
-        self.assertTrue(nmultichoosek(4,1,1) == 12)
-        self.assertTrue(nmultichoosek(4,3,1) == 4)
-        self.assertTrue(nmultichoosek(4,1,3) == 4)
-        self.assertTrue(nmultichoosek(4,2,1) == 12)
-        self.assertTrue(nmultichoosek(4,1,2) == 12)
-        self.assertTrue(nmultichoosek(4,2,2) == 6)
 
     def test_StoneVgrid(self):
         Req = np.array([1000, 1000], dtype = np.float64)
