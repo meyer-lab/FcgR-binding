@@ -80,13 +80,15 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     return logReq
 
 def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
-    ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
-    ## receptors, granted each epitope of the ligand binds to the receptor
-    ## kind in question with dissociation constant Kd and cross-links with
-    ## other receptors with crosslinking constant Kx = 10^logKx. All
-    ## equations derived from Stone et al. (2001). Assumed that ligand is at
-    ## saturating concentration L0 = 7e-8 M, which is as it is (approximately)
-    ## for TNP-4-BSA in Lux et al. (2013).
+    '''
+    Returns the number of mutlivalent ligand bound to a cell with 10^logR
+    receptors, granted each epitope of the ligand binds to the receptor
+    kind in question with dissociation constant Kd and cross-links with
+    other receptors with crosslinking constant Kx = 10^logKx. All
+    equations derived from Stone et al. (2001). Assumed that ligand is at
+    saturating concentration L0 = 7e-8 M, which is as it is (approximately)
+    for TNP-4-BSA in Lux et al. (2013).
+    '''
     v = np.int_(v)
 
     ## Vector of binomial coefficients
@@ -95,7 +97,7 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
         return (np.nan, np.nan, np.nan, np.nan)
 
     # Calculate vieq from equation 1
-    vieqIter = (L0*Ka*nchoosek(v,j+1)*Kx**j*Req**(j+1) for j in range(v))
+    vieqIter = (L0*Ka*nchoosek(v,j+1)*((Kx*Req)**j)*Req for j in range(v))
     vieq = np.fromiter(vieqIter, np.float, count = v)
 
     ## Calculate L, according to equation 7
@@ -106,16 +108,13 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
         return (Lbound, np.nan, np.nan, np.nan, Req)
 
     # Calculate Rmulti from equation 5
-    RmultiIter = ((j+1)*vieq[j] for j in range(1,v))
-    Rmulti = np.sum(np.fromiter(RmultiIter, np.float, count = v-1))
+    Rmulti = np.sum(np.multiply(vieq[1:], np.arange(2, v+1, dtype = np.float)))
 
     # Calculate Rbound
-    RbndIter = ((j+1)*vieq[j] for j in range(v))
-    Rbnd = np.sum(np.fromiter(RbndIter, np.float, count = v))
+    Rbnd = np.sum(np.multiply(vieq, np.arange(1, v+1, dtype = np.float)))
 
     # Calculate numXlinks from equation 4
-    nXlinkIter = (j*vieq[j] for j in range(1,v))
-    nXlink = np.sum(np.fromiter(nXlinkIter, np.float, count = v-1))
+    nXlink = np.sum(np.multiply(vieq[1:], np.arange(1, v, dtype = np.float)))
 
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
 
