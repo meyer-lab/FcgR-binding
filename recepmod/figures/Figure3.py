@@ -7,7 +7,7 @@ import seaborn as sns
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
 
 def makeFigure():
-    from ..StoneHelper import read_chain
+    from ..StoneHelper import read_chain, mapMCMC, getFitPrediction, reduceMCMC
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
@@ -17,33 +17,34 @@ def makeFigure():
     # Filter for only remotely likely parameter sets
     dset = dset.loc[dset['LL'] > np.min(dset['LL']) - 3,:]
 
+    dsetSamp = dset.sample(200)
+
+    runFunc = lambda x: getFitPrediction(M, x[2:])
+
+    output = mapMCMC(runFunc, dsetSamp)
+
     # Setup plotting space
-    f = plt.figure(figsize=(7,6))
+    f = plt.figure(figsize=(7, 6))
 
     # Make grid
-    gs1 = gridspec.GridSpec(3,3)
+    gs1 = gridspec.GridSpec(4, 3)
 
     # Get list of axis objects
-    ax = [ f.add_subplot(gs1[x]) for x in range(1,9) ]
+    ax = [ f.add_subplot(gs1[x]) for x in range(0,12) ]
 
     #
-    plotFitBinding(M, dset, quant = "LbndPred", axarr = ax)
+    Rbndplot(output.copy(), axarr = ax[0:])
+
+    #
+    Rmultiplot(output.copy(), axarr = ax[6:])
 
     # Tweak layout
     plt.tight_layout()
 
     return f
 
-def plotFitBinding(M, dset, quant = "LbndPred", axarr = None):
-    from ..StoneHelper import mapMCMC, getFitPrediction, reduceMCMC
-
-    dsetSamp = dset.sample(300)
-
-    runFunc = lambda x: getFitPrediction(M, x[2:])
-
-    output = mapMCMC(runFunc, dsetSamp)
-
-    output[quant] = output.groupby(['pSetNum'])[quant].apply(lambda x: x / x.mean())
+def Rbndplot(output, axarr = None):
+    output['RbndPred'] = output.apply(lambda row: (row['RbndPred'] / (row['RbndPred'] + row['Req'])), axis=1)
 
     if axarr is None:
         f = plt.figure()
@@ -59,7 +60,36 @@ def plotFitBinding(M, dset, quant = "LbndPred", axarr = None):
     # Loop through receptors creating plot
     for axx, fcr in fcIter:
         sns.boxplot(x="Ig",
-                    y = quant,
+                    y = 'RbndPred',
+                    hue="TNP",
+                    data=output.loc[output['FcgR'] == fcr,:],
+                    ax = axx,
+                    showfliers=False)
+
+        axx.set_ylabel("FcgR bound/total")
+        axx.set_xlabel("")
+        axx.set_ylim((0, 1))
+        axx.legend_.remove()
+        axx.set_title(fcr)
+
+def Rmultiplot(output, axarr = None):
+    output['RmultiPred'] = output.groupby(['pSetNum'])['RmultiPred'].apply(lambda x: x / x.mean())
+
+    if axarr is None:
+        f = plt.figure()
+
+        # Make grid
+        gs1 = gridspec.GridSpec(2,3)
+
+        # Create 6 axes for each FcgR
+        axarr = [ f.add_subplot(gs1[x]) for x in range(6) ]
+
+    fcIter = zip(axarr, FcgRidx.keys())
+
+    # Loop through receptors creating plot
+    for axx, fcr in fcIter:
+        sns.boxplot(x="Ig",
+                    y = "RmultiPred",
                     hue="TNP",
                     data=output.loc[output['FcgR'] == fcr,:],
                     ax = axx,
@@ -67,6 +97,6 @@ def plotFitBinding(M, dset, quant = "LbndPred", axarr = None):
 
         axx.set_ylabel("Binding (RU)")
         axx.set_xlabel("")
-        axx.set_ylim((0, np.nanmax(output.loc[output['FcgR'] == fcr,quant].as_matrix())*1.05))
+        axx.set_ylim((0, 4))
         axx.legend_.remove()
         axx.set_title(fcr)
