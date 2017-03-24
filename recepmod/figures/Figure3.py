@@ -29,12 +29,15 @@ def makeFigure():
     #
     plotFitBinding(M, dset, quant = "LbndPred", axarr = ax)
 
+    # Tweak layout
+    plt.tight_layout()
+
     return f
 
 def plotFitBinding(M, dset, quant = "LbndPred", axarr = None):
     from ..StoneHelper import mapMCMC, getFitPrediction, reduceMCMC
 
-    dsetSamp = dset.sample(1000)
+    dsetSamp = dset.sample(300)
 
     runFunc = lambda x: getFitPrediction(M, x[2:])
 
@@ -50,10 +53,6 @@ def plotFitBinding(M, dset, quant = "LbndPred", axarr = None):
 
         # Create 6 axes for each FcgR
         axarr = [ f.add_subplot(gs1[x]) for x in range(6) ]
-
-        built = True
-    else:
-        built = False
 
     fcIter = zip(axarr, FcgRidx.keys())
 
@@ -71,6 +70,3 @@ def plotFitBinding(M, dset, quant = "LbndPred", axarr = None):
         axx.set_ylim((0, np.nanmax(output.loc[output['FcgR'] == fcr,quant].as_matrix())*1.05))
         axx.legend_.remove()
         axx.set_title(fcr)
-
-    if built is True:
-        plt.tight_layout()
