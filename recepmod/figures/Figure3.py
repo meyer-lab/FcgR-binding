@@ -171,3 +171,22 @@ def runTwoRecepPredict(ax):
 
 
     ax.plot(output)
+
+# logR = [4.0, 4.5]
+# Ka = [1.0E6, 1.0E4]
+# Kx = 1.0E-5
+#
+# SS = StoneTwo(logR, Ka, Kx)
+#
+# gnus = np.arange(1, 30)
+# outOne = np.zeros(gnus.shape, dtype = np.float64)
+# outTwo = np.zeros(gnus.shape, dtype = np.float64)
+#
+# for ii in range(gnus.shape[0]):
+#     output = SS.getRmultiAll(gnus[ii], 1.0E-6)
+#
+#     outOne[ii] = output[0]
+#     outTwo[ii] = output[1]
+#
+# plt.plot(gnus, outOne, 'r', gnus, outTwo, 'b')
+# plt.plot(gnus, outOne-outTwo)
