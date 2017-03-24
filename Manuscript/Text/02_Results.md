@@ -20,15 +20,11 @@ We utilized Markov Chain Monte Carlo to fit the model to our measurements of Fc�
 
 The prior constrained the TNP-4 and TNP-26 avidity to within 1–8 and 20–32 respectively, which must be considered when interpreting the resulting fit ([@Fig:Fit]F). Within this constraint, there was a strong preference toward higher effective avidity with both species. The deviation parameter for the immune complex binding data fit to a greater value than the receptor expression measurements, consistent with greater variation in the former ([@Fig:Fit]G). We compared the receptor expression deviation parameter to its experimentally determined value by calculating the standard error normalized to the mean of each measurement, then averaging these values. The resultant number (0.08) was close to and fell within one standard deviation of the predicted value (0.06).
 
+## Model fitting normalizes detection effects
 
 
 
-
-
-
-
-
-
+![**Model fitting normalizes detection effects.** A) XXX.](./Figures/Figure3.svg){#fig:DataReanal}
 
 
 
@@ -44,7 +40,7 @@ The prior constrained the TNP-4 and TNP-26 avidity to within 1–8 and 20–32 r
 
 ## The parameterized binding model provides specific predictions for the coordinate effects of immune complex abundance, avidity, and class
 
-![**Specific predictions regarding the coordinate effects of immune complex parameters.** A) Predicted binding versus concentration of immune complex for varying avidity. B) Predicted multimerized FcgR versus concentration of immune complex for varying avidity. C) The number of receptor crosslinks versus concentration of immune complex for varying avidity. D) The amount of binding versus number of crosslinks for two different affinities, with varied avidities. E) The predicted amount of multimerized receptor versus avidity for a cell expressing XXXX and XXXX simultaneously. F) The predicted ratio of multimerized activating to inhibitory FcgR for a cell expressing XXXX and XXXX simultaneously.](./Figures/Figure3.svg){#fig:ParamModel}
+![**Specific predictions regarding the coordinate effects of immune complex parameters.** A) Predicted binding versus concentration of immune complex for varying avidity. B) Predicted multimerized FcgR versus concentration of immune complex for varying avidity. C) The number of receptor crosslinks versus concentration of immune complex for varying avidity. D) The amount of binding versus number of crosslinks for two different affinities, with varied avidities. E) The predicted amount of multimerized receptor versus avidity for a cell expressing XXXX and XXXX simultaneously. F) The predicted ratio of multimerized activating to inhibitory FcgR for a cell expressing XXXX and XXXX simultaneously.](./Figures/Figure4.svg){#fig:ParamModel}
 
 
 
