@@ -35,6 +35,7 @@ def makeFigure():
     # Make histogram subplots
     histSubplots(dset, axes = [ax[2], ax[3], ax[4], ax[5]])
 
+    # Make receptor expression subplot
     violinPlot(dset, ax = ax[6])
 
     for ii in range(len(ax)):
@@ -89,6 +90,8 @@ def violinPlot(dset, ax=None):
                        rotation=40,
                        rotation_mode="anchor",
                        ha="right")
+
+    ax.set_ylabel(r'Log$_{10}$ Fc$\gamma$R Expression')
 
 def LLplot(dset, ax = None):
     # TODO: Should this maybe be a plot of the autocorrelation or geweke criterion instead?
