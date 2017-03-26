@@ -35,10 +35,11 @@ def makeFigure():
     # Make histogram subplots
     histSubplots(dset, axes = [ax[2], ax[3], ax[4], ax[5]])
 
+    # Make receptor expression subplot
     violinPlot(dset, ax = ax[6])
 
-    for ii in range(len(ax)):
-        subplotLabel(ax[ii], string.ascii_uppercase[ii+1])
+    for ii, item in enumerate(ax):
+        subplotLabel(item, string.ascii_uppercase[ii+1])
 
     return f
 
@@ -83,12 +84,14 @@ def violinPlot(dset, ax=None):
     dset = dset[['Rexp']]
     dset.columns = FcgRidx.keys()
 
-    objs = sns.violinplot(data=dset, cut=0, ax=ax)
+    sns.violinplot(data=dset, cut=0, ax=ax, linewidth = 0.0)
 
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
                        rotation_mode="anchor",
                        ha="right")
+
+    ax.set_ylabel(r'Log$_{10}$ Fc$\gamma$R Expression')
 
 def LLplot(dset, ax = None):
     # TODO: Should this maybe be a plot of the autocorrelation or geweke criterion instead?
@@ -165,48 +168,3 @@ def plotFit(fitMean, ax=None):
     ax.loglog()
     ax.set_ylim(0.01, 5)
     ax.set_xlim(0.01, 5)
-
-def plotFitBinding(M, dset, quant = "LbndPred", axarr = None):
-    from ..StoneHelper import mapMCMC, getFitPrediction, reduceMCMC
-
-    dset = dset.loc[dset['LL'] > np.min(dset['LL']) - 3,:]
-    dsetSamp = dset.sample(1000)
-
-    runFunc = lambda x: getFitPrediction(M, x[2:])
-
-    output = mapMCMC(runFunc, dsetSamp)
-
-    output[quant] = output.groupby(['pSetNum'])[quant].apply(lambda x: x / x.mean())
-
-    if axarr is None:
-        f = plt.figure()
-
-        # Make grid
-        gs1 = gridspec.GridSpec(2,3)
-
-        # Create 6 axes for each FcgR
-        axarr = [ f.add_subplot(gs1[x]) for x in range(6) ]
-
-        built = True
-    else:
-        built = False
-
-    fcIter = zip(axarr, FcgRidx.keys())
-
-    # Loop through receptors creating plot
-    for axx, fcr in fcIter:
-        sns.boxplot(x="Ig",
-                    y = quant,
-                    hue="TNP",
-                    data=output.loc[output['FcgR'] == fcr,:],
-                    ax = axx,
-                    showfliers=False)
-
-        axx.set_ylabel("Binding (RU)")
-        axx.set_xlabel("")
-        axx.set_ylim((0, np.nanmax(output.loc[output['FcgR'] == fcr,quant].as_matrix())*1.05))
-        axx.legend_.remove()
-        axx.set_title(fcr)
-
-    if built is True:
-        plt.tight_layout()

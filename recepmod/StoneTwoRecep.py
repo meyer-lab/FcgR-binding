@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.optimize import brentq
-from scipy.misc import comb
 from .StoneModel import nchoosek
 
 # This function takes in the relevant parameters and creates the v_ij grid

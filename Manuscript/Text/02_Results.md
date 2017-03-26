@@ -10,7 +10,7 @@ We quantitatively measured receptor abundance for each FcγR-expressing cell lin
 
 ## A multivalent interaction model accounts for variation in IgG-FcγR binding
 
-![**A multivalent binding model accounts for IgG-FcγR binding.** A) Schematic of the multivalent binding model for interaction of an immune complex with FcγRs. B) Trace for MCMC chain during fitting process. C) Predicted versus measured binding for each FcγR-IgG pair at each avidity. D) Marginal distribution for the crosslinking constant Kx. E) Marginal distribution for the constants to convert immune complex binding to normalized fluorescence signal. F) Marginal distribution for the avidity of TNP-4-BSA and TNP-26-BSA. G) Marginal distribution for each distribution spread parameter. H) The marginal distributions for receptor expression within each cell line expressing a signal FcγR. Experimental measurements of receptor expression are individually overlaid. I) Marginal distribution of Kx.](./Figures/Figure2.svg){#fig:Fit}
+![**A multivalent binding model accounts for IgG-FcγR binding.** A) Schematic of the multivalent binding model for interaction of an immune complex with FcγRs. B) Trace for MCMC chain during fitting process. C) Predicted versus measured binding for each FcγR-IgG pair at each avidity. D) Marginal distribution for the crosslinking constant K~x~. E) Marginal distribution for the constants to convert immune complex binding to normalized fluorescence signal. F) Marginal distribution for the avidity of TNP-4-BSA and TNP-26-BSA. G) Marginal distribution for each distribution spread parameter. H) The marginal distributions for receptor expression within each cell line expressing a signal FcγR. Experimental measurements of receptor expression are individually overlaid.](./Figures/Figure2.svg){#fig:Fit}
 
 To interpret the complex variation in binding we observed with each IgG-FcγR pair (i.e. affinity), receptor expression, and immune complex avidity, we employed an equilibrium model of multivalent ligand/monovalent receptor binding [@Stone:2001fm]. Within the model, an initial binding event occurs with the kinetics of the monovalent interaction ([@Fig:Fit]A). Subsequent multivalent binding events occur with a partition coefficient K~x~. Thus, K~x~ values much greater than 1 lead to highly multivalent interactions while K~x~ values much less than 1 lead to predominantly monovalent binding.
 
@@ -20,15 +20,11 @@ We utilized Markov Chain Monte Carlo to fit the model to our measurements of Fc�
 
 The prior constrained the TNP-4 and TNP-26 avidity to within 1–8 and 20–32 respectively, which must be considered when interpreting the resulting fit ([@Fig:Fit]F). Within this constraint, there was a strong preference toward higher effective avidity with both species. The deviation parameter for the immune complex binding data fit to a greater value than the receptor expression measurements, consistent with greater variation in the former ([@Fig:Fit]G). We compared the receptor expression deviation parameter to its experimentally determined value by calculating the standard error normalized to the mean of each measurement, then averaging these values. The resultant number (0.08) was close to and fell within one standard deviation of the predicted value (0.06).
 
+## Model fitting normalizes detection effects
 
 
 
-
-
-
-
-
-
+![**Model fitting normalizes detection effects.** A) XXX.](./Figures/Figure3.svg){#fig:DataReanal}
 
 
 
@@ -44,7 +40,7 @@ The prior constrained the TNP-4 and TNP-26 avidity to within 1–8 and 20–32 r
 
 ## The parameterized binding model provides specific predictions for the coordinate effects of immune complex abundance, avidity, and class
 
-![**Specific predictions regarding the coordinate effects of immune complex parameters.** A) Predicted binding versus concentration of immune complex for varying avidity. B) Predicted multimerized FcgR versus concentration of immune complex for varying avidity. C) The number of receptor crosslinks versus concentration of immune complex for varying avidity. D) The amount of binding versus number of crosslinks for two different affinities, with varied avidities. E) The predicted amount of multimerized receptor versus avidity for a cell expressing XXXX and XXXX simultaneously. F) The predicted ratio of multimerized activating to inhibitory FcgR for a cell expressing XXXX and XXXX simultaneously.](./Figures/Figure3.svg){#fig:ParamModel}
+![**Specific predictions regarding the coordinate effects of immune complex parameters.** A) Predicted binding versus concentration of immune complex for varying avidity. B) Predicted multimerized FcgR versus concentration of immune complex for varying avidity. C) The number of receptor crosslinks versus concentration of immune complex for varying avidity. D) The amount of binding versus number of crosslinks for two different affinities, with varied avidities. E) The predicted amount of multimerized receptor versus avidity for a cell expressing XXXX and XXXX simultaneously. F) The predicted ratio of multimerized activating to inhibitory FcgR for a cell expressing XXXX and XXXX simultaneously.](./Figures/Figure4.svg){#fig:ParamModel}
 
 
 
