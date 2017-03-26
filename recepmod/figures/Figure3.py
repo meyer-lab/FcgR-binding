@@ -32,10 +32,13 @@ def makeFigure():
     # Get list of axis objects
     ax = [ f.add_subplot(gs1[x]) for x in range(0,12) ]
 
-    #
+    subplotLabel(ax[0], 'A')
+    subplotLabel(ax[6], 'B')
+
+    # Bound / total receptor prediction
     Rbndplot(output.copy(), axarr = ax[0:])
 
-    #
+    # Multimerized receptor prediction
     Rmultiplot(output.copy(), axarr = ax[6:])
 
     # Tweak layout
@@ -66,7 +69,7 @@ def Rbndplot(output, axarr = None):
                     ax = axx,
                     showfliers=False)
 
-        axx.set_ylabel("FcgR bound/total")
+        axx.set_ylabel(r'Fc$\gamma$R bound/total')
         axx.set_xlabel("")
         axx.set_ylim((0, 1))
         axx.legend_.remove()
@@ -74,6 +77,7 @@ def Rbndplot(output, axarr = None):
 
 def Rmultiplot(output, axarr = None):
     output['RmultiPred'] = output.groupby(['pSetNum'])['RmultiPred'].apply(lambda x: x / x.mean())
+    output['nXlinkPred'] = output.groupby(['pSetNum'])['nXlinkPred'].apply(lambda x: x / x.mean())
 
     if axarr is None:
         f = plt.figure()
@@ -89,14 +93,13 @@ def Rmultiplot(output, axarr = None):
     # Loop through receptors creating plot
     for axx, fcr in fcIter:
         sns.boxplot(x="Ig",
-                    y = "RmultiPred",
+                    y = "nXlinkPred",
                     hue="TNP",
                     data=output.loc[output['FcgR'] == fcr,:],
-                    ax = axx,
-                    showfliers=False)
+                    ax = axx)
 
-        axx.set_ylabel("Binding (RU)")
+        axx.set_ylabel(r'Multimerized Fc$\gamma$R')
         axx.set_xlabel("")
-        axx.set_ylim((0, 4))
+        #axx.set_ylim((0, 4))
         axx.legend_.remove()
         axx.set_title(fcr)
