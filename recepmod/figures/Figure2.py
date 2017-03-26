@@ -38,8 +38,8 @@ def makeFigure():
     # Make receptor expression subplot
     violinPlot(dset, ax = ax[6])
 
-    for ii in range(len(ax)):
-        subplotLabel(ax[ii], string.ascii_uppercase[ii+1])
+    for ii, item in enumerate(ax):
+        subplotLabel(item, string.ascii_uppercase[ii+1])
 
     return f
 
@@ -84,7 +84,7 @@ def violinPlot(dset, ax=None):
     dset = dset[['Rexp']]
     dset.columns = FcgRidx.keys()
 
-    objs = sns.violinplot(data=dset, cut=0, ax=ax)
+    sns.violinplot(data=dset, cut=0, ax=ax, linewidth = 0.0)
 
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
