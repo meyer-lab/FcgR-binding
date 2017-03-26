@@ -1,13 +1,12 @@
 import os
-import string
-from matplotlib import gridspec, rcParams
+from matplotlib import gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
+from .FigureCommon import FcgRidx, subplotLabel
 
 def makeFigure():
-    from ..StoneHelper import read_chain, mapMCMC, getFitPrediction, reduceMCMC
+    from ..StoneHelper import read_chain, mapMCMC, getFitPrediction
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
