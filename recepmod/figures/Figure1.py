@@ -169,13 +169,13 @@ def makeFigure():
 
     plotNormalizedBindingvsKA(fitMean, ax2, ax3)
 
-    subplotLabel(ax2, 'B')
-    subplotLabel(ax3, 'C')
+    subplotLabel(ax2, 'C')
+    subplotLabel(ax3, 'D')
 
     ax4 = f.add_subplot(gs1[3])
     plotAvidityEffectVsKA(fitMean,ax4)
 
-    subplotLabel(ax4, 'D')
+    subplotLabel(ax4, 'E')
 
     axarr = []
     for j in range(6):
@@ -184,7 +184,7 @@ def makeFigure():
         else:
             axarr.append(f.add_subplot(gs1[j+5]))
 
-    subplotLabel(axarr[0], 'E')
+    subplotLabel(axarr[0], 'B')
 
     mfiAdjMeanFigureMaker(measAll,axarr)
 

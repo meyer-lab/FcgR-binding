@@ -15,3 +15,5 @@ runFunc(Figure1, 'Figure1')
 runFunc(Figure2, 'Figure2')
 
 runFunc(Figure3, 'Figure3')
+
+runFunc(Figure4, 'Figure4')
