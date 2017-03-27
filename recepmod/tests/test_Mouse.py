@@ -110,7 +110,7 @@ class TestStoneMouse(unittest.TestCase):
         if logR < 0 or kx < 0 or v < 0 or Li < 0:
             raise ValueError('Negative input parameters')
         zN = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        plots = self.Mod.FcgRPlots(zN)
+        self.Mod.FcgRPlots(zN)
 
     def test_RmultiAvidityTable(self):
         # Plots effectiveness vs. each FcgR binding parameter
@@ -123,7 +123,7 @@ class TestStoneMouse(unittest.TestCase):
         x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         Rmultiv = self.Mod.RmultiAvidity(x)
-        RmultivTb = self.Mod.RmultiAvidityTable(z)
+        self.Mod.RmultiAvidityTable(z)
 
         self.assertTrue(Rmultiv.shape == (6,v))
 
@@ -136,12 +136,12 @@ class TestStoneMouse(unittest.TestCase):
             raise ValueError('Negative input parameters')
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         tbNK = self.Mod.NimmerjahnTb_Knockdown(z)
-        res = self.Mod.NimmerjahnKnockdownLasso(z)
-        cross = self.Mod.KnockdownLassoCrossVal(z)
-        cross2 = self.Mod.KnockdownLassoCrossVal2(z)
-        result = self.Mod.KnockdownPCA(z)
+        self.Mod.NimmerjahnKnockdownLasso(z)
+        self.Mod.KnockdownLassoCrossVal(z)
+        self.Mod.KnockdownLassoCrossVal2(z)
+        self.Mod.KnockdownPCA(z)
         self.assertTrue(tbNK.shape == (18,25))
-    
+
     def test_Knockdown_Tree(self):
         logR = np.log10(10**5)
         kx = 10**(-7)
@@ -150,7 +150,7 @@ class TestStoneMouse(unittest.TestCase):
         if logR < 0 or kx < 0 or v < 0 or Li < 0:
             raise ValueError('Negative input parameters')
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        tree = self.Mod.DecisionTree(z)
+        self.Mod.DecisionTree(z)
 
 if __name__ == '__main__':
     unittest.main()
