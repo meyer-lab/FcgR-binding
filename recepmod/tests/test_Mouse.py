@@ -141,6 +141,16 @@ class TestStoneMouse(unittest.TestCase):
         cross2 = self.Mod.KnockdownLassoCrossVal2(z)
         result = self.Mod.KnockdownPCA(z)
         self.assertTrue(tbNK.shape == (18,25))
+    
+    def test_Knockdown_Tree(self):
+        logR = np.log10(10**5)
+        kx = 10**(-7)
+        v = 10
+        Li = 10**(-9)
+        if logR < 0 or kx < 0 or v < 0 or Li < 0:
+            raise ValueError('Negative input parameters')
+        z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
+        tree = self.Mod.DecisionTree(z)
 
 if __name__ == '__main__':
     unittest.main()
