@@ -8,7 +8,7 @@ from sklearn.decomposition import PCA
 from sklearn import tree
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pydotplus 
+import pydotplus
 from .StoneModel import StoneMod
 sns.set(style="ticks")
 
@@ -513,8 +513,8 @@ class StoneModelMouse:
         return res
 
     def KnockdownPCA(self,z):
-        # Principle Components Analysis of effectiveness vs. FcgR binding 
-        # predictions in Knockdown table 
+        # Principle Components Analysis of effectiveness vs. FcgR binding
+        # predictions in Knockdown table
         pca = PCA(n_components=5)
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbNparam = tbN.iloc[:, list(range(24))]
@@ -549,7 +549,7 @@ class StoneModelMouse:
         return result
 
     def DecisionTree(self,z):
-        # Decision Tree using Knockdown table with a pair of rows corresponding 
+        # Decision Tree using Knockdown table with a pair of rows corresponding
         # to same IgG and FcgRconditions taken out.
         # Does not accurately predict for IgG2b, IgG1-IIB-/-, and IgG2b-IIB-/-
         tbN = self.NimmerjahnTb_Knockdown(z)
@@ -566,7 +566,7 @@ class StoneModelMouse:
                 effect[i] = 0
         #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
         # Assign independent variables and dependent variable "effect"
-        
+
         for i in range(9):
             ls = list(range(18))
             ls.pop(2*i+1)
@@ -578,7 +578,7 @@ class StoneModelMouse:
             clf = clf.fit(independent1, effect1)
 #            print(i,clf.predict(independent[[2*i,2*i+1], :]))
 #            print(clf.predict_proba(independent[[2*i,2*i+1], :]))
-#        dot_data = tree.export_graphviz(clf, out_file=None) 
-#        graph = pydotplus.graph_from_dot_data(dot_data) 
+#        dot_data = tree.export_graphviz(clf, out_file=None)
+#        graph = pydotplus.graph_from_dot_data(dot_data)
 #        graph.write_pdf("DecisionTree.pdf")
         return effect
