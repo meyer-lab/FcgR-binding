@@ -18,10 +18,10 @@ class TestStoneMouse(unittest.TestCase):
 
     def test_dataOutput_StoneModMouse(self):
         # Checks size of fullOutput
-        logR = np.log10(30000*random.random())
-        kx = random.random()
-        v = random.randint(1, 30)
-        Li = random.random()
+        logR = np.log10(24000)
+        kx = 10**(-7)
+        v = 5
+        Li = 10**(-9)
         if logR < 0 or kx < 0 or v < 0 or Li < 0:
             raise ValueError('Negative input parameters')
         x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
@@ -117,14 +117,14 @@ class TestStoneMouse(unittest.TestCase):
         logR = np.log10(10**5)
         kx = 10**(-7)
         v = 5
-        Li = 10**(-9)
+        Li = 7*10**(-9)
         if logR < 0 or kx < 0 or v < 0 or Li < 0:
             raise ValueError('Negative input parameters')
         x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         Rmultiv = self.Mod.RmultiAvidity(x)
         self.Mod.RmultiAvidityTable(z)
-
+        #self.Mod.LassoRmultiv(z)
         self.assertTrue(Rmultiv.shape == (6,v))
 
     def test_NimmerjahnTb_Knockdown(self):
@@ -151,6 +151,7 @@ class TestStoneMouse(unittest.TestCase):
             raise ValueError('Negative input parameters')
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         self.Mod.DecisionTree(z)
+        self.Mod.DecisionTree2(z)
 
 if __name__ == '__main__':
     unittest.main()
