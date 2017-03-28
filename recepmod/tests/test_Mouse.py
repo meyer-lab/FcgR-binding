@@ -124,7 +124,6 @@ class TestStoneMouse(unittest.TestCase):
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         Rmultiv = self.Mod.RmultiAvidity(x)
         self.Mod.RmultiAvidityTable(z)
-        #self.Mod.LassoRmultiv(z)
         self.assertTrue(Rmultiv.shape == (6,v))
 
     def test_NimmerjahnTb_Knockdown(self):
@@ -138,7 +137,9 @@ class TestStoneMouse(unittest.TestCase):
         tbNK = self.Mod.NimmerjahnTb_Knockdown(z)
         self.Mod.NimmerjahnKnockdownLasso(z)
         self.Mod.KnockdownLassoCrossVal(z)
+        self.Mod.KnockdownLassoCrossVal(z, logspace = True)
         self.Mod.KnockdownLassoCrossVal2(z)
+        self.Mod.KnockdownLassoCrossVal3(z)
         self.Mod.KnockdownPCA(z)
         self.assertTrue(tbNK.shape == (18,25))
 
@@ -152,6 +153,7 @@ class TestStoneMouse(unittest.TestCase):
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         self.Mod.DecisionTree(z)
         self.Mod.DecisionTree2(z)
+        self.Mod.DecisionTree3(z)
 
 if __name__ == '__main__':
     unittest.main()
