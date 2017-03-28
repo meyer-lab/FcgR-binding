@@ -49,7 +49,7 @@ class StoneModelMouse:
         # Assign inputs for StoneMod
         x1 = np.array(x1)
         v = x1[self.uvIDX]
-        Kx = np.power(10, x1[self.kxIDX])
+        Kx = x1[self.kxIDX]
         L0 = x1[self.L0IDX]
 
         # Initiate numpy arrays for StoneMod outputs
@@ -295,7 +295,7 @@ class StoneModelMouse:
         # Assign inputs for Rmulti_v
         x1 = np.array(x1)
         v = int(x1[self.uvIDX])
-        Kx = np.power(10, x1[self.kxIDX])
+        Kx = x1[self.kxIDX]
         L0 = x1[self.L0IDX]
 
         # Initiate numpy arrays for StoneMod outputs
@@ -451,8 +451,9 @@ class StoneModelMouse:
 
     def KnockdownLassoCrossVal(self, z):
         # Cross validate KnockdownLasso by using a pair of rows as test set
-        # Fails when the test sets are IgG1, IgG2b, IgG1-IIB-/-, IgG2a-I-/-, IgG2a-III-/-
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+        # Predicts for IgG1, IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, and IgG2a-I,IV-/-
+        # Fails to predict for IgG2b, IgG1-IIB-/-, IgG2a-III-/-
+        las = linear_model.Lasso(alpha = 0.008, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
         independent = self.NimmerjahnKnockdownLasso(z)
         for r in range(9):
@@ -469,6 +470,7 @@ class StoneModelMouse:
             res = las.fit(x_train, y_train)
 #            print(las.score(x_train,y_train))
 #            print(las.score(x_test, y_test))
+#            print(y_test,las.predict(x_test))
             y1 = y_test[1]
             y1 = np.array(y1)
 #            print(1-abs(las.predict(x_test[1,:])-y1)/y1)
@@ -485,7 +487,8 @@ class StoneModelMouse:
 
     def KnockdownLassoCrossVal2(self, z):
         # Cross validate KnockdownLasso(v=10) by using a row as test set
-        # Predictive when test sets are (IgG2a,) IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-FcgRI,IV-/-
+        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-, 
+        # Kind of predictive for IgG2b, IgG2a-I,IV-/-
         las = linear_model.Lasso(alpha = 0.008, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
         independent = self.NimmerjahnKnockdownLasso(z)
@@ -499,6 +502,7 @@ class StoneModelMouse:
             y_test = np.array(tbN.iloc[[2*r+1],24])
             res = las.fit(x_train, y_train)
 #            print(las.score(x_train,y_train))
+#            print(y_test,las.predict(x_test))
 #            if y_test != 0:
 #                print(1-abs(las.predict(x_test)-y_test)/y_test)
 #            plt.scatter(y_train, las.predict(x_train), color='red')
@@ -527,7 +531,7 @@ class StoneModelMouse:
 
         # Plot explained variance ratio
         result = pca.fit(independent, effect)
-#        print(pca.explained_variance_ratio_)
+        print(pca.explained_variance_ratio_)
         plt.figure(1, figsize=(4, 3))
         plt.clf()
         plt.axes([.2, .2, .7, .7])
@@ -551,7 +555,7 @@ class StoneModelMouse:
     def DecisionTree(self,z):
         # Decision Tree using Knockdown table with a pair of rows corresponding
         # to same IgG and FcgRconditions taken out.
-        # Does not accurately predict for IgG2b, IgG1-IIB-/-, and IgG2b-IIB-/-
+        # Does not accurately predict for IgG2b, IgG1-IIB-/-, IgG2b-IIB-/-, and IgG2a-I-/-
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbNparam = tbN.iloc[:, list(range(24))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
@@ -576,9 +580,75 @@ class StoneModelMouse:
         # Construct Decision Tree
             clf = tree.DecisionTreeClassifier()
             clf = clf.fit(independent1, effect1)
-#            print(i,clf.predict(independent[[2*i,2*i+1], :]))
+#            print(clf.predict(independent[[2*i,2*i+1], :]))
 #            print(clf.predict_proba(independent[[2*i,2*i+1], :]))
 #        dot_data = tree.export_graphviz(clf, out_file=None)
 #        graph = pydotplus.graph_from_dot_data(dot_data)
 #        graph.write_pdf("DecisionTree.pdf")
         return effect
+
+    def DecisionTree2(self,z):
+        # Decision Tree with one row removed
+        # Fails to predict for IgG2b, IgGI-IIB-/-, IgG2b-IIB-/-, IgG2a-FcgRI-/-
+        tbN = self.NimmerjahnTb_Knockdown(z)
+        tbNparam = tbN.iloc[:, list(range(24))]
+        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        independent = np.array(tbN_norm.iloc[:, list(range(16))])
+        independent = independent.reshape(18,16)
+        effect = np.array(tbN.iloc[:,24])
+        effect = effect.reshape(18,1)
+        for i in range(18):
+            if effect[i] >= 0.5:
+                effect[i] = 1
+            else:
+                effect[i] = 0
+        #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
+        # Assign independent variables and dependent variable "effect"
+
+        for i in range(18):
+            ls = list(range(18))
+            ls.pop(i)
+            independent1 = np.array(independent[ls,:])
+            effect1 = np.array(effect[ls])
+        # Construct Decision Tree
+            clf = tree.DecisionTreeClassifier()
+            clf = clf.fit(independent1, effect1)
+#            print(clf.predict(independent[i:i+1, :]))
+#            print(clf.predict_proba(independent[i:i+1, :]))
+        return effect
+    
+#    def RmultivKnockdownTb(self, z):
+#        
+#        
+#    def LassoRmultiv(self,z):
+#        # Lasso regression of Rmultiv
+#        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+#        tbN = self.RmultiAvidityTable(z)
+#        tbNparam = tbN.iloc[:, list(range(24))]
+#        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+#        # Assign independent variables and dependent variable "effect"
+#        independent = np.array(tbN_norm.iloc[:, list(range(16))])
+#        independent = independent.reshape(18,16)
+#        effect = np.array(tbN.iloc[:,24])
+#        effect = effect.reshape(18,1)
+#        # Linear regression and plot result
+#        res = las.fit(independent, effect)
+#        coe = res.coef_
+#        coe = coe.reshape(4,4)
+##        print(las.score(independent, effect))
+##        print(coe)
+#        plt.scatter(effect, las.predict(independent), color='red')
+#        plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
+#        plt.xlabel("Effectiveness")
+#        plt.ylabel("Prediction")
+#        plt.show()
+#        return independent
+#    
+#    def CrossValRmultiv(self,z):
+#        
+#    def PCARmultiv(self,z):
+#        
+#    def TreeRmultiv(self,z):
+#        
+#    def OrtizTable(self,z):
+        
