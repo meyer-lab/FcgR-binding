@@ -4,7 +4,7 @@ from matplotlib import gridspec, rcParams
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from ..StoneHelper import read_chain, getFitMeasMergedSummarized
+from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chain
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
 
 def makeFigure():
@@ -14,7 +14,7 @@ def makeFigure():
     M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
 
     pBest = dset.iloc[np.argmax(dset['LL']),:][2:].as_matrix()
-
+    
     rcParams['lines.markeredgewidth'] = 1.0
 
     # Setup plotting space
@@ -37,6 +37,9 @@ def makeFigure():
 
     # Make receptor expression subplot
     violinPlot(dset, ax = ax[6])
+
+    # Make Geweke diagnostic subplot
+    GewekeDiagPlot(dset,ax[7])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii+1])
@@ -168,3 +171,16 @@ def plotFit(fitMean, ax=None):
     ax.loglog()
     ax.set_ylim(0.01, 5)
     ax.set_xlim(0.01, 5)
+
+def GewekeDiagPlot(dset,ax=None):
+    if not ax:
+        ax = plt.gca()
+    _, pvalues = geweke_chain(dset)
+    ax.plot([0.05]*len(pvalues),'r-')
+    ax.set_xticks(np.array([j for j in range(len(pvalues))]))
+    templist = []
+    for j in range(2,dset.shape[1]):
+        templist.append(dset.columns[j])
+    ax.set_xticklabels(templist,rotation=90,rotation_mode="anchor",ha="right")
+    ax.plot(pvalues,'gx')
+    ax.set_ylabel('p-values')
