@@ -52,11 +52,6 @@ $endfor$
 
 </header>
 $endif$
-$if(toc)$
-<nav id="$idprefix$TOC">
-$toc$
-</nav>
-$endif$
 
 $if(abstract)$
 
