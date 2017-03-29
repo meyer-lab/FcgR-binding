@@ -109,6 +109,7 @@ def LLplot(dset, ax = None):
 
     # Reorganize data for plotting
     dset = dset[['LL', 'walker', 'IDX']].pivot(index = 'IDX', columns = 'walker', values = 'LL')
+    print(dset.shape)
 
     # Plot LL values
     dset.plot(ax = ax, legend = False, ylim = (-100, -50))
