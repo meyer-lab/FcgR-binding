@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import h5py
 from tqdm import trange
+from scipy.stats import ttest_ind
 
 try:
     import cPickle as pickle
@@ -173,3 +174,21 @@ def mapStore(dset, M):
 def reduce():
     frameList = pd.read_pickle('mapped_chain.pkl')
     return reduceMCMC(frameList)
+
+def geweke(chain1, chain2=None):
+    len0 = chain1.shape[0]
+    if not chain2:
+        chain2 = chain1[int(np.ceil(len0/2)):len0]
+        chain1 = chain1[int(np.ceil(len0*0.1)):int(np.ceil(len0*0.2))]
+    statistic, pvalue = ttest_ind(chain1,chain2)
+    return statistic, pvalue
+            
+def geweke_chain(dset):
+    statistics = []
+    pvalues = []
+    dsett = dset.drop(['LL','walker'],1).as_matrix()
+    for j in range(dsett.shape[1]):
+        statistic, pvalue = geweke(dsett[:,j])
+        statistics.append(statistic)
+        pvalues.append(pvalue)
+    return statistics, pvalues
