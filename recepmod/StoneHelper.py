@@ -185,7 +185,7 @@ def geweke(chain1, chain2=None):
     return statistic, pvalue
             
 def geweke_chain(dset):
-    # Perform the Geweke Diagnostic on multiple chains of data contained in a single NumPy array, where each column of the chain is treated as a chain.
+    # Perform the Geweke Diagnostic on multiple chains of data contained in a Pandas DataFrame "dset" output by read_chain.
     statistics = []
     pvalues = []
     dsett = dset.drop(['LL','walker'],1).as_matrix()
