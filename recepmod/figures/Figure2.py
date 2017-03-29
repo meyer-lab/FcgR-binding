@@ -1,9 +1,9 @@
-from matplotlib import gridspec, rcParams
-import numpy as np
-import matplotlib.pyplot as plt
 import os
-import seaborn as sns
 import string
+from matplotlib import gridspec, rcParams
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
 
@@ -35,17 +35,18 @@ def makeFigure():
     # Make histogram subplots
     histSubplots(dset, axes = [ax[2], ax[3], ax[4], ax[5]])
 
+    # Make receptor expression subplot
     violinPlot(dset, ax = ax[6])
 
-    for ii in range(len(ax)):
-        subplotLabel(ax[ii], string.ascii_uppercase[ii+1])
+    for ii, item in enumerate(ax):
+        subplotLabel(item, string.ascii_uppercase[ii+1])
 
     return f
 
-def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True):
+def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True, ylabelpad=-5):
     # This should take a merged and summarized data frame
 
-    if ax == None:
+    if ax is None:
         fig = plt.figure(figsize=(7,6))
         ax = fig.add_subplot(1, 1, 1)
 
@@ -72,27 +73,29 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True):
 
     ax.set_yscale('log')
     ax.set_xscale('log')
-    plt.ylabel(nameFieldY)
+    plt.ylabel(nameFieldY,labelpad=ylabelpad)
     plt.xlabel(nameFieldX)
 
 def violinPlot(dset, ax=None):
     # If no axis was provided make our own
-    if ax == None:
+    if ax is None:
         ax = plt.gca()
 
     dset = dset[['Rexp']]
     dset.columns = FcgRidx.keys()
 
-    objs = sns.violinplot(data=dset,cut=0,ax=ax)
+    sns.violinplot(data=dset, cut=0, ax=ax, linewidth = 0.0)
 
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
                        rotation_mode="anchor",
                        ha="right")
 
+    ax.set_ylabel(r'Log$_{10}$ Fc$\gamma$R Expression')
+
 def LLplot(dset, ax = None):
     # TODO: Should this maybe be a plot of the autocorrelation or geweke criterion instead?
-    if ax == None:
+    if ax is None:
         ax = plt.gca()
 
     # Find out how many walkers we had
@@ -112,8 +115,8 @@ def LLplot(dset, ax = None):
 
 
 def histSubplots(dset, axes=None):
-    if axes == None:
-        fig, axes = plt.subplots(nrows=1, ncols=4)
+    if axes is None:
+        _, axes = plt.subplots(nrows=1, ncols=4)
 
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 10)),:]
 
@@ -140,11 +143,13 @@ def histSubplots(dset, axes=None):
 
 
 def plotFit(fitMean, ax=None):
-    if ax == None:
+    if ax is None:
         fig = plt.figure(figsize=(8,6))
         ax = fig.add_subplot(1, 1, 1)
 
-    for index, row in fitMean.iterrows():
+    ax.plot([0.01, 5], [0.01, 5], color='k', linestyle='-', linewidth=1)
+
+    for _, row in fitMean.iterrows():
         colorr = FcgRidx[row['FcgR']]
         ax.errorbar(x=row['Fit'],
                     y=row['Meas_mean'],

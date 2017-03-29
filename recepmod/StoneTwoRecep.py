@@ -1,12 +1,6 @@
 import numpy as np
 from scipy.optimize import brentq
-from scipy.misc import comb
-from memoize import memoize
-
-# A fast cached version of nchoosek
-@memoize
-def nmultichoosek(n, k, i):
-    return comb(n, k, exact=True)*comb(n-k, i, exact=True)
+from .StoneModel import nchoosek
 
 # This function takes in the relevant parameters and creates the v_ij grid
 # Kx should be the Kx of Ka[0]
@@ -14,22 +8,20 @@ def nmultichoosek(n, k, i):
 # Req should be a tuple of size 2
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
     # Initialize the grid of possibilities
-    vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float64)
+    vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float)
 
-    # ii is the number of receptor one bound
-    for ii in range(gnu+1):
-        # jj is the number of receptor two bound
-        for jj in range(gnu+1):
-            if ii+jj > gnu or (ii == 0 and jj == 0):
-                continue
+    # ii, jj is the number of receptor one, two bound
+    for jj in range(gnu+1):
+        # Terms that only depend on jj
+        jPen = L0 * Ka[0] * (Ka[1]/Ka[0]*Req[1]*Kx)**jj * nchoosek(gnu, jj) / Kx
 
-            nmk = L0 * nmultichoosek(gnu,ii,jj)
+        # Setup iterator for inner loop
+        iterable = (jPen*nchoosek(gnu-jj,ii)*(Req[0]*Kx)**ii for ii in range(gnu+1-jj))
 
-            ReqPenalty = Req[0]**ii * Req[1]**jj
+        # Assign output of inner loop
+        vGrid[0:(gnu+1-jj), jj] = np.transpose(np.fromiter(iterable, np.float))
 
-            KxPenalty = Kx**(ii+jj-1) * (Ka[1]/Ka[0])**jj
-
-            vGrid[ii, jj] = Ka[0]*nmk*KxPenalty*ReqPenalty
+    vGrid[0, 0] = 0
 
     return vGrid
 

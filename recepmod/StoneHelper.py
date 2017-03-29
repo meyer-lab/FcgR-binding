@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 import h5py
-from tqdm import tqdm
+from tqdm import trange
 
 try:
     import cPickle as pickle
@@ -80,22 +80,18 @@ def getFitPrediction(self, x):
 
     return dd
 
-# This function takes (1) a function that takes a parameter set and
-# returns a dataframe and (2) a list of parameter sets. It returns a dataframe
-# with all the individual dataframe outputs stacked, and a number identifier for
-# which parameter set each set of quantities came from
 def mapMCMC(dFunction, pSet):
-    # Make a list for all the dataframes
-    retVals = list()
+    """
+    This function takes (1) a function that takes a parameter set and
+    returns a dataframe and (2) a list of parameter sets. It returns a dataframe
+    with all the individual dataframe outputs stacked, and a number identifier for
+    which parameter set each set of quantities came from
+    """
+    # Set the function to pass back results
+    funFunc = lambda ii: dFunction(pSet.iloc[ii,:]).assign(pSetNum = ii)
 
-    # Iterate over each parameter set
-    TQDM = tqdm(range(pSet.shape[0]))
-    TQDM.mininterval=60
-    TQDM.maxinterval=120
-
-    for ii in TQDM:
-        # Call the passed function and add the output to the list
-        retVals.append(dFunction(pSet[ii,:]).assign(pSetNum = ii))
+    # Iterate over each parameter set, output to a list
+    retVals = map(funFunc, trange(pSet.shape[0]))
 
     # Concatenate all the dataframes vertically and return
     return pd.concat(retVals)
