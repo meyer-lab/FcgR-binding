@@ -461,8 +461,10 @@ class StoneModelMouse:
             for i in range (18):
                 for j in range(24):
                     if np.isnan(tbN1.iloc[i,j]) == False:
-                        if tbN1.iloc[i,j] >=1:
+                        if tbN1.iloc[i,j] >= 1:
                             tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
+                        elif tbN1.iloc[i,j] < 1:
+                            tbN1.ix[i,j] = 0
         tbNparam = tbN1.iloc[:, list(range(24))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
         
@@ -548,6 +550,8 @@ class StoneModelMouse:
                 if np.isnan(tbN1.iloc[i,j]) == False:
                     if tbN1.iloc[i,j] >=1:
                         tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
+                    elif tbN1.iloc[i,j] < 1:
+                        tbN1.ix[i,j] = 0
         tbNparam = tbN1.iloc[:, list(range(24))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
         eff = []
