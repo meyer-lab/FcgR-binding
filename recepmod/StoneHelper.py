@@ -176,6 +176,7 @@ def reduce():
     return reduceMCMC(frameList)
 
 def geweke(chain1, chain2=None):
+    # Perform the Geweke Diagnostic between two univariate chains. If two chains are input instead of one, Student's t-test is performed instead.
     len0 = chain1.shape[0]
     if not chain2:
         chain2 = chain1[int(np.ceil(len0/2)):len0]
@@ -184,6 +185,7 @@ def geweke(chain1, chain2=None):
     return statistic, pvalue
             
 def geweke_chain(dset):
+    # Perform the Geweke Diagnostic on multiple chains of data contained in a single NumPy array, where each column of the chain is treated as a chain.
     statistics = []
     pvalues = []
     dsett = dset.drop(['LL','walker'],1).as_matrix()
