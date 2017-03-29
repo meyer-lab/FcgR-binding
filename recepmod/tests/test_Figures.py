@@ -1,15 +1,12 @@
 import unittest
-from ..figures import Figure1
-from ..figures import Figure2
-from ..figures import Figure3
-from ..figures import Figure4
-from ..figures import Figure5
-import numpy as np
-import pandas
 import os
 import time
+import pandas
+from ..figures import Figure1, Figure2
 from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasMergedSummarized, read_chain, getMeasuredDataFrame
+
+# TODO: Check the return vlues from the plotting functions
 
 class TestFigMethods(unittest.TestCase):
     def setUp(self):
@@ -34,14 +31,10 @@ class TestFigMethods(unittest.TestCase):
         # Create avidity effect vs. Ka plot
         Figure1.plotAvidityEffectVsKA(fitMean)
 
-        self.assertTrue(True)
-
     # Test mfiAdjMean plot
     def test_mfiAdjMean_figure(self):
         # Call the plotting function
         Figure1.mfiAdjMeanFigureMaker(getMeasuredDataFrame(self.M))
-
-        self.assertTrue(True)
 
     # Test the predicted vs. measured plot
     def test_Fig2_plots(self):
@@ -57,14 +50,10 @@ class TestFigMethods(unittest.TestCase):
         # Create the LL of the fit plot
         Figure2.plotQuant(fitFrame, 'Meas_mean', 'Meas_mean')
 
-        self.assertTrue(True)
-
     # Test hist subplots
     def test_Fig2_histSubplots(self):
 
         Figure2.histSubplots(self.dset)
-
-        self.assertTrue(True)
 
 if __name__ == '__main__':
     unittest.main()

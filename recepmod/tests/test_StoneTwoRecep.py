@@ -1,6 +1,7 @@
 import unittest
 import time
-from ..StoneTwoRecep import *
+import numpy as np
+from ..StoneTwoRecep import StoneVgrid, StoneRmultiAll, reqSolver, StoneRbnd
 
 class TestStoneTwoRecpMethods(unittest.TestCase):
     def setUp(self):
@@ -9,31 +10,6 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
     def tearDown(self):
         t = time.time() - self.startTime
         print("%s: %.3f" % (self.id(), t*1000))
-
-    def test_nmultichoosek(self):
-        # Check that the case with avidity 2 works as expected
-        self.assertTrue(nmultichoosek(2,0,0) == 1)
-        self.assertTrue(nmultichoosek(2,1,0) == 2)
-        self.assertTrue(nmultichoosek(2,0,1) == 2)
-        self.assertTrue(nmultichoosek(2,2,0) == 1)
-        self.assertTrue(nmultichoosek(2,0,2) == 1)
-        self.assertTrue(nmultichoosek(2,1,1) == 2)
-
-        # Check that avidity 3 works
-        self.assertTrue(nmultichoosek(3,0,0) == 1)
-        self.assertTrue(nmultichoosek(3,1,0) == 3)
-        self.assertTrue(nmultichoosek(3,0,1) == 3)
-        self.assertTrue(nmultichoosek(3,2,0) == 3)
-        self.assertTrue(nmultichoosek(3,0,2) == 3)
-        self.assertTrue(nmultichoosek(3,1,1) == 6)
-
-        # Check that avidity 4 works
-        self.assertTrue(nmultichoosek(4,1,1) == 12)
-        self.assertTrue(nmultichoosek(4,3,1) == 4)
-        self.assertTrue(nmultichoosek(4,1,3) == 4)
-        self.assertTrue(nmultichoosek(4,2,1) == 12)
-        self.assertTrue(nmultichoosek(4,1,2) == 12)
-        self.assertTrue(nmultichoosek(4,2,2) == 6)
 
     def test_StoneVgrid(self):
         Req = np.array([1000, 1000], dtype = np.float64)
@@ -61,7 +37,7 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
         output2 = StoneVgrid(np.flipud(Req),np.flipud(Ka),gnu,Kx,L0)
 
         # Check that detailed balance holds
-        self.assertTrue(np.all(np.equal(output, np.transpose(output2))))
+        self.assertTrue(np.all(np.isclose(output, np.transpose(output2))))
 
     # Test that varying Req and Ka provides the expected results
     def test_vGridVar(self):
@@ -169,23 +145,23 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
         Ka = np.array([1E5, 1E4], dtype=np.float64)
 
 
-        output, vGrid, Rbnd = self.retReqDebug(logR, Ka)
+        output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[1], output[0])
 
         # Flip Ka around and see the relationship still applies
         Ka[0:2] = [1.0E2, 1.0E6]
-        output, vGrid, Rbnd = self.retReqDebug(logR, Ka)
+        output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[0], output[1])
 
         # Now keep Ka equal but have asymmetric expression
         Ka[0:2] = 1.0E5
         logR[0:2] = [4.0, 5.0]
-        output, vGrid, Rbnd = self.retReqDebug(logR, Ka)
+        output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[1], output[0])
 
         # And perform same with expression switched
         logR[0:2] = [5.0, 4.0]
-        output, vGrid, Rbnd = self.retReqDebug(logR, Ka)
+        output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[0], output[1])
 
 if __name__ == '__main__':
