@@ -40,17 +40,17 @@ As a consequence of this construction, K~x~ becomes zero in the absence of bindi
 
 ### Model Fitting
 
-We fit our model to binding measurements for each FcγR-IgG pair using Markov Chain Monte Carlo as implemented within the emcee package [@ForemanMackey:2013ux]. We assumed that the variance in each measurement was proportional to the true value. Therefore, we additionally fit a variance parameter σ~1~, and calculated the likelihood of each measurement given a model by comparison to a normal distribution with mean equal to the model prediction and standard deviation equal to the prediction times σ~1~.
+We fit our model to binding measurements for each FcγR-IgG pair using Markov Chain Monte Carlo as implemented within the emcee package [@ForemanMackey:2013ux]. We assumed that the variance in each measurement was proportional to the true value. Therefore, we additionally fit a variance parameter σ~1~. The likelihood of each measurement was calculated by comparison to a normal distribution with mean equal to the model prediction and standard deviation equal to the prediction times σ~1~.
 
-In addition to the measured immune complex binding data, the receptor expression of each cell line was quantitatively measured. These measurements were treated similarly, with a separate variance parameter σ~2~, and likelihood calculated by comparison to a normal distribution with mean equal to the predicted receptor expression and standard deviation equal to that prediction times σ~2~. The overall likelihood of the model at each parameter set was calculated by summing each of these individual likelihoods. The priors for each parameter were therefore otherwise specified to be uniform.
+In addition to immune complex binding, the receptor expression of each cell line was quantitatively measured. These measurements were treated similarly, with a separate variance parameter σ~2~, and likelihood calculated by comparison to a normal distribution with mean equal to the predicted receptor expression and standard deviation equal to that prediction times σ~2~. The overall likelihood of the model at each parameter set was calculated by the product of all individual likelihoods. The priors for each parameter were therefore otherwise specified to be uniform.
 
 ### Two Receptor Model
 
-To account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of two receptors. Assuming K~x~ for each receptor was proportional to K~a~ was necessary to fulfill detailed balance.
+To account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of two receptors. Assuming K~x~ for each receptor was proportional to K~a~ was necessary to fulfill detailed balance. Under the same assumptions as before, the relative proportion of receptor complexes with receptors one and two respectively bound i- and j-valently is specified as:
 
 $$ v_{i,j,eq} = {v \choose i}{v-i\choose j} L_0 K_{a,a}^{1-j} R_{eq,a}^i K_x^{i+j-1} (R_{eq,b}K_{a,b})^j $$ {#eq:vieqTwo}
 
-Where i and j are the number of the first and second receptors bound to the immune complex, respectively. As a consequence, $0 \leq i + j < v$. Therefore, the amount of ligand bound to either receptor is calculated by:
+where K~a~ and K~b~ are the association constants for receptor one and two respectively, and R~eq,a~ and R~eq,b~ are the respective quantities of unbound receptor one and two. As a consequence, $0 \leq i + j < v$. Therefore, the amount of ligand bound to either receptor is calculated by:
 
 $$ L_{bound} = \sum_{\forall i + j > 0} v_{i,j,eq}  $$ {#eq:mlbound}
 
