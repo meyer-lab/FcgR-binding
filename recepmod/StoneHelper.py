@@ -194,3 +194,6 @@ def geweke_chain(dset):
         statistics.append(statistic)
         pvalues.append(pvalue)
     return statistics, pvalues
+
+def geweke_chains(DSET):
+    return 0
