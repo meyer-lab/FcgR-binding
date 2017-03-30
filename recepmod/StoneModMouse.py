@@ -624,13 +624,25 @@ class StoneModelMouse:
 #        print(trans)
         return result
 
-    def DecisionTree(self,z):
+    def DecisionTree(self,z, logspace = False):
         # Decision Tree using Knockdown table with a pair of rows corresponding
         # to same IgG and FcgRconditions taken out.
         # Does not accurately predict for IgG2b, IgG1-IIB-/-, IgG2a-I-/-, and IgG2a-I,IV-/-
+        # In logspace, doesn't predict for IgG2b and IgG1-IIB-/-
+        output = []
         tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
+        tbN1 = tbN.copy()
+        if logspace == True:
+            for i in range (18):
+                for j in range(24):
+                    if np.isnan(tbN1.iloc[i,j]) == False:
+                        if tbN1.iloc[i,j] >= 1:
+                            tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
+                        elif tbN1.iloc[i,j] < 1:
+                            tbN1.ix[i,j] = 0
+        tbNparam = tbN1.iloc[:, list(range(24))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        #Assign independent variables and dependent variable "effect"
         independent = np.array(tbN_norm.iloc[:, list(range(16))])
         independent = independent.reshape(18,16)
         effect = np.array(tbN.iloc[:,24])
@@ -641,7 +653,9 @@ class StoneModelMouse:
             else:
                 effect[i] = 0
         #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
-        #Assign independent variables and dependent variable "effect"
+        
+        # Use decision tree with each pair of rows removed to predict the 
+        # effectiveness data of that pair of rows
         for i in range(9):
             ls = list(range(18))
             ls.pop(2*i+1)
@@ -651,19 +665,30 @@ class StoneModelMouse:
         # Construct Decision Tree
             clf = tree.DecisionTreeClassifier()
             clf = clf.fit(independent1, effect1)
-#            print(clf.predict(independent[[2*i,2*i+1], :]))
-#            print(clf.predict_proba(independent[[2*i,2*i+1], :]))
+            output.extend(clf.predict(independent[[2*i,2*i+1], :]))
 #        dot_data = tree.export_graphviz(clf, out_file=None)
 #        graph = pydotplus.graph_from_dot_data(dot_data)
 #        graph.write_pdf("DecisionTree.pdf")
-        return effect
+        return output
 
-    def DecisionTree2(self,z):
+    def DecisionTree2(self,z, logspace = False):
         # Decision Tree with one row removed
         # Fails to predict for IgG2b, IgGI-IIB-/-, IgG2a-I,IV-/-
+        # In logspace, fails to predict for IgG2b, IgG1-IIB-/-, and IgG2a-I-/-
+        output = []
         tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
+        tbN1 = tbN.copy()
+        if logspace == True:
+            for i in range (18):
+                for j in range(24):
+                    if np.isnan(tbN1.iloc[i,j]) == False:
+                        if tbN1.iloc[i,j] >= 1:
+                            tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
+                        elif tbN1.iloc[i,j] < 1:
+                            tbN1.ix[i,j] = 0
+        tbNparam = tbN1.iloc[:, list(range(24))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        # Assign independent variables and dependent variable "effect"
         independent = np.array(tbN_norm.iloc[:, list(range(16))])
         independent = independent.reshape(18,16)
         effect = np.array(tbN.iloc[:,24])
@@ -673,9 +698,8 @@ class StoneModelMouse:
                 effect[i] = 1
             else:
                 effect[i] = 0
-        #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
-        # Assign independent variables and dependent variable "effect"
-
+        
+        # Construct trees with one row removed to predict effectiveness of that row
         for i in range(18):
             ls = list(range(18))
             ls.pop(i)
@@ -684,16 +708,27 @@ class StoneModelMouse:
         # Construct Decision Tree
             clf = tree.DecisionTreeClassifier()
             clf = clf.fit(independent1, effect1)
-#            print(clf.predict(independent[i:i+1, :]))
-#            print(clf.predict_proba(independent[i:i+1, :]))
-        return effect
+            output.extend(clf.predict(independent[i:i+1, :]))
+        return output
     
-    def DecisionTree3(self,z):
+    def DecisionTree3(self,z, logspace = False):
         # Decision Tree with 9 rows (only v = 10)
         # Fails to predict for IgG2b, IgG2a-I-/-, IgG2a-I,IV-/-
+        # In logspace, fails to predict IgG2b, IgG2a-/-, and IgG2a-I,IV-/-
+        output = []
         tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
+        tbN1 = tbN.copy()
+        if logspace == True:
+            for i in range (18):
+                for j in range(24):
+                    if np.isnan(tbN1.iloc[i,j]) == False:
+                        if tbN1.iloc[i,j] >= 1:
+                            tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
+                        elif tbN1.iloc[i,j] < 1:
+                            tbN1.ix[i,j] = 0
+        tbNparam = tbN1.iloc[:, list(range(24))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        # Assign independent variables and dependent variable "effect"
         independent = np.array(tbN_norm.iloc[:, list(range(16))])
         independent = independent.reshape(18,16)
         effect = np.array(tbN.iloc[:,24])
@@ -703,9 +738,8 @@ class StoneModelMouse:
                 effect[i] = 1
             else:
                 effect[i] = 0
-        #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
-        # Assign independent variables and dependent variable "effect"
-
+        
+        # Use decision tree with one row removed to predict effectiveness of that row
         for i in range(9):
             ls = list(range(1,18,2))
             ls.pop(i)
@@ -714,6 +748,5 @@ class StoneModelMouse:
         # Construct Decision Tree
             clf = tree.DecisionTreeClassifier()
             clf = clf.fit(independent1, effect1)
-#            print(clf.predict(independent[2*i+1:2*i+2, :]))
-#            print(clf.predict_proba(independent[i:i+1, :]))
-        return effect
+            output.extend(clf.predict(independent[2*i+1:2*i+2, :]))
+        return output
