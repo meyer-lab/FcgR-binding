@@ -154,6 +154,10 @@ class TestStoneMouse(unittest.TestCase):
         self.Mod.DecisionTree(z)
         self.Mod.DecisionTree2(z)
         self.Mod.DecisionTree3(z)
+        self.Mod.DecisionTree(z, logspace = True)
+        self.Mod.DecisionTree2(z, logspace = True)
+        output = self.Mod.DecisionTree3(z, logspace = True)
+        self.assertTrue(len(output) == 9)
 
 if __name__ == '__main__':
     unittest.main()
