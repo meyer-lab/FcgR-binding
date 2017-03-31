@@ -217,17 +217,25 @@ class StoneModelMouse:
         return independent
 
     def NimmerjahnLassoCrossVal(self, z):
+        # Cross-validation fails for all 3 IgG subclasses: IgG1, IgG2a, and IgG2b
         las = linear_model.Lasso(alpha = 0.005, normalize = True)
         tbN = self.NimmerjahnEffectTable(z)
         independent = self.NimmerjahnLasso(z)
         effect = np.array(tbN.iloc[list(range(6)),30])
         effect = effect.reshape(6,1)
-        x_train, x_test, y_train, y_test = train_test_split(independent, effect, test_size=1/6, random_state=0)
-        res = las.fit(x_train, y_train)
-#        print(las.score(x_test, y_test))
-        coe = res.coef_
-        coe = coe.reshape(4,5)
-#        print(coe)
+        for i in range(3):
+            l = list(range(6))
+            l.pop(2*i+1)
+            l.pop(2*i)
+            x_train = independent[l,:]
+            y_train = effect[l]
+            x_test = independent[[2*i,2*i+1],:]
+            y_test = effect[[2*i,2*i+1]]
+            res = las.fit(x_train, y_train)
+#            print(las.score(x_test, y_test))
+            coe = res.coef_
+            coe = coe.reshape(4,5)
+#            print(coe)
         return res
 
     def FcgRPlots(self, z):
@@ -603,7 +611,9 @@ class StoneModelMouse:
 
         # Plot explained variance ratio
         result = pca.fit(independent, effect)
-#        print(pca.explained_variance_ratio_)
+        ratio = pca.explained_variance_ratio_
+        roundratio = [ '%.6f' % j for j in ratio ]
+#        print(ratio)
         plt.figure(1, figsize=(4, 3))
         plt.clf()
         plt.axes([.2, .2, .7, .7])
@@ -612,9 +622,20 @@ class StoneModelMouse:
         plt.xlabel('n_components')
         plt.ylabel('explained_variance_')
         plt.show()
+        # Heatmap with first 5 eigenvectors
+        scores = pca.components_.reshape(5,16)
+        idx = []
+        for i in range(5):
+            idx.append("PC"+str(i+1)+'('+str(roundratio[i])+')')
+        column = tbN_norm.columns[0:16]
+        PCscoretb = pd.DataFrame(scores, index=idx, columns=column)
+        sns.heatmap(PCscoretb)
+        plt.title("PCA heatmap")
+        plt.show()
 
         # Plot loading
         trans = PCA(n_components=2).fit_transform(independent, effect)
+#        print(trans.reshape(6,6))
         plt.scatter(trans[:, 0], trans[:, 1], color='red')
 #        plt.plot(trans[:, 0], trans[:, 1], color='blue', linewidth=3)
         plt.title("First 2 PCA directions")
