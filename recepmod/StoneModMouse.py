@@ -65,7 +65,7 @@ class StoneModelMouse:
                 continue
             Ka = float(Ka)
             ## Calculate the MFI which should result from this condition according to the model
-            stoneModOut = StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
+            stoneModOut = StoneMod(logR,Ka,v,Kx*Ka,L0, fullOutput = True)
             outputLbnd[k] = stoneModOut[0]
             outputRbnd[k] = stoneModOut[1]
             outputReq[k] = stoneModOut[4]
