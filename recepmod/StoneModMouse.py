@@ -461,7 +461,7 @@ class StoneModelMouse:
         # Cross validate KnockdownLasso by using a pair of rows as test set
         # Predicts for IgG1, IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, and IgG2a-I,IV-/-
         # Fails to predict for IgG2b, IgG1-IIB-/-, IgG2a-III-/-
-        # In logspace, works for IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, and IgG2a-I,IV-/- 
+        # In logspace, works for IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, and IgG2a-I,IV-/-
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbN1 = tbN.copy()
@@ -475,7 +475,7 @@ class StoneModelMouse:
                             tbN1.ix[i,j] = 0
         tbNparam = tbN1.iloc[:, list(range(24))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        
+
         # Iterate over each set of 2 rows being the test set
         for r in range(9):
 #            print(r)
@@ -506,7 +506,7 @@ class StoneModelMouse:
 
     def KnockdownLassoCrossVal2(self, z):
         # Cross validate KnockdownLasso(v=10) by using a row as test set
-        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-, 
+        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-,
         # Kind of predictive for IgG2b, IgG2a-I,IV-/- (predicted = 2*actual) ()
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
@@ -545,10 +545,10 @@ class StoneModelMouse:
         plt.ylabel("Prediction")
         plt.show()
         return res
-    
+
     def KnockdownLassoCrossVal3(self, z):
         # Cross validate KnockdownLasso(v=10) by using a row as test set
-        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-, 
+        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-,
         # Kind of predictive for IgG2b, IgG2a-I,IV-/- (predicted = 2*actual) ()
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
@@ -653,10 +653,10 @@ class StoneModelMouse:
         output = []
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbN1 = tbN.copy()
-        if logspace == True:
+        if logspace is True:
             for i in range (18):
                 for j in range(24):
-                    if np.isnan(tbN1.iloc[i,j]) == False:
+                    if np.isnan(tbN1.iloc[i,j]) is False:
                         if tbN1.iloc[i,j] >= 1:
                             tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
                         elif tbN1.iloc[i,j] < 1:
@@ -674,8 +674,8 @@ class StoneModelMouse:
             else:
                 effect[i] = 0
         #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
-        
-        # Use decision tree with each pair of rows removed to predict the 
+
+        # Use decision tree with each pair of rows removed to predict the
         # effectiveness data of that pair of rows
         for i in range(9):
             ls = list(range(18))
@@ -699,10 +699,10 @@ class StoneModelMouse:
         output = []
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbN1 = tbN.copy()
-        if logspace == True:
+        if logspace is True:
             for i in range (18):
                 for j in range(24):
-                    if np.isnan(tbN1.iloc[i,j]) == False:
+                    if np.isnan(tbN1.iloc[i,j]) is False:
                         if tbN1.iloc[i,j] >= 1:
                             tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
                         elif tbN1.iloc[i,j] < 1:
@@ -719,7 +719,7 @@ class StoneModelMouse:
                 effect[i] = 1
             else:
                 effect[i] = 0
-        
+
         # Construct trees with one row removed to predict effectiveness of that row
         for i in range(18):
             ls = list(range(18))
@@ -731,7 +731,7 @@ class StoneModelMouse:
             clf = clf.fit(independent1, effect1)
             output.extend(clf.predict(independent[i:i+1, :]))
         return output
-    
+
     def DecisionTree3(self,z, logspace = False):
         # Decision Tree with 9 rows (only v = 10)
         # Fails to predict for IgG2b, IgG2a-I-/-, IgG2a-I,IV-/-
@@ -739,10 +739,10 @@ class StoneModelMouse:
         output = []
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbN1 = tbN.copy()
-        if logspace == True:
+        if logspace is True:
             for i in range (18):
                 for j in range(24):
-                    if np.isnan(tbN1.iloc[i,j]) == False:
+                    if np.isnan(tbN1.iloc[i,j]) is False:
                         if tbN1.iloc[i,j] >= 1:
                             tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
                         elif tbN1.iloc[i,j] < 1:
@@ -759,7 +759,7 @@ class StoneModelMouse:
                 effect[i] = 1
             else:
                 effect[i] = 0
-        
+
         # Use decision tree with one row removed to predict effectiveness of that row
         for i in range(9):
             ls = list(range(1,18,2))
