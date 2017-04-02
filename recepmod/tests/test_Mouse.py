@@ -25,7 +25,7 @@ class TestStoneMouse(unittest.TestCase):
         if logR < 0 or kx < 0 or v < 0 or Li < 0:
             raise ValueError('Negative input parameters')
         x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
-        out = np.array(self.Mod.StoneModMouse(x, fullOutput = True))
+        out = np.array(self.Mod.StoneModMouse(x))
         self.assertTrue(out.shape == (5,6))
 
     def test_dataOutput_StoneModMouse2(self):
@@ -38,8 +38,7 @@ class TestStoneMouse(unittest.TestCase):
             raise ValueError('Negative input parameters')
         x = [logR, logR, logR, logR, logR, logR, 'IgG2b', kx, v, Li]
         a = self.Mod.StoneModMouse(x)
-        b = a[1] + a[2]
-        b = np.array(b)
+        b = np.array(a[1] + a[4])
         for j in range(5):
             if not np.isnan(b[j]):
                 self.assertAlmostEqual(10**logR, b[j], delta = (10**logR)/10000)
@@ -53,9 +52,7 @@ class TestStoneMouse(unittest.TestCase):
         if logR < 0 or kx < 0 or v < 0 or Li < 0:
             raise ValueError('Negative input parameters')
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        tb = self.Mod.pdOutputTable(z, fullOutput = False)
-        self.assertTrue(tb.shape == (4,18))
-        tbfull = self.Mod.pdOutputTable(z, fullOutput = True)
+        tbfull = self.Mod.pdOutputTable(z)
         self.assertTrue(tbfull.shape == (4,30))
 
     def test_pdAvidityTable(self):
@@ -66,11 +63,8 @@ class TestStoneMouse(unittest.TestCase):
         Li = 10**(-8)*random.random()
         if logR < 0 or kx < 0 or v < 0 or Li < 0:
             raise ValueError('Negative input parameters')
-        y = [logR, logR, logR, logR, logR, logR, 'IgG3', kx, Li]
-        tba = self.Mod.pdAvidityTable(y, 4, 7, fullOutput = False)
-        self.assertTrue(tba.shape == (4,18))
         y2 = [logR, logR, logR, logR, logR, logR, 'IgG2a', kx, Li]
-        tba2 = self.Mod.pdAvidityTable(y2, v, v+2, fullOutput = True)
+        tba2 = self.Mod.pdAvidityTable(y2, v, v+2)
         self.assertTrue(tba2.shape == (3,30))
 
     def test_NimmerjahnEffectTable(self):
@@ -135,9 +129,10 @@ class TestStoneMouse(unittest.TestCase):
             raise ValueError('Negative input parameters')
         z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
         tbNK = self.Mod.NimmerjahnTb_Knockdown(z)
+        tbNK.to_csv('out.csv')
         self.Mod.NimmerjahnKnockdownLasso(z)
         self.Mod.KnockdownLassoCrossVal(z)
-        self.Mod.KnockdownLassoCrossVal(z, logspace = True)
+        #self.Mod.KnockdownLassoCrossVal(z, logspace = True)
         self.Mod.KnockdownLassoCrossVal2(z)
         self.Mod.KnockdownLassoCrossVal3(z)
         self.Mod.KnockdownPCA(z)

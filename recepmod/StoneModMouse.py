@@ -29,7 +29,7 @@ class StoneModelMouse:
         self.uvIDX = 8
         self.L0IDX = 9
 
-    def StoneModMouse(self, x, fullOutput = False):
+    def StoneModMouse(self, x):
         ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
         ## receptors, granted each epitope of the ligand binds to the receptor
         ## kind in question with affinity Ka and cross-links with
@@ -42,9 +42,6 @@ class StoneModelMouse:
             if self.Igs[i] == x[self.IgIDX]:
                 x1[self.IgIDX] = np.nan
                 l = i
-#        if type(x[self.IgIDX]) != int:
-#            return (np.nan, np.nan, np.nan)
-        #print(x[self.IgIDX])
 
         # Assign inputs for StoneMod
         x1 = np.array(x1)
@@ -56,10 +53,8 @@ class StoneModelMouse:
         outputLbnd = np.full((6), np.nan)
         outputReq = np.full((6), np.nan)
         outputRbnd = np.full((6), np.nan)
-
-        if fullOutput:
-            outputRmulti = np.full((6), np.nan)
-            outputnXlink = np.full((6), np.nan)
+        outputRmulti = np.full((6), np.nan)
+        outputnXlink = np.full((6), np.nan)
 
         # Iterate over each FcgR
         for k in range(6):
@@ -74,17 +69,12 @@ class StoneModelMouse:
             outputLbnd[k] = stoneModOut[0]
             outputRbnd[k] = stoneModOut[1]
             outputReq[k] = stoneModOut[4]
+            outputRmulti[k] = stoneModOut[2]
+            outputnXlink[k] = stoneModOut[3]
 
-            # Fill in Rmulti and nXlink for full output
-            if fullOutput:
-                outputRmulti[k] = stoneModOut[2]
-                outputnXlink[k] = stoneModOut[3]
+        return (outputLbnd, outputRbnd, outputRmulti, outputnXlink, outputReq)
 
-        if fullOutput:
-            return (outputLbnd, outputRbnd, outputRmulti, outputnXlink, outputReq)
-        return (outputLbnd, outputRbnd, outputReq)
-
-    def pdOutputTable(self, z, fullOutput = False):
+    def pdOutputTable(self, z):
         # Takes in a list of shape (8) for z in the format of [logR, logR, logR, logR, logR, logR, kx, v, Li]
         # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
         # Outputs a pandas table of binding prediction
@@ -92,61 +82,39 @@ class StoneModelMouse:
         labels = []
 
         # Set labels for columns of pandas table
-        if fullOutput:
-            for i in self.FcgRs:
-                for j in ['-Lbnd', '-Rbnd', '-Rmulti', '-nXlink', '-Req']:
-                    labels.append(i+j)
-        else:
-            for i in self.FcgRs:
-                for j in ['-Lbnd', '-Rbnd', '-Req']:
-                    labels.append(i+j)
+        for i in self.FcgRs:
+            for j in ['-Lbnd', '-Rbnd', '-Rmulti', '-nXlink', '-Req']:
+                labels.append(i+j)
 
         # Make a 3-d array of StoneModMouse output for each Ig
-        if fullOutput:
-            for i in range(len(self.Igs)):
-                x = z[:]
-                x.insert(self.IgIDX, self.Igs[i])
-                stoneModMurine.append(np.transpose(self.StoneModMouse(x, fullOutput = True)))
-        else:
-            for i in range(len(self.Igs)):
-                x = z[:]
-                x.insert(self.IgIDX, self.Igs[i])
-                stoneModMurine.append(np.transpose(self.StoneModMouse(x)))
+        for i in range(len(self.Igs)):
+            x = z[:]
+            x.insert(self.IgIDX, self.Igs[i])
+            stoneModMurine.append(np.transpose(self.StoneModMouse(x)))
 
         # Reshape data for pandas table
         output = np.array(stoneModMurine)
-        if fullOutput:
-            output = np.reshape(output,(4,30))
-        else:
-            output = np.reshape(output,(4,18))
+
+        output = np.reshape(output,(4,30))
 
         # Make pandas table of binding predictions of Ig-FcgR pairs
         table = pd.DataFrame(np.array(output), index = self.Igs, columns = labels)
         return table
 
-    def pdAvidityTable(self, y, vl, vu, fullOutput = False):
+    def pdAvidityTable(self, y, vl, vu):
         # Takes in a list of shape (8) for y <x without avidity v>, lower bond for avidity vl, and upper bond for avidity vu
         # Organizes a pandas table of binding predictions for a given Ig as avidity varies
         tb1 = pd.DataFrame()
         Ig = y[self.IgIDX]
         idx = []
         # Concatenating a pandas table for a range of avidity
-        if fullOutput is False:
-            for i in range(vl, vu+1):
-                x = y[:]
-                x.insert(self.uvIDX, i)
-                x.pop(self.IgIDX)
-                z = x
-                tb = self.pdOutputTable(z, fullOutput = False)
-                tb1 = pd.concat([tb1, tb.loc[[Ig]]])
-        elif fullOutput is True:
-            for j in range(vl, vu+1):
-                x = y[:]
-                x.insert(self.uvIDX, j)
-                x.pop(self.IgIDX)
-                z = x
-                tb = self.pdOutputTable(z, fullOutput = True)
-                tb1 = pd.concat([tb1, tb.loc[[Ig]]])
+        for j in range(vl, vu+1):
+            x = y[:]
+            x.insert(self.uvIDX, j)
+            x.pop(self.IgIDX)
+            z = x
+            tb = self.pdOutputTable(z)
+            tb1 = pd.concat([tb1, tb.loc[[Ig]]])
         # Indexing
         for k in range(vl, vu+1):
             idx.append(Ig+'-'+str(k))
@@ -160,9 +128,9 @@ class StoneModelMouse:
         tbN = pd.DataFrame()
         idx = []
         # create pandas tables
-        tv = self.pdOutputTable(z, fullOutput = True)
+        tv = self.pdOutputTable(z)
         z1[self.uvIDX-1] = 1
-        t1 = self.pdOutputTable(z1, fullOutput = True)
+        t1 = self.pdOutputTable(z1)
         # Compose a table of shape (8,30), 2 rows for each IgG
         for i in self.Igs:
             for j in [1, z[self.uvIDX-1]]:
@@ -176,7 +144,7 @@ class StoneModelMouse:
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
         return tbN
 
-    def NimmerjahnMultiLinear(self, z, fullOutput = True):
+    def NimmerjahnMultiLinear(self, z):
         # Multi-Linear regression of FcgR binding predictions for effectiveness of IgG therapy
         reg = linear_model.LinearRegression()
         tbN = self.NimmerjahnEffectTable(z)
