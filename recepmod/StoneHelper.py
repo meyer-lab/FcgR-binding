@@ -97,7 +97,13 @@ def mapMCMC(dFunction, pSet):
     return pd.concat(retVals)
 
 # Reduce the collection of predictions to various summary statistics.
-def reduceMCMC(frameList, groupByC = ['Ig', 'FcgR', 'TNP'], dropC = ['Expression', 'pSetNum']):
+def reduceMCMC(frameList, groupByC = None, dropC = None):
+    if groupByC is None:
+        groupByC = ['Ig', 'FcgR', 'TNP']
+
+    if dropC is None:
+        dropC = ['Expression', 'pSetNum']
+
     # Drop indicated columns
     frameList = frameList.drop(dropC, axis = 1).groupby(groupByC)
 
