@@ -67,9 +67,9 @@ class TestStoneMouse(unittest.TestCase):
     def test_NimmerjahnMultiLinear(self):
         # Prints coefficients of multi-linear regression model
 
-        result = self.Mod.NimmerjahnMultiLinear(self.z)
+        self.Mod.NimmerjahnMultiLinear(self.z)
         res = self.Mod.NimmerjahnLasso(self.z)
-        res2 = self.Mod.NimmerjahnLassoCrossVal(self.z)
+        self.Mod.NimmerjahnLassoCrossVal(self.z)
 
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(res, np.ndarray)
@@ -78,15 +78,6 @@ class TestStoneMouse(unittest.TestCase):
         # Plots effectiveness vs. each FcgR binding parameter
 
         self.Mod.FcgRPlots(self.z)
-
-    def test_RmultiAvidityTable(self):
-        # Plots effectiveness vs. each FcgR binding parameter
-        x = [self.logR, self.logR, self.logR, self.logR, self.logR, self.logR,
-             'IgG1', self.kx, self.v, self.Li]
-
-        Rmultiv = self.Mod.RmultiAvidity(x)
-        self.Mod.RmultiAvidityTable(self.z)
-        self.assertTrue(Rmultiv.shape == (6, self.v))
 
     def test_NimmerjahnTb_Knockdown(self):
         tbNK = self.Mod.NimmerjahnTb_Knockdown(self.z)
