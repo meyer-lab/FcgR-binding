@@ -12,6 +12,12 @@ sns.set(style="ticks")
 
 np.seterr(over = 'raise')
 
+def funcAppend(indexList, nameApp):
+    idx = []
+    for i in indexList:
+        idx.append(i+nameApp)
+    return idx
+
 class StoneModelMouse:
     # Takes in a list of shape (9) for x: Rexp for FcgRs and TRIM21 logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):
@@ -28,11 +34,13 @@ class StoneModelMouse:
         self.L0IDX = 9
 
     def StoneModMouse(self, x):
-        ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
-        ## receptors, granted each epitope of the ligand binds to the receptor
-        ## kind in question with affinity Ka and cross-links with
-        ## other receptors with crosslinking constant Kx = 10^logKx. All
-        ## equations derived from Stone et al. (2001).
+        '''
+        Returns the number of mutlivalent ligand bound to a cell with 10^logR
+        receptors, granted each epitope of the ligand binds to the receptor
+        kind in question with affinity Ka and cross-links with
+        other receptors with crosslinking constant Kx = 10^logKx. All
+        equations derived from Stone et al. (2001).
+        '''
 
         # Assign Ig type to a number corresponding to the row of Ka
         x1 = x[:]
@@ -244,10 +252,7 @@ class StoneModelMouse:
 
         # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
         tbK1 = tbK.iloc[:, list(range(24))]
-        idx1 = []
-        for i in tbK1.index:
-            idx1.append(i+'-FcgRIIB-/-')
-        tbK1.index = idx1
+        tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
         FcgRIIBcol = tbK.columns[4:8]
         l1 = list(range(24))
         for i in range(4):
@@ -259,10 +264,7 @@ class StoneModelMouse:
 
         # set up tbK2 for FcgRI knockdown, IgG2a treatment
         tbK2 = tbK.iloc[(2,3), list(range(24))]
-        idx2 = []
-        for i in tbK2.index:
-            idx2.append(i+'-FcgRI-/-')
-        tbK2.index = idx2
+        tbK2.index = funcAppend(tbK2.index, '-FcgRI-/-')
         FcgRIcol = tbK.columns[0:4]
         l2 = list(range(24))
         for i in range(4):
@@ -274,10 +276,7 @@ class StoneModelMouse:
 
         # set up tbK3 for FcgRIII knockdown, IgG2a treatment
         tbK3 = tbK.iloc[(2,3), list(range(24))]
-        idx3 = []
-        for i in tbK3.index:
-            idx3.append(i+'-FcgRIII-/-')
-        tbK3.index = idx3
+        tbK3.index = funcAppend(tbK3.index, '-FcgRIII-/-')
         FcgRIIIcol = tbK.columns[8:12]
         l3 = list(range(24))
         for i in range(4):
@@ -289,10 +288,7 @@ class StoneModelMouse:
 
         # set up tbK4 table for FcgRI knockdown, FcgRIV blocking, IgG2a treatment
         tbK4 = tbK.iloc[(2,3), list(range(24))]
-        idx4 = []
-        for i in tbK4.index:
-            idx4.append(i+'-FcgRI,IV-/-')
-        tbK4.index = idx4
+        tbK4.index = funcAppend(tbK4.index, '-FcgRI,IV-/-')
         FcgRIcol2 = tbK.columns[0:4]
         FcgRIVcol = tbK.columns[12:16]
         l4 = list(range(24))
@@ -308,10 +304,7 @@ class StoneModelMouse:
         tbK4.loc[:,'Effectiveness'] = pd.Series([0,0.35], index=tbK4.index)
 
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
-        tbNK = tbK.append(tbK1)
-        tbNK = tbNK.append(tbK2)
-        tbNK = tbNK.append(tbK3)
-        tbNK = tbNK.append(tbK4)
+        tbNK = tbK.append((tbK1, tbK2, tbK3, tbK4))
 
         return tbNK
 
