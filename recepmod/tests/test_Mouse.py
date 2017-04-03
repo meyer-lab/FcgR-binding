@@ -81,7 +81,7 @@ class TestStoneMouse(unittest.TestCase):
 
     def test_NimmerjahnTb_Knockdown(self):
         tbNK = self.Mod.NimmerjahnTb_Knockdown(self.z)
-        tbNK.to_csv('out.csv')
+        # tbNK.to_csv('out.csv')
         self.Mod.NimmerjahnKnockdownLasso(self.z)
         self.Mod.KnockdownLassoCrossVal(self.z)
         #self.Mod.KnockdownLassoCrossVal(self.z, logspace = True)

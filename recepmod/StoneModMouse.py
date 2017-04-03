@@ -304,7 +304,7 @@ class StoneModelMouse:
         tbK4.loc[:,'Effectiveness'] = pd.Series([0,0.35], index=tbK4.index)
 
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
-        tbNK = tbK.append((tbK1, tbK2, tbK3, tbK4))
+        tbNK = tbK.append([tbK1, tbK2, tbK3, tbK4])
 
         return tbNK
 
