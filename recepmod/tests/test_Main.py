@@ -5,6 +5,15 @@ import numpy as np
 from scipy.stats import norm
 from ..StoneModel import StoneModel, nchoosek, ReqFuncSolver, logpdf_sum, StoneMod
 
+def get_random_vars():
+    kai = random.random()
+    kx = random.random()
+    vi = random.randint(1, 30)
+    R = random.random()
+    Li = random.random()
+
+    return (kai, kx, vi, R, Li)
+
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
         self.M = StoneModel()
@@ -22,17 +31,8 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(nchoosek(8,3) == 56)
         self.assertTrue(nchoosek(9,3) == 84)
 
-    def get_random_vars(self):
-        kai = random.random()
-        kx = random.random()
-        vi = random.randint(1, 30)
-        R = random.random()
-        Li = random.random()
-
-        return (kai, kx, vi, R, Li)
-
     def test_reqFuncSolver(self):
-        kai, kx, vi, R, Li = self.get_random_vars()
+        kai, kx, vi, R, Li = get_random_vars()
 
         diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*kai*(1+kx*(10**x))**(vi-1))
 
@@ -44,7 +44,7 @@ class TestStoneMethods(unittest.TestCase):
 
     def test_StoneMod(self):
         # This test should check that the model output satisfies Rbound = Rtot - Req
-        kai, kx, vi, R, Li = self.get_random_vars()
+        kai, kx, vi, R, Li = get_random_vars()
 
         StoneRet = StoneMod(np.log10(R),kai,vi,kx,Li,fullOutput = True)
         Req = 10**ReqFuncSolver(R,kai,Li,vi,kx)
