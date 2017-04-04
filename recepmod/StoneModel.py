@@ -3,25 +3,23 @@ from memoize import memoize
 
 np.seterr(over = 'raise')
 
-# Normal distribution function. Sums over the likelihoods of points in x
 def logpdf_sum(x, loc, scale):
+    """ Normal distribution function. Sums over the likelihoods of points in x """
     root2 = np.sqrt(2)
     root2pi = np.sqrt(2*np.pi)
     prefactor = - x.size * np.log(scale * root2pi)
     summand = -np.square((x - loc)/(root2 * scale))
     return  prefactor + np.nansum(summand)
 
-#@memoize
+@memoize
 def nchoosek(n, k):
     """ A fast cached version of nchoosek """
     from scipy.misc import comb
 
-    return comb(n, k)
+    return comb(n, k, exact=True)
 
 def normalizeData(filepath):
-    """
-    Import Lux et al data and normalize by experiment.
-    """
+    """ Import Lux et al data and normalize by experiment. """
 
     ## Read in the csv data for the first experiments.
     Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
