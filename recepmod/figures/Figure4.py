@@ -95,7 +95,6 @@ def PredictionVersusAvidity(ax, Kx):
     ax[1].set_xlabel(r'Multimerized Fc$\gamma$R')
     ax[2].set_xlabel(r'Fc$\gamma$R Nxlinks')
 
-
 def TwoRecep(Kx, ax = None):
     """
     E) Predicted multimerized receptor versus avidity for RI + RIIB
