@@ -76,10 +76,7 @@ def activityBias(vGrid):
 
     for ii in range(gnu+1):
         for jj in range(gnu+1):
-            if (ii+jj) < 2:
-                continue
-
-            activity = activity + vGrid[ii,jj]*(ii-1)*(jj-1)
+            activity = activity + np.max(vGrid[ii,jj]*(ii-1), 0.0) - np.max(vGrid[ii,jj]*(jj-1), 0.0)
 
     return activity
 
@@ -160,4 +157,4 @@ class StoneTwo:
     def __init__(self, logR, Ka, Kx):
         self.logR = np.array(logR, dtype=np.float64, copy=True)
         self.Ka = np.array(Ka, dtype=np.float64, copy=True)
-        self.Kx = np.array(Kx, dtype=np.float64, copy=True)
+        self.Kx = np.array(Kx*Ka[0], dtype=np.float64, copy=True)
