@@ -104,7 +104,7 @@ def TwoRecep(Kx, ax = None):
     Ka = [6.5E7, 1.2E5]
     logR = [2.0, 4.5]
     avidity = [1, 2, 8, 32, 128]
-    ligand = np.logspace(start = -12, stop = -5, num = 30)
+    ligand = np.logspace(start = -12, stop = -5, num = 20)
 
     current_palette = sns.color_palette()
     ax[0].set_prop_cycle(cycler('color', current_palette[1:]))

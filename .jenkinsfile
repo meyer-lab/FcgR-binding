@@ -4,6 +4,11 @@ pipeline {
     PATH = "/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/texlive/2016/bin/x86_64-darwin/"
   }
   stages {
+    stage('Clean') {
+      steps {
+        sh 'make clean'
+      }
+    }
     stage('Profile') {
       steps {
         sh 'make profile'
@@ -12,7 +17,6 @@ pipeline {
     }
     stage('Build') {
       steps {
-        sh 'make clean'
         sh 'make'
       }
     }
