@@ -3,16 +3,16 @@
 
 import numpy as np
 import pandas as pd
-import h5py
-from tqdm import trange
 
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
 
-# Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
+    """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
+    import h5py
+
     # Open hdf5 file
     f = h5py.File(filename, 'r')
 
@@ -87,6 +87,8 @@ def mapMCMC(dFunction, pSet):
     with all the individual dataframe outputs stacked, and a number identifier for
     which parameter set each set of quantities came from
     """
+    from tqdm import trange
+
     # Set the function to pass back results
     funFunc = lambda ii: dFunction(pSet.iloc[ii,:]).assign(pSetNum = ii)
 

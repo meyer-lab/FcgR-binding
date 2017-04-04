@@ -1,10 +1,4 @@
-from matplotlib.backends.backend_pdf import PdfPages
-import matplotlib.pyplot as plt
-from recepmod.figures import Figure1
-from recepmod.figures import Figure2
-from recepmod.figures import Figure3
-from recepmod.figures import Figure4
-from recepmod.figures import Figure5
+from recepmod.figures import Figure1, Figure2, Figure3, Figure4
 
 def runFunc(figClass, nameOut):
     ff = figClass.makeFigure()

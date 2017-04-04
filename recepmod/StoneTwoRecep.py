@@ -1,12 +1,15 @@
 import numpy as np
-from scipy.optimize import brentq
-from .StoneModel import nchoosek
+import pandas as pd
 
-# This function takes in the relevant parameters and creates the v_ij grid
-# Kx should be the Kx of Ka[0]
-# Ka should be a tuple of size 2 with each affinity
-# Req should be a tuple of size 2
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
+    """
+    This function takes in the relevant parameters and creates the v_ij grid
+    Kx should be the Kx of Ka[0]
+    Ka should be a tuple of size 2 with each affinity
+    Req should be a tuple of size 2
+    """
+    from .StoneModel import nchoosek
+
     # Initialize the grid of possibilities
     vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float)
 
@@ -25,8 +28,9 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
 
     return vGrid
 
-# This calculates the Rbnd quantity from a v_ij grid
 def StoneRbnd(vGrid):
+    """ This calculates the Rbnd quantity from a v_ij grid """
+
     # We can calculate gnu from the size of the v_ij grid
     gnu = vGrid.shape[0] - 1
 
@@ -62,8 +66,24 @@ def StoneRmultiAll(vGrid):
 
     return np.array((np.sum(vGridSone), np.sum(vGridStwo)))
 
-# Solve for Req
+def activityBias(vGrid):
+    vGrid = np.copy(vGrid)
+
+    # We can calculate gnu from the size of the v_ij grid
+    gnu = vGrid.shape[0] - 1
+
+    activity = 0.0
+
+    for ii in range(gnu+1):
+        for jj in range(gnu+1):
+            activity = activity + np.fmax(vGrid[ii,jj]*(ii-1), 0.0) - np.fmax(vGrid[ii,jj]*(jj-1), 0.0)
+
+    return activity
+
 def reqSolver(logR,Ka,gnu,Kx,L0):
+    """ Solve for Req """
+    from scipy.optimize import brentq
+
     R = np.power(10.0, logR)
 
     # This is the error function to find the root of
@@ -113,7 +133,28 @@ class StoneTwo:
 
         return StoneRmultiAll(vgridOut)
 
+    def getAllProps(self, gnu, L0):
+        Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
+
+        vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
+
+        Rbnd = StoneRbnd(vgridOut)
+        RmultiAll = StoneRmultiAll(vgridOut)
+
+        return pd.Series(dict(logRone = self.logR[0],
+                              logRtwo = self.logR[1],
+                              RmultiOne = RmultiAll[0],
+                              RmultiTwo = RmultiAll[1],
+                              RbndOne = Rbnd[0],
+                              RbndTwo = Rbnd[1],
+                              ligand = L0,
+                              avidity = gnu,
+                              activity = activityBias(vgridOut),
+                              KaOne = self.Ka[0],
+                              KaTwo = self.Ka[1],
+                              Kx = self.Kx))
+
     def __init__(self, logR, Ka, Kx):
         self.logR = np.array(logR, dtype=np.float64, copy=True)
         self.Ka = np.array(Ka, dtype=np.float64, copy=True)
-        self.Kx = np.array(Kx, dtype=np.float64, copy=True)
+        self.Kx = np.array(Kx*Ka[0], dtype=np.float64, copy=True)
