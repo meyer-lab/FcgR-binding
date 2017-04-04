@@ -76,7 +76,7 @@ def activityBias(vGrid):
 
     for ii in range(gnu+1):
         for jj in range(gnu+1):
-            activity = activity + np.max(vGrid[ii,jj]*(ii-1), 0.0) - np.max(vGrid[ii,jj]*(jj-1), 0.0)
+            activity = activity + np.fmax(vGrid[ii,jj]*(ii-1), 0.0) - np.fmax(vGrid[ii,jj]*(jj-1), 0.0)
 
     return activity
 
