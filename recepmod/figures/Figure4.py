@@ -9,10 +9,12 @@ from ..StoneHelper import read_chain
 from .FigureCommon import subplotLabel
 from ..StoneTwoRecep import StoneTwo
 
-# Figure 3: Specific predictions regarding the coordinate effects of immune
+# Figure 4: Specific predictions regarding the coordinate effects of immune
 # complex parameters.
 
 def makeFigure():
+    print("Starting Figure 4")
+
     import string
     import os
     from matplotlib import gridspec
@@ -46,6 +48,15 @@ def makeFigure():
 
     return f
 
+def plotRanges():
+    avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
+    ligand = np.logspace(start = -12, stop = -5, num = 40)
+
+    return (ligand, avidity)
+
+def skipColor(ax):
+    ax.set_prop_cycle(cycler('color', sns.color_palette()[1:]))
+
 def PredictionVersusAvidity(ax, Kx):
     '''
     A) Predicted binding v conc of IC for varying avidity.
@@ -55,14 +66,12 @@ def PredictionVersusAvidity(ax, Kx):
     '''
     # Receptor expression
     Rexp = 4.0
-    avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
+    ligand, avidity = plotRanges()
     Ka = 1.2E6 # FcgRIIIA-Phe - IgG1
-    ligand = np.logspace(start = -12, stop = -5, num = 40)
 
-    current_palette = sns.color_palette()
-    ax[1].set_prop_cycle(cycler('color', current_palette[1:]))
-    ax[2].set_prop_cycle(cycler('color', current_palette[1:]))
-    ax[3].set_prop_cycle(cycler('color', current_palette[1:]))
+    skipColor(ax[1])
+    skipColor(ax[2])
+    skipColor(ax[3])
 
     def calculate(x):
         a = StoneMod(Rexp,Ka,x['avidity'],Kx*Ka,x['ligand'], fullOutput = True)
@@ -90,9 +99,9 @@ def PredictionVersusAvidity(ax, Kx):
     ax[0].set_xlabel('IC Concentration (M)')
     ax[1].set_xlabel('IC Concentration (M)')
     ax[2].set_xlabel('IC Concentration (M)')
-    ax[0].set_xlabel(r'Bound Fc$\gamma$R')
-    ax[1].set_xlabel(r'Multimerized Fc$\gamma$R')
-    ax[2].set_xlabel(r'Fc$\gamma$R Nxlinks')
+    ax[0].set_ylabel(r'Bound Fc$\gamma$R')
+    ax[1].set_ylabel(r'Multimerized Fc$\gamma$R')
+    ax[2].set_ylabel(r'Fc$\gamma$R Nxlinks')
 
 def TwoRecep(Kx, ax = None):
     """
@@ -102,12 +111,10 @@ def TwoRecep(Kx, ax = None):
     # Active, inhibitory
     Ka = [6.5E7, 1.2E5]
     logR = [2.0, 4.5]
-    avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
-    ligand = np.logspace(start = -12, stop = -5, num = 20)
+    ligand, avidity = plotRanges()
 
-    current_palette = sns.color_palette()
-    ax[0].set_prop_cycle(cycler('color', current_palette[1:]))
-    ax[1].set_prop_cycle(cycler('color', current_palette[1:]))
+    skipColor(ax[0])
+    skipColor(ax[1])
 
     acl = StoneTwo(logR, Ka, Kx)
 
@@ -119,5 +126,8 @@ def TwoRecep(Kx, ax = None):
     outputs = inputs.apply(calculate, axis = 1).assign(ratio = lambda x: x.RmultiOne - x.RmultiTwo)
 
     for ii in avidity:
-        outputs[outputs['avidity'] == ii].plot(x = "RmultiTwo", y = "RmultiOne", ax = ax[0], loglog = True, legend = False)
+        outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], loglog = True, legend = False)
         outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "ratio", ax = ax[1], logx = True, legend = False)
+
+    ax[0].set_xlabel(r'Multimerized Fc$\gamma$R 1')
+    ax[0].set_ylabel(r'Multimerized Fc$\gamma$R 2')
