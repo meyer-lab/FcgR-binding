@@ -1,7 +1,7 @@
 from emcee import EnsembleSampler
 import numpy as np
 from recepmod import StoneModel
-from recepmod.fitFuncs import *
+from recepmod.fitFuncs import getUniformStart, startH5File
 
 newData = True
 bestLL = -np.inf

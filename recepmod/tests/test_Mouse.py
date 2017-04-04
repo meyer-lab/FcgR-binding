@@ -90,14 +90,5 @@ class TestStoneMouse(unittest.TestCase):
         self.Mod.KnockdownPCA(self.z)
         self.assertTrue(tbNK.shape == (18, 25))
 
-    def test_Knockdown_Tree(self):
-        self.Mod.DecisionTree(self.z)
-        self.Mod.DecisionTree2(self.z)
-        self.Mod.DecisionTree3(self.z)
-        self.Mod.DecisionTree(self.z, logspace = True)
-        self.Mod.DecisionTree2(self.z, logspace = True)
-        output = self.Mod.DecisionTree3(self.z, logspace = True)
-        self.assertTrue(len(output) == 9)
-
 if __name__ == '__main__':
     unittest.main()
