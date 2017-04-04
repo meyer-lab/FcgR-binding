@@ -108,12 +108,12 @@ def PredictionVersusAvidity(ax, Kx):
 
 def TwoRecep(Kx, ax = None):
     """
-    E) Predicted multimerized receptor versus avidity for RI + RIIB
+    E) Predicted multimerized receptor versus avidity for RIII-Phe + RIIB
     F) The predicted ratio (E)
     """
     # Active, inhibitory
-    Ka = [6.5E7, 1.2E5]
-    logR = [2.0, 4.5]
+    Ka = [1.2E6, 1.2E5]
+    logR = [4.0, 4.5]
     ligand, avidity = plotRanges()
 
     skipColor(ax[0])
@@ -126,13 +126,18 @@ def TwoRecep(Kx, ax = None):
 
     inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
-    outputs = inputs.apply(calculate, axis = 1).assign(ratio = lambda x: x.RmultiOne - x.RmultiTwo)
+    outputs = inputs.apply(calculate, axis = 1)
 
     for ii in avidity:
+        if ii == 1:
+            continue
+
         outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], loglog = True, legend = False)
-        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "ratio", ax = ax[1], logx = True, legend = False)
+        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
 
     ax[0].set_xlabel(r'Multimerized Fc$\gamma$RI')
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
     ax[0].set_xlim(1E-9, 10)
     ax[0].set_ylim(1E-9, 10)
+    ax[1].set_xlabel('IC Concentration (M)')
+    ax[1].set_ylabel('Ratio')

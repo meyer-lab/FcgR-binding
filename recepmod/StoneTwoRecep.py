@@ -66,6 +66,23 @@ def StoneRmultiAll(vGrid):
 
     return np.array((np.sum(vGridSone), np.sum(vGridStwo)))
 
+def activityBias(vGrid):
+    vGrid = np.copy(vGrid)
+
+    # We can calculate gnu from the size of the v_ij grid
+    gnu = vGrid.shape[0] - 1
+
+    activity = 0.0
+
+    for ii in range(gnu+1):
+        for jj in range(gnu+1):
+            if (ii+jj) < 2:
+                continue
+
+            activity = activity + vGrid[ii,jj]*(ii-1)*(jj-1)
+
+    return activity
+
 def reqSolver(logR,Ka,gnu,Kx,L0):
     """ Solve for Req """
     from scipy.optimize import brentq
@@ -135,6 +152,7 @@ class StoneTwo:
                               RbndTwo = Rbnd[1],
                               ligand = L0,
                               avidity = gnu,
+                              activity = activityBias(vgridOut),
                               KaOne = self.Ka[0],
                               KaTwo = self.Ka[1],
                               Kx = self.Kx))
