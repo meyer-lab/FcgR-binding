@@ -1,7 +1,5 @@
 import os
 import numpy as np
-from scipy.optimize import brentq
-from scipy.misc import comb
 from memoize import memoize
 
 np.seterr(over = 'raise')
@@ -17,6 +15,8 @@ def logpdf_sum(x, loc, scale):
 # A fast cached version of nchoosek
 @memoize
 def nchoosek(n, k):
+    from scipy.misc import comb
+
     return comb(n, k, exact=True)
 
 # Normalize the input data taking into account batch effects
@@ -49,22 +49,20 @@ def normalizeData(filepath):
 
     return newLux
 
-## The purpose of this function is to calculate the value of Req (from Eq  1
-## from Stone) given parameters R, kai=Ka,Li=L, vi=v, and kx=Kx. It does this
-## by performing the bisction algorithm on Eq 2 from Stone. The bisection
-## algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
 def ReqFuncSolver(R, ka, Li, vi, kx):
+    """
+    The purpose of this function is to calculate the value of Req (from Eq 1
+    from Stone) given parameters R, kai=Ka,Li=L, vi=v, and kx=Kx. It does this
+    by performing the bisction algorithm on Eq 2 from Stone. The bisection
+    algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
+    """
+    from scipy.optimize import brentq
+
     ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
     ## is necessarily lower than log10(R).
-    a = -40
-    b = np.log10(R)
+    a, b = -40, np.log10(R)
 
-    ## Create anonymous function diffFunAnon which calls diffFun for parameters R, vi=v, kx=Kx, and viLikdi.
-    ## This function subtracts the right side of Equation 2 from Stone from the left side of the same Equation. The
-    ## bisection algorithm is run using this function so as to calculate log10(Req) which satisfies all parameters.
-    ## Each time this function is called: x is log10 of the value of Req being tested, R is R from Stone 2, vi is v from
-    ## Stone 2, kx is Kx from Stone 2, and viLikdi is a product which is constant over all iterations of the bisection
-    ## algorithm over diffFun for a single calling of ReqFuncSolver.
+    ## Mass balance for receptor species, to identify the amount of free receptor
     diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
 
     try:
@@ -73,11 +71,8 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     except FloatingPointError:
         return np.nan
 
-    ## Implement the bisection algorithm using SciPy's brentq. Please see SciPy documentation for rationale behind
-    ## input parameter not described beforehand. Brentq is ~2x faster than bisect
-    logReq = brentq(diffFunAnon, a, b, disp=False)
-
-    return logReq
+    ## Implement the bisection algorithm using SciPy's brentq.
+    return brentq(diffFunAnon, a, b, disp=False)
 
 def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     '''
@@ -117,12 +112,6 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     nXlink = np.sum(np.multiply(vieq[1:], np.arange(1, v, dtype = np.float)))
 
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
-
-## Kx should be zero clearly when Ka is zero, and should approach a constant
-## when Ka is infinitely large. Therefore, using functions of the form
-## ax/(K + x) make the most sense. To expand upon what's described here,
-## one could create a series of those terms, and specify that each subsequent
-## term must have a K value greater than the previous.
 
 class StoneModel:
     ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
