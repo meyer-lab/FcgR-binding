@@ -105,6 +105,10 @@ def PredictionVersusAvidity(ax, Kx):
     ax[0].set_ylabel(r'Bound Fc$\gamma$R')
     ax[1].set_ylabel(r'Multimerized Fc$\gamma$R')
     ax[2].set_ylabel(r'Fc$\gamma$R Nxlinks')
+    ax[3].set_xlabel(r'Bound Fc$\gamma$R')
+    ax[3].set_ylabel(r'Fc$\gamma$R Nxlinks')
+    ax[3].set_ylim(1, 1E4)
+    ax[3].set_xlim(1, 1E4)
 
 def TwoRecep(Kx, ax = None):
     """
