@@ -53,7 +53,7 @@ def makeFigure():
 
 def plotRanges():
     avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
-    ligand = np.logspace(start = -12, stop = -5, num = 40)
+    ligand = np.logspace(start = -12, stop = -5, num = 50)
     Ka = [1.2E6, 1.2E5] # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
     logR = [4.0, 4.5]
 
