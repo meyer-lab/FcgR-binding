@@ -46,6 +46,9 @@ def makeFigure():
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
 
+    # Tweak layout
+    plt.tight_layout()
+
     return f
 
 def plotRanges():
@@ -129,5 +132,7 @@ def TwoRecep(Kx, ax = None):
         outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], loglog = True, legend = False)
         outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "ratio", ax = ax[1], logx = True, legend = False)
 
-    ax[0].set_xlabel(r'Multimerized Fc$\gamma$R 1')
-    ax[0].set_ylabel(r'Multimerized Fc$\gamma$R 2')
+    ax[0].set_xlabel(r'Multimerized Fc$\gamma$RI')
+    ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
+    ax[0].set_xlim(1E-9, 10)
+    ax[0].set_ylim(1E-9, 10)
