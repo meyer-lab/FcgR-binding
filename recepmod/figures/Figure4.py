@@ -54,8 +54,10 @@ def makeFigure():
 def plotRanges():
     avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
     ligand = np.logspace(start = -12, stop = -5, num = 40)
+    Ka = [1.2E6, 1.2E5] # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
+    logR = [4.0, 4.5]
 
-    return (ligand, avidity)
+    return (ligand, avidity, Ka, logR)
 
 def skipColor(ax):
     ax.set_prop_cycle(cycler('color', sns.color_palette()[1:]))
@@ -68,16 +70,14 @@ def PredictionVersusAvidity(ax, Kx):
     D) Binding v # xlinks for two different affinities, with varied avidities.
     '''
     # Receptor expression
-    Rexp = 4.0
-    ligand, avidity = plotRanges()
-    Ka = 1.2E6 # FcgRIIIA-Phe - IgG1
+    ligand, avidity, Ka, logR = plotRanges()
 
     skipColor(ax[1])
     skipColor(ax[2])
     skipColor(ax[3])
 
     def calculate(x):
-        a = StoneMod(Rexp,Ka,x['avidity'],Kx*Ka,x['ligand'], fullOutput = True)
+        a = StoneMod(logR[0],Ka[0],x['avidity'],Kx*Ka[0],x['ligand'], fullOutput = True)
 
         return pd.Series(dict(bound = a[0],
                               avidity = x['avidity'],
@@ -111,33 +111,24 @@ def TwoRecep(Kx, ax = None):
     E) Predicted multimerized receptor versus avidity for RIII-Phe + RIIB
     F) The predicted ratio (E)
     """
-    # Active, inhibitory
-    Ka = [1.2E6, 1.2E5]
-    logR = [4.0, 4.5]
-    ligand, avidity = plotRanges()
+    ligand, avidity, Ka, logR = plotRanges()
 
     skipColor(ax[0])
     skipColor(ax[1])
 
     acl = StoneTwo(logR, Ka, Kx)
 
-    def calculate(x):
-        return acl.getAllProps(int(x['avidity']), x['ligand'])
-
     inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
-    outputs = inputs.apply(calculate, axis = 1)
+    outputs = inputs.apply(lambda x: acl.getAllProps(int(x['avidity']), x['ligand']), axis = 1)
 
-    for ii in avidity:
-        if ii == 1:
-            continue
-
+    for ii in avidity[1::]:
         outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], loglog = True, legend = False)
         outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
 
     ax[0].set_xlabel(r'Multimerized Fc$\gamma$RI')
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
-    ax[0].set_xlim(1E-9, 10)
-    ax[0].set_ylim(1E-9, 10)
+    ax[0].set_xlim(1E-3, 1E4)
+    ax[0].set_ylim(1E-3, 1E4)
     ax[1].set_xlabel('IC Concentration (M)')
     ax[1].set_ylabel('Ratio')
