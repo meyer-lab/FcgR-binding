@@ -128,7 +128,7 @@ def TwoRecep(Kx, ax = None):
 
     ax[0].set_xlabel(r'Multimerized Fc$\gamma$RI')
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
-    ax[0].set_xlim(1E-3, 1E4)
-    ax[0].set_ylim(1E-3, 1E4)
+    ax[0].set_xlim(1, 1E4)
+    ax[0].set_ylim(1, 1E4)
     ax[1].set_xlabel('IC Concentration (M)')
     ax[1].set_ylabel('Ratio')
