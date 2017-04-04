@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-from scipy.optimize import brentq
-from .StoneModel import nchoosek
 
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
     """
@@ -10,6 +8,7 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     Ka should be a tuple of size 2 with each affinity
     Req should be a tuple of size 2
     """
+    from .StoneModel import nchoosek
 
     # Initialize the grid of possibilities
     vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float)
@@ -69,6 +68,7 @@ def StoneRmultiAll(vGrid):
 
 def reqSolver(logR,Ka,gnu,Kx,L0):
     """ Solve for Req """
+    from scipy.optimize import brentq
 
     R = np.power(10.0, logR)
 

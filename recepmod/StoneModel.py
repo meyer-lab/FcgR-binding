@@ -1,8 +1,5 @@
-import os
 import numpy as np
 from memoize import memoize
-from scipy.misc import comb
-from scipy.optimize import brentq
 
 np.seterr(over = 'raise')
 
@@ -14,10 +11,12 @@ def logpdf_sum(x, loc, scale):
     summand = -np.square((x - loc)/(root2 * scale))
     return  prefactor + np.nansum(summand)
 
-# A fast cached version of nchoosek
-@memoize
+#@memoize
 def nchoosek(n, k):
-    return comb(n, k, exact=True)
+    """ A fast cached version of nchoosek """
+    from scipy.misc import comb
+
+    return comb(n, k)
 
 def normalizeData(filepath):
     """
@@ -50,6 +49,7 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     by performing the bisction algorithm on Eq 2 from Stone. The bisection
     algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
     """
+    from scipy.optimize import brentq
 
     ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
     ## is necessarily lower than log10(R).
@@ -208,6 +208,8 @@ class StoneModel:
         return self.NormalErrorCoefcalc(x, fullOutput)
 
     def __init__(self, newData = True):
+        import os
+
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
         path = os.path.dirname(os.path.abspath(__file__))
         self.TNPs = ['TNP-4', 'TNP-26']
