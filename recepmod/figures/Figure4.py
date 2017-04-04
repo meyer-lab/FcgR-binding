@@ -24,9 +24,6 @@ def makeFigure():
     # Only keep good samples
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 4)),:]
 
-    # Only keep Kx parameters
-    dsetFilter = dsetFilter[['Kx1']].sample(n = 1000)
-
     # Setup plotting space
     f = plt.figure(figsize=(7,5))
 
