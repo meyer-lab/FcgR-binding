@@ -3,6 +3,12 @@ pipeline {
   environment {
     PATH = "/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/texlive/2016/bin/x86_64-darwin/"
   }
+  stage('Profile') {
+    steps {
+      sh 'make profile'
+      archiveArtifacts artifacts: 'profile.png', onlyIfSuccessful: true
+    }
+  }
   stages {
     stage('Build') {
       steps {
@@ -24,12 +30,6 @@ pipeline {
           unstableTotalAll           : '1000',
           usePreviousBuildAsReference: true
           ])
-      }
-    }
-    stage('Profile') {
-      steps {
-        sh 'make profile'
-        archiveArtifacts artifacts: 'profile.png', onlyIfSuccessful: true
       }
     }
     stage('Deploy') {
