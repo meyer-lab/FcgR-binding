@@ -1,12 +1,12 @@
 import numpy as np
-from scipy.optimize import brentq
-from .StoneModel import nchoosek
 
 # This function takes in the relevant parameters and creates the v_ij grid
 # Kx should be the Kx of Ka[0]
 # Ka should be a tuple of size 2 with each affinity
 # Req should be a tuple of size 2
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
+    from .StoneModel import nchoosek
+
     # Initialize the grid of possibilities
     vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float)
 
@@ -64,6 +64,8 @@ def StoneRmultiAll(vGrid):
 
 # Solve for Req
 def reqSolver(logR,Ka,gnu,Kx,L0):
+    from scipy.optimize import brentq
+
     R = np.power(10.0, logR)
 
     # This is the error function to find the root of
@@ -112,6 +114,28 @@ class StoneTwo:
         vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
 
         return StoneRmultiAll(vgridOut)
+
+    def getAllProps(self, gnu, L0):
+        import pandas as pd
+
+        Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
+
+        vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
+
+        Rbnd = StoneRbnd(vgridOut)
+        RmultiAll = StoneRmultiAll(vgridOut)
+
+        return pd.Series(dict(logRone = self.logR[0],
+                              logRtwo = self.logR[1],
+                              RmultiOne = RmultiAll[0],
+                              RmultiTwo = RmultiAll[1],
+                              RbndOne = Rbnd[0],
+                              RbndTwo = Rbnd[1],
+                              ligand = L0,
+                              avidity = gnu,
+                              KaOne = self.Ka[0],
+                              KaTwo = self.Ka[1],
+                              Kx = self.Kx))
 
     def __init__(self, logR, Ka, Kx):
         self.logR = np.array(logR, dtype=np.float64, copy=True)

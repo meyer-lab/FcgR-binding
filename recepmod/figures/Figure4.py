@@ -1,7 +1,4 @@
-import os
-import string
 from itertools import product
-from matplotlib import gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -10,12 +7,16 @@ from cycler import cycler
 from ..StoneModel import StoneMod
 from ..StoneHelper import read_chain
 from .FigureCommon import subplotLabel
-from ..StoneTwoRecep import StoneTwo, StoneVgrid
+from ..StoneTwoRecep import StoneTwo
 
 # Figure 3: Specific predictions regarding the coordinate effects of immune
 # complex parameters.
 
 def makeFigure():
+    import string
+    import os
+    from matplotlib import gridspec
+
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
     # Retrieve model and fit from hdf5 file
@@ -23,6 +24,7 @@ def makeFigure():
 
     # Only keep good samples
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 4)),:]
+    Kx = np.power(10, np.median(dsetFilter['Kx1']))
 
     # Setup plotting space
     f = plt.figure(figsize=(7,5))
@@ -34,27 +36,28 @@ def makeFigure():
     ax = [ f.add_subplot(gs1[x]) for x in range(6) ]
 
     # Plot subplot A
-    PredictionVersusAvidity(ax[0:4])
+    PredictionVersusAvidity(ax[0:4], Kx)
 
     # Plot from two receptor model
-    TwoRecep(dset, ax = ax[4:6])
+    TwoRecep(Kx, ax = ax[4:6])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
 
     return f
 
-# A) Predicted binding v conc of IC for varying avidity. B) Predicted
-# multimerized FcgR v conc of IC for varying avidity. C) # of xlinks v conc of IC for varying avidity.
-# D) The amount of binding versus number of crosslinks for two
-# different affinities, with varied avidities.
-def PredictionVersusAvidity(ax):
+#
+def PredictionVersusAvidity(ax, Kx):
+    '''
+    A) Predicted binding v conc of IC for varying avidity.
+    B) Predicted multimerized FcgR v conc of IC for varying avidity.
+    C) # of xlinks v conc of IC for varying avidity.
+    D) Binding v # xlinks for two different affinities, with varied avidities.
+    '''
     # Receptor expression
-    Rexp = 3.0
+    Rexp = 4.0
     avidity = [1, 2, 4, 8, 16, 32]
-    Ka = 1.0E5
-    # TODO: Have Kx set from data for the given Ka
-    Kx = np.power(10, -6.7)
+    Ka = 1.2E6 # FcgRIIIA-Phe - IgG1
     ligand = np.logspace(start = -9, stop = -5, num = 40)
 
     current_palette = sns.color_palette()
@@ -63,7 +66,7 @@ def PredictionVersusAvidity(ax):
     ax[3].set_prop_cycle(cycler('color', current_palette[1:]))
 
     def calculate(x):
-        a = StoneMod(Rexp,Ka,x['avidity'],Kx,x['ligand'], fullOutput = True)
+        a = StoneMod(Rexp,Ka,x['avidity'],Kx*Ka,x['ligand'], fullOutput = True)
 
         return pd.Series(dict(bound = a[0], avidity = x['avidity'], ligand = x['ligand'], Rmulti = a[2], nXlink = a[3]))
 
@@ -79,15 +82,14 @@ def PredictionVersusAvidity(ax):
             outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "nXlink", ax = ax[2], logx = True)
             outputs[outputs['avidity'] == ii].plot(x = "bound", y = "nXlink", ax = ax[3], loglog = True)
 
-
-# E) The predicted amount of multimerized receptor versus avidity for a cell
-# expressing RIII and RIIB simultaneously. F) The predicted ratio (E)
-# TODO: Examine distribution of receptor bound numbers over avidity
-def TwoRecep(_, ax = None):
+def TwoRecep(Kx, ax = None):
+    """
+    E) Predicted multimerized receptor versus avidity for RI + RIIB
+    F) The predicted ratio (E)
+    """
     # Active, inhibitory
-    Rexp = [3.0, 4.0]
-    Ka = [2.0E6, 1.2E5]
-    Kx = np.power(10, -6.7)
+    Ka = [6.5E7, 1.2E5]
+    logR = [2.0, 4.5]
     avidity = [2, 4, 8, 16, 32]
     ligand = np.logspace(start = -12, stop = -5, num = 20)
 
@@ -95,95 +97,15 @@ def TwoRecep(_, ax = None):
     ax[0].set_prop_cycle(cycler('color', current_palette[1:]))
     ax[1].set_prop_cycle(cycler('color', current_palette[1:]))
 
+    acl = StoneTwo(logR, Ka, Kx)
+
     def calculate(x):
-        acl = StoneTwo(Rexp, Ka, Kx)
-
-        oo = acl.getRmultiAll(int(x['avidity']), x['ligand'])
-
-        return pd.Series(dict(ratio = oo[0]*oo[0]/(oo[0] + oo[1]),
-                              RmultiOne = oo[0],
-                              RmultiTwo = oo[1],
-                              ligand = x['ligand'],
-                              avidity = x['avidity']))
+        return acl.getAllProps(int(x['avidity']), x['ligand'])
 
     inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
-    outputs = inputs.apply(calculate, axis = 1)
+    outputs = inputs.apply(calculate, axis = 1).assign(ratio = lambda x: x.RmultiTwo / x.RmultiOne)
 
     for ii in avidity:
         outputs[outputs['avidity'] == ii].plot(x = "RmultiTwo", y = "RmultiOne", ax = ax[0], loglog = True)
         outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "ratio", ax = ax[1], logx = True)
-
-    #ax[1].set_ylim(0, 1000)
-
-
-def Kdplot(dset, ax = None):
-    # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
-
-    Ka = 1.0E6
-
-    def calculate(x):
-        a = x['Kx1'] * Ka / (Ka + x['Kdxa'])
-
-        return pd.Series(dict(Kx = a, Kx1 = x['Kx1'], Kdxa = x['Kdxa']))
-
-    dset = dset.apply(calculate, axis = 1)
-
-    dset.hist(column = "Kx", ax = ax, bins = 50)
-
-
-def runTwoRecepPredict(ax):
-    # Active, inhibitory
-    Req = [1.0E4, 5.0E4]
-    Kx = np.power(10, -6.7)
-
-    # Ka
-    Ka = [2.0E6, 1.2E5]
-    L0 = 1E-4
-
-
-    output = np.zeros((30,1), dtype = np.float64)
-
-    def process(gnu):
-        multGrid = np.zeros((gnu+1, gnu+1), dtype = np.float64)
-
-        for ii in range(gnu+1):
-            for jj in range(gnu+1):
-                if ii > jj:
-                    multGrid[ii,jj] = ii-jj-1
-
-        gridd = StoneVgrid(Req,Ka,gnu,Kx,L0)
-
-        gridd = gridd / np.sum(np.sum(gridd))
-
-        gridd = np.multiply(gridd, multGrid)
-
-        return np.sum(np.sum(gridd))
-
-    for ii in range(2, 30):
-        output[ii] = process(ii)
-
-
-
-    ax.plot(output)
-
-# logR = [4.0, 4.5]
-# Ka = [1.0E6, 1.0E4]
-# Kx = 1.0E-5
-#
-# SS = StoneTwo(logR, Ka, Kx)
-#
-# gnus = np.arange(1, 30)
-# outOne = np.zeros(gnus.shape, dtype = np.float64)
-# outTwo = np.zeros(gnus.shape, dtype = np.float64)
-#
-# for ii in range(gnus.shape[0]):
-#     output = SS.getRmultiAll(gnus[ii], 1.0E-6)
-#
-#     outOne[ii] = output[0]
-#     outTwo[ii] = output[1]
-#
-# plt.plot(gnus, outOne, 'r', gnus, outTwo, 'b')
-# plt.plot(gnus, outOne-outTwo)
