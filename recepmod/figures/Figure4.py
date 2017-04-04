@@ -46,7 +46,6 @@ def makeFigure():
 
     return f
 
-#
 def PredictionVersusAvidity(ax, Kx):
     '''
     A) Predicted binding v conc of IC for varying avidity.
@@ -56,7 +55,7 @@ def PredictionVersusAvidity(ax, Kx):
     '''
     # Receptor expression
     Rexp = 4.0
-    avidity = [1, 2, 8, 32, 128]
+    avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
     Ka = 1.2E6 # FcgRIIIA-Phe - IgG1
     ligand = np.logspace(start = -12, stop = -5, num = 40)
 
@@ -103,7 +102,7 @@ def TwoRecep(Kx, ax = None):
     # Active, inhibitory
     Ka = [6.5E7, 1.2E5]
     logR = [2.0, 4.5]
-    avidity = [1, 2, 8, 32, 128]
+    avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
     ligand = np.logspace(start = -12, stop = -5, num = 20)
 
     current_palette = sns.color_palette()
