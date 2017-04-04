@@ -103,7 +103,7 @@ def TwoRecep(Kx, ax = None):
     """
     # Active, inhibitory
     Ka = [6.5E7, 1.2E5]
-    logR = [1.0, 4.5]
+    logR = [2.0, 4.5]
     avidity = [1, 2, 8, 32, 128]
     ligand = np.logspace(start = -12, stop = -5, num = 40)
 
@@ -118,7 +118,7 @@ def TwoRecep(Kx, ax = None):
 
     inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
-    outputs = inputs.apply(calculate, axis = 1).assign(ratio = lambda x: x.RmultiOne / x.RmultiTwo)
+    outputs = inputs.apply(calculate, axis = 1).assign(ratio = lambda x: x.RmultiOne - x.RmultiTwo)
 
     for ii in avidity:
         outputs[outputs['avidity'] == ii].plot(x = "RmultiTwo", y = "RmultiOne", ax = ax[0], loglog = True, legend = False)
