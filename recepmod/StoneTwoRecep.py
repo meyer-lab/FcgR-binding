@@ -1,11 +1,15 @@
 import numpy as np
+import pandas as pd
+from scipy.optimize import brentq
+from .StoneModel import nchoosek
 
-# This function takes in the relevant parameters and creates the v_ij grid
-# Kx should be the Kx of Ka[0]
-# Ka should be a tuple of size 2 with each affinity
-# Req should be a tuple of size 2
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
-    from .StoneModel import nchoosek
+    """
+    This function takes in the relevant parameters and creates the v_ij grid
+    Kx should be the Kx of Ka[0]
+    Ka should be a tuple of size 2 with each affinity
+    Req should be a tuple of size 2
+    """
 
     # Initialize the grid of possibilities
     vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float)
@@ -25,8 +29,9 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
 
     return vGrid
 
-# This calculates the Rbnd quantity from a v_ij grid
 def StoneRbnd(vGrid):
+    """ This calculates the Rbnd quantity from a v_ij grid """
+
     # We can calculate gnu from the size of the v_ij grid
     gnu = vGrid.shape[0] - 1
 
@@ -62,9 +67,8 @@ def StoneRmultiAll(vGrid):
 
     return np.array((np.sum(vGridSone), np.sum(vGridStwo)))
 
-# Solve for Req
 def reqSolver(logR,Ka,gnu,Kx,L0):
-    from scipy.optimize import brentq
+    """ Solve for Req """
 
     R = np.power(10.0, logR)
 
@@ -116,8 +120,6 @@ class StoneTwo:
         return StoneRmultiAll(vgridOut)
 
     def getAllProps(self, gnu, L0):
-        import pandas as pd
-
         Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
 
         vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)

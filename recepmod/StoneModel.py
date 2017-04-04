@@ -1,6 +1,8 @@
 import os
 import numpy as np
 from memoize import memoize
+from scipy.misc import comb
+from scipy.optimize import brentq
 
 np.seterr(over = 'raise')
 
@@ -15,20 +17,12 @@ def logpdf_sum(x, loc, scale):
 # A fast cached version of nchoosek
 @memoize
 def nchoosek(n, k):
-    from scipy.misc import comb
-
     return comb(n, k, exact=True)
 
-# Normalize the input data taking into account batch effects
 def normalizeData(filepath):
-    ## To begin, read in the MFI measurements from both of Lux's experiments from
-    ## their respective csvs. Then, subtract background MFIs from these nominal
-    ## MFIs. Then, normalize the data by replicate. For each step after the
-    ##reading, I manipulated the csv data in different ways, which are explained
-    ## in the comments. Please refer to these comments to understand what is
-    ## going on, especially with variables of the name "temp$." All
-    ## variables with such names are only meant to construct mfiAdjMean1 (from
-    ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
+    """
+    Import Lux et al data and normalize by experiment.
+    """
 
     ## Read in the csv data for the first experiments.
     Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
@@ -56,7 +50,6 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     by performing the bisction algorithm on Eq 2 from Stone. The bisection
     algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
     """
-    from scipy.optimize import brentq
 
     ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
     ## is necessarily lower than log10(R).
