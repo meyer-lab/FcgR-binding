@@ -1,13 +1,9 @@
-import os
 import pandas as pd
 import numpy as np
 from sklearn import linear_model
 from sklearn.decomposition import PCA
-from sklearn import tree
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pydotplus
-from .StoneModel import StoneMod
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -21,6 +17,8 @@ def funcAppend(indexList, nameApp):
 class StoneModelMouse:
     # Takes in a list of shape (9) for x: Rexp for FcgRs and TRIM21 logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):
+        import os
+
         path = os.path.dirname(os.path.abspath(__file__))
 
         self.Igs = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
@@ -41,6 +39,8 @@ class StoneModelMouse:
         other receptors with crosslinking constant Kx = 10^logKx. All
         equations derived from Stone et al. (2001).
         '''
+
+        from .StoneModel import StoneMod
 
         # Assign Ig type to a number corresponding to the row of Ka
         x1 = x[:]
