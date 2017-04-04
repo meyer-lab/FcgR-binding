@@ -127,12 +127,10 @@ def TwoRecep(Kx, ax = None):
     outputs = inputs.apply(lambda x: acl.getAllProps(int(x['avidity']), x['ligand']), axis = 1)
 
     for ii in avidity[1::]:
-        outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], loglog = True, legend = False)
+        outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], legend = False)
         outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
 
-    ax[0].set_xlabel(r'Multimerized Fc$\gamma$RI')
+    ax[0].set_xlabel(r'Multimerized Fc$\gamma$RIII-F')
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
-    ax[0].set_xlim(1, 1E4)
-    ax[0].set_ylim(1, 1E4)
     ax[1].set_xlabel('IC Concentration (M)')
-    ax[1].set_ylabel('Ratio')
+    ax[1].set_ylabel('Activity Index')
