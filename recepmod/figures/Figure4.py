@@ -56,9 +56,9 @@ def PredictionVersusAvidity(ax, Kx):
     '''
     # Receptor expression
     Rexp = 4.0
-    avidity = [1, 2, 4, 8, 16, 32]
+    avidity = [1, 2, 8, 32, 128]
     Ka = 1.2E6 # FcgRIIIA-Phe - IgG1
-    ligand = np.logspace(start = -12, stop = -5, num = 40)
+    ligand = np.logspace(start = -12, stop = -5, num = 60)
 
     current_palette = sns.color_palette()
     ax[1].set_prop_cycle(cycler('color', current_palette[1:]))
@@ -104,8 +104,8 @@ def TwoRecep(Kx, ax = None):
     # Active, inhibitory
     Ka = [6.5E7, 1.2E5]
     logR = [1.0, 4.5]
-    avidity = [2, 4, 8, 16, 32]
-    ligand = np.logspace(start = -12, stop = -5, num = 20)
+    avidity = [1, 2, 8, 32, 128]
+    ligand = np.logspace(start = -12, stop = -5, num = 40)
 
     current_palette = sns.color_palette()
     ax[0].set_prop_cycle(cycler('color', current_palette[1:]))
@@ -121,5 +121,5 @@ def TwoRecep(Kx, ax = None):
     outputs = inputs.apply(calculate, axis = 1).assign(ratio = lambda x: x.RmultiOne / x.RmultiTwo)
 
     for ii in avidity:
-        outputs[outputs['avidity'] == ii].plot(x = "RmultiTwo", y = "RmultiOne", ax = ax[0], loglog = True)
-        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "ratio", ax = ax[1], logx = True)
+        outputs[outputs['avidity'] == ii].plot(x = "RmultiTwo", y = "RmultiOne", ax = ax[0], loglog = True, legend = False)
+        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "ratio", ax = ax[1], logx = True, legend = False)
