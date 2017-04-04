@@ -58,7 +58,7 @@ def PredictionVersusAvidity(ax, Kx):
     Rexp = 4.0
     avidity = [1, 2, 4, 8, 16, 32]
     Ka = 1.2E6 # FcgRIIIA-Phe - IgG1
-    ligand = np.logspace(start = -9, stop = -5, num = 40)
+    ligand = np.logspace(start = -12, stop = -5, num = 40)
 
     current_palette = sns.color_palette()
     ax[1].set_prop_cycle(cycler('color', current_palette[1:]))
@@ -68,19 +68,33 @@ def PredictionVersusAvidity(ax, Kx):
     def calculate(x):
         a = StoneMod(Rexp,Ka,x['avidity'],Kx*Ka,x['ligand'], fullOutput = True)
 
-        return pd.Series(dict(bound = a[0], avidity = x['avidity'], ligand = x['ligand'], Rmulti = a[2], nXlink = a[3]))
+        return pd.Series(dict(bound = a[0],
+                              avidity = x['avidity'],
+                              ligand = x['ligand'],
+                              Rmulti = a[2],
+                              nXlink = a[3]))
 
     inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
     outputs = inputs.apply(calculate, axis = 1)
 
     for ii in avidity:
-        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "bound", ax = ax[0], logx = True)
+        curDat = outputs[outputs['avidity'] == ii]
+
+        curDat.plot(x = "ligand", y = "bound", ax = ax[0], logx = True, legend = False)
 
         if ii > 1:
-            outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "Rmulti", ax = ax[1], logx = True)
-            outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "nXlink", ax = ax[2], logx = True)
-            outputs[outputs['avidity'] == ii].plot(x = "bound", y = "nXlink", ax = ax[3], loglog = True)
+            curDat.plot(x = "ligand", y = "Rmulti", ax = ax[1], logx = True, legend = False)
+            curDat.plot(x = "ligand", y = "nXlink", ax = ax[2], logx = True, legend = False)
+            curDat.plot(x = "bound", y = "nXlink", ax = ax[3], loglog = True, legend = False)
+
+    ax[0].set_xlabel('IC Concentration (M)')
+    ax[1].set_xlabel('IC Concentration (M)')
+    ax[2].set_xlabel('IC Concentration (M)')
+    ax[0].set_xlabel('Bound FcgR')
+    ax[1].set_xlabel('Multimerized FcgR')
+    ax[2].set_xlabel('FcgR Nxlinks')
+
 
 def TwoRecep(Kx, ax = None):
     """
@@ -89,7 +103,7 @@ def TwoRecep(Kx, ax = None):
     """
     # Active, inhibitory
     Ka = [6.5E7, 1.2E5]
-    logR = [2.0, 4.5]
+    logR = [1.0, 4.5]
     avidity = [2, 4, 8, 16, 32]
     ligand = np.logspace(start = -12, stop = -5, num = 20)
 
