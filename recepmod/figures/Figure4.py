@@ -91,9 +91,9 @@ def PredictionVersusAvidity(ax, Kx):
     ax[0].set_xlabel('IC Concentration (M)')
     ax[1].set_xlabel('IC Concentration (M)')
     ax[2].set_xlabel('IC Concentration (M)')
-    ax[0].set_xlabel('Bound FcgR')
-    ax[1].set_xlabel('Multimerized FcgR')
-    ax[2].set_xlabel('FcgR Nxlinks')
+    ax[0].set_xlabel(r'Bound Fc$\gamma$R')
+    ax[1].set_xlabel(r'Multimerized Fc$\gamma$R')
+    ax[2].set_xlabel(r'Fc$\gamma$R Nxlinks')
 
 
 def TwoRecep(Kx, ax = None):
@@ -118,7 +118,7 @@ def TwoRecep(Kx, ax = None):
 
     inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
-    outputs = inputs.apply(calculate, axis = 1).assign(ratio = lambda x: x.RmultiTwo / x.RmultiOne)
+    outputs = inputs.apply(calculate, axis = 1).assign(ratio = lambda x: x.RmultiOne / x.RmultiTwo)
 
     for ii in avidity:
         outputs[outputs['avidity'] == ii].plot(x = "RmultiTwo", y = "RmultiOne", ax = ax[0], loglog = True)
