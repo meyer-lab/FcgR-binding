@@ -1,4 +1,4 @@
-from recepmod.figures import Figure1, Figure2, Figure3, Figure4
+from recepmod.figures import Figure1, Figure2, Figure3, Figure4, Figure5
 
 def runFunc(figClass, nameOut):
     ff = figClass.makeFigure()
@@ -11,3 +11,5 @@ runFunc(Figure2, 'Figure2')
 runFunc(Figure3, 'Figure3')
 
 runFunc(Figure4, 'Figure4')
+
+runFunc(Figure5, 'Figure5')
