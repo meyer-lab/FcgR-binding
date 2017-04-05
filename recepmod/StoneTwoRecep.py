@@ -149,6 +149,7 @@ class StoneTwo:
                               RbndTwo = Rbnd[1],
                               ligand = L0,
                               avidity = gnu,
+                              ligandEff = L0*gnu,
                               activity = activityBias(vgridOut),
                               KaOne = self.Ka[0],
                               KaTwo = self.Ka[1],
