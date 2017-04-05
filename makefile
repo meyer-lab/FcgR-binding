@@ -34,7 +34,7 @@ test:
 
 profile:
 	python3 -m cProfile -o profile.pstats genFigures.py
-	python3 -m gprof2dot -e 0.2 -n 1.0 -f pstats profile.pstats | dot -Tpng -o profile.png
+	python3 -m gprof2dot -n 2.0 -f pstats profile.pstats | dot -Tpng -o profile.png
 
 upload:
 	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
