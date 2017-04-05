@@ -82,6 +82,7 @@ def PredictionVersusAvidity(ax, Kx):
         return pd.Series(dict(bound = a[0],
                               avidity = x['avidity'],
                               ligand = x['ligand'],
+                              ligandEff = x['ligand'] * x['avidity'],
                               Rmulti = a[2],
                               nXlink = a[3]))
 
