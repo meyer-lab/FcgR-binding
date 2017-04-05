@@ -25,11 +25,11 @@ class TestStoneMethods(unittest.TestCase):
         print("%s: %.3f" % (self.id(), t*1000))
 
     def test_nchoosek(self):
-        self.assertTrue(nchoosek(5,3) == 10)
-        self.assertTrue(nchoosek(6,3) == 20)
-        self.assertTrue(nchoosek(7,3) == 35)
-        self.assertTrue(nchoosek(8,3) == 56)
-        self.assertTrue(nchoosek(9,3) == 84)
+        self.assertTrue(nchoosek(5)[3] == 10)
+        self.assertTrue(nchoosek(6)[3] == 20)
+        self.assertTrue(nchoosek(7)[3] == 35)
+        self.assertTrue(nchoosek(8)[3] == 56)
+        self.assertTrue(nchoosek(9)[3] == 84)
 
     def test_reqFuncSolver(self):
         kai, kx, vi, R, Li = get_random_vars()

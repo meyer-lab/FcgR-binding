@@ -13,16 +13,16 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     # Initialize the grid of possibilities
     vGrid = np.zeros([gnu+1, gnu+1], dtype=np.float)
 
+    # Terms that only depend on jj
+    jPen = L0 * Ka[0] * np.power(Ka[1]/Ka[0]*Req[1]*Kx, np.arange(gnu+1)) * nchoosek(gnu) / Kx
+
     # ii, jj is the number of receptor one, two bound
     for jj in range(gnu+1):
-        # Terms that only depend on jj
-        jPen = L0 * Ka[0] * (Ka[1]/Ka[0]*Req[1]*Kx)**jj * nchoosek(gnu, jj) / Kx
+        # Setup slice
+        iterable = jPen[jj] * nchoosek(gnu-jj) * np.power(Req[0]*Kx, np.arange(gnu+1-jj))
 
-        # Setup iterator for inner loop
-        iterable = (jPen*nchoosek(gnu-jj,ii)*(Req[0]*Kx)**ii for ii in range(gnu+1-jj))
-
-        # Assign output of inner loop
-        vGrid[0:(gnu+1-jj), jj] = np.transpose(np.fromiter(iterable, np.float))
+        # Assign output
+        vGrid[0:(gnu+1-jj), jj] = np.transpose(iterable)
 
     vGrid[0, 0] = 0
 
@@ -149,6 +149,7 @@ class StoneTwo:
                               RbndTwo = Rbnd[1],
                               ligand = L0,
                               avidity = gnu,
+                              ligandEff = L0*gnu,
                               activity = activityBias(vgridOut),
                               KaOne = self.Ka[0],
                               KaTwo = self.Ka[1],

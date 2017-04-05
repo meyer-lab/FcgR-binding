@@ -12,11 +12,11 @@ def logpdf_sum(x, loc, scale):
     return  prefactor + np.nansum(summand)
 
 @memoize
-def nchoosek(n, k):
-    """ A fast cached version of nchoosek """
+def nchoosek(n):
+    """ A fast cached version of nchoosek. """
     from scipy.misc import comb
 
-    return comb(n, k, exact=True)
+    return comb(n, np.arange(n+1))
 
 def normalizeData(filepath):
     """ Import Lux et al data and normalize by experiment. """
@@ -83,8 +83,7 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
         return (np.nan, np.nan, np.nan, np.nan)
 
     # Calculate vieq from equation 1
-    vieqIter = (L0*Ka*nchoosek(v,j+1)*((Kx*Req)**j)*Req for j in range(v))
-    vieq = np.fromiter(vieqIter, np.float, count = v)
+    vieq = L0*Ka*Req*(nchoosek(v)[1::]) * np.power(Kx*Req, np.arange(v))
 
     ## Calculate L, according to equation 7
     Lbound = np.sum(vieq)
