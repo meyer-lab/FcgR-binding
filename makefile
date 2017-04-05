@@ -14,6 +14,7 @@ $(fdir)/Figure1%pdf $(fdir)/Figure2%pdf $(fdir)/Figure3%pdf $(fdir)/Figure1%svg 
 
 Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
+	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
 
 Manuscript/index.html: Manuscript/Text/*.md $(fdir)/Figure1.svg $(fdir)/Figure2.svg $(fdir)/Figure3.svg
 	pandoc -s $(pan_common) -t html5 --mathjax -c ./Templates/kultiad.css --template=$(tdir)/html.template -o ./Manuscript/index.html
@@ -34,7 +35,7 @@ test:
 
 profile:
 	python3 -m cProfile -o profile.pstats genFigures.py
-	python3 -m gprof2dot -f pstats profile.pstats | dot -Tpng -o profile.png
+	python3 -m gprof2dot -n 2.0 -f pstats profile.pstats | dot -Tpng -o profile.png
 
 upload:
 	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
