@@ -30,6 +30,6 @@ In contrast to NK cells, other innate immune cell types express activating and i
 
 ## An IgG-FcγR binding model deconvolves *in vivo* function
 
-![**An IgG-FcγR binding model deconvolves *in vivo* function.** A) Schematic of earlier IgG class experiments and regression approach. B) XXX. C) XXX. D) Predicted versus observed effect on lung metastasis formation upon cross-validation. E) XX.](./Figures/Foo.png){#fig:InVivoResults}
+![**An IgG-FcγR binding model deconvolves *in vivo* function.** A) Schematic of earlier IgG class experiments and regression approach. B) XXX. C) XXX. D) Predicted versus observed effect on lung metastasis formation upon cross-validation. E) XX.](./Figures/Figure5.pdf){#fig:InVivoResults}
 
 We wished to finally explore whether a multivalent binding model can enable reverse engineering of effector function *in vivo*. We surmised that our modeling approach would allow one to convert interventions using defined IgG subclasses into predictions regarding the relevant IgG-FcγR driving response.
