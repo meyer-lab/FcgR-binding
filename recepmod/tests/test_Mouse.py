@@ -64,16 +64,6 @@ class TestStoneMouse(unittest.TestCase):
 
         self.assertTrue(tbN.shape == (8,31))
 
-    def test_NimmerjahnMultiLinear(self):
-        # Prints coefficients of multi-linear regression model
-
-        self.Mod.NimmerjahnMultiLinear(self.z)
-        res = self.Mod.NimmerjahnLasso(self.z)
-        self.Mod.NimmerjahnLassoCrossVal(self.z)
-
-        # Make sure we were given a Pandas dataframe
-        self.assertIsInstance(res, np.ndarray)
-
     def test_FcgRPlots(self):
         # Plots effectiveness vs. each FcgR binding parameter
 
@@ -84,9 +74,8 @@ class TestStoneMouse(unittest.TestCase):
         # tbNK.to_csv('out.csv')
         self.Mod.NimmerjahnKnockdownLasso(self.z)
         self.Mod.KnockdownLassoCrossVal(self.z)
-        #self.Mod.KnockdownLassoCrossVal(self.z, logspace = True)
+        self.Mod.KnockdownLassoCrossVal(self.z, logspace = True)
         self.Mod.KnockdownLassoCrossVal2(self.z)
-        self.Mod.KnockdownLassoCrossVal3(self.z)
         self.Mod.KnockdownPCA(self.z)
         self.assertTrue(tbNK.shape == (18, 25))
 
