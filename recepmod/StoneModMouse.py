@@ -150,74 +150,6 @@ class StoneModelMouse:
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
         return tbN
 
-    def NimmerjahnMultiLinear(self, z):
-        # Multi-Linear regression of FcgR binding predictions for effectiveness of IgG therapy
-        reg = linear_model.LinearRegression()
-        tbN = self.NimmerjahnEffectTable(z)
-        # Assign independent variables and dependent variable "effect"
-        # Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
-        independent = np.array(tbN.iloc[list(range(2,6)), list(range(1,21,5))].apply(np.log10))
-        independent = independent.reshape(4,4)
-        effect = np.array(tbN.iloc[list(range(2,6)),30])
-        effect = effect.reshape(4,1)
-        # Linear regression and plot result
-        result = reg.fit(independent, effect)
-#        plt.scatter(effect, reg.predict(independent), color='black')
-#        plt.plot(effect, reg.predict(independent), color='blue', linewidth=3)
-        #plt.show()
-        return result
-
-    def NimmerjahnLasso(self, z):
-        # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
-        las = linear_model.Lasso(alpha = 0.005, normalize = True)
-        tbN = self.NimmerjahnEffectTable(z)
-        tbNparam = tbN.iloc[:, list(range(30))]
-        tbN_norm = (tbNparam - tbNparam.mean()) / (tbNparam.max() - tbNparam.min())
-        # Assign independent variables and dependent variable "effect"
-        # Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
-        independent = np.array(tbN_norm.iloc[list(range(6)), list(range(20))])
-        independent = independent.reshape(6,20)
-        effect = np.array(tbN.iloc[list(range(6)),30])
-        effect = effect.reshape(6,1)
-        # Linear regression and plot result
-        res = las.fit(independent, effect)
-        coe = res.coef_
-        coe = coe.reshape(4,5)
-#        print(las.score(independent, effect))
-#        print(coe)
-        plt.scatter(effect, las.predict(independent), color='red')
-        plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
-        plt.show()
-        return independent
-
-    def NimmerjahnLassoCrossVal(self, z, printt = False):
-        # Cross-validation fails for all 3 IgG subclasses: IgG1, IgG2a, and IgG2b
-        las = linear_model.Lasso(alpha = 0.005, normalize = True)
-        tbN = self.NimmerjahnEffectTable(z)
-        independent = self.NimmerjahnLasso(z)
-        effect = np.array(tbN.iloc[list(range(6)),30])
-        effect = effect.reshape(6,1)
-        for i in range(3):
-            l = list(range(6))
-            l.pop(2*i+1)
-            l.pop(2*i)
-            x_train = independent[l,:]
-            y_train = effect[l]
-            x_test = independent[[2*i,2*i+1],:]
-            y_test = effect[[2*i,2*i+1]]
-            res = las.fit(x_train, y_train)
-
-            if printt is True:
-                print(las.score(x_test, y_test))
-
-            coe = res.coef_
-            coe = coe.reshape(4,5)
-
-            if printt is True:
-                print(coe)
-
-        return res
-
     def FcgRPlots(self, z):
         # Plot effectiveness vs. all FcgR binding parameters
         tbN = self.NimmerjahnEffectTable(z)
@@ -240,6 +172,7 @@ class StoneModelMouse:
         plotTb = np.transpose(np.array([index, bndParam, eff]))
         table = pd.DataFrame(plotTb, columns = ['index', 'bndParam', 'eff'])
         sns.lmplot(x="bndParam", y="eff", col = 'index', hue = 'index', col_wrap=2, ci=None, palette="muted", data=table, size = 3)
+        plt.show()
 
     def NimmerjahnTb_Knockdown(self, z):
         tbK = self.NimmerjahnEffectTable(z)
@@ -310,21 +243,22 @@ class StoneModelMouse:
 
     def NimmerjahnKnockdownLasso(self, z):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+        las = linear_model.Lasso(alpha = 0.008, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbNparam = tbN.iloc[:, list(range(24))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
         # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbN_norm.iloc[:, list(range(16))])
-        independent = independent.reshape(18,16)
-        effect = np.array(tbN.iloc[:,24])
-        effect = effect.reshape(18,1)
+        independent = np.array(tbN_norm.iloc[list(range(1,18,2)), list(range(16))])
+        independent = independent.reshape(9,16)
+        effect = np.array(tbN.iloc[list(range(1,18,2)),24])
+        effect = effect.reshape(9,1)
         # Linear regression and plot result
         res = las.fit(independent, effect)
         coe = res.coef_
-        coe = coe.reshape(4,4)
-#        print(las.score(independent, effect))
-#        print(coe)
+        #coe = coe.reshape(4,4)
+        coe = np.array(coe)
+        coetb = pd.DataFrame(coe.reshape(1,16), index = ["coefficient"], columns = tbN.columns[0:16])
+#        print(coetb)
         plt.scatter(effect, las.predict(independent), color='red')
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
         plt.xlabel("Effectiveness")
@@ -352,6 +286,8 @@ class StoneModelMouse:
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
 
         # Iterate over each set of 2 rows being the test set
+        eff = []
+        predict = []
         for r in range(9):
             ls = list(range(18))
             ls.pop(2*r+1)
@@ -361,23 +297,19 @@ class StoneModelMouse:
             x_test = np.array(tbN_norm.iloc[[2*r,2*r+1], list(range(16))])
             y_test = np.array(tbN.iloc[[2*r,2*r+1],24])
             res = las.fit(x_train, y_train)
+            eff.append(y_test)
+            predict.append(las.predict(x_test))
 
             if printt is True:
                 print(las.score(x_train,y_train))
                 print(las.score(x_test, y_test))
                 print(y_test,las.predict(x_test))
-#            y1 = y_test[1]
-#            y1 = np.array(y1)
-#            print(1-abs(las.predict(x_test[1,:])-y1)/y1)
-#            plt.scatter(y_train, las.predict(x_train), color='red')
-#            plt.scatter(y_test, las.predict(x_test), color='green')
-#            plt.plot(y_train, las.predict(x_train), color='blue', linewidth=3)
-#            plt.xlabel("Effectiveness")
-#            plt.ylabel("Prediction")
-#            plt.show()
-#            coe = res.coef_
-#            coe = coe.reshape(4,4)
-#            print(coe)
+        plt.scatter(eff, predict, color='green')
+        plt.plot((0,1),(0,1), ls="--", c=".3")
+        plt.title("Cross-Validation 1")
+        plt.xlabel("Effectiveness")
+        plt.ylabel("Prediction")
+        plt.show()
         return res
 
     def KnockdownLassoCrossVal2(self, z):
@@ -417,56 +349,6 @@ class StoneModelMouse:
         plt.scatter(eff, predict, color='green')
         plt.plot((0,1),(0,1), ls="--", c=".3")
         plt.title("Cross-Validation 2")
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
-        return res
-
-    def KnockdownLassoCrossVal3(self, z):
-        # Cross validate KnockdownLasso(v=10) by using a row as test set
-        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-,
-        # Kind of predictive for IgG2b, IgG2a-I,IV-/- (predicted = 2*actual) ()
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbN1 = tbN.copy()
-        for i in range (18):
-            for j in range(24):
-                if np.isnan(tbN1.iloc[i,j]) is False:
-                    if tbN1.iloc[i,j] >=1:
-                        tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
-                    elif tbN1.iloc[i,j] < 1:
-                        tbN1.ix[i,j] = 0
-        tbNparam = tbN1.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        eff = []
-        predict = []
-        for r in range(9):
-#            print(r)
-            l = [2*x+1 for x in range(9)]
-            l.pop(r)
-            x_train = np.array(tbN_norm.iloc[l,list(range(16))])
-            y_train = np.array(tbN.iloc[l,24])
-            x_test = np.array(tbN_norm.iloc[[2*r+1], list(range(16))])
-            y_test = np.array(tbN.iloc[[2*r+1],24])
-            res = las.fit(x_train, y_train)
-            eff.append(y_test)
-            predict.append(las.predict(x_test))
-#            print(las.score(x_train,y_train))
-#            print(y_test,las.predict(x_test))
-#            if y_test != 0:
-#                print(1-abs(las.predict(x_test)-y_test)/y_test)
-#            plt.scatter(y_train, las.predict(x_train), color='red')
-#            plt.scatter(y_test, las.predict(x_test), color='green')
-#            plt.plot((0,1),(0,1), ls="--", c=".3")
-#            plt.xlabel("Effectiveness")
-#            plt.ylabel("Prediction")
-#            plt.show()
-#            coe = res.coef_
-#            coe = coe.reshape(4,4)
-#            print(coe)
-        plt.scatter(eff, predict, color='green')
-        plt.plot((0,1),(0,1), ls="--", c=".3")
-        plt.title("Cross-Validation 3")
         plt.xlabel("Effectiveness")
         plt.ylabel("Prediction")
         plt.show()
