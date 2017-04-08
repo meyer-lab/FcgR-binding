@@ -1,8 +1,7 @@
 FcgR,    IgG1, IgG2a, IgG2b, IgG3
-FcgRI,   0,    1E8,   1E5,   +
+FcgRI,   0,    1E8,   1E5, 2E7
 FcgRIIB, 3E6,  4E5,   2E6,   0
 FcgRIII, 3E5,  7E5,   6E5,   0
 FcgRIV,    0,  3E7,   2E7,   0
-FcRn,    8E6,    +,     +,   +
-TRIM21,  2E6,    +,     +,   +
 # Sourced from Guilliams, Nat Rev Immunology, 2014
+# IgG3 affinity from Gavin et al, J Immunology, 1998

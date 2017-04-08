@@ -5,6 +5,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
 from itertools import product
+import re
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -23,7 +24,7 @@ class StoneModelMouse:
         path = os.path.dirname(os.path.abspath(__file__))
 
         self.Igs = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
-        self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV', 'FcgRn', 'TRIM21']
+        self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV']
         # Read in csv file of murine binding affinities
         self.kaMouse = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), delimiter=',', skip_header=1, usecols=list(range(1,5)))
         # Indices for elements in x
@@ -57,16 +58,14 @@ class StoneModelMouse:
         L0 = x1[self.L0IDX]
 
         # Initiate numpy arrays for StoneMod outputs
-        output = np.full((5, 6), np.nan)
+        output = np.full((5, len(self.FcgRs)), np.nan)
 
         # Iterate over each FcgR
-        for k in range(6):
+        for k in range(len(self.FcgRs)):
             logR = x1[k]
             ## Set the affinity for the binding of the FcgR and IgG in question
-            Ka = self.kaMouse[k][l]
-            if Ka == '+' or np.isnan(Ka):
-                continue
-            Ka = float(Ka)
+            Ka = float(self.kaMouse[k][l])
+
             ## Calculate the MFI which should result from this condition according to the model
             stoneModOut = StoneMod(logR,Ka,v,Kx*Ka,L0, fullOutput = True)
             output[:, k] = np.asarray(stoneModOut, dtype = np.float)
@@ -91,7 +90,7 @@ class StoneModelMouse:
             stoneModMurine.append(np.transpose(self.StoneModMouse(x)))
 
         # Reshape data for pandas table
-        output = np.reshape(np.array(stoneModMurine), (4, 30))
+        output = np.reshape(np.array(stoneModMurine), (4, -1))
 
         # Make pandas table of binding predictions of Ig-FcgR pairs
         return pd.DataFrame(np.array(output), index = self.Igs, columns = labels)
@@ -140,6 +139,7 @@ class StoneModelMouse:
         return tbN
 
     def FcgRPlots(self, z):
+        # TODO: Fix
         # Plot effectiveness vs. all FcgR binding parameters
         tbN = self.NimmerjahnEffectTable(z)
         tbNparam = tbN.iloc[:, list(range(30))]
@@ -163,87 +163,51 @@ class StoneModelMouse:
         plt.show()
 
     def NimmerjahnTb_Knockdown(self, z):
-        import re
-
         tbK = self.NimmerjahnEffectTable(z)
         # remove Req columns
         tbK = tbK.select(lambda x: not re.search('Req', x), axis=1)
-        # Remove IgG3
-        tbK = tbK.iloc[0:6,:]
 
         # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
-        tbK1 = tbK.iloc[:, list(range(24))]
+        tbK1 = tbK.copy()
         tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
-        FcgRIIBcol = tbK.columns[4:8]
-        l1 = list(range(24))
-        for i in range(4):
-            l1.pop(7-i)
-        tbK1 = tbK1.iloc[:, l1]
-        for j in range(4):
-            tbK1.insert((4+j), FcgRIIBcol[j], 0)
-        tbK1.loc[:,'Effectiveness'] = pd.Series([0,.70,0,1,0,0.75], index=tbK1.index)
+        tbK1.loc[:,'Effectiveness'] = pd.Series([0, 0.7, 0, 1, 0, 0.75, 0, 0],
+                                                index=tbK1.index)
+        tbK1.iloc[:, 4:8] = 0.0
 
         # set up tbK2 for FcgRI knockdown, IgG2a treatment
-        tbK2 = tbK.iloc[(2,3), list(range(24))]
+        tbK2 = tbK.iloc[(2, 3), :].copy()
         tbK2.index = funcAppend(tbK2.index, '-FcgRI-/-')
-        FcgRIcol = tbK.columns[0:4]
-        l2 = list(range(24))
-        for i in range(4):
-            l2.pop(0)
-        tbK2 = tbK2.iloc[:, l2]
-        for j in range(4):
-            tbK2.insert(j, FcgRIcol[j], 0)
-        tbK2.loc[:,'Effectiveness'] = pd.Series([0,0.80], index=tbK2.index)
+        tbK2.loc[:,'Effectiveness'] = pd.Series([0, 0.8], index=tbK2.index)
+        tbK2.iloc[:, 0:4] = 0.0
 
         # set up tbK3 for FcgRIII knockdown, IgG2a treatment
-        tbK3 = tbK.iloc[(2,3), list(range(24))]
+        tbK3 = tbK.iloc[(2, 3), :].copy()
         tbK3.index = funcAppend(tbK3.index, '-FcgRIII-/-')
-        FcgRIIIcol = tbK.columns[8:12]
-        l3 = list(range(24))
-        for i in range(4):
-            l3.pop(11-i)
-        tbK3 = tbK3.iloc[:, l3]
-        for j in range(4):
-            tbK3.insert(8+j, FcgRIIIcol[j], 0)
-        tbK3.loc[:,'Effectiveness'] = pd.Series([0,0.93], index=tbK3.index)
+        tbK3.loc[:,'Effectiveness'] = pd.Series([0, 0.93], index=tbK3.index)
+        tbK3.iloc[:, 8:12] = 0.0
 
         # set up tbK4 table for FcgRI knockdown, FcgRIV blocking, IgG2a treatment
-        tbK4 = tbK.iloc[(2,3), list(range(24))]
+        tbK4 = tbK.iloc[(2, 3), :].copy()
         tbK4.index = funcAppend(tbK4.index, '-FcgRI,IV-/-')
-        FcgRIcol2 = tbK.columns[0:4]
-        FcgRIVcol = tbK.columns[12:16]
-        l4 = list(range(24))
-        for i in range(4):
-            l4.pop(15-i)
-        for i in range(4):
-            l4.pop(3-i)
-        tbK4 = tbK4.iloc[:, l4]
-        for j in range(4):
-            tbK4.insert(j, FcgRIcol2[j], 0)
-        for j in range(4):
-            tbK4.insert(12+j, FcgRIVcol[j], 0)
-        tbK4.loc[:,'Effectiveness'] = pd.Series([0,0.35], index=tbK4.index)
+        tbK4.loc[:,'Effectiveness'] = pd.Series([0, 0.35], index=tbK4.index)
+        tbK4.iloc[:, 0:4] = 0.0
+        tbK4.iloc[:, 12:16] = 0.0
 
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
-        tbNK = tbK.append([tbK1, tbK2, tbK3, tbK4])
-
-        return tbNK
+        return tbK.append([tbK1, tbK2, tbK3, tbK4])
 
     def NimmerjahnKnockdownLasso(self, z):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(16))]
+        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
         # Assign independent variables and dependent variable "effect"
         independent = np.array(tbN_norm)
-        independent = independent.reshape(18,16)
         effect = np.array(tbN['Effectiveness'])
-        effect = effect.reshape(18,1)
         # Linear regression and plot result
         res = las.fit(independent, effect)
         coe = res.coef_
-        #coe = coe.reshape(4,4)
         coe = np.array(coe)
         coetb = pd.DataFrame(coe.reshape(1,16), index = ["coefficient"], columns = tbN.columns[0:16])
         coetb.plot(kind='bar', title = 'Lasso Coefficients')
@@ -263,7 +227,7 @@ class StoneModelMouse:
         # In logspace, works for IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, and IgG2a-I,IV-/-
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(16))]
+        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
         if logspace is True:
             tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -3)
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
@@ -309,13 +273,11 @@ class StoneModelMouse:
         # predictions in Knockdown table
         pca = PCA(n_components=5)
         tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
+        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
         # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbN_norm.iloc[:, list(range(16))])
-        independent = independent.reshape(18,16)
-        effect = np.array(tbN.iloc[:,24])
-        effect = effect.reshape(18,1)
+        independent = np.array(tbN_norm)
+        effect = np.array(tbN['Effectiveness'])
 
         # Plot explained variance ratio
         result = pca.fit(independent, effect)
