@@ -73,9 +73,13 @@ class StoneModelMouse:
         return output
 
     def pdOutputTable(self, z):
-        # Takes in a list of shape (8) for z in the format of [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
-        # Outputs a pandas table of binding prediction
+        """
+        Takes in a list of shape (8) for z in the format of [logR, logR, logR,
+        logR, logR, logR, kx, v, Li] Organizes the binding prediction between
+        the 24 Ig-FcgR pairs calculated by StoneModMouse(x). Outputs a pandas
+        table of binding prediction
+        """
+
         stoneModMurine = []
         labels = []
 
@@ -93,11 +97,14 @@ class StoneModelMouse:
         output = np.reshape(np.array(stoneModMurine), (4, -1))
 
         # Make pandas table of binding predictions of Ig-FcgR pairs
-        return pd.DataFrame(np.array(output), index = self.Igs, columns = labels)
+        return pd.DataFrame(np.array(output), index=self.Igs, columns=labels)
 
     def pdAvidityTable(self, y, vl, vu):
-        # Takes in a list of shape (8) for y <x without avidity v>, lower bond for avidity vl, and upper bond for avidity vu
-        # Organizes a pandas table of binding predictions for a given Ig as avidity varies
+        """
+        Takes in a list of shape (8) for y <x without avidity v>, lower bond
+        for avidity vl, and upper bond for avidity vu. Organizes a pandas table
+        of binding predictions for a given Ig as avidity varies
+        """
         tb1 = pd.DataFrame()
         Ig = y[self.IgIDX]
         idx = []
@@ -159,7 +166,15 @@ class StoneModelMouse:
         # Plot effectiveness vs. each binding parameter
         plotTb = np.transpose(np.array([index, bndParam, eff]))
         table = pd.DataFrame(plotTb, columns = ['index', 'bndParam', 'eff'])
-        sns.lmplot(x="bndParam", y="eff", col = 'index', hue = 'index', col_wrap=2, ci=None, palette="muted", data=table, size = 3)
+        sns.lmplot(x="bndParam",
+                   y="eff",
+                   col = 'index',
+                   hue = 'index',
+                   col_wrap=2,
+                   ci=None,
+                   palette="muted",
+                   data=table,
+                   size = 3)
         plt.show()
 
     def NimmerjahnTb_Knockdown(self, z):
@@ -199,12 +214,10 @@ class StoneModelMouse:
     def NimmerjahnKnockdownLasso(self, z):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbN_norm)
-        effect = np.array(tbN['Effectiveness'])
+
+        # Collect data
+        independent, effect, tbN = self.modelPrep(z)
+
         # Linear regression and plot result
         res = las.fit(independent, effect)
         coe = res.coef_
@@ -212,7 +225,7 @@ class StoneModelMouse:
         coetb = pd.DataFrame(coe.reshape(1,16), index = ["coefficient"], columns = tbN.columns[0:16])
         coetb.plot(kind='bar', title = 'Lasso Coefficients')
         plt.show()
-#        print(coetb)
+
         plt.scatter(effect, las.predict(independent), color='red')
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
         plt.xlabel("Effectiveness")
@@ -220,24 +233,17 @@ class StoneModelMouse:
         plt.show()
         return res
 
-    def KnockdownLassoCrossVal(self, z, logspace = False, printt = False, addavidity1 = False):
-        # Cross validate KnockdownLasso by using a pair of rows as test set
-        # Predicts for IgG1, IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, and IgG2a-I,IV-/-
-        # Fails to predict for IgG2b, IgG1-IIB-/-, IgG2a-III-/-
-        # In logspace, works for IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, and IgG2a-I,IV-/-
+    def KnockdownLassoCrossVal(self, z, logspace = False, addavidity1 = False):
+        """ Cross validate KnockdownLasso by using a pair of rows as test set """
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
-        if logspace is True:
-            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -3)
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+
+        # Collect data
+        independent, effect, tbN = self.modelPrep(z, logspace)
 
         # Iterate over each set of 2 rows being the test set
         eff = []
         predict = []
         for r in range(9):
-            independent = np.array(tbN_norm)
-            effect = np.array(tbN['Effectiveness'])
             if addavidity1 is False:
                 l = [2*x+1 for x in range(9)]
                 l.pop(r)
@@ -246,20 +252,13 @@ class StoneModelMouse:
                 l = list(range(18))
                 l.pop(2*r+1)
                 l.pop(2*r)
-                testl = [2*r,2*r+1]
-            x_train = np.array(independent[l,:])
-            y_train = np.array(effect[l])
-            x_test = np.array(independent[testl,:])
-            y_test = np.array(effect[testl])
-            res = las.fit(x_train, y_train)
-            eff.append(y_test)
-            predict.append(las.predict(x_test))
+                testl = [2*r, 2*r+1]
+            res = las.fit(independent[l,:], effect[l])
 
-            if printt is True:
-                print(las.score(x_train,y_train))
-                print(las.score(x_test, y_test))
-                print(y_test,las.predict(x_test))
-                print(res.coef_.reshape(4,4))
+            # Append results from this leave out step
+            eff.append(effect[testl])
+            predict.append(las.predict(independent[testl,:]))
+
         plt.scatter(eff, predict, color='green')
         plt.plot((0,1),(0,1), ls="--", c=".3")
         plt.title("Cross-Validation 1")
@@ -268,22 +267,37 @@ class StoneModelMouse:
         plt.show()
         return res
 
-    def KnockdownPCA(self,z):
-        # Principle Components Analysis of effectiveness vs. FcgR binding
-        # predictions in Knockdown table
-        pca = PCA(n_components=5)
+    def modelPrep(self, z, logspace = False):
+        """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+
+        # Log transform if needed
+        if logspace is True:
+            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -3)
+
         # Assign independent variables and dependent variable "effect"
         independent = np.array(tbN_norm)
         effect = np.array(tbN['Effectiveness'])
+
+        return (independent, effect, tbN)
+
+    def KnockdownPCA(self,z):
+        """
+        Principle Components Analysis of effectiveness vs. FcgR binding
+        predictions in Knockdown table
+        """
+        pca = PCA(n_components=5)
+
+        # Collect data
+        independent, effect, tbN = self.modelPrep(z)
 
         # Plot explained variance ratio
         result = pca.fit(independent, effect)
         ratio = pca.explained_variance_ratio_
         roundratio = [ '%.6f' % j for j in ratio ]
-#        print(ratio)
+
         plt.figure(1, figsize=(4, 3))
         plt.clf()
         plt.axes([.2, .2, .7, .7])
@@ -297,7 +311,7 @@ class StoneModelMouse:
         idx = []
         for i in range(5):
             idx.append("PC"+str(i+1)+'('+str(roundratio[i])+')')
-        column = tbN_norm.columns[0:16]
+        column = tbN.columns[0:16]
         PCscoretb = pd.DataFrame(scores, index=idx, columns=column)
         sns.heatmap(PCscoretb)
         plt.title("PCA heatmap")
