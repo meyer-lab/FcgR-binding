@@ -165,13 +165,13 @@ class StoneModelMouse:
         plt.show()
 
     def NimmerjahnTb_Knockdown(self, z):
+        import re
+
         tbK = self.NimmerjahnEffectTable(z)
         # remove Req columns
-        l = list(range(31))
-        for i in range(6):
-            col = 5*(5-i)+4
-            l.pop(col)
-        tbK = tbK.iloc[list(range(6)), l]
+        tbK = tbK.select(lambda x: not re.search('Req', x), axis=1)
+        # Remove IgG3
+        tbK = tbK.iloc[0:6,:]
 
         # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
         tbK1 = tbK.iloc[:, list(range(24))]
