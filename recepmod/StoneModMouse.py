@@ -56,11 +56,7 @@ class StoneModelMouse:
         L0 = x1[self.L0IDX]
 
         # Initiate numpy arrays for StoneMod outputs
-        outputLbnd = np.full((6), np.nan)
-        outputReq = np.full((6), np.nan)
-        outputRbnd = np.full((6), np.nan)
-        outputRmulti = np.full((6), np.nan)
-        outputnXlink = np.full((6), np.nan)
+        output = np.full((5, 6), np.nan)
 
         # Iterate over each FcgR
         for k in range(6):
@@ -72,25 +68,22 @@ class StoneModelMouse:
             Ka = float(Ka)
             ## Calculate the MFI which should result from this condition according to the model
             stoneModOut = StoneMod(logR,Ka,v,Kx*Ka,L0, fullOutput = True)
-            outputLbnd[k] = stoneModOut[0]
-            outputRbnd[k] = stoneModOut[1]
-            outputReq[k] = stoneModOut[4]
-            outputRmulti[k] = stoneModOut[2]
-            outputnXlink[k] = stoneModOut[3]
+            output[:, k] = np.asarray(stoneModOut, dtype = np.float)
 
-        return (outputLbnd, outputRbnd, outputRmulti, outputnXlink, outputReq)
+        return output
 
     def pdOutputTable(self, z):
         # Takes in a list of shape (8) for z in the format of [logR, logR, logR, logR, logR, logR, kx, v, Li]
         # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
         # Outputs a pandas table of binding prediction
+        from itertools import product
+
         stoneModMurine = []
         labels = []
 
         # Set labels for columns of pandas table
-        for i in self.FcgRs:
-            for j in ['-Lbnd', '-Rbnd', '-Rmulti', '-nXlink', '-Req']:
-                labels.append(i+j)
+        for p in product(self.FcgRs, ['-Lbnd', '-Rbnd', '-Rmulti', '-nXlink', '-Req']):
+            labels.append(p[0]+p[1])
 
         # Make a 3-d array of StoneModMouse output for each Ig
         for i in range(len(self.Igs)):
@@ -99,13 +92,10 @@ class StoneModelMouse:
             stoneModMurine.append(np.transpose(self.StoneModMouse(x)))
 
         # Reshape data for pandas table
-        output = np.array(stoneModMurine)
-
-        output = np.reshape(output,(4,30))
+        output = np.reshape(np.array(stoneModMurine), (4, 30))
 
         # Make pandas table of binding predictions of Ig-FcgR pairs
-        table = pd.DataFrame(np.array(output), index = self.Igs, columns = labels)
-        return table
+        return pd.DataFrame(np.array(output), index = self.Igs, columns = labels)
 
     def pdAvidityTable(self, y, vl, vu):
         # Takes in a list of shape (8) for y <x without avidity v>, lower bond for avidity vl, and upper bond for avidity vu
