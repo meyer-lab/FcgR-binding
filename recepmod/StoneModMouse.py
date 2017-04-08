@@ -4,6 +4,7 @@ from sklearn import linear_model
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
+from itertools import product
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -76,8 +77,6 @@ class StoneModelMouse:
         # Takes in a list of shape (8) for z in the format of [logR, logR, logR, logR, logR, logR, kx, v, Li]
         # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
         # Outputs a pandas table of binding prediction
-        from itertools import product
-
         stoneModMurine = []
         labels = []
 
@@ -147,17 +146,16 @@ class StoneModelMouse:
         tbN_norm = (tbNparam - tbNparam.mean()) / (tbNparam.max()- tbNparam.min())
         # Initiate variables
         bndParam = []
-        eff = []
+        eff = list(tbN.iloc[list(range(6)),30]) * 20
         index = []
         # Set up binding and effectiveness parameters column
         for j in range(20):
             bndParam += list(tbN_norm.iloc[list(range(6)),j])
-            eff += list(tbN.iloc[list(range(6)),30])
 
         # Set index for 20 plots
-        for k in range(4):
-            for l in range(5):
-                index.extend([int(str(k+1)+str(l+1))]*6)
+        for k in product(range(1,5), range(1,6)):
+            index.extend([int(str(k[0])+str(k[1]))]*6)
+
         # Plot effectiveness vs. each binding parameter
         plotTb = np.transpose(np.array([index, bndParam, eff]))
         table = pd.DataFrame(plotTb, columns = ['index', 'bndParam', 'eff'])
