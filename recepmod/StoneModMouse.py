@@ -266,7 +266,7 @@ class StoneModelMouse:
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbNparam = tbN.iloc[:, list(range(16))]
-        if logspace == True:
+        if logspace is True:
             tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -3)
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
 
@@ -276,11 +276,11 @@ class StoneModelMouse:
         for r in range(9):
             independent = np.array(tbN_norm)
             effect = np.array(tbN['Effectiveness'])
-            if addavidity1 == False:
+            if addavidity1 is False:
                 l = [2*x+1 for x in range(9)]
                 l.pop(r)
                 testl = [2*r+1]
-            elif addavidity1 == True:
+            else:
                 l = list(range(18))
                 l.pop(2*r+1)
                 l.pop(2*r)
