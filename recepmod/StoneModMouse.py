@@ -243,21 +243,23 @@ class StoneModelMouse:
 
     def NimmerjahnKnockdownLasso(self, z):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
-        las = linear_model.Lasso(alpha = 0.008, normalize = True)
+        las = linear_model.Lasso(alpha = 0.01, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
+        tbNparam = tbN.iloc[:, list(range(16))]
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
         # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbN_norm.iloc[list(range(1,18,2)), list(range(16))])
-        independent = independent.reshape(9,16)
-        effect = np.array(tbN.iloc[list(range(1,18,2)),24])
-        effect = effect.reshape(9,1)
+        independent = np.array(tbN_norm)
+        independent = independent.reshape(18,16)
+        effect = np.array(tbN['Effectiveness'])
+        effect = effect.reshape(18,1)
         # Linear regression and plot result
         res = las.fit(independent, effect)
         coe = res.coef_
         #coe = coe.reshape(4,4)
         coe = np.array(coe)
         coetb = pd.DataFrame(coe.reshape(1,16), index = ["coefficient"], columns = tbN.columns[0:16])
+        coetb.plot(kind='bar', title = 'Lasso Coefficients')
+        plt.show()
 #        print(coetb)
         plt.scatter(effect, las.predict(independent), color='red')
         plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
@@ -266,36 +268,37 @@ class StoneModelMouse:
         plt.show()
         return res
 
-    def KnockdownLassoCrossVal(self, z, logspace = False, printt = False):
+    def KnockdownLassoCrossVal(self, z, logspace = False, printt = False, addavidity1 = False):
         # Cross validate KnockdownLasso by using a pair of rows as test set
         # Predicts for IgG1, IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, and IgG2a-I,IV-/-
         # Fails to predict for IgG2b, IgG1-IIB-/-, IgG2a-III-/-
         # In logspace, works for IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, and IgG2a-I,IV-/-
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
         tbN = self.NimmerjahnTb_Knockdown(z)
-        tbN1 = tbN.copy()
-        if logspace is True:
-            for i in range (18):
-                for j in range(24):
-                    if np.isnan(tbN1.iloc[i,j]) is False:
-                        if tbN1.iloc[i,j] >= 1:
-                            tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
-                        elif tbN1.iloc[i,j] < 1:
-                            tbN1.ix[i,j] = 0
-        tbNparam = tbN1.iloc[:, list(range(24))]
+        tbNparam = tbN.iloc[:, list(range(16))]
+        if logspace == True:
+            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -3)
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
 
         # Iterate over each set of 2 rows being the test set
         eff = []
         predict = []
         for r in range(9):
-            ls = list(range(18))
-            ls.pop(2*r+1)
-            ls.pop(2*r)
-            x_train = np.array(tbN_norm.iloc[ls, list(range(16))])
-            y_train = np.array(tbN.iloc[ls,24])
-            x_test = np.array(tbN_norm.iloc[[2*r,2*r+1], list(range(16))])
-            y_test = np.array(tbN.iloc[[2*r,2*r+1],24])
+            independent = np.array(tbN_norm)
+            effect = np.array(tbN['Effectiveness'])
+            if addavidity1 == False:
+                l = [2*x+1 for x in range(9)]
+                l.pop(r)
+                testl = [2*r+1]
+            elif addavidity1 == True:
+                l = list(range(18))
+                l.pop(2*r+1)
+                l.pop(2*r)
+                testl = [2*r,2*r+1]
+            x_train = np.array(independent[l,:])
+            y_train = np.array(effect[l])
+            x_test = np.array(independent[testl,:])
+            y_test = np.array(effect[testl])
             res = las.fit(x_train, y_train)
             eff.append(y_test)
             predict.append(las.predict(x_test))
@@ -304,51 +307,10 @@ class StoneModelMouse:
                 print(las.score(x_train,y_train))
                 print(las.score(x_test, y_test))
                 print(y_test,las.predict(x_test))
+                print(res.coef_.reshape(4,4))
         plt.scatter(eff, predict, color='green')
         plt.plot((0,1),(0,1), ls="--", c=".3")
         plt.title("Cross-Validation 1")
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
-        return res
-
-    def KnockdownLassoCrossVal2(self, z):
-        # Cross validate KnockdownLasso(v=10) by using a row as test set
-        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-,
-        # Kind of predictive for IgG2b, IgG2a-I,IV-/- (predicted = 2*actual) ()
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        eff = []
-        predict = []
-        for r in range(9):
-#            print(r)
-            l = [2*x+1 for x in range(9)]
-            l.pop(r)
-            x_train = np.array(tbN_norm.iloc[l,list(range(16))])
-            y_train = np.array(tbN.iloc[l,24])
-            x_test = np.array(tbN_norm.iloc[[2*r+1], list(range(16))])
-            y_test = np.array(tbN.iloc[[2*r+1],24])
-            res = las.fit(x_train, y_train)
-            eff.append(y_test)
-            predict.append(las.predict(x_test))
-#            print(las.score(x_train,y_train))
-#            print(y_test,las.predict(x_test))
-#            if y_test != 0:
-#                print(1-abs(las.predict(x_test)-y_test)/y_test)
-#            plt.scatter(y_train, las.predict(x_train), color='red')
-#            plt.scatter(y_test, las.predict(x_test), color='green')
-#            plt.plot((0,1),(0,1), ls="--", c=".3")
-#            plt.xlabel("Effectiveness")
-#            plt.ylabel("Prediction")
-#            plt.show()
-#            coe = res.coef_
-#            coe = coe.reshape(4,4)
-#            print(coe)
-        plt.scatter(eff, predict, color='green')
-        plt.plot((0,1),(0,1), ls="--", c=".3")
-        plt.title("Cross-Validation 2")
         plt.xlabel("Effectiveness")
         plt.ylabel("Prediction")
         plt.show()
