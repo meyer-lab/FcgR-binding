@@ -1,6 +1,7 @@
 import unittest
 import random
 import time
+import pandas
 import numpy as np
 from ..StoneModMouse import StoneModelMouse
 
@@ -20,7 +21,7 @@ class TestStoneMouse(unittest.TestCase):
         print("%s: %.3f" % (self.id(), t*1000))
 
     def test_dataImport_kaMouse(self):
-        self.assertTrue(self.Mod.kaMouse.shape == (6,4))
+        self.assertTrue(self.Mod.kaMouse.shape == (4,4))
 
     def test_dataOutput_StoneModMouse(self):
         # Checks size of fullOutput
@@ -29,7 +30,8 @@ class TestStoneMouse(unittest.TestCase):
              'IgG1', self.kx, self.v, self.Li]
 
         out = np.array(self.Mod.StoneModMouse(x))
-        self.assertTrue(out.shape == (5,6))
+
+        self.assertTrue(out.shape == (5,4))
 
     def test_dataOutput_StoneModMouse2(self):
         # Checks that the model output satisfies R = Rbnd + Req
@@ -39,7 +41,7 @@ class TestStoneMouse(unittest.TestCase):
 
         a = self.Mod.StoneModMouse(x)
         b = np.array(a[1] + a[4])
-        for j in range(5):
+        for j in range(4):
             if not np.isnan(b[j]):
                 self.assertAlmostEqual(10**self.logR, b[j], delta = (10**self.logR)/10000)
 
@@ -47,27 +49,36 @@ class TestStoneMouse(unittest.TestCase):
         # Checks the shape of pandas table from pdOutputTable
 
         tbfull = self.Mod.pdOutputTable(self.z)
-        self.assertTrue(tbfull.shape == (4,30))
+
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(tbfull, pandas.core.frame.DataFrame)
+
+        self.assertTrue(tbfull.shape == (4,5*len(self.Mod.FcgRs)))
 
     def test_pdAvidityTable(self):
         # Check shape of pandas table from pdAvidityTable
-        logR = np.log10(30000*random.random())
+        y2 = [self.logR, self.logR, self.logR, self.logR, self.logR, self.logR,
+              'IgG2a', self.kx, self.Li]
 
-        if logR < 0:
-            raise ValueError('Negative input parameters')
-        y2 = [logR, logR, logR, logR, logR, logR, 'IgG2a', self.kx, self.Li]
         tba2 = self.Mod.pdAvidityTable(y2, self.v, self.v+2)
-        self.assertTrue(tba2.shape == (3,30))
+
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(tba2, pandas.core.frame.DataFrame)
+
+        self.assertTrue(tba2.shape == (3,5*len(self.Mod.FcgRs)))
 
     def test_NimmerjahnEffectTable(self):
         tbN = self.Mod.NimmerjahnEffectTable(self.z)
 
-        self.assertTrue(tbN.shape == (8,31))
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
 
-    def test_FcgRPlots(self):
+        self.assertTrue(tbN.shape == (8,5*len(self.Mod.FcgRs)+1))
+
+    #def test_FcgRPlots(self):
         # Plots effectiveness vs. each FcgR binding parameter
 
-        self.Mod.FcgRPlots(self.z)
+        # self.Mod.FcgRPlots(self.z)
 
     def test_NimmerjahnTb_Knockdown(self):
         tbNK = self.Mod.NimmerjahnTb_Knockdown(self.z)
@@ -78,7 +89,8 @@ class TestStoneMouse(unittest.TestCase):
         self.Mod.KnockdownLassoCrossVal(self.z, addavidity1 = True)
         self.Mod.KnockdownLassoCrossVal(self.z, logspace = True, addavidity1 = True)
         self.Mod.KnockdownPCA(self.z)
-        self.assertTrue(tbNK.shape == (18, 25))
+
+        self.assertTrue(tbNK.shape == (22, 17))
 
 if __name__ == '__main__':
     unittest.main()
