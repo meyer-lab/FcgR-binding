@@ -75,7 +75,8 @@ class TestStoneMouse(unittest.TestCase):
         self.Mod.NimmerjahnKnockdownLasso(self.z)
         self.Mod.KnockdownLassoCrossVal(self.z)
         self.Mod.KnockdownLassoCrossVal(self.z, logspace = True)
-        self.Mod.KnockdownLassoCrossVal2(self.z)
+        self.Mod.KnockdownLassoCrossVal(self.z, addavidity1 = True)
+        self.Mod.KnockdownLassoCrossVal(self.z, logspace = True, addavidity1 = True)
         self.Mod.KnockdownPCA(self.z)
         self.assertTrue(tbNK.shape == (18, 25))
 
