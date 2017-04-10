@@ -180,7 +180,7 @@ def geweke(chain1, chain2=None):
     len0 = chain1.shape[0]
     if not chain2:
         chain2 = chain1[int(np.ceil(len0/2)):len0]
-        chain1 = chain1[int(np.ceil(len0*0.1)):int(np.ceil(len0*0.2))]
+        chain1 = chain1[0:int(np.ceil(len0*0.1))]
     statistic, pvalue = ttest_ind(chain1,chain2)
     return statistic, pvalue
             
@@ -196,4 +196,16 @@ def geweke_chain(dset):
     return statistics, pvalues
 
 def geweke_chains(DSET):
-    return 0
+    nwalkers = int(np.max(DSET['walker']))+1
+    Statistics = []
+    Pvalues = []
+    DSETT = DSET.T
+    DSETT.columns = [item % nwalkers for item in DSETT.columns]
+    for j in range(nwalkers):
+        statistics, pvalues = geweke_chain(DSETT[j].T)
+        Statistics.append(statistics)
+        Pvalues.append(pvalues)
+    return Statistics, Pvalues
+
+def pseudoGeweke(chain1,chain2):
+    
