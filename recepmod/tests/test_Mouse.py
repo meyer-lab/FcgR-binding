@@ -96,6 +96,7 @@ class TestStoneMouse(unittest.TestCase):
         """ Test that table for prediction off of just affinities is correct. """
 
         tbN = self.Mod.NimmerjahnEffectTableAffinities()
+        # tbN.to_csv('out.csv')
 
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
