@@ -92,5 +92,15 @@ class TestStoneMouse(unittest.TestCase):
 
         self.assertTrue(tbNK.shape == (22, 17))
 
+    def test_NimmerjahnEffectTableAffinities(self):
+        """ Test that table for prediction off of just affinities is correct. """
+
+        tbN = self.Mod.NimmerjahnEffectTableAffinities()
+
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
+
+        self.assertTrue(tbN.shape == (11, 5))
+
 if __name__ == '__main__':
     unittest.main()
