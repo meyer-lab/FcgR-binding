@@ -16,5 +16,9 @@ class TestOrtizMethods(unittest.TestCase):
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(self.Ortiz.FcResponse, pandas.core.frame.DataFrame)
 
+    def test_predictResponse(self):
+        # Run prediction
+        self.Ortiz.predictResponse()
+
 if __name__ == '__main__':
     unittest.main()

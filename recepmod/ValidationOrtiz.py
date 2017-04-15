@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from .StoneTwoRecep import StoneTwo
 
 class Ortiz:
     def __init__(self):
@@ -19,3 +20,26 @@ class Ortiz:
 
         ## Read in the Fc responses
         self.FcResponse = pd.read_csv(os.path.join(path,'./data/ortiz/Fig2DE-response.csv'), comment='#')
+
+    def predictResponse(self):
+        ''' Predict the response measured. '''
+
+        KaOne = self.kaBruhns[0][0] # The affinity of the relevant interaction
+        KaTwo = self.kaBruhns[0][0] # The affinity of the relevant interaction
+        L0 = 1E-4 # This is known
+
+        logR = [2, 3]
+
+        Kx = 1E-9
+
+        #a = StoneTwo(logR, Ka, Kx)
+
+        #outt = list()
+
+        #for ii in range(len(self.structs)):
+        #    outt = outt.append(a.getAllProps(self.valency[ii], L0))
+
+        #print(outt)
+
+
+

@@ -243,7 +243,7 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         return tbK.append([tbK1, tbK2, tbK3, tbK4])
 
-    def NimmerjahnKnockdownLasso(self, z):
+    def NimmerjahnKnockdownLasso(self, z, plott=False):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
 
@@ -255,19 +255,23 @@ class StoneModelMouse:
         coe = res.coef_
         coe = np.array(coe)
         coetb = pd.DataFrame(coe.reshape(1,16), index = ["coefficient"], columns = tbN.columns[0:16])
-        coetb.plot(kind='bar', title = 'Lasso Coefficients')
-        plt.show()
 
-        plt.scatter(effect, las.predict(independent), color='red')
-        plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
+        if plott is True:
+            coetb.plot(kind='bar', title = 'Lasso Coefficients')
+            plt.show()
+
+        if plott is True:
+            plt.scatter(effect, las.predict(independent), color='red')
+            plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
+            plt.xlabel("Effectiveness")
+            plt.ylabel("Prediction")
+            plt.show()
+
         return res
 
-    def KnockdownLassoCrossVal(self, z, logspace = False, addavidity1 = False):
+    def KnockdownLassoCrossVal(self, z, logspace=False, addavidity1=False, plott=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+        las = linear_model.Lasso(alpha=0.01, normalize=True)
 
         # Collect data
         independent, effect, _ = self.modelPrep(z, logspace)
@@ -291,15 +295,17 @@ class StoneModelMouse:
             eff.append(effect[testl])
             predict.append(las.predict(independent[testl,:]))
 
-        plt.scatter(eff, predict, color='green')
-        plt.plot((0,1),(0,1), ls="--", c=".3")
-        plt.title("Cross-Validation 1")
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
+        if plott is True:
+            plt.scatter(eff, predict, color='green')
+            plt.plot((0, 1), (0, 1), ls="--", c=".3")
+            plt.title("Cross-Validation 1")
+            plt.xlabel("Effectiveness")
+            plt.ylabel("Prediction")
+            plt.show()
+
         return res
 
-    def modelPrep(self, z, logspace = False):
+    def modelPrep(self, z, logspace=False):
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
@@ -315,7 +321,7 @@ class StoneModelMouse:
 
         return (independent, effect, tbN)
 
-    def KnockdownPCA(self,z):
+    def KnockdownPCA(self, z, plott=False):
         """
         Principle Components Analysis of effectiveness vs. FcgR binding
         predictions in Knockdown table
@@ -330,14 +336,16 @@ class StoneModelMouse:
         ratio = pca.explained_variance_ratio_
         roundratio = [ '%.6f' % j for j in ratio ]
 
-        plt.figure(1, figsize=(4, 3))
-        plt.clf()
-        plt.axes([.2, .2, .7, .7])
-        plt.plot(pca.explained_variance_, linewidth=2)
-        plt.axis('tight')
-        plt.xlabel('n_components')
-        plt.ylabel('explained_variance_')
-        plt.show()
+        if plott is True:
+            plt.figure(1, figsize=(4, 3))
+            plt.clf()
+            plt.axes([.2, .2, .7, .7])
+            plt.plot(pca.explained_variance_, linewidth=2)
+            plt.axis('tight')
+            plt.xlabel('n_components')
+            plt.ylabel('explained_variance_')
+            plt.show()
+        
         # Heatmap with first 5 eigenvectors
         scores = pca.components_.reshape(5,16)
         idx = []
@@ -345,18 +353,20 @@ class StoneModelMouse:
             idx.append("PC"+str(i+1)+'('+str(roundratio[i])+')')
         column = tbN.columns[0:16]
         PCscoretb = pd.DataFrame(scores, index=idx, columns=column)
-        sns.heatmap(PCscoretb)
-        plt.title("PCA heatmap")
-        plt.show()
+
+        if plott is True:
+            sns.heatmap(PCscoretb)
+            plt.title("PCA heatmap")
+            plt.show()
 
         # Plot loading
         trans = PCA(n_components=2).fit_transform(independent, effect)
-#        print(trans.reshape(6,6))
-        plt.scatter(trans[:, 0], trans[:, 1], color='red')
-#        plt.plot(trans[:, 0], trans[:, 1], color='blue', linewidth=3)
-        plt.title("First 2 PCA directions")
-        plt.xlabel("PC1")
-        plt.ylabel("PC2")
-        plt.show()
-#        print(trans)
+        
+        if plott is True:
+            plt.scatter(trans[:, 0], trans[:, 1], color='red')
+            plt.title("First 2 PCA directions")
+            plt.xlabel("PC1")
+            plt.ylabel("PC2")
+            plt.show()
+
         return result

@@ -120,9 +120,9 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
 class StoneTwo:
     def getRbnd(self, gnu, L0):
-        Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
+        Req = reqSolver(self.logR, self.Ka, gnu, self.Kx, L0)
 
-        vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
+        vgridOut = StoneVgrid(np.power(10, Req), self.Ka, gnu, self.Kx, L0)
 
         return StoneRbnd(vgridOut)
 
