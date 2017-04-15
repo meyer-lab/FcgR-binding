@@ -66,6 +66,15 @@ class TestStoneMouse(unittest.TestCase):
         self.assertIsInstance(tba2, pandas.core.frame.DataFrame)
 
         self.assertTrue(tba2.shape == (3,5*len(self.Mod.FcgRs)))
+        
+    def test_MultiAvidityTable(self):
+        # Check shape of pandas table from MultiAvidityTable
+        tbM = self.Mod.MultiAvidityTable(self.z)
+
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(tbM, pandas.core.frame.DataFrame)
+
+        self.assertTrue(tbM.shape == (40,4*len(self.Mod.FcgRs)))
 
     def test_NimmerjahnEffectTable(self):
         tbN = self.Mod.NimmerjahnEffectTable(self.z)
