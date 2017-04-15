@@ -1,11 +1,11 @@
+import re
+from itertools import product
 import pandas as pd
 import numpy as np
 from sklearn import linear_model
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
-from itertools import product
-import re
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -145,6 +145,38 @@ class StoneModelMouse:
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
         return tbN
 
+    def NimmerjahnEffectTableAffinities(self):
+        # Setup initial table
+        tbK = pd.DataFrame(np.transpose(self.kaMouse),
+                           index = self.Igs,
+                           columns = self.FcgRs)
+        tbK.loc[:,'Effectiveness'] = pd.Series([0, 0.95, 0.20, 0], index=tbK.index)
+
+
+
+        # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
+        tbK1 = tbK.copy()
+        tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
+        tbK1.loc[:,'Effectiveness'] = pd.Series([0.7, 1, 0.75, 0],
+                                                index=tbK1.index)
+        tbK1.iloc[:, 4:8] = 0.0
+
+        # set up tbK2 for FcgRI, FcgRIII, FcgRI/IV knockdown, IgG2a treatment
+        tbK2 = tbK.iloc[(1, 1, 1), :].copy()
+        idx = list(tbK2.index)
+        idx[0] = idx[0] + '-FcgRI-/-'
+        idx[1] = idx[1] + '-FcgRIII-/-'
+        idx[2] = idx[2] + '-FcgRI,IV-/-'
+        tbK2.index = idx
+        tbK2.loc[:, 'Effectiveness'] = pd.Series([0.8, 0.93, 0.35], index=tbK2.index)
+        tbK2.iloc[0, 0] = 0.0
+        tbK2.iloc[1, 2] = 0.0
+        tbK2.iloc[2, 0] = 0.0
+        tbK2.iloc[2, 3] = 0.0
+
+        # Join tbK, tbK1, tbK2 into one table
+        return tbK.append([tbK1, tbK2])
+
     def FcgRPlots(self, z):
         # TODO: Fix
         # Plot effectiveness vs. all FcgR binding parameters
@@ -238,7 +270,7 @@ class StoneModelMouse:
         las = linear_model.Lasso(alpha = 0.01, normalize = True)
 
         # Collect data
-        independent, effect, tbN = self.modelPrep(z, logspace)
+        independent, effect, _ = self.modelPrep(z, logspace)
 
         # Iterate over each set of 2 rows being the test set
         eff = []
