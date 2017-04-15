@@ -19,13 +19,3 @@ try:
     import memoize
 except ImportError as ie:
     print(ie, '\nmemoize2 does not seem to be installed.')
-
-try:
-    import matplotlib
-except ImportError as ie:
-    print(ie, '\nmatplotlib does not seem to be installed.')
-
-try:
-    import seaborn
-except ImportError as ie:
-    print(ie, '\nseaborn does not seem to be installed.')
