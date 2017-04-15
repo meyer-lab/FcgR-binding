@@ -153,7 +153,7 @@ class StoneTwo:
                               activity = activityBias(vgridOut),
                               KaOne = self.Ka[0],
                               KaTwo = self.Ka[1],
-                              Kx = self.Kx))
+                              Kx = self.Kx), dtype = np.float64)
 
     def __init__(self, logR, Ka, Kx):
         self.logR = np.array(logR, dtype=np.float64, copy=True)
