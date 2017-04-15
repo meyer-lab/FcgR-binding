@@ -85,9 +85,9 @@ class TestStoneMouse(unittest.TestCase):
         # tbNK.to_csv('out.csv')
         self.Mod.NimmerjahnKnockdownLasso(self.z)
         self.Mod.KnockdownLassoCrossVal(self.z)
-        self.Mod.KnockdownLassoCrossVal(self.z, logspace = True)
-        self.Mod.KnockdownLassoCrossVal(self.z, addavidity1 = True)
-        self.Mod.KnockdownLassoCrossVal(self.z, logspace = True, addavidity1 = True)
+        self.Mod.KnockdownLassoCrossVal(self.z, logspace=True)
+        self.Mod.KnockdownLassoCrossVal(self.z, addavidity1=True, printt=True)
+        self.Mod.KnockdownLassoCrossVal(self.z, logspace=True, addavidity1=True)
         self.Mod.KnockdownPCA(self.z)
 
         self.assertTrue(tbNK.shape == (22, 17))
@@ -97,6 +97,8 @@ class TestStoneMouse(unittest.TestCase):
 
         tbN = self.Mod.NimmerjahnEffectTableAffinities()
         # tbN.to_csv('out.csv')
+
+        self.Mod.NimmerjahnPredictByAffinities()
 
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)

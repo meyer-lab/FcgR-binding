@@ -2,10 +2,13 @@ import re
 from itertools import product
 import pandas as pd
 import numpy as np
+import sklearn
 from sklearn import linear_model
+from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGroupOut
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
+from .StoneHelper import rep
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -177,6 +180,30 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2 into one table
         return tbK.append([tbK1, tbK2])
 
+    def NimmerjahnPredictByAffinities(self):
+        """ This will run ordinary linear regression using just affinities of receptors. """
+
+        lr = linear_model.LinearRegression()
+
+        data = self.NimmerjahnEffectTableAffinities()
+        X = data.iloc[:, 0:4]
+        y = data['Effectiveness']
+
+        # Run crossvalidation predictions at the same time
+        predicted = cross_val_predict(lr, X, y, cv=11)
+
+        # How well did we do on crossvalidation?
+        crossval_perf = sklearn.metrics.explained_variance_score(y, predicted)
+
+        # Do direct regression too
+        lr.fit(X, y)
+
+        # How well did we do on direct?
+        direct_perf = sklearn.metrics.explained_variance_score(y, lr.predict(X))
+
+        return (direct_perf, crossval_perf)
+
+
     def FcgRPlots(self, z):
         # TODO: Fix
         # Plot effectiveness vs. all FcgR binding parameters
@@ -245,7 +272,7 @@ class StoneModelMouse:
 
     def NimmerjahnKnockdownLasso(self, z, plott=False):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=10000)
 
         # Collect data
         independent, effect, tbN = self.modelPrep(z)
@@ -269,41 +296,45 @@ class StoneModelMouse:
 
         return res
 
-    def KnockdownLassoCrossVal(self, z, logspace=False, addavidity1=False, plott=False):
+    def KnockdownLassoCrossVal(self, z, logspace=False, addavidity1=False, plott=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.Lasso(alpha=0.01, normalize=True)
+        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=10000)
 
         # Collect data
-        independent, effect, _ = self.modelPrep(z, logspace)
+        X, y, _ = self.modelPrep(z, logspace)
 
-        # Iterate over each set of 2 rows being the test set
-        eff = []
-        predict = []
-        for r in range(9):
-            if addavidity1 is False:
-                l = [2*x+1 for x in range(9)]
-                l.pop(r)
-                testl = [2*r+1]
-            else:
-                l = list(range(18))
-                l.pop(2*r+1)
-                l.pop(2*r)
-                testl = [2*r, 2*r+1]
-            res = las.fit(independent[l,:], effect[l])
+        # Setup the crossvalidation iterators
+        if addavidity1 is False:
+            loo = LeaveOneOut()
+            looI = loo.split(X, y)
+        else:
+            loo = LeaveOneGroupOut()
+            looI = loo.split(X, y, groups = rep(range(11), 2))
 
-            # Append results from this leave out step
-            eff.append(effect[testl])
-            predict.append(las.predict(independent[testl,:]))
+        # Run crossvalidation
+        predict = cross_val_predict(las, X, y, cv = looI, n_jobs=-1)
+
+        # How well did we do on crossvalidation?
+        crossval_perf = sklearn.metrics.explained_variance_score(y, predict)
+
+        # Do direct regression too
+        las.fit(X, y)
+
+        # How well did we do on direct?
+        direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
 
         if plott is True:
-            plt.scatter(eff, predict, color='green')
+            plt.scatter(effect, predict, color='green')
             plt.plot((0, 1), (0, 1), ls="--", c=".3")
             plt.title("Cross-Validation 1")
             plt.xlabel("Effectiveness")
             plt.ylabel("Prediction")
             plt.show()
 
-        return res
+        if printt is True:
+            print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
+
+        return (crossval_perf, direct_perf)
 
     def modelPrep(self, z, logspace=False):
         """ Collect the data and split into X and Y blocks. """
