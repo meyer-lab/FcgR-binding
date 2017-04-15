@@ -48,17 +48,17 @@ class TestStoneTwoRecpMethods(unittest.TestCase):
         gnu = 4
 
         output = StoneVgrid(Req,Ka,gnu,Kx,L0)
-        self.assertGreater(output[3,0], output[0,3])
+        self.assertGreater(output[3, 0], output[0, 3])
 
         Req = np.flipud(Req)
-        output = StoneVgrid(Req,Ka,gnu,Kx,L0)
-        self.assertLess(output[3,0], output[0,3])
+        output = StoneVgrid(Req, Ka, gnu, Kx, L0)
+        self.assertLess(output[3, 0], output[0, 3])
 
         Req[0:2] = [1E3, 1E3]
         Ka[0:2] = [1E4, 1E3]
 
-        output = StoneVgrid(Req,Ka,gnu,Kx,L0)
-        self.assertGreater(output[3,0], output[0,3])
+        output = StoneVgrid(Req, Ka, gnu, Kx, L0)
+        self.assertGreater(output[3, 0], output[0, 3])
 
         Ka = np.flipud(Ka)
         output = StoneVgrid(Req,Ka,gnu,Kx,L0)
