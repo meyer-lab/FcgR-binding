@@ -120,9 +120,9 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
 class StoneTwo:
     def getRbnd(self, gnu, L0):
-        Req = reqSolver(self.logR,self.Ka,gnu,self.Kx,L0)
+        Req = reqSolver(self.logR, self.Ka, gnu, self.Kx, L0)
 
-        vgridOut = StoneVgrid(np.power(10,Req),self.Ka,gnu,self.Kx,L0)
+        vgridOut = StoneVgrid(np.power(10, Req), self.Ka, gnu, self.Kx, L0)
 
         return StoneRbnd(vgridOut)
 
@@ -153,7 +153,7 @@ class StoneTwo:
                               activity = activityBias(vgridOut),
                               KaOne = self.Ka[0],
                               KaTwo = self.Ka[1],
-                              Kx = self.Kx))
+                              Kx = self.Kx), dtype = np.float64)
 
     def __init__(self, logR, Ka, Kx):
         self.logR = np.array(logR, dtype=np.float64, copy=True)
