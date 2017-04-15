@@ -2,10 +2,13 @@ import re
 from itertools import product
 import pandas as pd
 import numpy as np
+import sklearn
 from sklearn import linear_model
+from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGroupOut
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
+from .StoneHelper import rep
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -204,6 +207,30 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2 into one table
         return tbK.append([tbK1, tbK2])
 
+    def NimmerjahnPredictByAffinities(self):
+        """ This will run ordinary linear regression using just affinities of receptors. """
+
+        lr = linear_model.LinearRegression()
+
+        data = self.NimmerjahnEffectTableAffinities()
+        X = data.iloc[:, 0:4]
+        y = data['Effectiveness']
+
+        # Run crossvalidation predictions at the same time
+        predicted = cross_val_predict(lr, X, y, cv=11)
+
+        # How well did we do on crossvalidation?
+        crossval_perf = sklearn.metrics.explained_variance_score(y, predicted)
+
+        # Do direct regression too
+        lr.fit(X, y)
+
+        # How well did we do on direct?
+        direct_perf = sklearn.metrics.explained_variance_score(y, lr.predict(X))
+
+        return (direct_perf, crossval_perf)
+
+
     def FcgRPlots(self, z):
         # TODO: Fix
         # Plot effectiveness vs. all FcgR binding parameters
@@ -270,9 +297,9 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         return tbK.append([tbK1, tbK2, tbK3, tbK4])
 
-    def NimmerjahnKnockdownLasso(self, z):
+    def NimmerjahnKnockdownLasso(self, z, plott=False):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=10000)
 
         # Collect data
         independent, effect, tbN = self.modelPrep(z)
@@ -282,52 +309,61 @@ class StoneModelMouse:
         coe = res.coef_
         coe = np.array(coe)
         coetb = pd.DataFrame(coe.reshape(1,16), index = ["coefficient"], columns = tbN.columns[0:16])
-        coetb.plot(kind='bar', title = 'Lasso Coefficients')
-        plt.show()
 
-        plt.scatter(effect, las.predict(independent), color='red')
-        plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
+        if plott is True:
+            coetb.plot(kind='bar', title = 'Lasso Coefficients')
+            plt.show()
+
+        if plott is True:
+            plt.scatter(effect, las.predict(independent), color='red')
+            plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
+            plt.xlabel("Effectiveness")
+            plt.ylabel("Prediction")
+            plt.show()
+
         return res
 
-    def KnockdownLassoCrossVal(self, z, logspace = False, addavidity1 = False):
+    def KnockdownLassoCrossVal(self, z, logspace=False, addavidity1=False, plott=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.Lasso(alpha = 0.01, normalize = True, max_iter= 10000)
+        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=10000)
 
         # Collect data
-        if logspace == False:
-            independent, effect, _ = self.modelPrep(z)
-        elif logspace == True:
-            independent, effect, _ = self.modelPrep(z, logspace = True)
-        # Iterate over each set of 2 rows being the test set
-        eff = []
-        predict = []
-        for r in range(11):
-            if addavidity1 is False:
-                l = [2*x+1 for x in range(11)]
-                l.pop(r)
-                testl = [2*r+1]
-            else:
-                l = list(range(22))
-                l.pop(2*r+1)
-                l.pop(2*r)
-                testl = [2*r, 2*r+1]
-            res = las.fit(independent[l,:], effect[l])
+        X, y, _ = self.modelPrep(z, logspace)
 
-            # Append results from this leave out step
-            eff.append(effect[testl])
-            predict.append(las.predict(independent[testl,:]))
-        plt.scatter(eff, predict, color='green')
-        plt.plot((0,1),(0,1), ls="--", c=".3")
-        plt.title("Cross-Validation 1")
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
-        return res
+        # Setup the crossvalidation iterators
+        if addavidity1 is False:
+            loo = LeaveOneOut()
+            looI = loo.split(X, y)
+        else:
+            loo = LeaveOneGroupOut()
+            looI = loo.split(X, y, groups = rep(range(11), 2))
 
-    def modelPrep(self, z, logspace = False):
+        # Run crossvalidation
+        predict = cross_val_predict(las, X, y, cv = looI, n_jobs=-1)
+
+        # How well did we do on crossvalidation?
+        crossval_perf = sklearn.metrics.explained_variance_score(y, predict)
+
+        # Do direct regression too
+        las.fit(X, y)
+
+        # How well did we do on direct?
+        direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
+
+        if plott is True:
+            plt.scatter(effect, predict, color='green')
+            plt.plot((0, 1), (0, 1), ls="--", c=".3")
+            plt.title("Cross-Validation 1")
+            plt.xlabel("Effectiveness")
+            plt.ylabel("Prediction")
+            plt.show()
+
+        if printt is True:
+            print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
+
+        return (crossval_perf, direct_perf)
+
+    def modelPrep(self, z, logspace=False):
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
@@ -342,7 +378,7 @@ class StoneModelMouse:
 
         return (independent, effect, tbN)
 
-    def KnockdownPCA(self,z):
+    def KnockdownPCA(self, z, plott=False):
         """
         Principle Components Analysis of effectiveness vs. FcgR binding
         predictions in Knockdown table
@@ -357,14 +393,16 @@ class StoneModelMouse:
         ratio = pca.explained_variance_ratio_
         roundratio = [ '%.6f' % j for j in ratio ]
 
-        plt.figure(1, figsize=(4, 3))
-        plt.clf()
-        plt.axes([.2, .2, .7, .7])
-        plt.plot(pca.explained_variance_, linewidth=2)
-        plt.axis('tight')
-        plt.xlabel('n_components')
-        plt.ylabel('explained_variance_')
-        plt.show()
+        if plott is True:
+            plt.figure(1, figsize=(4, 3))
+            plt.clf()
+            plt.axes([.2, .2, .7, .7])
+            plt.plot(pca.explained_variance_, linewidth=2)
+            plt.axis('tight')
+            plt.xlabel('n_components')
+            plt.ylabel('explained_variance_')
+            plt.show()
+        
         # Heatmap with first 5 eigenvectors
         scores = pca.components_.reshape(5,16)
         idx = []
@@ -372,18 +410,20 @@ class StoneModelMouse:
             idx.append("PC"+str(i+1)+'('+str(roundratio[i])+')')
         column = tbN.columns[0:16]
         PCscoretb = pd.DataFrame(scores, index=idx, columns=column)
-        sns.heatmap(PCscoretb)
-        plt.title("PCA heatmap")
-        plt.show()
+
+        if plott is True:
+            sns.heatmap(PCscoretb)
+            plt.title("PCA heatmap")
+            plt.show()
 
         # Plot loading
         trans = PCA(n_components=2).fit_transform(independent, effect)
-#        print(trans.reshape(6,6))
-        plt.scatter(trans[:, 0], trans[:, 1], color='red')
-#        plt.plot(trans[:, 0], trans[:, 1], color='blue', linewidth=3)
-        plt.title("First 2 PCA directions")
-        plt.xlabel("PC1")
-        plt.ylabel("PC2")
-        plt.show()
-#        print(trans)
+        
+        if plott is True:
+            plt.scatter(trans[:, 0], trans[:, 1], color='red')
+            plt.title("First 2 PCA directions")
+            plt.xlabel("PC1")
+            plt.ylabel("PC2")
+            plt.show()
+
         return result
