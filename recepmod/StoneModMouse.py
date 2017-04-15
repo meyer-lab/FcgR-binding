@@ -121,7 +121,34 @@ class StoneModelMouse:
             idx.append(Ig+'-'+str(k))
         tb1.index = idx
         return tb1
-
+    
+    def MultiAvidityTable(self,z):
+        """
+        Takes a list of shape(8) for z <x without Ig Class>,
+        outputs a table of FcgR binding data of v*4 rows for each avidity-Ig pair
+        """
+        tbM = pd.DataFrame()
+        uvidx = self.uvIDX-1
+        uv = z[uvidx]
+        idx = []
+        # Concatenating a pandas table for a range of avidity
+        for j in range(1, uv+1):
+            z1 = z[:]
+            z1[uvidx] = j
+            tb = self.pdOutputTable(z1)
+            tbM = pd.concat([tbM, tb])
+        # Indexing
+        for k in range(1, uv+1):
+            for Ig in self.Igs:
+                idx.append(Ig+'-'+str(k))
+        tbM.index = idx
+        
+        # remove Req columns
+        tbM = tbM.select(lambda x: not re.search('Req', x), axis=1)
+        
+        return tbM
+            
+        
     def NimmerjahnEffectTable(self, z):
         # Makes a pandas dataframe of shape(8,31) with 2 different avidities for each 1gG
         # Initiate variables
@@ -267,21 +294,23 @@ class StoneModelMouse:
 
     def KnockdownLassoCrossVal(self, z, logspace = False, addavidity1 = False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
+        las = linear_model.Lasso(alpha = 0.01, normalize = True, max_iter= 10000)
 
         # Collect data
-        independent, effect, _ = self.modelPrep(z, logspace)
-
+        if logspace == False:
+            independent, effect, _ = self.modelPrep(z)
+        elif logspace == True:
+            independent, effect, _ = self.modelPrep(z, logspace = True)
         # Iterate over each set of 2 rows being the test set
         eff = []
         predict = []
-        for r in range(9):
+        for r in range(11):
             if addavidity1 is False:
-                l = [2*x+1 for x in range(9)]
+                l = [2*x+1 for x in range(11)]
                 l.pop(r)
                 testl = [2*r+1]
             else:
-                l = list(range(18))
+                l = list(range(22))
                 l.pop(2*r+1)
                 l.pop(2*r)
                 testl = [2*r, 2*r+1]
@@ -290,7 +319,6 @@ class StoneModelMouse:
             # Append results from this leave out step
             eff.append(effect[testl])
             predict.append(las.predict(independent[testl,:]))
-
         plt.scatter(eff, predict, color='green')
         plt.plot((0,1),(0,1), ls="--", c=".3")
         plt.title("Cross-Validation 1")
@@ -303,11 +331,10 @@ class StoneModelMouse:
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown(z)
         tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-
         # Log transform if needed
         if logspace is True:
-            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -3)
+            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -5)
+        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
 
         # Assign independent variables and dependent variable "effect"
         independent = np.array(tbN_norm)
