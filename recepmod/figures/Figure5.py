@@ -23,10 +23,10 @@ def makeFigure():
     f = plt.figure(figsize=(7,5))
 
     # Make grid
-    gs1 = gridspec.GridSpec(2,3)
+    gs1 = gridspec.GridSpec(3,3)
 
     # Get list of axis objects
-    ax = [ f.add_subplot(gs1[x]) for x in range(6) ]
+    ax = [ f.add_subplot(gs1[x]) for x in range(9) ]
 
     # Blank out for the cartoon
     ax[0].axis('off')
@@ -45,6 +45,9 @@ def makeFigure():
 
     # Show performance of affinity prediction
     InVivoPredictVsActualAffinities(ax=ax[5])
+
+    # Predict class/avidity effect
+    ClassAvidityPredict(ax=ax[6])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -83,6 +86,14 @@ def InVivoPredictComponents(ax=None):
     if ax is None:
         ax = plt.gca()
 
+    logR = np.log10(10**5)
+    z = [logR, logR, logR, logR, logR, logR, 10**(-12.25), 10, 10**(-9)]
+
+    M = StoneModelMouse()
+    model = M.NimmerjahnKnockdownLasso(z)
+
+    
+
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
@@ -97,7 +108,6 @@ def RequiredComponents(ax=None):
 
     ax.set_ylabel('Leave One Intervention Out Perc Explained')
     ax.set_xlabel('Components')
-
 
 def InVivoPredictVsActualAffinities(ax=None):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
@@ -114,6 +124,27 @@ def InVivoPredictVsActualAffinities(ax=None):
     ax.set_ylabel('Predicted Effect')
     ax.set_xlabel('Actual Effect')
 
+def ClassAvidityPredict(ax=None):
+    """ Plot prediction of in vivo model with varying avidity and class. """
+    from ..StoneModMouse import MultiAvidityPredict, StoneModelMouse
 
+    # If no axis was provided make our own
+    if ax is None:
+        ax = plt.gca()
+
+    logR = np.log10(10**5)
+    z = [logR, logR, logR, logR, logR, logR, 10**(-12.25), 10, 10**(-9)]
+
+    M = StoneModelMouse()
+    model = M.NimmerjahnKnockdownLasso(z)
+
+    z[7] = 30
+
+    table = MultiAvidityPredict(M, z, np.insert(model.coef_, 0, model.intercept_))
+
+    sns.factorplot(ax=ax, x='Avidity', y='Predict', hue='Ig', data=table, size=1)
+
+
+    ax.set_ylabel('Predicted Effect')
 
 

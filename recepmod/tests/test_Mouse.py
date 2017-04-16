@@ -3,7 +3,7 @@ import random
 import time
 import pandas
 import numpy as np
-from ..StoneModMouse import StoneModelMouse
+from ..StoneModMouse import StoneModelMouse, MultiAvidityTable, MultiAvidityPredict
 
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
@@ -118,6 +118,13 @@ class TestStoneMouse(unittest.TestCase):
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
 
         self.assertTrue(tbN.shape == (11, 5))
+
+    def test_MultiAvidityTable(self):
+
+        outt = MultiAvidityTable(self.Mod, self.z)
+
+        MultiAvidityPredict(self.Mod, self.z, np.full((17,), 1.0, dtype=np.float64))
+
 
 if __name__ == '__main__':
     unittest.main()

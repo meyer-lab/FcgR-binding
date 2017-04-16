@@ -124,33 +124,6 @@ class StoneModelMouse:
             idx.append(Ig+'-'+str(k))
         tb1.index = idx
         return tb1
-    
-    def MultiAvidityTable(self,z):
-        """
-        Takes a list of shape(8) for z <x without Ig Class>,
-        outputs a table of FcgR binding data of v*4 rows for each avidity-Ig pair
-        """
-        tbM = pd.DataFrame()
-        uvidx = self.uvIDX-1
-        uv = z[uvidx]
-        idx = []
-        # Concatenating a pandas table for a range of avidity
-        for j in range(1, uv+1):
-            z1 = z[:]
-            z1[uvidx] = j
-            tb = self.pdOutputTable(z1)
-            tbM = pd.concat([tbM, tb])
-        # Indexing
-        for k in range(1, uv+1):
-            for Ig in self.Igs:
-                idx.append(Ig+'-'+str(k))
-        tbM.index = idx
-        
-        # remove Req columns
-        tbM = tbM.select(lambda x: not re.search('Req', x), axis=1)
-        
-        return tbM
-            
         
     def NimmerjahnEffectTable(self, z):
         # Makes a pandas dataframe of shape(8,31) with 2 different avidities for each 1gG
@@ -442,3 +415,53 @@ class StoneModelMouse:
             plt.show()
 
         return result
+
+def MultiAvidityTable(M, z):
+    """
+    Takes a list of shape(8) for z <x without Ig Class>,
+    outputs a table of FcgR binding data of v*4 rows for each avidity-Ig pair
+    """
+    tbM = pd.DataFrame()
+    uvidx = M.uvIDX-1
+    uv = z[uvidx]
+    idx = []
+    # Concatenating a pandas table for a range of avidity
+    for j in range(1, uv+1):
+        z1 = z[:]
+        z1[uvidx] = j
+        tb = M.pdOutputTable(z1)
+        tbM = pd.concat([tbM, tb])
+    # Indexing
+    for k in range(1, uv+1):
+        for Ig in M.Igs:
+            idx.append(Ig+'-'+str(k))
+    tbM.index = idx
+    
+    # remove Req columns
+    tbM = tbM.select(lambda x: not re.search('Req', x), axis=1)
+    
+    return tbM
+
+def MultiAvidityPredict(M, z, paramV):
+    """ Make predictions for the effect of avidity and class. """
+    table = MultiAvidityTable(M, z)
+
+    if len(paramV) != (table.shape[1] + 1):
+        raise ValueError('Weighting list doesn\'t match data.')
+
+    def transF(inVal):
+        return np.dot(paramV[1::], inVal.values) + paramV[0]
+
+    def extractAvidity(inVal):
+        return int(inVal.name.split('-')[1])
+
+    def extractIg(inVal):
+        return inVal.name.split('-')[0]
+
+    table['Predict'] = table.apply(transF, axis=1)
+    table['Avidity'] = table.apply(extractAvidity, axis=1)
+    table['Ig'] = table.apply(extractIg, axis=1)
+
+    return table
+
+    
