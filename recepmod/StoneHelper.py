@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+from memoize import memoize
 
 try:
     import cPickle as pickle
@@ -42,6 +43,20 @@ def read_chain(filename):
 
 def rep(x, N):
     return [item for item in x for i in range(N)]
+
+@memoize
+def getMedianKx():
+    """ Read the MCMC chain and find the median Kx. Cheched for sanity. """
+    import os
+
+    # Retrieve model and fit from hdf5 file
+    _, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5"))
+
+    # Only keep good samples
+    dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 3)),:]
+    Kx = np.power(10, np.median(dsetFilter['Kx1']))
+
+    return Kx
 
 # Return a dataframe with the measured data labeled with the condition variables
 def getMeasuredDataFrame(self):
