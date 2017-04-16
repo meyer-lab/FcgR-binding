@@ -207,14 +207,27 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2 into one table
         return tbK.append([tbK1, tbK2])
 
-    def NimmerjahnPredictByAffinities(self):
+    def NimmerjahnPredictByAffinities(self, fixed=False, simple=False, logspace=False):
         """ This will run ordinary linear regression using just affinities of receptors. """
 
-        lr = linear_model.LinearRegression()
+        # Run ridge regression with forced direction or simple OLS
+        if simple is True:
+            lr = linear_model.LinearRegression()
+        else:
+            lr = linear_model.ElasticNet(positive=fixed, max_iter=10000)
 
         data = self.NimmerjahnEffectTableAffinities()
+
+        # Log transform if needed
+        if logspace is True:
+            data = data.apply(np.log2).replace(-np.inf, -5)
+
         X = data.iloc[:, 0:4]
         y = data['Effectiveness']
+
+        # If we're fixing the parameters, we need to make the inhibitory receptor negative
+        if fixed is True:
+            X.loc[:, 1] = -X.iloc[:, 1]
 
         # Run crossvalidation predictions at the same time
         predicted = cross_val_predict(lr, X, y, cv=11)
@@ -299,7 +312,7 @@ class StoneModelMouse:
 
     def NimmerjahnKnockdownLasso(self, z, plott=False):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
-        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=10000)
+        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=100000)
 
         # Collect data
         independent, effect, tbN = self.modelPrep(z)
@@ -325,7 +338,7 @@ class StoneModelMouse:
 
     def KnockdownLassoCrossVal(self, z, logspace=False, addavidity1=False, plott=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=10000)
+        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=100000)
 
         # Collect data
         X, y, _ = self.modelPrep(z, logspace)
