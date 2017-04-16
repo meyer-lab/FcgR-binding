@@ -87,12 +87,12 @@ def InVivoPredictComponents(ax=None):
         ax = plt.gca()
 
     logR = np.log10(10**5)
-    z = [logR, logR, logR, logR, logR, logR, 10**(-12.25), 10, 10**(-9)]
+    z = [logR, logR, logR, logR, logR, logR, 10**(-12.25), 10]
 
     M = StoneModelMouse()
     model = M.NimmerjahnKnockdownLasso(z)
 
-    
+
 
 
     ax.set_ylabel('Weightings')
@@ -133,7 +133,7 @@ def ClassAvidityPredict(ax=None):
         ax = plt.gca()
 
     logR = np.log10(10**5)
-    z = [logR, logR, logR, logR, logR, logR, 10**(-12.25), 10, 10**(-9)]
+    z = [logR, logR, logR, logR, logR, logR, 10**(-12.25), 10]
 
     M = StoneModelMouse()
     model = M.NimmerjahnKnockdownLasso(z)

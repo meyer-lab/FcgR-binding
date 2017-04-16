@@ -34,7 +34,7 @@ class StoneModelMouse:
         self.IgIDX = 6
         self.kxIDX = 7
         self.uvIDX = 8
-        self.L0IDX = 9
+        self.L0 = 1E-9
 
     def StoneModMouse(self, x):
         '''
@@ -58,7 +58,6 @@ class StoneModelMouse:
         x1 = np.array(x1)
         v = x1[self.uvIDX]
         Kx = x1[self.kxIDX]
-        L0 = x1[self.L0IDX]
 
         # Initiate numpy arrays for StoneMod outputs
         output = np.full((5, len(self.FcgRs)), np.nan)
@@ -70,7 +69,7 @@ class StoneModelMouse:
             Ka = float(self.kaMouse[k][l])
 
             ## Calculate the MFI which should result from this condition according to the model
-            stoneModOut = StoneMod(logR,Ka,v,Kx*Ka,L0, fullOutput = True)
+            stoneModOut = StoneMod(logR,Ka,v,Kx*Ka,self.L0, fullOutput = True)
             output[:, k] = np.asarray(stoneModOut, dtype = np.float)
 
         return output
