@@ -241,8 +241,10 @@ class StoneModelMouse:
         # How well did we do on direct?
         direct_perf = sklearn.metrics.explained_variance_score(y, lr.predict(X))
 
-        return (direct_perf, crossval_perf)
+        data['DirectPredict'] = lr.predict(X)
+        data['CrossPredict'] = predicted
 
+        return (direct_perf, crossval_perf, data)
 
     def FcgRPlots(self, z):
         # TODO: Fix
