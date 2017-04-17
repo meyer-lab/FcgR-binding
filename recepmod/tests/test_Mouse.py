@@ -12,8 +12,9 @@ class TestStoneMouse(unittest.TestCase):
         self.kx = 10**(-12.25)
         self.logR = np.log10(10**5)
         self.v = 10
+        self.Li = 10**(-9)
         self.z = [self.logR, self.logR, self.logR, self.logR, self.logR,
-                  self.logR, self.kx, self.v]
+                  self.logR, self.kx, self.v, self.Li]
 
     def tearDown(self):
         t = time.time() - self.startTime
@@ -26,7 +27,7 @@ class TestStoneMouse(unittest.TestCase):
         # Checks size of fullOutput
 
         x = [self.logR, self.logR, self.logR, self.logR, self.logR, self.logR,
-             'IgG1', self.kx, self.v]
+             'IgG1', self.kx, self.v, self.Li]
 
         out = np.array(self.Mod.StoneModMouse(x))
 
@@ -36,7 +37,7 @@ class TestStoneMouse(unittest.TestCase):
         # Checks that the model output satisfies R = Rbnd + Req
 
         x = [self.logR, self.logR, self.logR, self.logR, self.logR, self.logR,
-             'IgG2b', self.kx, self.v]
+             'IgG2b', self.kx, self.v, self.Li]
 
         a = self.Mod.StoneModMouse(x)
         b = np.array(a[1] + a[4])
@@ -57,7 +58,7 @@ class TestStoneMouse(unittest.TestCase):
     def test_pdAvidityTable(self):
         # Check shape of pandas table from pdAvidityTable
         y2 = [self.logR, self.logR, self.logR, self.logR, self.logR, self.logR,
-              'IgG2a', self.kx]
+              'IgG2a', self.kx, self.Li]
 
         tba2 = self.Mod.pdAvidityTable(y2, self.v, self.v+2)
 
