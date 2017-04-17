@@ -69,7 +69,9 @@ class TestStoneMouse(unittest.TestCase):
         
     def test_MultiAvidityTable(self):
         # Check shape of pandas table from MultiAvidityTable
-        tbM = self.Mod.MultiAvidityTable(self.z)
+        tbM = MultiAvidityTable(self.Mod, self.z)
+
+        MultiAvidityPredict(self.Mod, self.z, np.full((17,), 1.0, dtype=np.float64))
 
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(tbM, pandas.core.frame.DataFrame)
@@ -118,13 +120,6 @@ class TestStoneMouse(unittest.TestCase):
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
 
         self.assertTrue(tbN.shape == (11, 5))
-
-    def test_MultiAvidityTable(self):
-
-        outt = MultiAvidityTable(self.Mod, self.z)
-
-        MultiAvidityPredict(self.Mod, self.z, np.full((17,), 1.0, dtype=np.float64))
-
 
 if __name__ == '__main__':
     unittest.main()
