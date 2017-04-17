@@ -20,7 +20,7 @@ def funcAppend(indexList, nameApp):
     return idx
 
 class StoneModelMouse:
-    # Takes in a list of shape (9) for x: Rexp for FcgRs and TRIM21 logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
+    # Takes in a list of shape (9) for x: Rexp for FcgRs logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):
         import os
 
@@ -200,38 +200,6 @@ class StoneModelMouse:
 
         return (direct_perf, crossval_perf, data)
 
-    def FcgRPlots(self, z):
-        # TODO: Fix
-        # Plot effectiveness vs. all FcgR binding parameters
-        tbN = self.NimmerjahnEffectTable()
-        tbNparam = tbN.iloc[:, list(range(30))]
-        tbN_norm = (tbNparam - tbNparam.mean()) / (tbNparam.max()- tbNparam.min())
-        # Initiate variables
-        bndParam = []
-        eff = list(tbN.iloc[list(range(6)),30]) * 20
-        index = []
-        # Set up binding and effectiveness parameters column
-        for j in range(20):
-            bndParam += list(tbN_norm.iloc[list(range(6)),j])
-
-        # Set index for 20 plots
-        for k in product(range(1,5), range(1,6)):
-            index.extend([int(str(k[0])+str(k[1]))]*6)
-
-        # Plot effectiveness vs. each binding parameter
-        plotTb = np.transpose(np.array([index, bndParam, eff]))
-        table = pd.DataFrame(plotTb, columns = ['index', 'bndParam', 'eff'])
-        sns.lmplot(x="bndParam",
-                   y="eff",
-                   col = 'index',
-                   hue = 'index',
-                   col_wrap=2,
-                   ci=None,
-                   palette="muted",
-                   data=table,
-                   size = 3)
-        plt.show()
-
     def NimmerjahnTb_Knockdown(self):
         tbK = self.NimmerjahnEffectTable()
         # remove Req columns
@@ -267,7 +235,7 @@ class StoneModelMouse:
         return tbK.append([tbK1, tbK2, tbK3, tbK4])
 
     def NimmerjahnKnockdownLasso(self, plott=False):
-        # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
+        """ Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters """
         las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=100000)
 
         # Collect data

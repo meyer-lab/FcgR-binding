@@ -36,7 +36,7 @@ class TestStoneMouse(unittest.TestCase):
                                            delta = (10**self.Mod.logR[j])/10000)
 
     def test_pdOutputTable(self):
-        # Checks the shape of pandas table from pdOutputTable
+        """ Checks the shape of pandas table from pdOutputTable """
 
         tbfull = self.Mod.pdOutputTable()
 
@@ -46,6 +46,7 @@ class TestStoneMouse(unittest.TestCase):
         self.assertTrue(tbfull.shape == (4,5*len(self.Mod.FcgRs)))
 
     def test_pdAvidityTable(self):
+        """ Checks pdAvidityTable """
         # Check shape of pandas table from pdAvidityTable
         tba2 = self.Mod.pdAvidityTable()
 
@@ -55,11 +56,12 @@ class TestStoneMouse(unittest.TestCase):
         self.assertTrue(tba2.shape == (self.Mod.v*len(self.Mod.Igs),5*len(self.Mod.FcgRs)))
         
     def test_MultiAvidityPredict(self):
-        # Check shape of pandas table from MultiAvidityTable
+        """ Check MultiAvidityPredict """
 
         MultiAvidityPredict(self.Mod, np.full((17,), 1.0, dtype=np.float64))
 
     def test_NimmerjahnEffectTable(self):
+        """ Check NimmerjahnEffectTable """
         tbN = self.Mod.NimmerjahnEffectTable()
 
         # Make sure we were given a Pandas dataframe
@@ -67,12 +69,8 @@ class TestStoneMouse(unittest.TestCase):
 
         self.assertTrue(tbN.shape == (8,5*len(self.Mod.FcgRs)+1))
 
-    #def test_FcgRPlots(self):
-        # Plots effectiveness vs. each FcgR binding parameter
-
-        # self.Mod.FcgRPlots(self.z)
-
     def test_NimmerjahnTb_Knockdown(self):
+        """ Check NimmerjahnTb_Knockdown """
         tbNK = self.Mod.NimmerjahnTb_Knockdown()
         # tbNK.to_csv('out.csv')
         self.Mod.NimmerjahnKnockdownLasso()
