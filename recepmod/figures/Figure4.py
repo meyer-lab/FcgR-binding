@@ -5,7 +5,6 @@ import pandas as pd
 import seaborn as sns
 from cycler import cycler
 from ..StoneModel import StoneMod
-from ..StoneHelper import read_chain
 from .FigureCommon import subplotLabel
 from ..StoneTwoRecep import StoneTwo
 
@@ -18,15 +17,12 @@ def makeFigure():
     import string
     import os
     from matplotlib import gridspec
+    from ..StoneHelper import getMedianKx
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
-    # Retrieve model and fit from hdf5 file
-    _, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
-
-    # Only keep good samples
-    dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 4)),:]
-    Kx = np.power(10, np.median(dsetFilter['Kx1']))
+    # We're going to need Kx
+    Kx = getMedianKx()
 
     # Setup plotting space
     f = plt.figure(figsize=(7,5))
