@@ -266,7 +266,7 @@ class StoneModel:
             ## is used to make the iterable object quant, each iterable element of
             ## which is a single-element list containing a string corresponding to
             ## a row in the original csv.
-            self.Rquant = np.loadtxt(os.path.join(path,'./data/FcgRquant.csv'), delimiter=',', skiprows=1)
+            self.Rquant = np.loadtxt(os.path.join(path,'./data/lux/FcgRquant.csv'), delimiter=',', skiprows=1)
             self.Rquant = np.log10(self.Rquant).transpose().tolist()
 
             # Remove nan entries from each array
@@ -274,7 +274,7 @@ class StoneModel:
                 self.Rquant[i] = np.delete(self.Rquant[i], np.where(np.isnan(self.Rquant[i])))
 
             # Load and normalize dataset two
-            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/New-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/lux/New-Fig2B.csv'))
 
             # We only include a second sigma if new data
             self.sig2IDX = 12
@@ -283,6 +283,6 @@ class StoneModel:
             self.pNames.insert(self.sig2IDX, 'sigma2')
         else:
             # Load and normalize dataset one
-            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/Luxetal2013-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/lux/Luxetal2013-Fig2B.csv'))
 
         self.Nparams = len(self.lb)
