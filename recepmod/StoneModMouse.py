@@ -203,7 +203,7 @@ class StoneModelMouse:
     def FcgRPlots(self, z):
         # TODO: Fix
         # Plot effectiveness vs. all FcgR binding parameters
-        tbN = self.NimmerjahnEffectTable(z)
+        tbN = self.NimmerjahnEffectTable()
         tbNparam = tbN.iloc[:, list(range(30))]
         tbN_norm = (tbNparam - tbNparam.mean()) / (tbNparam.max()- tbNparam.min())
         # Initiate variables
@@ -320,7 +320,7 @@ class StoneModelMouse:
         direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
 
         if plott is True:
-            plt.scatter(effect, predict, color='green')
+            plt.scatter(y, predict, color='green')
             plt.plot((0, 1), (0, 1), ls="--", c=".3")
             plt.title("Cross-Validation 1")
             plt.xlabel("Effectiveness")
