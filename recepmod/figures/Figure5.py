@@ -132,15 +132,12 @@ def ClassAvidityPredict(ax=None):
     if ax is None:
         ax = plt.gca()
 
-    logR = np.log10(10**5)
-    z = [logR, logR, logR, logR, logR, logR, 10**(-12.25), 10, 10**(-9)]
-
     M = StoneModelMouse()
-    model = M.NimmerjahnKnockdownLasso(z)
+    model = M.NimmerjahnKnockdownLasso()
 
-    z[7] = 30
+    M.v = 30
 
-    table = MultiAvidityPredict(M, z, np.insert(model.coef_, 0, model.intercept_))
+    table = MultiAvidityPredict(M, np.insert(model.coef_, 0, model.intercept_))
 
     sns.factorplot(ax=ax, x='Avidity', y='Predict', hue='Ig', data=table, size=1)
 

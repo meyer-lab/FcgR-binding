@@ -8,7 +8,7 @@ from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGrou
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
-from .StoneHelper import rep
+from .StoneHelper import rep, getMedianKx
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -29,14 +29,17 @@ class StoneModelMouse:
         self.Igs = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
         self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV']
         # Read in csv file of murine binding affinities
-        self.kaMouse = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), delimiter=',', skip_header=1, usecols=list(range(1,5)))
-        # Indices for elements in x
-        self.IgIDX = 6
-        self.kxIDX = 7
-        self.uvIDX = 8
-        self.L0IDX = 9
+        self.kaMouse = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), 
+                                     delimiter=',', 
+                                     skip_header=1, 
+                                     usecols=list(range(1,5)),
+                                     dtype=np.float64)
+        self.L0 = 1E-9
+        self.v = 10
+        self.Kx = getMedianKx()
+        self.logR = np.full((len(self.FcgRs),), np.log10(10**5), dtype = np.float64)
 
-    def StoneModMouse(self, x):
+    def StoneModMouse(self):
         '''
         Returns the number of mutlivalent ligand bound to a cell with 10^logR
         receptors, granted each epitope of the ligand binds to the receptor
@@ -44,38 +47,24 @@ class StoneModelMouse:
         other receptors with crosslinking constant Kx = 10^logKx. All
         equations derived from Stone et al. (2001).
         '''
-
         from .StoneModel import StoneMod
 
-        # Assign Ig type to a number corresponding to the row of Ka
-        x1 = x[:]
-        for i in range(4):
-            if self.Igs[i] == x[self.IgIDX]:
-                x1[self.IgIDX] = np.nan
-                l = i
-
-        # Assign inputs for StoneMod
-        x1 = np.array(x1)
-        v = x1[self.uvIDX]
-        Kx = x1[self.kxIDX]
-        L0 = x1[self.L0IDX]
-
         # Initiate numpy arrays for StoneMod outputs
-        output = np.full((5, len(self.FcgRs)), np.nan)
+        output = np.full((len(self.Igs), 5, len(self.FcgRs)), np.nan)
 
         # Iterate over each FcgR
-        for k in range(len(self.FcgRs)):
-            logR = x1[k]
-            ## Set the affinity for the binding of the FcgR and IgG in question
-            Ka = float(self.kaMouse[k][l])
+        for l in range(len(self.Igs)):
+            for k in range(len(self.FcgRs)):
+                ## Set the affinity for the binding of the FcgR and IgG in question
+                Ka = self.kaMouse[k][l]
 
-            ## Calculate the MFI which should result from this condition according to the model
-            stoneModOut = StoneMod(logR,Ka,v,Kx*Ka,L0, fullOutput = True)
-            output[:, k] = np.asarray(stoneModOut, dtype = np.float)
+                ## Calculate the MFI which should result from this condition according to the model
+                stoneModOut = StoneMod(self.logR[k],Ka,self.v,self.Kx*Ka,self.L0, fullOutput = True)
+                output[l, :, k] = np.asarray(stoneModOut, dtype = np.float)
 
         return output
 
-    def pdOutputTable(self, z):
+    def pdOutputTable(self):
         """
         Takes in a list of shape (8) for z in the format of [logR, logR, logR,
         logR, logR, logR, kx, v, Li] Organizes the binding prediction between
@@ -83,69 +72,61 @@ class StoneModelMouse:
         table of binding prediction
         """
 
-        stoneModMurine = []
-        labels = []
-
         # Set labels for columns of pandas table
+        labels = []
         for p in product(self.FcgRs, ['-Lbnd', '-Rbnd', '-Rmulti', '-nXlink', '-Req']):
             labels.append(p[0]+p[1])
 
         # Make a 3-d array of StoneModMouse output for each Ig
-        for i in range(len(self.Igs)):
-            x = z[:]
-            x.insert(self.IgIDX, self.Igs[i])
-            stoneModMurine.append(np.transpose(self.StoneModMouse(x)))
+        stoneModMurine = self.StoneModMouse()
 
         # Reshape data for pandas table
-        output = np.reshape(np.array(stoneModMurine), (4, -1))
+        output = np.reshape(stoneModMurine, (4, -1), order = 'F')
 
         # Make pandas table of binding predictions of Ig-FcgR pairs
-        return pd.DataFrame(np.array(output), index=self.Igs, columns=labels)
+        return pd.DataFrame(output, index=self.Igs, columns=labels)
 
-    def pdAvidityTable(self, y, vl, vu):
+    def pdAvidityTable(self):
         """
-        Takes in a list of shape (8) for y <x without avidity v>, lower bond
-        for avidity vl, and upper bond for avidity vu. Organizes a pandas table
-        of binding predictions for a given Ig as avidity varies
+        Organizes a pandas table of binding predictions for a given Ig as avidity varies from 1 to v
         """
         tb1 = pd.DataFrame()
-        Ig = y[self.IgIDX]
         idx = []
         # Concatenating a pandas table for a range of avidity
-        for j in range(vl, vu+1):
-            x = y[:]
-            x.insert(self.uvIDX, j)
-            x.pop(self.IgIDX)
-            z = x
-            tb = self.pdOutputTable(z)
-            tb1 = pd.concat([tb1, tb.loc[[Ig]]])
-        # Indexing
-        for k in range(vl, vu+1):
-            idx.append(Ig+'-'+str(k))
+        for j in range(1, self.v+1):
+            v = j
+            tb = self.pdOutputTable()
+            tb1 = pd.concat([tb1, tb])
+
+            for _, Ig in enumerate(self.Igs):
+                idx.append(Ig+'-'+str(j))
+            
         tb1.index = idx
         return tb1
         
-    def NimmerjahnEffectTable(self, z):
+    def NimmerjahnEffectTable(self):
         # Makes a pandas dataframe of shape(8,31) with 2 different avidities for each 1gG
         # Initiate variables
-        z1 = z[:]
-        tbN = pd.DataFrame()
         idx = []
         # create pandas tables
-        tv = self.pdOutputTable(z)
-        z1[self.uvIDX-1] = 1
-        t1 = self.pdOutputTable(z1)
-        # Compose a table of shape (8,30), 2 rows for each IgG
-        for i in self.Igs:
-            for j in [1, z[self.uvIDX-1]]:
-                if j == 1:
-                    tbN = pd.concat([tbN, t1.loc[[i]]])
-                else:
-                    tbN = pd.concat([tbN, tv.loc[[i]]])
-                idx.append(i+'-'+str(j))
+        tv = self.pdOutputTable()
+        uv = self.v
+        self.v = 1
+        tbN = pd.concat([tv, self.pdOutputTable()])
+        self.v = uv
+
+        # Redo the row indeces
+        idx = list(tbN.index)
+        for i in range(len(self.Igs)):
+            idx[i] = idx[i]+'-'+str(self.v)
+            idx[i+len(self.Igs)] = idx[i+len(self.Igs)]+'-1'
         tbN.index = idx
+
+        tbN = tbN.sort_index()
+
         # Append effectiveness data on the 31 column
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
+
         return tbN
 
     def NimmerjahnEffectTableAffinities(self):
@@ -251,8 +232,8 @@ class StoneModelMouse:
                    size = 3)
         plt.show()
 
-    def NimmerjahnTb_Knockdown(self, z):
-        tbK = self.NimmerjahnEffectTable(z)
+    def NimmerjahnTb_Knockdown(self):
+        tbK = self.NimmerjahnEffectTable()
         # remove Req columns
         tbK = tbK.select(lambda x: not re.search('Req', x), axis=1)
 
@@ -285,12 +266,12 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         return tbK.append([tbK1, tbK2, tbK3, tbK4])
 
-    def NimmerjahnKnockdownLasso(self, z, plott=False):
+    def NimmerjahnKnockdownLasso(self, plott=False):
         # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
         las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=100000)
 
         # Collect data
-        independent, effect, tbN = self.modelPrep(z)
+        independent, effect, tbN = self.modelPrep()
 
         # Linear regression and plot result
         res = las.fit(independent, effect)
@@ -311,12 +292,12 @@ class StoneModelMouse:
 
         return res
 
-    def KnockdownLassoCrossVal(self, z, logspace=False, addavidity1=False, plott=False, printt=False):
+    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, plott=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
         las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=100000)
 
         # Collect data
-        X, y, _ = self.modelPrep(z, logspace)
+        X, y, _ = self.modelPrep(logspace)
 
         # Setup the crossvalidation iterators
         if addavidity1 is False:
@@ -351,9 +332,9 @@ class StoneModelMouse:
 
         return (crossval_perf, direct_perf)
 
-    def modelPrep(self, z, logspace=False):
+    def modelPrep(self, logspace=False):
         """ Collect the data and split into X and Y blocks. """
-        tbN = self.NimmerjahnTb_Knockdown(z)
+        tbN = self.NimmerjahnTb_Knockdown()
         tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
         # Log transform if needed
         if logspace is True:
@@ -366,7 +347,7 @@ class StoneModelMouse:
 
         return (independent, effect, tbN)
 
-    def KnockdownPCA(self, z, plott=False):
+    def KnockdownPCA(self, plott=False):
         """
         Principle Components Analysis of effectiveness vs. FcgR binding
         predictions in Knockdown table
@@ -374,7 +355,7 @@ class StoneModelMouse:
         pca = PCA(n_components=5)
 
         # Collect data
-        independent, effect, tbN = self.modelPrep(z)
+        independent, effect, tbN = self.modelPrep()
 
         # Plot explained variance ratio
         result = pca.fit(independent, effect)
@@ -416,35 +397,12 @@ class StoneModelMouse:
 
         return result
 
-def MultiAvidityTable(M, z):
-    """
-    Takes a list of shape(8) for z <x without Ig Class>,
-    outputs a table of FcgR binding data of v*4 rows for each avidity-Ig pair
-    """
-    tbM = pd.DataFrame()
-    uvidx = M.uvIDX-1
-    uv = z[uvidx]
-    idx = []
-    # Concatenating a pandas table for a range of avidity
-    for j in range(1, uv+1):
-        z1 = z[:]
-        z1[uvidx] = j
-        tb = M.pdOutputTable(z1)
-        tbM = pd.concat([tbM, tb])
-    # Indexing
-    for k in range(1, uv+1):
-        for Ig in M.Igs:
-            idx.append(Ig+'-'+str(k))
-    tbM.index = idx
-    
-    # remove Req columns
-    tbM = tbM.select(lambda x: not re.search('Req', x), axis=1)
-    
-    return tbM
-
-def MultiAvidityPredict(M, z, paramV):
+def MultiAvidityPredict(M, paramV):
     """ Make predictions for the effect of avidity and class. """
-    table = MultiAvidityTable(M, z)
+    table = M.pdAvidityTable()
+
+    # remove Req columns
+    table = table.select(lambda x: not re.search('Req', x), axis=1)
 
     if len(paramV) != (table.shape[1] + 1):
         raise ValueError('Weighting list doesn\'t match data.')
