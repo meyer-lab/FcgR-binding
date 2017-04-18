@@ -49,7 +49,7 @@ class TestStoneMouse(unittest.TestCase):
         """ Checks pdAvidityTable """
         # Check shape of pandas table from pdAvidityTable
         tba2 = self.Mod.pdAvidityTable()
-
+        
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(tba2, pandas.core.frame.DataFrame)
 
@@ -79,6 +79,7 @@ class TestStoneMouse(unittest.TestCase):
         self.Mod.KnockdownLassoCrossVal(addavidity1=True, printt=True)
         self.Mod.KnockdownLassoCrossVal(logspace=True, addavidity1=True)
         self.Mod.KnockdownPCA()
+        
 
         self.assertTrue(tbNK.shape == (22, 17))
 
@@ -99,6 +100,14 @@ class TestStoneMouse(unittest.TestCase):
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
 
         self.assertTrue(tbN.shape == (11, 5))
+
+    def test_PCA(self):
+        trans = self.Mod.PCA()
+        
+        # Make sure we were given a numpy array
+        self.assertIsInstance(trans, np.ndarray)
+
+        self.assertTrue(trans.shape == (40, 2))
 
 if __name__ == '__main__':
     unittest.main()
