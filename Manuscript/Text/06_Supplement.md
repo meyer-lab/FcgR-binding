@@ -37,4 +37,11 @@ FcγRIIIA-158V IgG4         122    136    262    91     313    558    1026   239
 
   : Table: Raw binding measurements. The original MFIs from the Nimmerjahn Lab's experiment, normalized by replicate. No data was recorded in Replicate 2 for the combination of FcγRIIIA-158V, IgG3, and TNP-4-BSA. BG: Background.
 
+
+
+## Binding Experiment
+
+![**XXX. *** XXX.](./Figures/FigureSS.svg){#fig:BindingDeconv}
+
+
 # References
