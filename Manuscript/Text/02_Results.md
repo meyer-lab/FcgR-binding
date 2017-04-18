@@ -22,7 +22,7 @@ The prior constrained the TNP-4 and TNP-26 avidity to within 1–8 and 20–32 r
 
 ## The parameterized binding model provides specific predictions for the coordinate effects of immune complex abundance, avidity, and class
 
-![**Specific predictions for the coordinate effects of immune complex parameters.** A) Predicted IgG1-FcγRIIIA-F binding versus immune complex concentration for varying avidity. B) Predicted multimerized FcγRIIIA-F versus concentration of immune complex for varying avidity. C) The number of receptor crosslinks versus concentration of immune complex for varying avidity. D) The amount of binding versus number of crosslinks for varied avidities. E) The predicted amount of multimerized receptor versus avidity for a cell expressing FcγRIIIA-F and FcγRIIB simultaneously and responding to IgG1 immune complex. F) The predicted calculated activity index (FcγRIIIA-F crosslinks - FcγRIIB crosslinks) for the conditions in (E).](./Figures/Figure4.svg){#fig:pModel}
+![**Specific predictions for the coordinate effects of immune complex parameters.** A) Predicted IgG1-FcγRIIIA-F binding versus immune complex concentration for varying avidity. B) Predicted multimerized FcγRIIIA-F versus concentration of immune complex for varying avidity. C) The number of receptor crosslinks versus concentration of immune complex for varying avidity. D) The amount of binding versus number of crosslinks for varied avidities. E) The predicted amount of multimerized receptor versus avidity for a cell expressing FcγRIIIA-F and FcγRIIB simultaneously and responding to IgG1 immune complex. F) The predicted calculated activity index (FcγRIIIA-F crosslinks - FcγRIIB crosslinks) for the conditions in (E).](./Figures/Figure3.svg){#fig:pModel}
 
 With confidence that an equilibrium binding model can predict FcγR-immune complex binding, we sought to apply the model to make predictions about the combined influence of avidity and affinity on effector function. We focused on FcγRIIIA, which is expressed alone within NK cells, or alongside FcγRIIB in dendritic and other cell populations. Predicted binding curves showed a shift left with increasing avidity, consistent with the effects observed in similar contexts [@Ortiz:2016kc]  ([@Fig:pModel]A). Instead examining the number of receptor-receptor crosslinks or the abundance of receptors in multimer complexes instead showed a stronger response to avidity, and biphasic concentration dependence ([@Fig:pModel]B-C). As a consequence of the difference on receptor multimerization or binding, avidity leads to far more oligomerization with much less receptor binding ([@Fig:pModel]B-D). For example, an immune complex of avidity thirty-two leads to the same amount of receptor oligomerization as the peak for avidity two at a 1000-fold lower concentration, and while binding roughly 50-fold less receptor. This emphasizes that avidity is an essential factor to consider for enacting effector responses, and measuring receptor binding alone cannot predict the consequent FcγR oligomerization.
 
@@ -30,6 +30,16 @@ In contrast to NK cells, other innate immune cell types express activating and i
 
 ## An IgG-FcγR binding model deconvolves *in vivo* function
 
-![**An IgG-FcγR binding model deconvolves *in vivo* function.** A) Schematic of earlier IgG class experiments and regression approach. B) Principle components analysis of predicted binding with coordinate changes in IgG class or immune complex avidity. C) Predicted versus observed effect on lung metastasis formation upon cross-validation. D) Model weightings for elastic net regression of immune complex binding against lung metastasis reduction. E) Percent explained upon crossvalidation for models constructed with reduced sets of measurements. F) Predicted versus observed effect on lung metastasis formation upon cross-validation for a model utilizing only IgG-FcγR affinity measurements. G) Model predicted effectiveness upon variation in IgG class or avidity.](./Figures/Figure5.svg){#fig:InVivoResults}
+![**An IgG-FcγR binding model deconvolves *in vivo* function.** A) Schematic of earlier IgG class experiments and regression approach. B) Principle components analysis of predicted binding with coordinate changes in IgG class or immune complex avidity. C) Predicted versus observed effect on lung metastasis formation upon cross-validation. D) Model weightings for elastic net regression of immune complex binding against lung metastasis reduction. E) Percent explained upon crossvalidation for models constructed with reduced sets of measurements. F) Predicted versus observed effect on lung metastasis formation upon cross-validation for a model utilizing only IgG-FcγR affinity measurements. G) Model predicted effectiveness upon variation in IgG class or avidity.](./Figures/Figure4.svg){#fig:InVivoResults}
 
 We wished to finally explore whether a multivalent binding model can enable reverse engineering of effector function *in vivo*. We surmised that our modeling approach would allow one to convert interventions using defined IgG subclasses into predictions regarding the relevant IgG-FcγR driving response.
+
+
+
+
+
+
+
+## Human murine comparison
+
+![**XXX.** A) XXX. B) XXX. C) XXX. D) XXX.](./Figures/Figure4.svg){#fig:SpeciesCompare}
