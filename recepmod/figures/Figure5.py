@@ -57,16 +57,35 @@ def makeFigure():
 
     return f
 
+def MurineIgLegend():
+    # Make Legend by Ig subclass
+    import matplotlib.lines as mlines
+    Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'v', 'IgG3':'s'}
+    Igc = {'IgG1':'r', 'IgG2a':'y', 'IgG2b':'g', 'IgG3':'b'}
+    patches = list()
+
+    for j in Igs:
+        patches.append(mlines.Line2D([], [], color = Igc[j], marker=Igs[j], markersize=7, label=j, linestyle='None'))
+
+    return patches
+
 def ClassAvidityPCA(ax=None):
     """ Plot the generated binding data for different classes and avidities in PCA space. """
-
+    Mod = StoneModelMouse()
+    trans = Mod.PCA()
+    ms = list(range(5,15,1))
+    igs = ['o','d','v','s']
+    igc = ['r','y','g','b']
+    for i in range(4):
+        plt.scatter(trans[list(range(i,40,4)), 0], trans[list(range(i,40,4)), 1], marker=igs[i], s=ms, color=igc[i])
     # If no axis was provided make our own
     if ax is None:
         ax = plt.gca()
 
-
+    
     ax.set_ylabel('PC 2')
     ax.set_xlabel('PC 1')
+    ax.legend(handles=MurineIgLegend(), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
 def InVivoPredictVsActual(ax=None):
     """ Plot predicted vs actual for regression of conditions in vivo. """
