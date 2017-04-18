@@ -18,7 +18,7 @@ def makeFigure():
     Mod = StoneModelMouse()
 
     # Setup plotting space
-    f = plt.figure(figsize=(7, 5))
+    f = plt.figure(figsize=(5, 5))
 
     # Make grid
     gs1 = gridspec.GridSpec(2, 2)
