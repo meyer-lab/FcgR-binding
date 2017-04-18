@@ -16,7 +16,7 @@ def makeFigure():
     # Filter for only remotely likely parameter sets
     dset = dset.loc[dset['LL'] > np.min(dset['LL']) - 3,:]
 
-    dsetSamp = dset.sample(200)
+    dsetSamp = dset.sample(40)
 
     runFunc = lambda x: getFitPrediction(M, x[2:])
 

@@ -42,4 +42,4 @@ We wished to finally explore whether a multivalent binding model can enable reve
 
 ## Human murine comparison
 
-![**XXX.** A) XXX. B) XXX. C) XXX. D) XXX.](./Figures/Figure4.svg){#fig:SpeciesCompare}
+![**XXX.** A) XXX. B) XXX. C) XXX. D) XXX.](./Figures/Figure5.svg){#fig:SpeciesCompare}
