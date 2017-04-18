@@ -58,9 +58,9 @@ class TestStoneMouse(unittest.TestCase):
     def test_MultiAvidityPredict(self):
         """ Check MultiAvidityPredict """
 
-        _, _, _, _, model = self.Mod.KnockdownLassoCrossVal()
+        _, _, _, _, model, normV = self.Mod.KnockdownLassoCrossVal()
 
-        table = MultiAvidityPredict(self.Mod, np.insert(model.coef_, 0, model.intercept_))
+        table = MultiAvidityPredict(self.Mod, np.insert(model.coef_, 0, model.intercept_), normV)
 
     def test_NimmerjahnEffectTable(self):
         """ Check NimmerjahnEffectTable """
@@ -87,10 +87,8 @@ class TestStoneMouse(unittest.TestCase):
         # tbN.to_csv('out.csv')
 
         self.Mod.NimmerjahnPredictByAffinities(simple=True)
-        self.Mod.NimmerjahnPredictByAffinities(fixed=True)
         self.Mod.NimmerjahnPredictByAffinities()
         self.Mod.NimmerjahnPredictByAffinities(simple=True, logspace=True)
-        self.Mod.NimmerjahnPredictByAffinities(fixed=True, logspace=True)
         self.Mod.NimmerjahnPredictByAffinities(logspace=True)
 
         # Make sure we were given a Pandas dataframe
