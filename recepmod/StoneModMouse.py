@@ -94,7 +94,7 @@ class StoneModelMouse:
         idx = []
         # Concatenating a pandas table for a range of avidity
         for j in range(1, self.v+1):
-            v = j
+            self.v = j
             tb = self.pdOutputTable()
             tb1 = pd.concat([tb1, tb])
 
@@ -102,6 +102,7 @@ class StoneModelMouse:
                 idx.append(Ig+'-'+str(j))
             
         tb1.index = idx
+        self.v = 10
         return tb1
         
     def NimmerjahnEffectTable(self):
@@ -355,7 +356,7 @@ class StoneModelMouse:
 
         # Plot loading
         trans = PCA(n_components=2).fit_transform(independent, effect)
-        
+
         if plott is True:
             plt.scatter(trans[:, 0], trans[:, 1], color='red')
             plt.title("First 2 PCA directions")
@@ -364,7 +365,51 @@ class StoneModelMouse:
             plt.show()
 
         return result
+    
+    def PCA(self, plott = False):
+        """ Principle Components Analysis of FcgR binding predictions """
+        pca = PCA(n_components=5)
+        table = self.pdAvidityTable()
+        
+        # remove Req columns
+        tbNparam = table.select(lambda x: not re.search('Req', x), axis=1)
+        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        binding = np.array(tbN_norm)
+        
+        # Fit PCA
+        result = pca.fit(binding)
+        ratio = pca.explained_variance_ratio_
+        roundratio = [ '%.6f' % j for j in ratio ]
 
+        if plott is True:
+            plt.figure(1, figsize=(4, 3))
+            plt.clf()
+            plt.axes([.2, .2, .7, .7])
+            plt.plot(pca.explained_variance_, linewidth=2)
+            plt.axis('tight')
+            plt.xlabel('n_components')
+            plt.ylabel('explained_variance_')
+            plt.show()
+        
+         # Heatmap with first 5 eigenvectors
+        scores = pca.components_.reshape(5,16)
+        idx = []
+        for i in range(5):
+            idx.append("PC"+str(i+1)+'('+str(roundratio[i])+')')
+        column = tbNparam.columns[0:16]
+        PCscoretb = pd.DataFrame(scores, index=idx, columns=column)
+
+        if plott is True:
+            sns.heatmap(PCscoretb)
+            plt.title("PCA heatmap")
+            plt.show()
+
+        # Calculate loading
+        trans = PCA(n_components=2).fit_transform(binding)
+
+        return trans
+        
+            
 def MultiAvidityPredict(M, paramV):
     """ Make predictions for the effect of avidity and class. """
     table = M.pdAvidityTable()
@@ -389,5 +434,3 @@ def MultiAvidityPredict(M, paramV):
     table['Ig'] = table.apply(extractIg, axis=1)
 
     return table
-
-    
