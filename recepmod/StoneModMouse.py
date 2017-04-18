@@ -235,38 +235,12 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         return tbK.append([tbK1, tbK2, tbK3, tbK4])
 
-    def NimmerjahnKnockdownLasso(self, plott=False):
-        """ Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters """
-        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=100000)
-
-        # Collect data
-        independent, effect, tbN = self.modelPrep()
-
-        # Linear regression and plot result
-        res = las.fit(independent, effect)
-        coe = res.coef_
-        coe = np.array(coe)
-        coetb = pd.DataFrame(coe.reshape(1,16), index = ["coefficient"], columns = tbN.columns[0:16])
-
-        if plott is True:
-            coetb.plot(kind='bar', title = 'Lasso Coefficients')
-            plt.show()
-
-        if plott is True:
-            plt.scatter(effect, las.predict(independent), color='red')
-            plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
-            plt.xlabel("Effectiveness")
-            plt.ylabel("Prediction")
-            plt.show()
-
-        return res
-
-    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, plott=False, printt=False):
+    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
         las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=100000)
 
         # Collect data
-        X, y, _ = self.modelPrep(logspace)
+        X, y, tbN = self.modelPrep(logspace)
 
         # Setup the crossvalidation iterators
         if addavidity1 is False:
@@ -285,21 +259,21 @@ class StoneModelMouse:
         # Do direct regression too
         las.fit(X, y)
 
+        components = pd.Series(las.coef_, tbN.columns[:-1], dtype=np.float64)
+        components['Intercept'] = las.intercept_
+        components = components.to_frame(name='Weight')
+        components['Name'] = components.index
+
         # How well did we do on direct?
         direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
-
-        if plott is True:
-            plt.scatter(y, predict, color='green')
-            plt.plot((0, 1), (0, 1), ls="--", c=".3")
-            plt.title("Cross-Validation 1")
-            plt.xlabel("Effectiveness")
-            plt.ylabel("Prediction")
-            plt.show()
 
         if printt is True:
             print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
 
-        return (crossval_perf, direct_perf)
+        tbN['DirectPredict'] = direct_perf
+        tbN['CrossPredict'] = crossval_perf
+
+        return (direct_perf, crossval_perf, tbN, components, las)
 
     def modelPrep(self, logspace=False):
         """ Collect the data and split into X and Y blocks. """
@@ -315,56 +289,6 @@ class StoneModelMouse:
         effect = np.array(tbN['Effectiveness'])
 
         return (independent, effect, tbN)
-
-    def KnockdownPCA(self, plott=False):
-        """
-        Principle Components Analysis of effectiveness vs. FcgR binding
-        predictions in Knockdown table
-        """
-        pca = PCA(n_components=5)
-
-        # Collect data
-        independent, effect, tbN = self.modelPrep()
-
-        # Plot explained variance ratio
-        result = pca.fit(independent, effect)
-        ratio = pca.explained_variance_ratio_
-        roundratio = [ '%.6f' % j for j in ratio ]
-
-        if plott is True:
-            plt.figure(1, figsize=(4, 3))
-            plt.clf()
-            plt.axes([.2, .2, .7, .7])
-            plt.plot(pca.explained_variance_, linewidth=2)
-            plt.axis('tight')
-            plt.xlabel('n_components')
-            plt.ylabel('explained_variance_')
-            plt.show()
-        
-        # Heatmap with first 5 eigenvectors
-        scores = pca.components_.reshape(5,16)
-        idx = []
-        for i in range(5):
-            idx.append("PC"+str(i+1)+'('+str(roundratio[i])+')')
-        column = tbN.columns[0:16]
-        PCscoretb = pd.DataFrame(scores, index=idx, columns=column)
-
-        if plott is True:
-            sns.heatmap(PCscoretb)
-            plt.title("PCA heatmap")
-            plt.show()
-
-        # Plot loading
-        trans = PCA(n_components=2).fit_transform(independent, effect)
-
-        if plott is True:
-            plt.scatter(trans[:, 0], trans[:, 1], color='red')
-            plt.title("First 2 PCA directions")
-            plt.xlabel("PC1")
-            plt.ylabel("PC2")
-            plt.show()
-
-        return result
     
     def PCA(self, plott = False):
         """ Principle Components Analysis of FcgR binding predictions """
@@ -374,40 +298,16 @@ class StoneModelMouse:
         # remove Req columns
         tbNparam = table.select(lambda x: not re.search('Req', x), axis=1)
         tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        binding = np.array(tbN_norm)
         
         # Fit PCA
-        result = pca.fit(binding)
-        ratio = pca.explained_variance_ratio_
-        roundratio = [ '%.6f' % j for j in ratio ]
-
-        if plott is True:
-            plt.figure(1, figsize=(4, 3))
-            plt.clf()
-            plt.axes([.2, .2, .7, .7])
-            plt.plot(pca.explained_variance_, linewidth=2)
-            plt.axis('tight')
-            plt.xlabel('n_components')
-            plt.ylabel('explained_variance_')
-            plt.show()
+        result = pca.fit_transform(np.array(tbN_norm))
         
-         # Heatmap with first 5 eigenvectors
-        scores = pca.components_.reshape(5,16)
-        idx = []
-        for i in range(5):
-            idx.append("PC"+str(i+1)+'('+str(roundratio[i])+')')
-        column = tbNparam.columns[0:16]
-        PCscoretb = pd.DataFrame(scores, index=idx, columns=column)
+        # Assemble scores
+        scores = pd.DataFrame(result, index=tbN_norm.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
+        scores['Avidity'] = scores.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+        scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
 
-        if plott is True:
-            sns.heatmap(PCscoretb)
-            plt.title("PCA heatmap")
-            plt.show()
-
-        # Calculate loading
-        trans = PCA(n_components=2).fit_transform(binding)
-
-        return trans
+        return (scores, pca.explained_variance_ratio_)
         
             
 def MultiAvidityPredict(M, paramV):
@@ -423,14 +323,8 @@ def MultiAvidityPredict(M, paramV):
     def transF(inVal):
         return np.dot(paramV[1::], inVal.values) + paramV[0]
 
-    def extractAvidity(inVal):
-        return int(inVal.name.split('-')[1])
-
-    def extractIg(inVal):
-        return inVal.name.split('-')[0]
-
     table['Predict'] = table.apply(transF, axis=1)
-    table['Avidity'] = table.apply(extractAvidity, axis=1)
-    table['Ig'] = table.apply(extractIg, axis=1)
+    table['Avidity'] = table.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+    table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
 
     return table
