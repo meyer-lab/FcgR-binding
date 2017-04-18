@@ -6,6 +6,7 @@ import sklearn
 from sklearn import linear_model
 from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGroupOut
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
 from .StoneHelper import rep, getMedianKx
@@ -137,8 +138,6 @@ class StoneModelMouse:
                            columns = self.FcgRs)
         tbK.loc[:,'Effectiveness'] = pd.Series([0, 0.95, 0.20, 0], index=tbK.index)
 
-
-
         # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
         tbK1 = tbK.copy()
         tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
@@ -237,10 +236,13 @@ class StoneModelMouse:
 
     def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.ElasticNetCV(l1_ratio=0.9, max_iter=100000)
+        las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)
+        scale = StandardScaler()
 
         # Collect data
         X, y, tbN = self.modelPrep(logspace)
+
+        X = scale.fit_transform(X)
 
         # Setup the crossvalidation iterators
         if addavidity1 is False:
@@ -270,22 +272,23 @@ class StoneModelMouse:
         if printt is True:
             print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
 
-        tbN['DirectPredict'] = direct_perf
-        tbN['CrossPredict'] = crossval_perf
+        tbN['DirectPredict'] = las.predict(X)
+        tbN['CrossPredict'] = predict
 
-        return (direct_perf, crossval_perf, tbN, components, las)
+        return (direct_perf, crossval_perf, tbN, components, las, scale)
 
     def modelPrep(self, logspace=False):
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown()
+        tbN = tbN.select(lambda x: not re.search('Lbnd', x), axis=1)
+        tbN = tbN.select(lambda x: not re.search('nX', x), axis=1)
         tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
         # Log transform if needed
         if logspace is True:
             tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -5)
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
 
         # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbN_norm)
+        independent = np.array(tbNparam)
         effect = np.array(tbN['Effectiveness'])
 
         return (independent, effect, tbN)
@@ -294,34 +297,38 @@ class StoneModelMouse:
         """ Principle Components Analysis of FcgR binding predictions """
         pca = PCA(n_components=5)
         table = self.pdAvidityTable()
+        scale = StandardScaler()
         
         # remove Req columns
-        tbNparam = table.select(lambda x: not re.search('Req', x), axis=1)
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        table = table.select(lambda x: not re.search('Req', x), axis=1)
+
+        X = scale.fit_transform(np.array(table))
         
         # Fit PCA
-        result = pca.fit_transform(np.array(tbN_norm))
+        result = pca.fit_transform(X)
         
         # Assemble scores
-        scores = pd.DataFrame(result, index=tbN_norm.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
+        scores = pd.DataFrame(result, index=table.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
         scores['Avidity'] = scores.apply(lambda x: int(x.name.split('-')[1]), axis=1)
         scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
 
         return (scores, pca.explained_variance_ratio_)
         
             
-def MultiAvidityPredict(M, paramV):
+def MultiAvidityPredict(M, paramV, normV):
     """ Make predictions for the effect of avidity and class. """
     table = M.pdAvidityTable()
 
     # remove Req columns
+    table = table.select(lambda x: not re.search('nX', x), axis=1)
+    table = table.select(lambda x: not re.search('Lbnd', x), axis=1)
     table = table.select(lambda x: not re.search('Req', x), axis=1)
 
     if len(paramV) != (table.shape[1] + 1):
         raise ValueError('Weighting list doesn\'t match data.')
 
     def transF(inVal):
-        return np.dot(paramV[1::], inVal.values) + paramV[0]
+        return np.dot(paramV[1::], normV.transform(inVal.values)) + paramV[0]
 
     table['Predict'] = table.apply(transF, axis=1)
     table['Avidity'] = table.apply(lambda x: int(x.name.split('-')[1]), axis=1)
