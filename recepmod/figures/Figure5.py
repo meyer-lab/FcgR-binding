@@ -16,8 +16,8 @@ def makeFigure():
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
-    # We're going to need Kx
-    Kx = getMedianKx()
+    # Load murine class
+    Mod = StoneModelMouse()
 
     # Setup plotting space
     f = plt.figure(figsize=(7,5))
@@ -32,22 +32,22 @@ def makeFigure():
     ax[0].axis('off')
 
     # Make binding data PCA plot
-    ClassAvidityPCA(ax=ax[1])
+    ClassAvidityPCA(Mod, ax=ax[1])
 
     # Show performance of in vivo regression model
-    InVivoPredictVsActual(ax=ax[2])
+    InVivoPredictVsActual(Mod, ax=ax[2])
 
     # Show model components
-    InVivoPredictComponents(ax=ax[3])
+    InVivoPredictComponents(Mod, ax=ax[3])
 
     # Leave components out plot
     RequiredComponents(ax=ax[4])
 
     # Show performance of affinity prediction
-    InVivoPredictVsActualAffinities(ax=ax[5])
+    InVivoPredictVsActualAffinities(Mod, ax=ax[5])
 
     # Predict class/avidity effect
-    ClassAvidityPredict(ax=ax[6])
+    ClassAvidityPredict(Mod, ax=ax[6])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -69,50 +69,43 @@ def MurineIgLegend():
 
     return patches
 
-def ClassAvidityPCA(ax=None):
+def ClassAvidityPCA(Mod, ax=None):
     """ Plot the generated binding data for different classes and avidities in PCA space. """
-    Mod = StoneModelMouse()
-    trans = Mod.PCA()
-    ms = list(range(5,15,1))
-    igs = ['o','d','v','s']
-    igc = ['r','y','g','b']
-    for i in range(4):
-        plt.scatter(trans[list(range(i,40,4)), 0], trans[list(range(i,40,4)), 1], marker=igs[i], s=ms, color=igc[i])
     # If no axis was provided make our own
     if ax is None:
         ax = plt.gca()
-
     
+    scores, pctVar = Mod.PCA()
+
+    sns.factorplot(ax=ax, x='PC1', y='PC2', hue='Ig', data=scores)
+
     ax.set_ylabel('PC 2')
     ax.set_xlabel('PC 1')
-    ax.legend(handles=MurineIgLegend(), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
-def InVivoPredictVsActual(ax=None):
+def InVivoPredictVsActual(Mod, ax=None):
     """ Plot predicted vs actual for regression of conditions in vivo. """
 
     # If no axis was provided make our own
     if ax is None:
         ax = plt.gca()
 
+    _, _, tbN, _, _ = Mod.KnockdownLassoCrossVal(printt=True)
+
+    sns.factorplot(ax=ax, x='Effectiveness', y='CrossPredict', data=tbN)
 
     ax.set_ylabel('Predicted Effect')
     ax.set_xlabel('Actual Effect')
 
-def InVivoPredictComponents(ax=None):
+def InVivoPredictComponents(Mod, ax=None):
     """ Plot model components. """
 
     # If no axis was provided make our own
     if ax is None:
         ax = plt.gca()
 
-    logR = np.log10(10**5)
-    z = [logR, logR, logR, logR, logR, logR, 10**(-12.25), 10, 10**(-9)]
+    _, _, tbN, components, _ = Mod.KnockdownLassoCrossVal()
 
-    M = StoneModelMouse()
-    model = M.NimmerjahnKnockdownLasso(z)
-
-    
-
+    sns.barplot(ax=ax, y='Weight', x='Name', data=components)
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
@@ -128,14 +121,12 @@ def RequiredComponents(ax=None):
     ax.set_ylabel('Leave One Intervention Out Perc Explained')
     ax.set_xlabel('Components')
 
-def InVivoPredictVsActualAffinities(ax=None):
+def InVivoPredictVsActualAffinities(Mod, ax=None):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
 
     # If no axis was provided make our own
     if ax is None:
         ax = plt.gca()
-
-    Mod = StoneModelMouse()
 
     _, _, data = Mod.NimmerjahnPredictByAffinities()
 
@@ -143,22 +134,24 @@ def InVivoPredictVsActualAffinities(ax=None):
     ax.set_ylabel('Predicted Effect')
     ax.set_xlabel('Actual Effect')
 
-def ClassAvidityPredict(ax=None):
+def ClassAvidityPredict(Mod, ax=None):
     """ Plot prediction of in vivo model with varying avidity and class. """
     from ..StoneModMouse import MultiAvidityPredict, StoneModelMouse
+    from copy import deepcopy
+
+    Mod = deepcopy(Mod)
 
     # If no axis was provided make our own
     if ax is None:
         ax = plt.gca()
 
-    M = StoneModelMouse()
-    model = M.NimmerjahnKnockdownLasso()
+    _, _, _, _, model = Mod.KnockdownLassoCrossVal()
 
-    M.v = 30
+    Mod.v = 30
 
-    table = MultiAvidityPredict(M, np.insert(model.coef_, 0, model.intercept_))
+    table = MultiAvidityPredict(Mod, np.insert(model.coef_, 0, model.intercept_))
 
-    sns.factorplot(ax=ax, x='Avidity', y='Predict', hue='Ig', data=table, size=1)
+    sns.factorplot(ax=ax, x='Avidity', y='Predict', hue='Ig', data=table)
 
 
     ax.set_ylabel('Predicted Effect')
