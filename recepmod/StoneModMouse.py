@@ -328,7 +328,7 @@ def MultiAvidityPredict(M, paramV, normV):
         raise ValueError('Weighting list doesn\'t match data.')
 
     def transF(inVal):
-        return np.dot(paramV[1::], normV.transform(inVal.values)) + paramV[0]
+        return np.dot(paramV[1::], np.squeeze(normV.transform(inVal.values.reshape(1, -1)))) + paramV[0]
 
     table['Predict'] = table.apply(transF, axis=1)
     table['Avidity'] = table.apply(lambda x: int(x.name.split('-')[1]), axis=1)
