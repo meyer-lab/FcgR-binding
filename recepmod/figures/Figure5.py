@@ -3,6 +3,7 @@ import numpy as np
 import seaborn as sns
 import pandas as pd
 from ..StoneModMouse import StoneModelMouse
+from ..StoneModel import StoneModel
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import re
@@ -88,7 +89,31 @@ def PCAmurine(axes):
     for _, row in coefs.iterrows():
         axes[1].errorbar(x=row['PC1'], y=row['PC2'], marker='.')
 
+# Return a dataframe with the fit data labeled with the condition variables
+def getFitPrediction(M, x):
+    _, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = M.NormalErrorCoef(x, fullOutput = True)
+
+    outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
+
+    dd = (pd.DataFrame(data = outputFit, columns = ['Fit'])
+          .assign(Ig = M.Igs*12)
+          .assign(FcgR = rep(M.FcgRs, 4)*2)
+          .assign(TNP = rep(M.TNPs, 24))
+          .assign(RbndPred = np.reshape(np.transpose(outputRbnd), (-1, 1)))
+          .assign(RmultiPred = np.reshape(np.transpose(outputRmulti), (-1, 1)))
+          .assign(nXlinkPred = np.reshape(np.transpose(outputnXlink), (-1, 1)))
+          .assign(LbndPred = np.reshape(np.transpose(outputLbnd), (-1, 1)))
+          .assign(Req = np.reshape(np.transpose(outputReq), (-1, 1)))
+         )
+
+    return dd
+
 def PCAhuman(axes):
+    Mod = StoneModel()
+
+    #x = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, -12.5, 1, 1, 4, 5, 1, 1], dtype=np.float64)
+
+    #outt = getFitPrediction(Mod, x)
 
 
 
