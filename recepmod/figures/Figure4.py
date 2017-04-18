@@ -1,43 +1,51 @@
-from itertools import product
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import seaborn as sns
-from cycler import cycler
-from ..StoneModel import StoneMod
-from .FigureCommon import subplotLabel
-from ..StoneTwoRecep import StoneTwo
+import pandas as pd
+from ..StoneModMouse import StoneModelMouse
 
-# Figure 4: Specific predictions regarding the coordinate effects of immune
-# complex parameters.
+# Predict in vivo response
 
 def makeFigure():
-    print("Starting Figure 4")
-
     import string
-    import os
     from matplotlib import gridspec
     from ..StoneHelper import getMedianKx
+    from .FigureCommon import subplotLabel
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
-    # We're going to need Kx
-    Kx = getMedianKx()
+    # Load murine class
+    Mod = StoneModelMouse()
 
     # Setup plotting space
-    f = plt.figure(figsize=(7,5))
+    f = plt.figure(figsize=(7, 5))
 
     # Make grid
-    gs1 = gridspec.GridSpec(2,3)
+    gs1 = gridspec.GridSpec(3, 3)
 
     # Get list of axis objects
-    ax = [ f.add_subplot(gs1[x]) for x in range(6) ]
+    ax = [ f.add_subplot(gs1[x]) for x in range(9) ]
 
-    # Plot subplot A
-    PredictionVersusAvidity(ax[0:4], Kx)
+    # Blank out for the cartoon
+    ax[0].axis('off')
 
-    # Plot from two receptor model
-    TwoRecep(Kx, ax = ax[4:6])
+    # Make binding data PCA plot
+    ClassAvidityPCA(Mod, ax=ax[1])
+
+    # Show performance of in vivo regression model
+    InVivoPredictVsActual(Mod, ax=ax[2])
+
+    # Show model components
+    InVivoPredictComponents(Mod, ax=ax[3])
+
+    # Leave components out plot
+    RequiredComponents(ax=ax[4])
+
+    # Show performance of affinity prediction
+    InVivoPredictVsActualAffinities(Mod, ax=ax[5])
+
+    # Predict class/avidity effect
+    ClassAvidityPredict(Mod, ax=ax[6])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -47,89 +55,116 @@ def makeFigure():
 
     return f
 
-def plotRanges():
-    avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
-    ligand = np.logspace(start = -12, stop = -5, num = 50)
-    Ka = [1.2E6, 1.2E5] # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
-    logR = [4.0, 4.5]
+Igs = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3'}
+Igidx = dict(zip(Igs, sns.color_palette()))
 
-    return (ligand, avidity, Ka, logR)
+def MurineIgLegend():
+    # Make Legend by Ig subclass
+    import matplotlib.lines as mlines
+    Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'v', 'IgG3':'s'}
+    Igc = {'IgG1':'r', 'IgG2a':'y', 'IgG2b':'g', 'IgG3':'b'}
+    patches = list()
 
-def skipColor(ax):
-    ax.set_prop_cycle(cycler('color', sns.color_palette()[1:]))
+    for j in Igs:
+        patches.append(mlines.Line2D([], [], color = Igc[j], marker=Igs[j], markersize=7, label=j, linestyle='None'))
 
-def PredictionVersusAvidity(ax, Kx):
-    '''
-    A) Predicted binding v conc of IC for varying avidity.
-    B) Predicted multimerized FcgR v conc of IC for varying avidity.
-    C) # of xlinks v conc of IC for varying avidity.
-    D) Binding v # xlinks for two different affinities, with varied avidities.
-    '''
-    # Receptor expression
-    ligand, avidity, Ka, logR = plotRanges()
+    return patches
 
-    skipColor(ax[1])
-    skipColor(ax[2])
-    skipColor(ax[3])
+def ClassAvidityPCA(Mod, ax=None):
+    """ Plot the generated binding data for different classes and avidities in PCA space. """
+    # If no axis was provided make our own
+    if ax is None:
+        ax = plt.gca()
+    
+    scores, _ = Mod.PCA()
 
-    def calculate(x):
-        a = StoneMod(logR[0],Ka[0],x['avidity'],Kx*Ka[0],x['ligand'], fullOutput = True)
+    for _, row in scores.iterrows():
+        colorr = Igidx[row['Ig']]
+        ax.errorbar(x=row['PC1'], y=row['PC2'], marker='.', mfc=colorr)
 
-        return pd.Series(dict(bound = a[0],
-                              avidity = x['avidity'],
-                              ligand = x['ligand'],
-                              ligandEff = x['ligand'] * x['avidity'],
-                              Rmulti = a[2],
-                              nXlink = a[3]))
+    ax.set_ylabel('PC 2')
+    ax.set_xlabel('PC 1')
 
-    inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
+def InVivoPredictVsActual(Mod, ax=None):
+    """ Plot predicted vs actual for regression of conditions in vivo. """
 
-    outputs = inputs.apply(calculate, axis = 1)
+    # If no axis was provided make our own
+    if ax is None:
+        ax = plt.gca()
 
-    for ii in avidity:
-        curDat = outputs[outputs['avidity'] == ii]
+    _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(printt=True)
 
-        curDat.plot(x = "ligand", y = "bound", ax = ax[0], logx = True, legend = False)
+    tbN.plot(ax=ax, x='Effectiveness', y='CrossPredict', kind='scatter')
 
-        if ii > 1:
-            curDat.plot(x = "ligand", y = "Rmulti", ax = ax[1], logx = True, legend = False)
-            curDat.plot(x = "ligand", y = "nXlink", ax = ax[2], logx = True, legend = False)
-            curDat.plot(x = "bound", y = "nXlink", ax = ax[3], loglog = True, legend = False)
+    ax.set_ylim(0, 1.1)
+    ax.set_xlim(0, 1.1)
+    ax.set_ylabel('Predicted Effect')
+    ax.set_xlabel('Actual Effect')
 
-    ax[0].set_xlabel('IC Concentration (M)')
-    ax[1].set_xlabel('IC Concentration (M)')
-    ax[2].set_xlabel('IC Concentration (M)')
-    ax[0].set_ylabel(r'Bound Fc$\gamma$RIIIA-F')
-    ax[1].set_ylabel(r'Multimerized Fc$\gamma$RIIIA-F')
-    ax[2].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
-    ax[3].set_xlabel(r'Bound Fc$\gamma$RIIIA-F')
-    ax[3].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
-    ax[3].set_ylim(1, 1E3)
-    ax[3].set_xlim(1, 1E4)
+def InVivoPredictComponents(Mod, ax=None):
+    """ Plot model components. """
 
-def TwoRecep(Kx, ax = None):
-    """
-    E) Predicted multimerized receptor versus avidity for RIII-Phe + RIIB
-    F) The predicted ratio (E)
-    """
-    ligand, avidity, Ka, logR = plotRanges()
+    # If no axis was provided make our own
+    if ax is None:
+        ax = plt.gca()
 
-    skipColor(ax[0])
-    skipColor(ax[1])
+    _, _, _, components, _, _ = Mod.KnockdownLassoCrossVal()
 
-    acl = StoneTwo(logR, Ka, Kx)
+    sns.barplot(ax=ax, y='Weight', x='Name', data=components)
 
-    inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
+    ax.set_xticklabels(ax.get_xticklabels(),
+                       rotation=40,
+                       rotation_mode="anchor",
+                       ha="right")
 
-    outputs = inputs.apply(lambda x: acl.getAllProps(int(x['avidity']), x['ligand']), axis = 1)
+    ax.set_ylabel('Weightings')
+    ax.set_xlabel('Components')
 
-    for ii in avidity[1::]:
-        outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], legend = False)
-        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
+def RequiredComponents(ax=None):
+    """ Plot model components. """
 
-    ax[0].set_xlabel(r'Multimerized Fc$\gamma$RIIIA-F')
-    ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
-    ax[1].set_xlabel('IC Concentration (M)')
-    ax[1].set_ylabel('Activity Index')
-    ax[0].set_ylim(0, 1E3)
-    ax[0].set_xlim(0, 1E3)
+    # If no axis was provided make our own
+    if ax is None:
+        ax = plt.gca()
+
+    ax.set_ylabel('LOO Perc Explained')
+    ax.set_xlabel('Components')
+
+def InVivoPredictVsActualAffinities(Mod, ax=None):
+    """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
+
+    # If no axis was provided make our own
+    if ax is None:
+        ax = plt.gca()
+
+    _, _, data = Mod.NimmerjahnPredictByAffinities()
+
+    data.plot(kind='scatter', x='Effectiveness', y='CrossPredict', ax=ax)
+    ax.set_ylabel('Predicted Effect')
+    ax.set_xlabel('Actual Effect')
+
+def ClassAvidityPredict(Mod, ax=None):
+    """ Plot prediction of in vivo model with varying avidity and class. """
+    from ..StoneModMouse import MultiAvidityPredict, StoneModelMouse
+    from copy import deepcopy
+
+    Mod = deepcopy(Mod)
+
+    # If no axis was provided make our own
+    if ax is None:
+        ax = plt.gca()
+
+    _, _, _, _, model, normV = Mod.KnockdownLassoCrossVal()
+
+    Mod.v = 30
+
+    table = MultiAvidityPredict(Mod, np.insert(model.coef_, 0, model.intercept_), normV)
+
+    for _, row in table.iterrows():
+        colorr = Igidx[row['Ig']]
+        ax.errorbar(x=row['Avidity'], y=row['Predict'], marker='.', mfc=colorr)
+
+
+    ax.set_ylabel('Predicted Effect')
+
+
