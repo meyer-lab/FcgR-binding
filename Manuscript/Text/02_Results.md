@@ -30,7 +30,7 @@ In contrast to NK cells, other innate immune cell types express activating and i
 
 ## An IgG-FcγR binding model deconvolves *in vivo* function
 
-![**An IgG-FcγR binding model deconvolves *in vivo* function.** A) Schematic of earlier IgG class experiments and regression approach. B) Principle components analysis of predicted binding with coordinate changes in IgG class or immune complex avidity. C) Predicted versus observed effect on lung metastasis formation upon cross-validation. D) Model weightings for elastic net regression of immune complex binding against lung metastasis reduction. E) Percent explained upon crossvalidation for models constructed with reduced sets of measurements. F) Predicted versus observed effect on lung metastasis formation upon cross-validation for a model utilizing only IgG-FcγR affinity measurements. G) Model predicted effectiveness upon variation in IgG class or avidity.](./Figures/Figure4.svg){#fig:InVivoResults}
+![**An IgG-FcγR binding model deconvolves *in vivo* function.** A) Schematic of earlier IgG class experiments and regression approach. B) Principal components analysis of predicted binding with coordinate changes in IgG class or immune complex avidity. C) Predicted versus observed effect on lung metastasis formation upon cross-validation. D) Model weightings for elastic net regression of immune complex binding against lung metastasis reduction. E) Percent explained upon crossvalidation for models constructed with reduced sets of measurements. F) Predicted versus observed effect on lung metastasis formation upon cross-validation for a model utilizing only IgG-FcγR affinity measurements. G) Model predicted effectiveness upon variation in IgG class or avidity.](./Figures/Figure4.svg){#fig:InVivoResults}
 
 We wished to finally explore whether a multivalent binding model can enable reverse engineering of effector function *in vivo*. We surmised that our modeling approach would allow one to convert interventions using defined IgG subclasses into predictions regarding the relevant IgG-FcγR driving response.
 
@@ -40,6 +40,6 @@ We wished to finally explore whether a multivalent binding model can enable reve
 
 
 
-## Human murine comparison
+## Human-murine comparison
 
-![**XXX.** A) XXX. B) XXX. C) XXX. D) XXX.](./Figures/Figure5.svg){#fig:SpeciesCompare}
+![**XXX.** A) Principal components analysis of predicted binding with coordinate changes in IgG class, immune complex avidity, and concentration. B) Variable loadings for the murine principal components analysis. C) XXX. D) Variable loadings for the human principal components analysis.](./Figures/Figure5.svg){#fig:SpeciesCompare}
