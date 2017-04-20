@@ -4,6 +4,7 @@
 import numpy as np
 import pandas as pd
 from memoize import memoize
+from scipy.stats import ttest_ind
 
 try:
     import cPickle as pickle
@@ -229,6 +230,3 @@ def geweke_chains(DSET):
         Statistics.append(statistics)
         Pvalues.append(pvalues)
     return Statistics, Pvalues
-
-def pseudoGeweke(chain1,chain2):
-    

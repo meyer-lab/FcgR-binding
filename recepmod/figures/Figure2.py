@@ -4,7 +4,7 @@ from matplotlib import gridspec, rcParams
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chain
+from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chains
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
 
 def makeFigure():
@@ -179,7 +179,7 @@ def plotFit(fitMean, ax=None):
 def GewekeDiagPlot(dset,ax=None):
     if not ax:
         ax = plt.gca()
-    _, pvalues = geweke_chain(dset)
+    _, pvalues = geweke_chains(dset)
     ax.plot([0.05]*len(pvalues),'r-')
     ax.set_xticks(np.array([j for j in range(len(pvalues))]))
     templist = []
