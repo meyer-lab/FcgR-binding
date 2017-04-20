@@ -1,8 +1,9 @@
 import unittest
 import random
 import time
+import pandas
 import numpy as np
-from ..StoneModMouse import StoneModelMouse
+from ..StoneModMouse import StoneModelMouse, MultiAvidityPredict
 
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
@@ -14,146 +15,92 @@ class TestStoneMouse(unittest.TestCase):
         print("%s: %.3f" % (self.id(), t*1000))
 
     def test_dataImport_kaMouse(self):
-        self.assertTrue(self.Mod.kaMouse.shape == (6,4))
+        self.assertTrue(self.Mod.kaMouse.shape == (4, 4))
 
     def test_dataOutput_StoneModMouse(self):
         # Checks size of fullOutput
-        logR = np.log10(24000)
-        kx = 10**(-7)
-        v = 5
-        Li = 10**(-9)
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
-        out = np.array(self.Mod.StoneModMouse(x, fullOutput = True))
-        self.assertTrue(out.shape == (5,6))
+        out = np.array(self.Mod.StoneModMouse())
+
+        self.assertTrue(out.shape == (4, 5, 4))
 
     def test_dataOutput_StoneModMouse2(self):
         # Checks that the model output satisfies R = Rbnd + Req
-        logR = np.log10(30000*random.random())
-        kx = random.random()
-        v = random.randint(1, 30)
-        Li = 10**(-8)*random.random()
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        x = [logR, logR, logR, logR, logR, logR, 'IgG2b', kx, v, Li]
-        a = self.Mod.StoneModMouse(x)
-        b = a[1] + a[2]
-        b = np.array(b)
-        for j in range(5):
-            if not np.isnan(b[j]):
-                self.assertAlmostEqual(10**logR, b[j], delta = (10**logR)/10000)
+
+        a = self.Mod.StoneModMouse()
+        
+        for i in range(len(self.Mod.Igs)):
+            for j in range(len(self.Mod.FcgRs)):
+                if not np.isnan(a[i, 1, j]):
+                    self.assertAlmostEqual(10**self.Mod.logR[j], 
+                                           a[i, 1, j] + a[i, 4, j], 
+                                           delta = (10**self.Mod.logR[j])/10000)
 
     def test_pdOutputTable(self):
-        # Checks the shape of pandas table from pdOutputTable
-        logR = np.log10(30000*random.random())
-        kx = random.random()
-        v = random.randint(1, 30)
-        Li = 10**(-8)*random.random()
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        tb = self.Mod.pdOutputTable(z, fullOutput = False)
-        self.assertTrue(tb.shape == (4,18))
-        tbfull = self.Mod.pdOutputTable(z, fullOutput = True)
-        self.assertTrue(tbfull.shape == (4,30))
+        """ Checks the shape of pandas table from pdOutputTable """
 
-    def test_pdAvidityTable(self):
-        # Check shape of pandas table from pdAvidityTable
-        logR = np.log10(30000*random.random())
-        kx = random.random()
-        v = random.randint(1, 30)
-        Li = 10**(-8)*random.random()
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        y = [logR, logR, logR, logR, logR, logR, 'IgG3', kx, Li]
-        tba = self.Mod.pdAvidityTable(y, 4, 7, fullOutput = False)
-        self.assertTrue(tba.shape == (4,18))
-        y2 = [logR, logR, logR, logR, logR, logR, 'IgG2a', kx, Li]
-        tba2 = self.Mod.pdAvidityTable(y2, v, v+2, fullOutput = True)
-        self.assertTrue(tba2.shape == (3,30))
-
-    def test_NimmerjahnEffectTable(self):
-        logR = np.log10(10**5)
-        kx = 10**(-7)
-        v = 10
-        Li = 10**(-9)
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        tbN = self.Mod.NimmerjahnEffectTable(z)
-
-        self.assertTrue(tbN.shape == (8,31))
-
-    def test_NimmerjahnMultiLinear(self):
-        # Prints coefficients of multi-linear regression model
-        logR = np.log10(10**5)
-        kx = 10**(-7)
-        v = 10
-        Li = 10**(-9)
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        zN = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        result = self.Mod.NimmerjahnMultiLinear(zN)
-        res = self.Mod.NimmerjahnLasso(zN)
-        res2 = self.Mod.NimmerjahnLassoCrossVal(zN)
+        tbfull = self.Mod.pdOutputTable()
 
         # Make sure we were given a Pandas dataframe
-        self.assertIsInstance(res, np.ndarray)
+        self.assertIsInstance(tbfull, pandas.core.frame.DataFrame)
 
-    def test_FcgRPlots(self):
-        # Plots effectiveness vs. each FcgR binding parameter
-        logR = np.log10(10**5)
-        kx = 10**(-7)
-        v = 10
-        Li = 10**(-9)
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        zN = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        self.Mod.FcgRPlots(zN)
+        self.assertTrue(tbfull.shape == (4,5*len(self.Mod.FcgRs)))
 
-    def test_RmultiAvidityTable(self):
-        # Plots effectiveness vs. each FcgR binding parameter
-        logR = np.log10(10**5)
-        kx = 10**(-7)
-        v = 5
-        Li = 7*10**(-9)
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        x = [logR, logR, logR, logR, logR, logR, 'IgG1', kx, v, Li]
-        z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        Rmultiv = self.Mod.RmultiAvidity(x)
-        self.Mod.RmultiAvidityTable(z)
-        self.assertTrue(Rmultiv.shape == (6,v))
+    def test_pdAvidityTable(self):
+        """ Checks pdAvidityTable """
+        # Check shape of pandas table from pdAvidityTable
+        tba2 = self.Mod.pdAvidityTable()
+        
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(tba2, pandas.core.frame.DataFrame)
+
+        self.assertTrue(tba2.shape == (self.Mod.v*len(self.Mod.Igs),5*len(self.Mod.FcgRs)))
+        
+    def test_MultiAvidityPredict(self):
+        """ Check MultiAvidityPredict """
+
+        _, _, _, _, model, normV = self.Mod.KnockdownLassoCrossVal()
+
+        table = MultiAvidityPredict(self.Mod, np.insert(model.coef_, 0, model.intercept_), normV)
+
+    def test_NimmerjahnEffectTable(self):
+        """ Check NimmerjahnEffectTable """
+        tbN = self.Mod.NimmerjahnEffectTable()
+
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
+
+        self.assertTrue(tbN.shape == (8,5*len(self.Mod.FcgRs)+1))
 
     def test_NimmerjahnTb_Knockdown(self):
-        logR = np.log10(10**5)
-        kx = 10**(-7)
-        v = 10
-        Li = 10**(-9)
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        tbNK = self.Mod.NimmerjahnTb_Knockdown(z)
-        self.Mod.NimmerjahnKnockdownLasso(z)
-        self.Mod.KnockdownLassoCrossVal(z)
-        self.Mod.KnockdownLassoCrossVal(z, logspace = True)
-        self.Mod.KnockdownLassoCrossVal2(z)
-        self.Mod.KnockdownLassoCrossVal3(z)
-        self.Mod.KnockdownPCA(z)
-        self.assertTrue(tbNK.shape == (18,25))
+        """ Check NimmerjahnTb_Knockdown """
+        tbNK = self.Mod.NimmerjahnTb_Knockdown()
+        # tbNK.to_csv('out.csv')
+        self.Mod.KnockdownLassoCrossVal()
+        self.Mod.KnockdownLassoCrossVal(logspace=True)
+        self.Mod.KnockdownLassoCrossVal(addavidity1=True, printt=True)
+        self.Mod.KnockdownLassoCrossVal(logspace=True, addavidity1=True)
 
-    def test_Knockdown_Tree(self):
-        logR = np.log10(10**5)
-        kx = 10**(-7)
-        v = 10
-        Li = 10**(-9)
-        if logR < 0 or kx < 0 or v < 0 or Li < 0:
-            raise ValueError('Negative input parameters')
-        z = [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        self.Mod.DecisionTree(z)
-        self.Mod.DecisionTree2(z)
-        self.Mod.DecisionTree3(z)
+    def test_NimmerjahnEffectTableAffinities(self):
+        """ Test that table for prediction off of just affinities is correct. """
+
+        tbN = self.Mod.NimmerjahnEffectTableAffinities()
+        # tbN.to_csv('out.csv')
+
+        self.Mod.NimmerjahnPredictByAffinities(simple=True)
+        self.Mod.NimmerjahnPredictByAffinities()
+        self.Mod.NimmerjahnPredictByAffinities(simple=True, logspace=True)
+        self.Mod.NimmerjahnPredictByAffinities(logspace=True)
+
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
+
+        self.assertTrue(tbN.shape == (11, 5))
+
+    def test_PCA(self):
+        scores, expVar = self.Mod.PCA()
+        
+        # Make sure we were given a Pandas dataframe
+        self.assertIsInstance(scores, pandas.core.frame.DataFrame)
 
 if __name__ == '__main__':
     unittest.main()

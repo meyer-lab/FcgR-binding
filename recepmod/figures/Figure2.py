@@ -24,25 +24,28 @@ def makeFigure():
     gs1 = gridspec.GridSpec(3,3)
 
     # Get list of axis objects
-    ax = [ f.add_subplot(gs1[x]) for x in range(1,9) ]
+    ax = [ f.add_subplot(gs1[x]) for x in range(9) ]
+
+    # Blank out for the cartoon
+    ax[0].axis('off')
 
     # Place likelihood plot
-    LLplot(dset, ax[0])
+    LLplot(dset, ax[1])
 
     # Show predicted versus actual
-    plotFit(getFitMeasMergedSummarized(M, pBest), ax = ax[1])
+    plotFit(getFitMeasMergedSummarized(M, pBest), ax = ax[2])
 
     # Make histogram subplots
-    histSubplots(dset, axes = [ax[2], ax[3], ax[4], ax[5]])
+    histSubplots(dset, axes = [ax[3], ax[4], ax[5], ax[6]])
 
     # Make receptor expression subplot
-    violinPlot(dset, ax = ax[6])
+    violinPlot(dset, ax = ax[7])
 
     # Make Geweke diagnostic subplot
     GewekeDiagPlot(dset,ax[7])
 
     for ii, item in enumerate(ax):
-        subplotLabel(item, string.ascii_uppercase[ii+1])
+        subplotLabel(item, string.ascii_uppercase[ii])
 
     return f
 
