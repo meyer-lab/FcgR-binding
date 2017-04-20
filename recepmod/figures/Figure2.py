@@ -29,8 +29,8 @@ def makeFigure():
     # Blank out for the cartoon
     ax[0].axis('off')
 
-    # Place likelihood plot
-    LLplot(dset, ax[1])
+    # Make Geweke diagnostic subplot
+    GewekeDiagPlot(M,dset,ax[1])
 
     # Show predicted versus actual
     plotFit(getFitMeasMergedSummarized(M, pBest), ax = ax[2])
@@ -40,9 +40,6 @@ def makeFigure():
 
     # Make receptor expression subplot
     violinPlot(dset, ax = ax[7])
-
-    # Make Geweke diagnostic subplot
-    GewekeDiagPlot(M,dset,ax[8])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -90,7 +87,7 @@ def violinPlot(dset, ax=None):
     dset = dset[['Rexp']]
     dset.columns = FcgRidx.keys()
 
-    sns.violinplot(data=dset, cut=0, ax=ax, linewidth = 0.0)
+    sns.violinplot(data=dset, cut=0, ax=ax, linewidth=0)
 
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
@@ -98,28 +95,6 @@ def violinPlot(dset, ax=None):
                        ha="right")
 
     ax.set_ylabel(r'Log$_{10}$ Fc$\gamma$R Expression')
-
-def LLplot(dset, ax = None):
-    # TODO: Should this maybe be a plot of the autocorrelation or geweke criterion instead?
-    if ax is None:
-        ax = plt.gca()
-
-    # Find out how many walkers we had
-    nwalkers = int(np.max(dset['walker'])) + 1
-
-    # Make an index for what step values came from
-    dset = dset.assign(IDX = np.repeat(range(int(dset.shape[0]/nwalkers)), nwalkers))
-
-    # Reorganize data for plotting
-    dset = dset[['LL', 'walker', 'IDX']].pivot(index = 'IDX', columns = 'walker', values = 'LL')
-    print(dset.shape)
-
-    # Plot LL values
-    dset.plot(ax = ax, legend = False, ylim = (-100, -50))
-
-    # Try and fix overlapping elements
-    plt.tight_layout()
-
 
 def histSubplots(dset, axes=None):
     if axes is None:
