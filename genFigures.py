@@ -1,19 +1,19 @@
-from matplotlib.backends.backend_pdf import PdfPages
-import matplotlib.pyplot as plt
-from recepmod.figures import Figure1
-from recepmod.figures import Figure2
-from recepmod.figures import Figure3
-from recepmod.figures import Figure4
-from recepmod.figures import Figure5
+from recepmod.figures import Figure1, Figure2, FigureSS, Figure3, Figure4, Figure5
 
 def runFunc(figClass, nameOut):
-    ff = figClass.makeFigure()
-    ff.savefig('./Manuscript/Figures/' + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
-    ff.savefig('./Manuscript/Figures/' + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+	print('Starting on ' + nameOut)
+	ff = figClass.makeFigure()
+	ff.savefig('./Manuscript/Figures/' + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+	ff.savefig('./Manuscript/Figures/' + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+
 runFunc(Figure1, 'Figure1')
 
 runFunc(Figure2, 'Figure2')
 
+runFunc(FigureSS, 'FigureSS')
+
 runFunc(Figure3, 'Figure3')
 
 runFunc(Figure4, 'Figure4')
+
+runFunc(Figure5, 'Figure5')
