@@ -42,7 +42,7 @@ def makeFigure():
     violinPlot(dset, ax = ax[7])
 
     # Make Geweke diagnostic subplot
-    GewekeDiagPlot(dset,ax[7])
+    GewekeDiagPlot(M,dset,ax[8])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -176,15 +176,24 @@ def plotFit(fitMean, ax=None):
     ax.set_ylim(0.01, 5)
     ax.set_xlim(0.01, 5)
 
-def GewekeDiagPlot(dset,ax=None):
+def GewekeDiagPlot(M,dset,ax=None):
     if not ax:
         ax = plt.gca()
     _, pvalues = geweke_chains(dset)
-    ax.plot([0.05]*len(pvalues),'r-')
-    ax.set_xticks(np.array([j for j in range(len(pvalues))]))
-    templist = []
-    for j in range(2,dset.shape[1]):
-        templist.append(dset.columns[j])
-    ax.set_xticklabels(templist,rotation=90,rotation_mode="anchor",ha="right")
-    ax.plot(pvalues,'gx')
+    ax.plot([j for j in range(M.Nparams)],[0.05]*M.Nparams,'r-')
+##    ax.set_xticks(np.array([j for j in range(len(pvalues))]))
+    
+##    templist = []
+##    for j in range(2,dset.shape[1]):
+##        templist.append(dset.columns[j])
+
+##    ax.set_xticklabels(templist,rotation=90,rotation_mode="anchor",ha="right")
+    pvallist = []
+    pvalues = np.array(pvalues)
+    for j in range(M.Nparams):
+        pvallist.append(np.max(pvalues[:,j]))
+    ax.plot(np.arange(M.Nparams),pvallist,'gx')
+    ax.set_xticks([j for j in range(M.Nparams)])
+    ax.set_xticklabels(M.FcgRs+M.pNames,rotation=40)
     ax.set_ylabel('p-values')
+    ax.xaxis.grid(False)
