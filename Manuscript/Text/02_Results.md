@@ -40,6 +40,11 @@ We wished to finally explore whether a multivalent binding model can enable reve
 
 
 
-## Human-murine comparison
+## HComparing human and mouse IgG-FcγR interactions
 
-![**XXX.** A) Principal components analysis of predicted binding with coordinate changes in IgG class, immune complex avidity, and concentration. B) Variable loadings for the murine principal components analysis. C) XXX. D) Variable loadings for the human principal components analysis.](./Figures/Figure5.svg){#fig:SpeciesCompare}
+![**Comparing human and mouse IgG-FcγR interactions.** A) Principal components analysis (scores plot) of predicted binding with coordinate changes in murine IgG class, immune complex avidity, and concentration. B) Variable loadings for the murine principal components analysis. C) Scores plot of corresponding principle components analysis for the human case. D) Variable loadings for the human principal components analysis.](./Figures/Figure5.svg){#fig:SpeciesCompare}
+
+
+
+
+
