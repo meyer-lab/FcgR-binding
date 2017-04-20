@@ -1,715 +1,337 @@
-import os
+import re
+from itertools import product
 import pandas as pd
 import numpy as np
-from scipy.misc import comb
+import sklearn
 from sklearn import linear_model
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGroupOut
 from sklearn.decomposition import PCA
-from sklearn import tree
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pydotplus
-from .StoneModel import StoneMod
+from .StoneHelper import rep, getMedianKx
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
 
+def funcAppend(indexList, nameApp):
+    idx = []
+    for i in indexList:
+        idx.append(i+nameApp)
+    return idx
+
 class StoneModelMouse:
-    # Takes in a list of shape (9) for x: Rexp for FcgRs and TRIM21 logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
+    # Takes in a list of shape (9) for x: Rexp for FcgRs logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):
+        import os
+
         path = os.path.dirname(os.path.abspath(__file__))
 
         self.Igs = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
-        self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV', 'FcgRn', 'TRIM21']
+        self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV']
         # Read in csv file of murine binding affinities
-        self.kaMouse = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), delimiter=',', skip_header=1, usecols=list(range(1,5)))
-        # Indices for elements in x
-        self.IgIDX = 6
-        self.kxIDX = 7
-        self.uvIDX = 8
-        self.L0IDX = 9
+        self.kaMouse = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), 
+                                     delimiter=',', 
+                                     skip_header=1, 
+                                     usecols=list(range(1,5)),
+                                     dtype=np.float64)
+        self.L0 = 1E-9
+        self.v = 10
+        self.Kx = getMedianKx()
+        self.logR = np.full((len(self.FcgRs),), np.log10(10**5), dtype = np.float64)
 
-    def StoneModMouse(self, x, fullOutput = False):
-        ## Returns the number of mutlivalent ligand bound to a cell with 10^logR
-        ## receptors, granted each epitope of the ligand binds to the receptor
-        ## kind in question with affinity Ka and cross-links with
-        ## other receptors with crosslinking constant Kx = 10^logKx. All
-        ## equations derived from Stone et al. (2001).
-
-        # Assign Ig type to a number corresponding to the row of Ka
-        x1 = x[:]
-        for i in range(4):
-            if self.Igs[i] == x[self.IgIDX]:
-                x1[self.IgIDX] = np.nan
-                l = i
-#        if type(x[self.IgIDX]) != int:
-#            return (np.nan, np.nan, np.nan)
-        #print(x[self.IgIDX])
-
-        # Assign inputs for StoneMod
-        x1 = np.array(x1)
-        v = x1[self.uvIDX]
-        Kx = x1[self.kxIDX]
-        L0 = x1[self.L0IDX]
+    def StoneModMouse(self):
+        '''
+        Returns the number of mutlivalent ligand bound to a cell with 10^logR
+        receptors, granted each epitope of the ligand binds to the receptor
+        kind in question with affinity Ka and cross-links with
+        other receptors with crosslinking constant Kx = 10^logKx. All
+        equations derived from Stone et al. (2001).
+        '''
+        from .StoneModel import StoneMod
 
         # Initiate numpy arrays for StoneMod outputs
-        outputLbnd = np.full((6), np.nan)
-        outputReq = np.full((6), np.nan)
-        outputRbnd = np.full((6), np.nan)
-
-        if fullOutput:
-            outputRmulti = np.full((6), np.nan)
-            outputnXlink = np.full((6), np.nan)
+        output = np.full((len(self.Igs), 5, len(self.FcgRs)), np.nan)
 
         # Iterate over each FcgR
-        for k in range(6):
-            logR = x1[k]
-            ## Set the affinity for the binding of the FcgR and IgG in question
-            Ka = self.kaMouse[k][l]
-            if Ka == '+' or np.isnan(Ka):
-                continue
-            Ka = float(Ka)
-            ## Calculate the MFI which should result from this condition according to the model
-            stoneModOut = StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
-            outputLbnd[k] = stoneModOut[0]
-            outputRbnd[k] = stoneModOut[1]
-            outputReq[k] = stoneModOut[4]
+        for l in range(len(self.Igs)):
+            for k in range(len(self.FcgRs)):
+                ## Set the affinity for the binding of the FcgR and IgG in question
+                Ka = self.kaMouse[k][l]
 
-            # Fill in Rmulti and nXlink for full output
-            if fullOutput:
-                outputRmulti[k] = stoneModOut[2]
-                outputnXlink[k] = stoneModOut[3]
+                ## Calculate the MFI which should result from this condition according to the model
+                stoneModOut = StoneMod(self.logR[k],Ka,self.v,self.Kx*Ka,self.L0, fullOutput = True)
+                output[l, :, k] = np.asarray(stoneModOut, dtype = np.float)
 
-        if fullOutput:
-            return (outputLbnd, outputRbnd, outputRmulti, outputnXlink, outputReq)
-        return (outputLbnd, outputRbnd, outputReq)
+        return output
 
-    def pdOutputTable(self, z, fullOutput = False):
-        # Takes in a list of shape (8) for z in the format of [logR, logR, logR, logR, logR, logR, kx, v, Li]
-        # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
-        # Outputs a pandas table of binding prediction
-        stoneModMurine = []
-        labels = []
+    def pdOutputTable(self):
+        """
+        Takes in a list of shape (8) for z in the format of [logR, logR, logR,
+        logR, logR, logR, kx, v, Li] Organizes the binding prediction between
+        the 24 Ig-FcgR pairs calculated by StoneModMouse(x). Outputs a pandas
+        table of binding prediction
+        """
 
         # Set labels for columns of pandas table
-        if fullOutput:
-            for i in self.FcgRs:
-                for j in ['-Lbnd', '-Rbnd', '-Rmulti', '-nXlink', '-Req']:
-                    labels.append(i+j)
-        else:
-            for i in self.FcgRs:
-                for j in ['-Lbnd', '-Rbnd', '-Req']:
-                    labels.append(i+j)
+        labels = []
+        for p in product(self.FcgRs, ['-Lbnd', '-Rbnd', '-Rmulti', '-nXlink', '-Req']):
+            labels.append(p[0]+p[1])
 
         # Make a 3-d array of StoneModMouse output for each Ig
-        if fullOutput:
-            for i in range(len(self.Igs)):
-                x = z[:]
-                x.insert(self.IgIDX, self.Igs[i])
-                stoneModMurine.append(np.transpose(self.StoneModMouse(x, fullOutput = True)))
-        else:
-            for i in range(len(self.Igs)):
-                x = z[:]
-                x.insert(self.IgIDX, self.Igs[i])
-                stoneModMurine.append(np.transpose(self.StoneModMouse(x)))
+        stoneModMurine = self.StoneModMouse()
 
         # Reshape data for pandas table
-        output = np.array(stoneModMurine)
-        if fullOutput:
-            output = np.reshape(output,(4,30))
-        else:
-            output = np.reshape(output,(4,18))
+        output = np.reshape(stoneModMurine, (4, -1), order = 'F')
 
         # Make pandas table of binding predictions of Ig-FcgR pairs
-        table = pd.DataFrame(np.array(output), index = self.Igs, columns = labels)
-        return table
+        return pd.DataFrame(output, index=self.Igs, columns=labels)
 
-    def pdAvidityTable(self, y, vl, vu, fullOutput = False):
-        # Takes in a list of shape (8) for y <x without avidity v>, lower bond for avidity vl, and upper bond for avidity vu
-        # Organizes a pandas table of binding predictions for a given Ig as avidity varies
+    def pdAvidityTable(self):
+        """
+        Organizes a pandas table of binding predictions for a given Ig as avidity varies from 1 to v
+        """
         tb1 = pd.DataFrame()
-        Ig = y[self.IgIDX]
         idx = []
         # Concatenating a pandas table for a range of avidity
-        if fullOutput is False:
-            for i in range(vl, vu+1):
-                x = y[:]
-                x.insert(self.uvIDX, i)
-                x.pop(self.IgIDX)
-                z = x
-                tb = self.pdOutputTable(z, fullOutput = False)
-                tb1 = pd.concat([tb1, tb.loc[[Ig]]])
-        elif fullOutput is True:
-            for j in range(vl, vu+1):
-                x = y[:]
-                x.insert(self.uvIDX, j)
-                x.pop(self.IgIDX)
-                z = x
-                tb = self.pdOutputTable(z, fullOutput = True)
-                tb1 = pd.concat([tb1, tb.loc[[Ig]]])
-        # Indexing
-        for k in range(vl, vu+1):
-            idx.append(Ig+'-'+str(k))
-        tb1.index = idx
-        return tb1
+        for j in range(1, self.v+1):
+            self.v = j
+            tb = self.pdOutputTable()
+            tb1 = pd.concat([tb1, tb])
 
-    def NimmerjahnEffectTable(self, z):
+            for _, Ig in enumerate(self.Igs):
+                idx.append(Ig+'-'+str(j))
+            
+        tb1.index = idx
+        self.v = 10
+        return tb1
+        
+    def NimmerjahnEffectTable(self):
         # Makes a pandas dataframe of shape(8,31) with 2 different avidities for each 1gG
         # Initiate variables
-        z1 = z[:]
-        tbN = pd.DataFrame()
         idx = []
         # create pandas tables
-        tv = self.pdOutputTable(z, fullOutput = True)
-        z1[self.uvIDX-1] = 1
-        t1 = self.pdOutputTable(z1, fullOutput = True)
-        # Compose a table of shape (8,30), 2 rows for each IgG
-        for i in self.Igs:
-            for j in [1, z[self.uvIDX-1]]:
-                if j == 1:
-                    tbN = pd.concat([tbN, t1.loc[[i]]])
-                else:
-                    tbN = pd.concat([tbN, tv.loc[[i]]])
-                idx.append(i+'-'+str(j))
+        tv = self.pdOutputTable()
+        uv = self.v
+        self.v = 1
+        tbN = pd.concat([tv, self.pdOutputTable()])
+        self.v = uv
+
+        # Redo the row indeces
+        idx = list(tbN.index)
+        for i in range(len(self.Igs)):
+            idx[i] = idx[i]+'-'+str(self.v)
+            idx[i+len(self.Igs)] = idx[i+len(self.Igs)]+'-1'
         tbN.index = idx
+
+        tbN = tbN.sort_index()
+
         # Append effectiveness data on the 31 column
         tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
+
         return tbN
 
-    def NimmerjahnMultiLinear(self, z, fullOutput = True):
-        # Multi-Linear regression of FcgR binding predictions for effectiveness of IgG therapy
-        reg = linear_model.LinearRegression()
-        tbN = self.NimmerjahnEffectTable(z)
-        # Assign independent variables and dependent variable "effect"
-        # Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
-        independent = np.array(tbN.iloc[list(range(2,6)), list(range(1,21,5))].apply(np.log10))
-        independent = independent.reshape(4,4)
-        effect = np.array(tbN.iloc[list(range(2,6)),30])
-        effect = effect.reshape(4,1)
-        # Linear regression and plot result
-        result = reg.fit(independent, effect)
-#        plt.scatter(effect, reg.predict(independent), color='black')
-#        plt.plot(effect, reg.predict(independent), color='blue', linewidth=3)
-        #plt.show()
-        return result
-
-    def NimmerjahnLasso(self, z):
-        # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
-        las = linear_model.Lasso(alpha = 0.005, normalize = True)
-        tbN = self.NimmerjahnEffectTable(z)
-        tbNparam = tbN.iloc[:, list(range(30))]
-        tbN_norm = (tbNparam - tbNparam.mean()) / (tbNparam.max() - tbNparam.min())
-        # Assign independent variables and dependent variable "effect"
-        # Current independent variables: FcgRbnd for FcgRI, FcgRIIB, FcgRIII, and FcgRIV
-        independent = np.array(tbN_norm.iloc[list(range(6)), list(range(20))])
-        independent = independent.reshape(6,20)
-        effect = np.array(tbN.iloc[list(range(6)),30])
-        effect = effect.reshape(6,1)
-        # Linear regression and plot result
-        res = las.fit(independent, effect)
-        coe = res.coef_
-        coe = coe.reshape(4,5)
-#        print(las.score(independent, effect))
-#        print(coe)
-        plt.scatter(effect, las.predict(independent), color='red')
-        plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
-        plt.show()
-        return independent
-
-    def NimmerjahnLassoCrossVal(self, z):
-        las = linear_model.Lasso(alpha = 0.005, normalize = True)
-        tbN = self.NimmerjahnEffectTable(z)
-        independent = self.NimmerjahnLasso(z)
-        effect = np.array(tbN.iloc[list(range(6)),30])
-        effect = effect.reshape(6,1)
-        x_train, x_test, y_train, y_test = train_test_split(independent, effect, test_size=1/6, random_state=0)
-        res = las.fit(x_train, y_train)
-#        print(las.score(x_test, y_test))
-        coe = res.coef_
-        coe = coe.reshape(4,5)
-#        print(coe)
-        return res
-
-    def FcgRPlots(self, z):
-        # Plot effectiveness vs. all FcgR binding parameters
-        tbN = self.NimmerjahnEffectTable(z)
-        tbNparam = tbN.iloc[:, list(range(30))]
-        tbN_norm = (tbNparam - tbNparam.mean()) / (tbNparam.max()- tbNparam.min())
-        # Initiate variables
-        bndParam = []
-        eff = []
-        # Set up binding parameters column
-        for j in range(20):
-            bndParam += list(tbN_norm.iloc[list(range(6)),j])
-        # Set up effectiveness column
-        for i in range(20):
-            eff += list(tbN.iloc[list(range(6)),30])
-        index = []
-        # Set index for 20 plots
-        for k in range(4):
-            for l in range(5):
-                for n in range(6):
-                    index.append(int(str(k+1)+str(l+1)))
-        # Plot effectiveness vs. each binding parameter
-        plotTb = np.array([index, bndParam, eff])
-        plotTb = np.transpose(plotTb)
-        table = pd.DataFrame(plotTb, columns = ['index', 'bndParam', 'eff'])
-        sns.lmplot(x="bndParam", y="eff", col = 'index', hue = 'index', col_wrap=2, ci=None, palette="muted", data=table, size = 3)
-
-    def Rmulti_v(self, kx, ka, L0, logR0, v):
-        # Returns the number of receptors bond at or above each avidity
-        # Initiate variables
-        R0 = np.power(10,logR0)
-        sigma = 0.001
-        Req = R0/2
-        high = R0
-        low = 0
-        L_bound = 0
-        L = []
-        Rmultiv = []
-        while abs(R0 - Req*(1 + v*L0*ka*(1+kx*Req)**(v-1))) > sigma:
-            if (R0 - Req*(1 + v*L0*ka*(1+kx*Req)**(v-1))) > 0:
-                low = Req
-            elif (R0 - Req*(1 + v*L0*ka*(1+kx*Req)**(v-1))) < 0:
-                high = Req
-            Req = (high+low)/2
-        for i in range(1, int(v+1)):
-            L.append(comb(v,i)*(kx**(i-1))*L0*ka*(Req**i))
-            L_bound += L[i-1]
-        R = L[:]
-        for j in range(len(L)):
-            R[j] = R[j]*(j+1)
-        for k in range(len(R)):
-            Rmultiv.append(sum(R[k:len(R)]))
-        Rmultiv = np.array(Rmultiv)
-        return Rmultiv
-
-    def RmultiAvidity(self, x):
-        # Assign Ig type to a number corresponding to the row of Ka
-        x1 = x[:]
-        for i in range(4):
-            if self.Igs[i] == x[self.IgIDX]:
-                x1[self.IgIDX] = np.nan
-                l = i
-
-        # Assign inputs for Rmulti_v
-        x1 = np.array(x1)
-        v = int(x1[self.uvIDX])
-        Kx = x1[self.kxIDX]
-        L0 = x1[self.L0IDX]
-
-        # Initiate numpy arrays for StoneMod outputs
-        outputRmultiv = np.full((6,v), np.nan)
-
-        # Iterate over each FcgR
-        for k in range(6):
-            logR = x1[k]
-            ## Set the affinity for the binding of the FcgR and IgG in question
-            Ka = self.kaMouse[k][l]
-            if Ka == '+' or np.isnan(Ka):
-                continue
-            Ka = float(Ka)
-            ## Calculate the MFI which should result from this condition according to the model
-            RmultivOut = self.Rmulti_v(Kx, Ka, L0, logR, v)
-            outputRmultiv[k] = RmultivOut
-        outputRmultiv = outputRmultiv.reshape(6,int(v))
-        return outputRmultiv
-
-    def RmultiAvidityTable(self,z):
-        # Organizes the binding prediction between the 24 Ig-FcgR pairs calculated by StoneModMouse(x)
-        # Outputs a pandas table of binding prediction
-        v = z[self.uvIDX-1]
-        Rmultiv = []
-        labels = []
-
-        # Set labels for columns of pandas table
-        for i in self.FcgRs:
-            for j in range(v):
-                labels.append(i+'-'+str(j+1))
-
-        # Make a 3-d array of StoneModMouse output for each Ig
-        for i in range(len(self.Igs)):
-            x = z[:]
-            x.insert(self.IgIDX, self.Igs[i])
-            Rmultiv.append(self.RmultiAvidity(x))
-
-        # Reshape data for pandas table
-        output = np.array(Rmultiv)
-        output = np.reshape(output,(4,6*v))
-
-        # Make pandas table of binding predictions of Ig-FcgR pairs
-        tbv = pd.DataFrame(np.array(output), index = self.Igs, columns = labels)
-        # Append effectiveness data on the last column
-        tbv.loc[:,'Effectiveness'] = pd.Series([0,0.95,0.20,0], index=tbv.index)
-        return tbv
-
-    def NimmerjahnTb_Knockdown(self, z):
-        tbK = self.NimmerjahnEffectTable(z)
-        # remove Req columns
-        l = list(range(31))
-        for i in range(6):
-            col = 5*(5-i)+4
-            l.pop(col)
-        tbK = tbK.iloc[list(range(6)), l]
+    def NimmerjahnEffectTableAffinities(self):
+        # Setup initial table
+        tbK = pd.DataFrame(np.transpose(self.kaMouse),
+                           index = self.Igs,
+                           columns = self.FcgRs)
+        tbK.loc[:,'Effectiveness'] = pd.Series([0, 0.95, 0.20, 0], index=tbK.index)
 
         # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
-        tbK1 = tbK.iloc[:, list(range(24))]
-        idx1 = []
-        for i in tbK1.index:
-            idx1.append(i+'-FcgRIIB-/-')
-        tbK1.index = idx1
-        FcgRIIBcol = tbK.columns[4:8]
-        l1 = list(range(24))
-        for i in range(4):
-            l1.pop(7-i)
-        tbK1 = tbK1.iloc[:, l1]
-        for j in range(4):
-            tbK1.insert((4+j), FcgRIIBcol[j], 0)
-        tbK1.loc[:,'Effectiveness'] = pd.Series([0,.70,0,1,0,0.75], index=tbK1.index)
+        tbK1 = tbK.copy()
+        tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
+        tbK1.loc[:,'Effectiveness'] = pd.Series([0.7, 1, 0.75, 0],
+                                                index=tbK1.index)
+        tbK1.iloc[:, 4:8] = 0.0
+
+        # set up tbK2 for FcgRI, FcgRIII, FcgRI/IV knockdown, IgG2a treatment
+        tbK2 = tbK.iloc[(1, 1, 1), :].copy()
+        idx = list(tbK2.index)
+        idx[0] = idx[0] + '-FcgRI-/-'
+        idx[1] = idx[1] + '-FcgRIII-/-'
+        idx[2] = idx[2] + '-FcgRI,IV-/-'
+        tbK2.index = idx
+        tbK2.loc[:, 'Effectiveness'] = pd.Series([0.8, 0.93, 0.35], index=tbK2.index)
+        tbK2.iloc[0, 0] = 0.0
+        tbK2.iloc[1, 2] = 0.0
+        tbK2.iloc[2, 0] = 0.0
+        tbK2.iloc[2, 3] = 0.0
+
+        # Join tbK, tbK1, tbK2 into one table
+        return tbK.append([tbK1, tbK2])
+
+    def NimmerjahnPredictByAffinities(self, fixed=False, simple=False, logspace=False):
+        """ This will run ordinary linear regression using just affinities of receptors. """
+
+        # Run ridge regression with forced direction or simple OLS
+        if simple is True:
+            lr = linear_model.LinearRegression()
+        else:
+            lr = linear_model.ElasticNet(positive=fixed, max_iter=10000)
+
+        data = self.NimmerjahnEffectTableAffinities()
+
+        # Log transform if needed
+        if logspace is True:
+            data = data.apply(np.log2).replace(-np.inf, -5)
+
+        X = data.iloc[:, 0:4]
+        y = data['Effectiveness']
+
+        # If we're fixing the parameters, we need to make the inhibitory receptor negative
+        if fixed is True:
+            X.loc[:, 1] = -X.iloc[:, 1]
+
+        # Run crossvalidation predictions at the same time
+        predicted = cross_val_predict(lr, X, y, cv=11)
+
+        # How well did we do on crossvalidation?
+        crossval_perf = sklearn.metrics.explained_variance_score(y, predicted)
+
+        # Do direct regression too
+        lr.fit(X, y)
+
+        # How well did we do on direct?
+        direct_perf = sklearn.metrics.explained_variance_score(y, lr.predict(X))
+
+        data['DirectPredict'] = lr.predict(X)
+        data['CrossPredict'] = predicted
+
+        return (direct_perf, crossval_perf, data)
+
+    def NimmerjahnTb_Knockdown(self):
+        tbK = self.NimmerjahnEffectTable()
+        # remove Req columns
+        tbK = tbK.select(lambda x: not re.search('Req', x), axis=1)
+
+        # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
+        tbK1 = tbK.copy()
+        tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
+        tbK1.loc[:,'Effectiveness'] = pd.Series([0, 0.7, 0, 1, 0, 0.75, 0, 0],
+                                                index=tbK1.index)
+        tbK1.iloc[:, 4:8] = 0.0
 
         # set up tbK2 for FcgRI knockdown, IgG2a treatment
-        tbK2 = tbK.iloc[(2,3), list(range(24))]
-        idx2 = []
-        for i in tbK2.index:
-            idx2.append(i+'-FcgRI-/-')
-        tbK2.index = idx2
-        FcgRIcol = tbK.columns[0:4]
-        l2 = list(range(24))
-        for i in range(4):
-            l2.pop(0)
-        tbK2 = tbK2.iloc[:, l2]
-        for j in range(4):
-            tbK2.insert(j, FcgRIcol[j], 0)
-        tbK2.loc[:,'Effectiveness'] = pd.Series([0,0.80], index=tbK2.index)
+        tbK2 = tbK.iloc[(2, 3), :].copy()
+        tbK2.index = funcAppend(tbK2.index, '-FcgRI-/-')
+        tbK2.loc[:,'Effectiveness'] = pd.Series([0, 0.8], index=tbK2.index)
+        tbK2.iloc[:, 0:4] = 0.0
 
         # set up tbK3 for FcgRIII knockdown, IgG2a treatment
-        tbK3 = tbK.iloc[(2,3), list(range(24))]
-        idx3 = []
-        for i in tbK3.index:
-            idx3.append(i+'-FcgRIII-/-')
-        tbK3.index = idx3
-        FcgRIIIcol = tbK.columns[8:12]
-        l3 = list(range(24))
-        for i in range(4):
-            l3.pop(11-i)
-        tbK3 = tbK3.iloc[:, l3]
-        for j in range(4):
-            tbK3.insert(8+j, FcgRIIIcol[j], 0)
-        tbK3.loc[:,'Effectiveness'] = pd.Series([0,0.93], index=tbK3.index)
+        tbK3 = tbK.iloc[(2, 3), :].copy()
+        tbK3.index = funcAppend(tbK3.index, '-FcgRIII-/-')
+        tbK3.loc[:,'Effectiveness'] = pd.Series([0, 0.93], index=tbK3.index)
+        tbK3.iloc[:, 8:12] = 0.0
 
         # set up tbK4 table for FcgRI knockdown, FcgRIV blocking, IgG2a treatment
-        tbK4 = tbK.iloc[(2,3), list(range(24))]
-        idx4 = []
-        for i in tbK4.index:
-            idx4.append(i+'-FcgRI,IV-/-')
-        tbK4.index = idx4
-        FcgRIcol2 = tbK.columns[0:4]
-        FcgRIVcol = tbK.columns[12:16]
-        l4 = list(range(24))
-        for i in range(4):
-            l4.pop(15-i)
-        for i in range(4):
-            l4.pop(3-i)
-        tbK4 = tbK4.iloc[:, l4]
-        for j in range(4):
-            tbK4.insert(j, FcgRIcol2[j], 0)
-        for j in range(4):
-            tbK4.insert(12+j, FcgRIVcol[j], 0)
-        tbK4.loc[:,'Effectiveness'] = pd.Series([0,0.35], index=tbK4.index)
+        tbK4 = tbK.iloc[(2, 3), :].copy()
+        tbK4.index = funcAppend(tbK4.index, '-FcgRI,IV-/-')
+        tbK4.loc[:,'Effectiveness'] = pd.Series([0, 0.35], index=tbK4.index)
+        tbK4.iloc[:, 0:4] = 0.0
+        tbK4.iloc[:, 12:16] = 0.0
 
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
-        tbNK = tbK.append(tbK1)
-        tbNK = tbNK.append(tbK2)
-        tbNK = tbNK.append(tbK3)
-        tbNK = tbNK.append(tbK4)
+        return tbK.append([tbK1, tbK2, tbK3, tbK4])
 
-        return tbNK
+    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
+        """ Cross validate KnockdownLasso by using a pair of rows as test set """
+        las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)
+        scale = StandardScaler()
 
-    def NimmerjahnKnockdownLasso(self, z):
-        # Lasso regression of IgG1, IgG2a, and IgG2b effectiveness with binding predictions as potential parameters
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
+        # Collect data
+        X, y, tbN = self.modelPrep(logspace)
+
+        X = scale.fit_transform(X)
+
+        # Setup the crossvalidation iterators
+        if addavidity1 is False:
+            loo = LeaveOneOut()
+            looI = loo.split(X, y)
+        else:
+            loo = LeaveOneGroupOut()
+            looI = loo.split(X, y, groups = rep(range(11), 2))
+
+        # Run crossvalidation
+        predict = cross_val_predict(las, X, y, cv = looI, n_jobs=-1)
+
+        # How well did we do on crossvalidation?
+        crossval_perf = sklearn.metrics.explained_variance_score(y, predict)
+
+        # Do direct regression too
+        las.fit(X, y)
+
+        components = pd.Series(las.coef_, tbN.columns[:-1], dtype=np.float64)
+        components['Intercept'] = las.intercept_
+        components = components.to_frame(name='Weight')
+        components['Name'] = components.index
+
+        # How well did we do on direct?
+        direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
+
+        if printt is True:
+            print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
+
+        tbN['DirectPredict'] = las.predict(X)
+        tbN['CrossPredict'] = predict
+
+        return (direct_perf, crossval_perf, tbN, components, las, scale)
+
+    def modelPrep(self, logspace=False):
+        """ Collect the data and split into X and Y blocks. """
+        tbN = self.NimmerjahnTb_Knockdown()
+        tbN = tbN.select(lambda x: not re.search('Lbnd', x), axis=1)
+        tbN = tbN.select(lambda x: not re.search('nX', x), axis=1)
+        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
+        # Log transform if needed
+        if logspace is True:
+            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -5)
+
         # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbN_norm.iloc[:, list(range(16))])
-        independent = independent.reshape(18,16)
-        effect = np.array(tbN.iloc[:,24])
-        effect = effect.reshape(18,1)
-        # Linear regression and plot result
-        res = las.fit(independent, effect)
-        coe = res.coef_
-        coe = coe.reshape(4,4)
-#        print(las.score(independent, effect))
-#        print(coe)
-        plt.scatter(effect, las.predict(independent), color='red')
-        plt.plot(effect, las.predict(independent), color='blue', linewidth=3)
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
-        return res
+        independent = np.array(tbNparam)
+        effect = np.array(tbN['Effectiveness'])
 
-    def KnockdownLassoCrossVal(self, z, logspace = False):
-        # Cross validate KnockdownLasso by using a pair of rows as test set
-        # Predicts for IgG1, IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, and IgG2a-I,IV-/-
-        # Fails to predict for IgG2b, IgG1-IIB-/-, IgG2a-III-/-
-        # In logspace, works for IgG2a, IgG2a-IIB-/-, IgG2b-IIB-/-, and IgG2a-I,IV-/- 
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbN1 = tbN.copy()
-        if logspace == True:
-            for i in range (18):
-                for j in range(24):
-                    if np.isnan(tbN1.iloc[i,j]) == False:
-                        if tbN1.iloc[i,j] >=1:
-                            tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
-        tbNparam = tbN1.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        
-        # Iterate over each set of 2 rows being the test set
-        for r in range(9):
-#            print(r)
-            ls = list(range(18))
-            ls.pop(2*r+1)
-            ls.pop(2*r)
-            x_train = np.array(tbN_norm.iloc[ls, list(range(16))])
-            y_train = np.array(tbN.iloc[ls,24])
-            x_test = np.array(tbN_norm.iloc[[2*r,2*r+1], list(range(16))])
-            y_test = np.array(tbN.iloc[[2*r,2*r+1],24])
-            res = las.fit(x_train, y_train)
-#            print(las.score(x_train,y_train))
-#            print(las.score(x_test, y_test))
-#            print(y_test,las.predict(x_test))
-#            y1 = y_test[1]
-#            y1 = np.array(y1)
-#            print(1-abs(las.predict(x_test[1,:])-y1)/y1)
-#            plt.scatter(y_train, las.predict(x_train), color='red')
-#            plt.scatter(y_test, las.predict(x_test), color='green')
-#            plt.plot(y_train, las.predict(x_train), color='blue', linewidth=3)
-#            plt.xlabel("Effectiveness")
-#            plt.ylabel("Prediction")
-#            plt.show()
-#            coe = res.coef_
-#            coe = coe.reshape(4,4)
-#            print(coe)
-        return res
-
-    def KnockdownLassoCrossVal2(self, z):
-        # Cross validate KnockdownLasso(v=10) by using a row as test set
-        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-, 
-        # Kind of predictive for IgG2b, IgG2a-I,IV-/- (predicted = 2*actual) ()
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        eff = []
-        predict = []
-        for r in range(9):
-#            print(r)
-            l = [2*x+1 for x in range(9)]
-            l.pop(r)
-            x_train = np.array(tbN_norm.iloc[l,list(range(16))])
-            y_train = np.array(tbN.iloc[l,24])
-            x_test = np.array(tbN_norm.iloc[[2*r+1], list(range(16))])
-            y_test = np.array(tbN.iloc[[2*r+1],24])
-            res = las.fit(x_train, y_train)
-            eff.append(y_test)
-            predict.append(las.predict(x_test))
-#            print(las.score(x_train,y_train))
-#            print(y_test,las.predict(x_test))
-#            if y_test != 0:
-#                print(1-abs(las.predict(x_test)-y_test)/y_test)
-#            plt.scatter(y_train, las.predict(x_train), color='red')
-#            plt.scatter(y_test, las.predict(x_test), color='green')
-#            plt.plot((0,1),(0,1), ls="--", c=".3")
-#            plt.xlabel("Effectiveness")
-#            plt.ylabel("Prediction")
-#            plt.show()
-#            coe = res.coef_
-#            coe = coe.reshape(4,4)
-#            print(coe)
-        plt.scatter(eff, predict, color='green')
-        plt.plot((0,1),(0,1), ls="--", c=".3")
-        plt.title("Cross-Validation 2")
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
-        return res
+        return (independent, effect, tbN)
     
-    def KnockdownLassoCrossVal3(self, z):
-        # Cross validate KnockdownLasso(v=10) by using a row as test set
-        # Predictive when test sets are IgG1, IgG2a, IgG1-IIB-/-, IgG2a-IIB-/-, IgG2b-IIB-/-, IgG2a-I-/-, IgG2a-III-/-, 
-        # Kind of predictive for IgG2b, IgG2a-I,IV-/- (predicted = 2*actual) ()
-        las = linear_model.Lasso(alpha = 0.01, normalize = True)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbN1 = tbN.copy()
-        for i in range (18):
-            for j in range(24):
-                if np.isnan(tbN1.iloc[i,j]) == False:
-                    if tbN1.iloc[i,j] >=1:
-                        tbN1.ix[i,j] = np.log2(tbN1.iloc[i,j])
-        tbNparam = tbN1.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        eff = []
-        predict = []
-        for r in range(9):
-#            print(r)
-            l = [2*x+1 for x in range(9)]
-            l.pop(r)
-            x_train = np.array(tbN_norm.iloc[l,list(range(16))])
-            y_train = np.array(tbN.iloc[l,24])
-            x_test = np.array(tbN_norm.iloc[[2*r+1], list(range(16))])
-            y_test = np.array(tbN.iloc[[2*r+1],24])
-            res = las.fit(x_train, y_train)
-            eff.append(y_test)
-            predict.append(las.predict(x_test))
-#            print(las.score(x_train,y_train))
-#            print(y_test,las.predict(x_test))
-#            if y_test != 0:
-#                print(1-abs(las.predict(x_test)-y_test)/y_test)
-#            plt.scatter(y_train, las.predict(x_train), color='red')
-#            plt.scatter(y_test, las.predict(x_test), color='green')
-#            plt.plot((0,1),(0,1), ls="--", c=".3")
-#            plt.xlabel("Effectiveness")
-#            plt.ylabel("Prediction")
-#            plt.show()
-#            coe = res.coef_
-#            coe = coe.reshape(4,4)
-#            print(coe)
-        plt.scatter(eff, predict, color='green')
-        plt.plot((0,1),(0,1), ls="--", c=".3")
-        plt.title("Cross-Validation 3")
-        plt.xlabel("Effectiveness")
-        plt.ylabel("Prediction")
-        plt.show()
-        return res
-
-    def KnockdownPCA(self,z):
-        # Principle Components Analysis of effectiveness vs. FcgR binding
-        # predictions in Knockdown table
+    def PCA(self, plott = False):
+        """ Principle Components Analysis of FcgR binding predictions """
         pca = PCA(n_components=5)
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbN_norm.iloc[:, list(range(16))])
-        independent = independent.reshape(18,16)
-        effect = np.array(tbN.iloc[:,24])
-        effect = effect.reshape(18,1)
+        table = self.pdAvidityTable()
+        scale = StandardScaler()
+        
+        # remove Req columns
+        table = table.select(lambda x: not re.search('Req', x), axis=1)
 
-        # Plot explained variance ratio
-        result = pca.fit(independent, effect)
-#        print(pca.explained_variance_ratio_)
-        plt.figure(1, figsize=(4, 3))
-        plt.clf()
-        plt.axes([.2, .2, .7, .7])
-        plt.plot(pca.explained_variance_, linewidth=2)
-        plt.axis('tight')
-        plt.xlabel('n_components')
-        plt.ylabel('explained_variance_')
-        plt.show()
+        X = scale.fit_transform(np.array(table))
+        
+        # Fit PCA
+        result = pca.fit_transform(X)
+        
+        # Assemble scores
+        scores = pd.DataFrame(result, index=table.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
+        scores['Avidity'] = scores.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+        scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
 
-        # Plot loading
-        trans = PCA(n_components=2).fit_transform(independent, effect)
-        plt.scatter(trans[:, 0], trans[:, 1], color='red')
-#        plt.plot(trans[:, 0], trans[:, 1], color='blue', linewidth=3)
-        plt.title("First 2 PCA directions")
-        plt.xlabel("PC1")
-        plt.ylabel("PC2")
-        plt.show()
-#        print(trans)
-        return result
+        return (scores, pca.explained_variance_ratio_)
+        
+            
+def MultiAvidityPredict(M, paramV, normV):
+    """ Make predictions for the effect of avidity and class. """
+    table = M.pdAvidityTable()
 
-    def DecisionTree(self,z):
-        # Decision Tree using Knockdown table with a pair of rows corresponding
-        # to same IgG and FcgRconditions taken out.
-        # Does not accurately predict for IgG2b, IgG1-IIB-/-, IgG2a-I-/-, and IgG2a-I,IV-/-
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        independent = np.array(tbN_norm.iloc[:, list(range(16))])
-        independent = independent.reshape(18,16)
-        effect = np.array(tbN.iloc[:,24])
-        effect = effect.reshape(18,1)
-        for i in range(18):
-            if effect[i] >= 0.5:
-                effect[i] = 1
-            else:
-                effect[i] = 0
-        #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
-        #Assign independent variables and dependent variable "effect"
-        for i in range(9):
-            ls = list(range(18))
-            ls.pop(2*i+1)
-            ls.pop(2*i)
-            independent1 = np.array(independent[ls,:])
-            effect1 = np.array(effect[ls])
-        # Construct Decision Tree
-            clf = tree.DecisionTreeClassifier()
-            clf = clf.fit(independent1, effect1)
-#            print(clf.predict(independent[[2*i,2*i+1], :]))
-#            print(clf.predict_proba(independent[[2*i,2*i+1], :]))
-#        dot_data = tree.export_graphviz(clf, out_file=None)
-#        graph = pydotplus.graph_from_dot_data(dot_data)
-#        graph.write_pdf("DecisionTree.pdf")
-        return effect
+    # remove Req columns
+    table = table.select(lambda x: not re.search('nX', x), axis=1)
+    table = table.select(lambda x: not re.search('Lbnd', x), axis=1)
+    table = table.select(lambda x: not re.search('Req', x), axis=1)
 
-    def DecisionTree2(self,z):
-        # Decision Tree with one row removed
-        # Fails to predict for IgG2b, IgGI-IIB-/-, IgG2a-I,IV-/-
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        independent = np.array(tbN_norm.iloc[:, list(range(16))])
-        independent = independent.reshape(18,16)
-        effect = np.array(tbN.iloc[:,24])
-        effect = effect.reshape(18,1)
-        for i in range(18):
-            if effect[i] >= 0.5:
-                effect[i] = 1
-            else:
-                effect[i] = 0
-        #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
-        # Assign independent variables and dependent variable "effect"
+    if len(paramV) != (table.shape[1] + 1):
+        raise ValueError('Weighting list doesn\'t match data.')
 
-        for i in range(18):
-            ls = list(range(18))
-            ls.pop(i)
-            independent1 = np.array(independent[ls,:])
-            effect1 = np.array(effect[ls])
-        # Construct Decision Tree
-            clf = tree.DecisionTreeClassifier()
-            clf = clf.fit(independent1, effect1)
-#            print(clf.predict(independent[i:i+1, :]))
-#            print(clf.predict_proba(independent[i:i+1, :]))
-        return effect
-    
-    def DecisionTree3(self,z):
-        # Decision Tree with 9 rows (only v = 10)
-        # Fails to predict for IgG2b, IgG2a-I-/-, IgG2a-I,IV-/-
-        tbN = self.NimmerjahnTb_Knockdown(z)
-        tbNparam = tbN.iloc[:, list(range(24))]
-        tbN_norm = (tbNparam - tbNparam.min()) / (tbNparam.max() - tbNparam.min())
-        independent = np.array(tbN_norm.iloc[:, list(range(16))])
-        independent = independent.reshape(18,16)
-        effect = np.array(tbN.iloc[:,24])
-        effect = effect.reshape(18,1)
-        for i in range(18):
-            if effect[i] >= 0.5:
-                effect[i] = 1
-            else:
-                effect[i] = 0
-        #effect = np.array([0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,0]
-        # Assign independent variables and dependent variable "effect"
+    def transF(inVal):
+        return np.dot(paramV[1::], np.squeeze(normV.transform(inVal.values.reshape(1, -1)))) + paramV[0]
 
-        for i in range(9):
-            ls = list(range(1,18,2))
-            ls.pop(i)
-            independent1 = np.array(independent[ls,:])
-            effect1 = np.array(effect[ls])
-        # Construct Decision Tree
-            clf = tree.DecisionTreeClassifier()
-            clf = clf.fit(independent1, effect1)
-#            print(clf.predict(independent[2*i+1:2*i+2, :]))
-#            print(clf.predict_proba(independent[i:i+1, :]))
-        return effect
+    table['Predict'] = table.apply(transF, axis=1)
+    table['Avidity'] = table.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+    table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
+
+    return table

@@ -5,6 +5,8 @@ author:
   affiliation: Koch Institute for Integrative Cancer Research
 - name: Ning Guan
   affiliation: Koch Institute for Integrative Cancer Research
+- name: Anja Lux
+  affiliation: Friedrich-Alexander-University of Erlangen-Nürnberg
 - name: Aaron S. Meyer
   affiliation: Koch Institute for Integrative Cancer Research
 keywords:
@@ -34,6 +36,6 @@ Multiple efforts have sought to improve our understanding of IgG-mediated effect
 
 Models of multivalent ligand binding to monovalent receptors have been successfully employed to study function of other immune receptors with known, corresponding binding models [@Perelson:1980fs] [@Perelson:1980ds] [@Hlavacek:1999gb]. For example, a two-component binding model can capture the effect of T cell receptor activation [@Stone:2001fm]. However, the FcγR family presents the considerable additional challenge of multiple distinct receptor classes expressed simultaneously within cells. Additionally, the multiple FcγRs present, with activating and inhibitory roles, ensure that any manipulation of immune complex composition will necessarily have multivariate effects. The same challenge exists for other paired receptor-ligand families, including other immunoglobulin classes and the many phosphatidylserine receptors. Thus, while the underlying theoretical models of multivalent binding are long-standing, FcγR-IgG interactions are especially suited for developments in the ability to rigorously link these models to experimental observations.
 
-TODO: Make this last point more explicit.
+TODO: Flesh out this last point.
 
 In this study, we have employed a model of multivalent immune complex binding to FcγR receptors and show that it can capture the experimentally measured binding at differing valencies. Applying this model, we show it can quantitatively predict effector response in response to diverse interventions in a forward manner, and can deconvolve the causal factors of response in a reverse fashion. More broadly, these results demonstrate the power of a unified binding model tied to computational inference techniques linking theory and experimental observation.

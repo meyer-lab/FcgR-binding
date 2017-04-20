@@ -1,34 +1,25 @@
-import os
 import numpy as np
-from scipy.optimize import brentq
-from scipy.misc import comb
 from memoize import memoize
 
 np.seterr(over = 'raise')
 
-# Normal distribution function. Sums over the likelihoods of points in x
 def logpdf_sum(x, loc, scale):
+    """ Normal distribution function. Sums over the likelihoods of points in x """
     root2 = np.sqrt(2)
     root2pi = np.sqrt(2*np.pi)
     prefactor = - x.size * np.log(scale * root2pi)
     summand = -np.square((x - loc)/(root2 * scale))
     return  prefactor + np.nansum(summand)
 
-# A fast cached version of nchoosek
 @memoize
-def nchoosek(n, k):
-    return comb(n, k, exact=True)
+def nchoosek(n):
+    """ A fast cached version of nchoosek. """
+    from scipy.misc import comb
 
-# Normalize the input data taking into account batch effects
+    return comb(n, np.arange(n+1))
+
 def normalizeData(filepath):
-    ## To begin, read in the MFI measurements from both of Lux's experiments from
-    ## their respective csvs. Then, subtract background MFIs from these nominal
-    ## MFIs. Then, normalize the data by replicate. For each step after the
-    ##reading, I manipulated the csv data in different ways, which are explained
-    ## in the comments. Please refer to these comments to understand what is
-    ## going on, especially with variables of the name "temp$." All
-    ## variables with such names are only meant to construct mfiAdjMean1 (from
-    ## Lux's first experiments) and mfiAdjMean2 (from Lux's second experiments).
+    """ Import Lux et al data and normalize by experiment. """
 
     ## Read in the csv data for the first experiments.
     Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
@@ -49,22 +40,20 @@ def normalizeData(filepath):
 
     return newLux
 
-## The purpose of this function is to calculate the value of Req (from Eq  1
-## from Stone) given parameters R, kai=Ka,Li=L, vi=v, and kx=Kx. It does this
-## by performing the bisction algorithm on Eq 2 from Stone. The bisection
-## algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
 def ReqFuncSolver(R, ka, Li, vi, kx):
+    """
+    The purpose of this function is to calculate the value of Req (from Eq 1
+    from Stone) given parameters R, kai=Ka,Li=L, vi=v, and kx=Kx. It does this
+    by performing the bisction algorithm on Eq 2 from Stone. The bisection
+    algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
+    """
+    from scipy.optimize import brentq
+
     ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
     ## is necessarily lower than log10(R).
-    a = -40
-    b = np.log10(R)
+    a, b = -40, np.log10(R)
 
-    ## Create anonymous function diffFunAnon which calls diffFun for parameters R, vi=v, kx=Kx, and viLikdi.
-    ## This function subtracts the right side of Equation 2 from Stone from the left side of the same Equation. The
-    ## bisection algorithm is run using this function so as to calculate log10(Req) which satisfies all parameters.
-    ## Each time this function is called: x is log10 of the value of Req being tested, R is R from Stone 2, vi is v from
-    ## Stone 2, kx is Kx from Stone 2, and viLikdi is a product which is constant over all iterations of the bisection
-    ## algorithm over diffFun for a single calling of ReqFuncSolver.
+    ## Mass balance for receptor species, to identify the amount of free receptor
     diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
 
     try:
@@ -73,11 +62,8 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     except FloatingPointError:
         return np.nan
 
-    ## Implement the bisection algorithm using SciPy's brentq. Please see SciPy documentation for rationale behind
-    ## input parameter not described beforehand. Brentq is ~2x faster than bisect
-    logReq = brentq(diffFunAnon, a, b, disp=False)
-
-    return logReq
+    ## Implement the bisection algorithm using SciPy's brentq.
+    return brentq(diffFunAnon, a, b, disp=False)
 
 def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     '''
@@ -97,8 +83,7 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
         return (np.nan, np.nan, np.nan, np.nan)
 
     # Calculate vieq from equation 1
-    vieqIter = (L0*Ka*nchoosek(v,j+1)*((Kx*Req)**j)*Req for j in range(v))
-    vieq = np.fromiter(vieqIter, np.float, count = v)
+    vieq = L0*Ka*Req*(nchoosek(v)[1::]) * np.power(Kx*Req, np.arange(v))
 
     ## Calculate L, according to equation 7
     Lbound = np.sum(vieq)
@@ -117,12 +102,6 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     nXlink = np.sum(np.multiply(vieq[1:], np.arange(1, v, dtype = np.float)))
 
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
-
-## Kx should be zero clearly when Ka is zero, and should approach a constant
-## when Ka is infinitely large. Therefore, using functions of the form
-## ax/(K + x) make the most sense. To expand upon what's described here,
-## one could create a series of those terms, and specify that each subsequent
-## term must have a K value greater than the previous.
 
 class StoneModel:
     ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
@@ -226,6 +205,8 @@ class StoneModel:
         return self.NormalErrorCoefcalc(x, fullOutput)
 
     def __init__(self, newData = True):
+        import os
+
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
         path = os.path.dirname(os.path.abspath(__file__))
         self.TNPs = ['TNP-4', 'TNP-26']
@@ -285,7 +266,7 @@ class StoneModel:
             ## is used to make the iterable object quant, each iterable element of
             ## which is a single-element list containing a string corresponding to
             ## a row in the original csv.
-            self.Rquant = np.loadtxt(os.path.join(path,'./data/FcgRquant.csv'), delimiter=',', skiprows=1)
+            self.Rquant = np.loadtxt(os.path.join(path,'./data/lux/FcgRquant.csv'), delimiter=',', skiprows=1)
             self.Rquant = np.log10(self.Rquant).transpose().tolist()
 
             # Remove nan entries from each array
@@ -293,7 +274,7 @@ class StoneModel:
                 self.Rquant[i] = np.delete(self.Rquant[i], np.where(np.isnan(self.Rquant[i])))
 
             # Load and normalize dataset two
-            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/New-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/lux/New-Fig2B.csv'))
 
             # We only include a second sigma if new data
             self.sig2IDX = 12
@@ -302,6 +283,6 @@ class StoneModel:
             self.pNames.insert(self.sig2IDX, 'sigma2')
         else:
             # Load and normalize dataset one
-            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/Luxetal2013-Fig2B.csv'))
+            self.mfiAdjMean = normalizeData(os.path.join(path,'./data/lux/Luxetal2013-Fig2B.csv'))
 
         self.Nparams = len(self.lb)
