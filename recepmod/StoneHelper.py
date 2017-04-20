@@ -3,17 +3,17 @@
 
 import numpy as np
 import pandas as pd
-import h5py
-from tqdm import trange
-from scipy.stats import ttest_ind
+from memoize import memoize
 
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
 
-# Reads in hdf5 file and returns the instance of StoneModel and MCMC chain
 def read_chain(filename):
+    """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
+    import h5py
+
     # Open hdf5 file
     f = h5py.File(filename, 'r')
 
@@ -43,6 +43,20 @@ def read_chain(filename):
 
 def rep(x, N):
     return [item for item in x for i in range(N)]
+
+@memoize
+def getMedianKx():
+    """ Read the MCMC chain and find the median Kx. Cheched for sanity. """
+    import os
+
+    # Retrieve model and fit from hdf5 file
+    _, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5"))
+
+    # Only keep good samples
+    dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 3)),:]
+    Kx = np.power(10, np.median(dsetFilter['Kx1']))
+
+    return Kx
 
 # Return a dataframe with the measured data labeled with the condition variables
 def getMeasuredDataFrame(self):
@@ -88,6 +102,8 @@ def mapMCMC(dFunction, pSet):
     with all the individual dataframe outputs stacked, and a number identifier for
     which parameter set each set of quantities came from
     """
+    from tqdm import trange
+
     # Set the function to pass back results
     funFunc = lambda ii: dFunction(pSet.iloc[ii,:]).assign(pSetNum = ii)
 
@@ -98,7 +114,13 @@ def mapMCMC(dFunction, pSet):
     return pd.concat(retVals)
 
 # Reduce the collection of predictions to various summary statistics.
-def reduceMCMC(frameList, groupByC = ['Ig', 'FcgR', 'TNP'], dropC = ['Expression', 'pSetNum']):
+def reduceMCMC(frameList, groupByC = None, dropC = None):
+    if groupByC is None:
+        groupByC = ['Ig', 'FcgR', 'TNP']
+
+    if dropC is None:
+        dropC = ['Expression', 'pSetNum']
+
     # Drop indicated columns
     frameList = frameList.drop(dropC, axis = 1).groupby(groupByC)
 
@@ -174,6 +196,7 @@ def mapStore(dset, M):
 def reduce():
     frameList = pd.read_pickle('mapped_chain.pkl')
     return reduceMCMC(frameList)
+
 
 def geweke(chain1, chain2=None):
     # Perform the Geweke Diagnostic between two univariate chains. If two chains are input instead of one, Student's t-test is performed instead.

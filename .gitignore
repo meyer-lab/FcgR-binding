@@ -2,15 +2,7 @@
 **/__pycache__/
 *mcmc_chain.h5
 .Rproj.user
-*.nb.html
-.Rhistory
-Manuscript/.texpadtmp
 *.py~
 *.gitignore~
 Manuscript/Figures/Figure*
-
 Manuscript/Manuscript.pdf
-.ipynb_checkpoints
-.coverage
-.Ulysses-favorites.plist
-.Ulysses-Group.plist
