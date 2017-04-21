@@ -120,7 +120,7 @@ def PCAhuman(axes):
 
     x = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, getMedianKx(), 1, 1, 4, 5, 1, 1], dtype=np.float64)
 
-    outt = getFitPrediction(Mod, x)
+    #outt = getFitPrediction(Mod, x)
 
 
     axes[0].set_title('Human Scores')
