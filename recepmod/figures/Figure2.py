@@ -28,17 +28,17 @@ def makeFigure():
     gs1 = gridspec.GridSpec(3, 3)
 
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(len(gs1))]
+    ax = [f.add_subplot(gs1[x]) for x in range(9)]
 
     # Blank out for the cartoon
     ax[0].axis('off')
     ax[1].axis('off')
 
-    # Make Geweke diagnostic subplot
-    GewekeDiagPlot(M, dset, ax[2])
-
     # Show predicted versus actual
-    plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[3])
+    plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[2])
+
+    # Make Geweke diagnostic subplot
+    GewekeDiagPlot(M, dset, ax[3])
 
     # Make histogram subplots
     histSubplots(dset, axes=ax[4:8])
