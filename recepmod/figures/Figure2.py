@@ -25,10 +25,10 @@ def makeFigure():
     f = plt.figure(figsize=(7, 6))
 
     # Make grid
-    gs1 = gridspec.GridSpec(3, 4)
+    gs1 = gridspec.GridSpec(2, 4)
 
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(8)]
+    ax = [f.add_subplot(gs1[x]) for x in range(len(gs1))]
 
     # Blank out for the cartoon
     ax[0].axis('off')
@@ -72,8 +72,8 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True, ylabelpad=-
                     temp = temp[temp['TNP'] != 'TNP-4']
                     mfcVal = color
 
-                ax.errorbar(temp[nameFieldX], temp[nameFieldY], marker = Igs[j],
-                            mfc = mfcVal, mec = color, ecolor = color,
+                ax.errorbar(temp[nameFieldX], temp[nameFieldY], marker=Igs[j],
+                            mfc=mfcVal, mec=color, ecolor=color,
                             linestyle='None')
 
     if legend:
