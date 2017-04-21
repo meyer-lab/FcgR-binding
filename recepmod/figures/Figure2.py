@@ -25,25 +25,26 @@ def makeFigure():
     f = plt.figure(figsize=(7, 6))
 
     # Make grid
-    gs1 = gridspec.GridSpec(2, 4)
+    gs1 = gridspec.GridSpec(3, 3)
 
     # Get list of axis objects
     ax = [f.add_subplot(gs1[x]) for x in range(len(gs1))]
 
     # Blank out for the cartoon
     ax[0].axis('off')
+    ax[1].axis('off')
 
     # Make Geweke diagnostic subplot
-    GewekeDiagPlot(M, dset, ax[1])
+    GewekeDiagPlot(M, dset, ax[2])
 
     # Show predicted versus actual
-    plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[2])
+    plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[3])
 
     # Make histogram subplots
-    histSubplots(dset, axes=[ax[3], ax[4], ax[5], ax[6]])
+    histSubplots(dset, axes=ax[4:8])
 
     # Make receptor expression subplot
-    violinPlot(dset, ax=ax[7])
+    violinPlot(dset, ax=ax[8])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
