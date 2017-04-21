@@ -1,11 +1,15 @@
 import os
 import string
+
 from matplotlib import gridspec, rcParams
 import matplotlib.pyplot as plt
+
 import numpy as np
+
 import seaborn as sns
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chains
 from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
+
 
 def makeFigure():
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
@@ -13,38 +17,42 @@ def makeFigure():
     # Retrieve model and fit from hdf5 file
     M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
 
-    pBest = dset.iloc[np.argmax(dset['LL']),:][2:].as_matrix()
+    pBest = dset.iloc[np.argmax(dset['LL']), :][2:].as_matrix()
     
     rcParams['lines.markeredgewidth'] = 1.0
 
     # Setup plotting space
-    f = plt.figure(figsize=(7,6))
+    f = plt.figure(figsize=(7, 6))
 
     # Make grid
-    gs1 = gridspec.GridSpec(3,3)
+    gs1 = gridspec.GridSpec(3, 3)
 
     # Get list of axis objects
-    ax = [ f.add_subplot(gs1[x]) for x in range(9) ]
+    ax = [f.add_subplot(gs1[x]) for x in range(9)]
 
     # Blank out for the cartoon
     ax[0].axis('off')
-
-    # Make Geweke diagnostic subplot
-    GewekeDiagPlot(M,dset,ax[1])
+    ax[1].axis('off')
 
     # Show predicted versus actual
-    plotFit(getFitMeasMergedSummarized(M, pBest), ax = ax[2])
+    plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[2])
+
+    # Make Geweke diagnostic subplot
+    GewekeDiagPlot(M, dset, ax[3])
 
     # Make histogram subplots
-    histSubplots(dset, axes = [ax[3], ax[4], ax[5], ax[6]])
+    histSubplots(dset, axes=ax[4:8])
 
     # Make receptor expression subplot
-    violinPlot(dset, ax = ax[7])
+    violinPlot(dset, ax=ax[8])
 
-    for ii, item in enumerate(ax):
-        subplotLabel(item, string.ascii_uppercase[ii])
+    subplotLabel(ax[0], 'A')
+
+    for ii, item in enumerate(ax[2:9]):
+        subplotLabel(item, string.ascii_uppercase[ii+1])
 
     return f
+
 
 def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True, ylabelpad=-5):
     # This should take a merged and summarized data frame
@@ -67,17 +75,18 @@ def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True, ylabelpad=-
                     temp = temp[temp['TNP'] != 'TNP-4']
                     mfcVal = color
 
-                ax.errorbar(temp[nameFieldX], temp[nameFieldY], marker = Igs[j],
-                            mfc = mfcVal, mec = color, ecolor = color,
-                            linestyle = 'None')
+                ax.errorbar(temp[nameFieldX], temp[nameFieldY], marker=Igs[j],
+                            mfc=mfcVal, mec=color, ecolor=color,
+                            linestyle='None')
 
     if legend:
         ax.legend(handles=makeFcIgLegend())
 
     ax.set_yscale('log')
     ax.set_xscale('log')
-    plt.ylabel(nameFieldY,labelpad=ylabelpad)
+    plt.ylabel(nameFieldY, labelpad=ylabelpad)
     plt.xlabel(nameFieldX)
+
 
 def violinPlot(dset, ax=None):
     # If no axis was provided make our own

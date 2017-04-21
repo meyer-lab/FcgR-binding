@@ -1,44 +1,51 @@
-import numpy as np
 from memoize import memoize
 
-np.seterr(over = 'raise')
+import numpy as np
+
+np.seterr(over='raise')
+
 
 def logpdf_sum(x, loc, scale):
-    """ Normal distribution function. Sums over the likelihoods of points in x """
+    """
+    Normal distribution function. Sums over the likelihoods of points in x
+    """
     root2 = np.sqrt(2)
-    root2pi = np.sqrt(2*np.pi)
+    root2pi = np.sqrt(2 * np.pi)
     prefactor = - x.size * np.log(scale * root2pi)
-    summand = -np.square((x - loc)/(root2 * scale))
-    return  prefactor + np.nansum(summand)
+    summand = -np.square((x - loc) / (root2 * scale))
+    return prefactor + np.nansum(summand)
+
 
 @memoize
 def nchoosek(n):
     """ A fast cached version of nchoosek. """
     from scipy.misc import comb
 
-    return comb(n, np.arange(n+1))
+    return comb(n, np.arange(n + 1))
+
 
 def normalizeData(filepath):
     """ Import Lux et al data and normalize by experiment. """
 
-    ## Read in the csv data for the first experiments.
-    Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2,10)))
+    # Read in the csv data for the first experiments.
+    Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2, 10)))
 
     # Copy the data to a new matrix
     newLux = np.copy(Luxpre)
 
     # Subtract off the corresponding blank measurement
-    for (ii,jj) in np.ndindex(Luxpre.shape):
-        newLux[ii,jj] = Luxpre[ii,jj] - Luxpre[ii - (ii%5),jj]
+    for (ii, jj) in np.ndindex(Luxpre.shape):
+        newLux[ii, jj] = Luxpre[ii, jj] - Luxpre[ii - (ii % 5), jj]
 
     # Filter out the blank measurements
-    newLux = newLux[np.mod(range(newLux.shape[0]), 5) > 0,:]
+    newLux = newLux[np.mod(range(newLux.shape[0]), 5) > 0, :]
 
     # Normalize by the average intensity of each replicate
     for j in range(4):
-        newLux[:,(j,j+4)] = newLux[:,(j,j+4)] / np.nanmean(newLux[:,(j,j+4)])
+        newLux[:, (j, j + 4)] = newLux[:, (j, j + 4)] / np.nanmean(newLux[:, (j, j + 4)])
 
     return newLux
+
 
 def ReqFuncSolver(R, ka, Li, vi, kx):
     """
@@ -49,11 +56,11 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     """
     from scipy.optimize import brentq
 
-    ## a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
-    ## is necessarily lower than log10(R).
+    # a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
+    # is necessarily lower than log10(R).
     a, b = -40, np.log10(R)
 
-    ## Mass balance for receptor species, to identify the amount of free receptor
+    # Mass balance for receptor species, to identify the amount of free receptor
     diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
 
     try:
@@ -62,8 +69,9 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     except FloatingPointError:
         return np.nan
 
-    ## Implement the bisection algorithm using SciPy's brentq.
+    # Implement the bisection algorithm using SciPy's brentq.
     return brentq(diffFunAnon, a, b, disp=False)
+
 
 def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     '''
@@ -77,7 +85,7 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     '''
     v = np.int_(v)
 
-    ## Vector of binomial coefficients
+    # Vector of binomial coefficients
     Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
     if np.isnan(Req):
         return (np.nan, np.nan, np.nan, np.nan)
@@ -85,7 +93,7 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     # Calculate vieq from equation 1
     vieq = L0*Ka*Req*(nchoosek(v)[1::]) * np.power(Kx*Req, np.arange(v))
 
-    ## Calculate L, according to equation 7
+    # Calculate L, according to equation 7
     Lbound = np.sum(vieq)
 
     # If we just need the amount of ligand bound, exit here.
@@ -104,14 +112,14 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
 
 class StoneModel:
-    ## This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
-    ## This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
-    ## tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
-    ## logarithms of the receptor expression levels of FcgRIA, FcgRIIA-Arg, FcgRIIA-His, FcgRIIB, FcgRIIIA-Phe, and FcgRIIIA-Val (respectively),
-    ## the common logarithm of the Kx coefficient (by which the affinity for any receptor-IgG combo is multiplied in order to return Kx), the common
-    ## logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
-    ## of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
-    ## standard deviation of MFIs for that condition.
+    # This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
+    # This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
+    # tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
+    # logarithms of the receptor expression levels of FcgRIA, FcgRIIA-Arg, FcgRIIA-His, FcgRIIB, FcgRIIIA-Phe, and FcgRIIIA-Val (respectively),
+    # the common logarithm of the Kx coefficient (by which the affinity for any receptor-IgG combo is multiplied in order to return Kx), the common
+    # logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
+    # of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
+    # standard deviation of MFIs for that condition.
     def NormalErrorCoefcalc(self, x, fullOutput = False):
         ## Set the standard deviation coefficients
         sigCoef = np.power(10, x[self.sigIDX])
