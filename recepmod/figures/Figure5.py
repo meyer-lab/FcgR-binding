@@ -34,7 +34,6 @@ def makeFigure():
     subplotLabel(ax[2], 'B')
 
     for ii, item in enumerate(ax):
-        subplotLabel(item, string.ascii_uppercase[ii])
         ax[ii].set_ylabel('PC 2')
         ax[ii].set_xlabel('PC 1')
 
