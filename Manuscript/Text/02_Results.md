@@ -32,7 +32,9 @@ In contrast to NK cells, other innate immune cell types express activating and i
 
 ![**An IgG-FcγR binding model deconvolves *in vivo* function.** A) Schematic of earlier IgG class experiments and regression approach. B) Principal components analysis of predicted binding with coordinate changes in IgG class or immune complex avidity. C) Predicted versus observed effect on lung metastasis formation upon cross-validation. D) Model weightings for elastic net regression of immune complex binding against lung metastasis reduction. E) Percent explained upon crossvalidation for models constructed with reduced sets of measurements. F) Predicted versus observed effect on lung metastasis formation upon cross-validation for a model utilizing only IgG-FcγR affinity measurements. G) Model predicted effectiveness upon variation in IgG class or avidity.](./Figures/Figure4.svg){#fig:InVivoResults}
 
-We wished to finally explore whether a multivalent binding model can enable reverse engineering of effector function *in vivo*. We surmised that our modeling approach would allow one to convert interventions using defined IgG subclasses into predictions regarding the relevant IgG-FcγR driving response.
+We wished to explore whether a multivalent binding model can enable one to reverse engineer effector function *in vivo*. We surmised that our modeling approach would allow one to convert interventions using defined IgG subclasses into predictions regarding the relevant IgG-FcγR driving response. Prior studies investigating treatments for HIV, cancer, and autoimmune dysfunction [@Nimmerjahn:2005hu] have utilized antibodies with constant antigen binding while varying other parameters of FcγR engagement to show the importance of effector function in response to these treatments. One finding from these studies is that the relative affinity to each FcγR is important to the resulting response. However, we hypothesized that a more exact model of FcγR engagement would more exactly predict effector response ([@Fig:InVivoResults]A).
+
+To study *in vivo* effector response, we focused on the manipulations made in one study, wherein antibodies against the B16F10 melanoma antigen TRP1 (TA99) were applied to block lung metastasis in C57BL/6 mice. In addition to antibodies of varying constant region, we included a number of FcγR knockout or blocking manipulations by assuming the contribution of that receptor would be zero (SUPP TABLE). Examining the predicted binding by principal components analysis highlighted that varying antibody constant region has multivariate effects on the predicted binding ([@Fig:InVivoResults]B). 
 
 
 
@@ -40,9 +42,10 @@ We wished to finally explore whether a multivalent binding model can enable reve
 
 
 
-## HComparing human and mouse IgG-FcγR interactions
 
-![**Comparing human and mouse IgG-FcγR interactions.** A) Principal components analysis (scores plot) of predicted binding with coordinate changes in murine IgG class, immune complex avidity, and concentration. B) Variable loadings for the murine principal components analysis. C) Scores plot of corresponding principle components analysis for the human case. D) Variable loadings for the human principal components analysis.](./Figures/Figure5.svg){#fig:SpeciesCompare}
+## Comparing human and mouse IgG-FcγR interactions
+
+![**Comparing human and mouse IgG-FcγR interactions.** A) Principal components analysis of predicted binding with coordinate changes in murine IgG class, immune complex avidity, and concentration. B) Corresponding principle components analysis for the human case.](./Figures/Figure5.svg){#fig:SpeciesCompare}
 
 
 
