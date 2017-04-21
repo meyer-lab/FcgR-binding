@@ -46,8 +46,10 @@ def makeFigure():
     # Make receptor expression subplot
     violinPlot(dset, ax=ax[8])
 
-    for ii, item in enumerate(ax):
-        subplotLabel(item, string.ascii_uppercase[ii])
+    subplotLabel(ax[0], 'A')
+
+    for ii, item in enumerate(ax[2:9]):
+        subplotLabel(item, string.ascii_uppercase[ii+2])
 
     return f
 
