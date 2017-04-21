@@ -2,39 +2,42 @@ from itertools import product
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from cycler import cycler
+import seaborn as sns
 from ..StoneModel import StoneMod
 from .FigureCommon import subplotLabel
 from ..StoneTwoRecep import StoneTwo
 
 # Specific predictions regarding the coordinate effects of immune complex parameters.
 
+
 def makeFigure():
     import string
-    import os
     from matplotlib import gridspec
     from ..StoneHelper import getMedianKx
 
-    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
+    sns.set(style="whitegrid",
+            font_scale=0.7,
+            color_codes=True,
+            palette="colorblind")
 
     # We're going to need Kx
     Kx = getMedianKx()
 
     # Setup plotting space
-    f = plt.figure(figsize=(7,5))
+    f = plt.figure(figsize=(7, 5))
 
     # Make grid
-    gs1 = gridspec.GridSpec(2,3)
+    gs1 = gridspec.GridSpec(2, 3)
 
     # Get list of axis objects
-    ax = [ f.add_subplot(gs1[x]) for x in range(6) ]
+    ax = [f.add_subplot(gs1[x]) for x in range(6)]
 
     # Plot subplot A
     PredictionVersusAvidity(ax[0:4], Kx)
 
     # Plot from two receptor model
-    TwoRecep(Kx, ax = ax[4:6])
+    TwoRecep(Kx, ax=ax[4:6])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -44,16 +47,19 @@ def makeFigure():
 
     return f
 
+
 def plotRanges():
-    avidity = np.logspace(0, 5, 6, base = 2, dtype = np.int)
-    ligand = np.logspace(start = -12, stop = -5, num = 50)
+    avidity = np.logspace(0, 5, 6, base=2, dtype=np.int)
+    ligand = np.logspace(start=-12, stop=-5, num=50)
     Ka = [1.2E6, 1.2E5] # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
     logR = [4.0, 4.5]
 
     return (ligand, avidity, Ka, logR)
 
+
 def skipColor(ax):
     ax.set_prop_cycle(cycler('color', sns.color_palette()[1:]))
+
 
 def PredictionVersusAvidity(ax, Kx):
     '''
