@@ -1,7 +1,7 @@
-import numpy as np
 from memoize import memoize
+import numpy as np
 
-np.seterr(over = 'raise')
+np.seterr(over='raise')
 
 def logpdf_sum(x, loc, scale):
     """ Normal distribution function. Sums over the likelihoods of points in x """
@@ -9,7 +9,7 @@ def logpdf_sum(x, loc, scale):
     root2pi = np.sqrt(2*np.pi)
     prefactor = - x.size * np.log(scale * root2pi)
     summand = -np.square((x - loc)/(root2 * scale))
-    return  prefactor + np.nansum(summand)
+    return prefactor + np.nansum(summand)
 
 @memoize
 def nchoosek(n):
