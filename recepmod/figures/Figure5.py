@@ -30,6 +30,9 @@ def makeFigure():
 
     PCAhuman(ax[2:4])
 
+    subplotLabel(ax[0], 'A')
+    subplotLabel(ax[2], 'B')
+
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
         ax[ii].set_ylabel('PC 2')
@@ -88,8 +91,8 @@ def PCAmurine(axes):
     for _, row in coefs.iterrows():
         axes[1].errorbar(x=row['PC1'], y=row['PC2'], marker='.')
 
-    axes[0].set_title('Scores')
-    axes[1].set_title('Loadings')
+    axes[0].set_title('Murine Scores')
+    axes[1].set_title('Murine Loadings')
 
 # Return a dataframe with the fit data labeled with the condition variables
 def getFitPrediction(M, x):
@@ -117,8 +120,8 @@ def PCAhuman(axes):
 
     x = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, getMedianKx(), 1, 1, 4, 5, 1, 1], dtype=np.float64)
 
-    #outt = getFitPrediction(Mod, x)
+    outt = getFitPrediction(Mod, x)
 
 
-    axes[0].set_title('Scores')
-    axes[1].set_title('Loadings')
+    axes[0].set_title('Human Scores')
+    axes[1].set_title('Human Loadings')
