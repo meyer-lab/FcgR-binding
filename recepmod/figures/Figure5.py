@@ -13,7 +13,6 @@ import re
 def makeFigure():
     import string
     from matplotlib import gridspec
-    from ..StoneHelper import getMedianKx
     from .FigureCommon import subplotLabel
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
@@ -29,7 +28,7 @@ def makeFigure():
 
     PCAmurine(ax[0:2])
 
-    PCAhuman(ax[2::])
+    PCAhuman(ax[2:4])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -89,9 +88,14 @@ def PCAmurine(axes):
     for _, row in coefs.iterrows():
         axes[1].errorbar(x=row['PC1'], y=row['PC2'], marker='.')
 
+    axes[0].set_title('Scores')
+    axes[1].set_title('Loadings')
+
 # Return a dataframe with the fit data labeled with the condition variables
 def getFitPrediction(M, x):
-    _, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = M.NormalErrorCoef(x, fullOutput = True)
+    from ..StoneHelper import rep
+
+    _, outputFit, _, outputRbnd, outputRmulti, outputnXlink, outputLbnd, _ = M.NormalErrorCoef(x, fullOutput = True)
 
     outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
 
@@ -103,20 +107,18 @@ def getFitPrediction(M, x):
           .assign(RmultiPred = np.reshape(np.transpose(outputRmulti), (-1, 1)))
           .assign(nXlinkPred = np.reshape(np.transpose(outputnXlink), (-1, 1)))
           .assign(LbndPred = np.reshape(np.transpose(outputLbnd), (-1, 1)))
-          .assign(Req = np.reshape(np.transpose(outputReq), (-1, 1)))
          )
 
     return dd
 
 def PCAhuman(axes):
     Mod = StoneModel()
+    from ..StoneHelper import getMedianKx
 
-    #x = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, -12.5, 1, 1, 4, 5, 1, 1], dtype=np.float64)
+    x = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, getMedianKx(), 1, 1, 4, 5, 1, 1], dtype=np.float64)
 
     #outt = getFitPrediction(Mod, x)
 
 
-
-    
-
-
+    axes[0].set_title('Scores')
+    axes[1].set_title('Loadings')

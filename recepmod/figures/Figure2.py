@@ -49,7 +49,7 @@ def makeFigure():
     subplotLabel(ax[0], 'A')
 
     for ii, item in enumerate(ax[2:9]):
-        subplotLabel(item, string.ascii_uppercase[ii+2])
+        subplotLabel(item, string.ascii_uppercase[ii+1])
 
     return f
 
