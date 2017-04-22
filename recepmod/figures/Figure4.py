@@ -123,7 +123,7 @@ def InVivoPredictComponents(Mod, ax=None):
 
     _, _, _, components, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
-    sns.barplot(ax=ax, y='Weight', x='Name', data=components, marker='.')
+    sns.barplot(ax=ax, y='Weight', x='Name', data=components)
 
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
