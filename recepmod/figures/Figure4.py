@@ -29,23 +29,26 @@ def makeFigure():
     # Blank out for the cartoon
     ax[0].axis('off')
 
-    # Make binding data PCA plot
-    ClassAvidityPCA(Mod, ax=ax[1])
-
-    # Show performance of in vivo regression model
-    InVivoPredictVsActual(Mod, ax=ax[2])
-
-    # Show model components
-    InVivoPredictComponents(Mod, ax=ax[3])
-
-    # Leave components out plot
-    RequiredComponents(ax=ax[4])
+    # Plot A/I vs effectiveness.
+    AIplot(Mod, ax=ax[1])
 
     # Show performance of affinity prediction
-    InVivoPredictVsActualAffinities(Mod, ax=ax[5])
+    InVivoPredictVsActualAffinities(Mod, ax=ax[2])
+
+    # Make binding data PCA plot
+    ClassAvidityPCA(Mod, ax=ax[3])
+
+    # Show performance of in vivo regression model
+    InVivoPredictVsActual(Mod, ax=ax[4])
+
+    # Show model components
+    InVivoPredictComponents(Mod, ax=ax[5])
+
+    # Leave components out plot
+    RequiredComponents(ax=ax[6])
 
     # Predict class/avidity effect
-    ClassAvidityPredict(Mod, ax=ax[6])
+    ClassAvidityPredict(Mod, ax=ax[7])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -66,7 +69,9 @@ def MurineIgLegend():
     patches = list()
 
     for j in Igs:
-        patches.append(mlines.Line2D([], [], color = Igc[j], marker=Igs[j], markersize=7, label=j, linestyle='None'))
+        patches.append(mlines.Line2D([], [], color = Igc[j], 
+                       marker=Igs[j], markersize=7, label=j, 
+                       linestyle='None'))
 
     return patches
 
@@ -120,6 +125,26 @@ def InVivoPredictComponents(Mod, ax=None):
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
 
+def AIplot(Mod, ax=None):
+    """ Plot A/I vs effectiveness. """
+
+    # If no axis was provided make our own
+    if ax is None:
+        ax = plt.gca()
+
+    table = Mod.NimmerjahnEffectTableAffinities()
+    table = table.loc[table.FcgRIIB > 0, :]
+    table['AtoI'] = table.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV)/x.FcgRIIB, axis=1)
+    table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
+
+    for _, row in table.iterrows():
+        colorr = Igidx[row['Ig']]
+        ax.errorbar(x=row['AtoI'], y=row['Effectiveness'], marker='.', mfc=colorr)
+
+    ax.set_ylabel('Effectiveness')
+    ax.set_xlabel('A/I Ratio')
+    ax.set_xscale('log')
+
 def RequiredComponents(ax=None):
     """ Plot model components. """
 
@@ -138,10 +163,14 @@ def InVivoPredictVsActualAffinities(Mod, ax=None):
         ax = plt.gca()
 
     _, _, data = Mod.NimmerjahnPredictByAffinities()
+    data['Ig'] = data.apply(lambda x: x.name.split('-')[0], axis=1)
 
-    data.plot(kind='scatter', x='Effectiveness', y='CrossPredict', ax=ax)
-    ax.set_ylabel('Predicted Effect')
-    ax.set_xlabel('Actual Effect')
+    for _, row in data.iterrows():
+        colorr = Igidx[row['Ig']]
+        ax.errorbar(x=row['DirectPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
+
+    ax.set_xlabel('Regressed Effect')
+    ax.set_ylabel('Effectiveness')
 
 def ClassAvidityPredict(Mod, ax=None):
     """ Plot prediction of in vivo model with varying avidity and class. """
