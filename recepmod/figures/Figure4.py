@@ -102,7 +102,9 @@ def InVivoPredictVsActual(Mod, ax=None):
 
     _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
-    tbN.plot(ax=ax, x='Effectiveness', y='CrossPredict', kind='scatter')
+    for _, row in data.iterrows():
+        colorr = Igidx[row['Ig']]
+        ax.errorbar(x=row['CrossPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
 
     ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
 
@@ -120,7 +122,7 @@ def InVivoPredictComponents(Mod, ax=None):
 
     _, _, _, components, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
-    sns.barplot(ax=ax, y='Weight', x='Name', data=components)
+    sns.barplot(ax=ax, y='Weight', x='Name', data=components, marker='.')
 
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
@@ -178,8 +180,8 @@ def InVivoPredictVsActualAffinities(Mod, ax=None):
 
     ax.set_xlabel('Regressed Effect')
     ax.set_ylabel('Effectiveness')
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
+    ax.set_xlim(-0.05, 1.05)
+    ax.set_ylim(-0.05, 1.05)
 
 def ClassAvidityPredict(Mod, ax=None):
     """ Plot prediction of in vivo model with varying avidity and class. """
