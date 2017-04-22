@@ -244,7 +244,7 @@ class StoneModelMouse:
         
         # set up tbK5 for IgG2b-Fucose-/-
         # Add effectiveness
-        IgG2b_fucose = np.insert(IgG2b_fucose, [16], [[0], [0.70]], axis=1)
+        IgG2b_fucose = np.insert(IgG2b_fucose, 16, [0, 0.70], axis=1)
         tbK5idx = funcAppend(tbK.index[4:6], '-Fucose-/-')
         tbK5 = pd.DataFrame(IgG2b_fucose, index = tbK5idx, columns = tbK.columns)
 
@@ -253,11 +253,11 @@ class StoneModelMouse:
 
     def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)
+        las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=10000)
         scale = StandardScaler()
 
         # Collect data
-        X, y, tbN = self.modelPrep(logspace)
+        X, y, tbN = self.modelPrep(logspace, addavidity1)
 
         X = scale.fit_transform(X)
 
@@ -286,19 +286,23 @@ class StoneModelMouse:
         # How well did we do on direct?
         direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
 
-        if printt is True:
-            print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
+        print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
 
         tbN['DirectPredict'] = las.predict(X)
         tbN['CrossPredict'] = predict
 
         return (direct_perf, crossval_perf, tbN, components, las, scale)
 
-    def modelPrep(self, logspace=False):
+    def modelPrep(self, logspace=False, addavidity1=False):
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown()
         tbN = tbN.select(lambda x: not re.search('Lbnd', x), axis=1)
         tbN = tbN.select(lambda x: not re.search('nX', x), axis=1)
+
+        if addavidity1 is False:
+            temp = tbN.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+            tbN = tbN.loc[temp > 1, :]
+
         tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
         # Log transform if needed
         if logspace is True:
@@ -314,12 +318,11 @@ class StoneModelMouse:
         """ Principle Components Analysis of FcgR binding predictions """
         pca = PCA(n_components=5)
         table = self.pdAvidityTable()
-        scale = StandardScaler()
         
         # remove Req columns
         table = table.select(lambda x: not re.search('Req', x), axis=1)
 
-        X = scale.fit_transform(np.array(table))
+        X = StandardScaler().fit_transform(np.array(table))
         
         # Fit PCA
         result = pca.fit_transform(X)
