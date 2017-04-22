@@ -97,7 +97,7 @@ def InVivoPredictVsActual(Mod, ax=None):
     if ax is None:
         ax = plt.gca()
 
-    _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(printt=True)
+    _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal()
 
     tbN.plot(ax=ax, x='Effectiveness', y='CrossPredict', kind='scatter')
 
@@ -171,6 +171,7 @@ def InVivoPredictVsActualAffinities(Mod, ax=None):
 
     ax.set_xlabel('Regressed Effect')
     ax.set_ylabel('Effectiveness')
+    ax.set_xlim(0, 1)
 
 def ClassAvidityPredict(Mod, ax=None):
     """ Plot prediction of in vivo model with varying avidity and class. """
