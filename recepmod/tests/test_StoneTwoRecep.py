@@ -4,13 +4,6 @@ import numpy as np
 from ..StoneTwoRecep import StoneVgrid, StoneRmultiAll, reqSolver, StoneRbnd
 
 class TestStoneTwoRecpMethods(unittest.TestCase):
-    def setUp(self):
-        self.startTime = time.time()
-
-    def tearDown(self):
-        t = time.time() - self.startTime
-        print("%s: %.3f" % (self.id(), t*1000))
-
     def test_StoneVgrid(self):
         Req = np.array([1000, 1000], dtype = np.float64)
         Ka = np.array([1000, 2000], dtype = np.float64)
