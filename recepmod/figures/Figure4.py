@@ -78,11 +78,9 @@ def MurineIgLegend():
 
     return patches
 
-def ClassAvidityPCA(Mod, ax=None):
+def ClassAvidityPCA(Mod, ax):
     """ Plot the generated binding data for different classes and avidities in PCA space. """
     # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
     
     scores, _ = Mod.PCA()
 
@@ -93,12 +91,8 @@ def ClassAvidityPCA(Mod, ax=None):
     ax.set_ylabel('PC 2')
     ax.set_xlabel('PC 1')
 
-def InVivoPredictVsActual(Mod, ax=None):
+def InVivoPredictVsActual(Mod):
     """ Plot predicted vs actual for regression of conditions in vivo. """
-
-    # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
 
     _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
     tbN['Ig'] = tbN.apply(lambda x: x.name.split('-')[0], axis=1)
@@ -111,15 +105,11 @@ def InVivoPredictVsActual(Mod, ax=None):
 
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlim(-0.05, 1.05)
-    ax.set_ylabel('Predicted Effect')
-    ax.set_xlabel('Actual Effect')
+    ax.set_ylabel('Effectiveness')
+    ax.set_xlabel('Predicted Effect')
 
-def InVivoPredictComponents(Mod, ax=None):
+def InVivoPredictComponents(Mod, ax):
     """ Plot model components. """
-
-    # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
 
     _, _, _, components, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
@@ -133,12 +123,8 @@ def InVivoPredictComponents(Mod, ax=None):
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
 
-def AIplot(Mod, ax=None):
+def AIplot(Mod, ax):
     """ Plot A/I vs effectiveness. """
-
-    # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
 
     table = Mod.NimmerjahnEffectTableAffinities()
     table = table.loc[table.FcgRIIB > 0, :]
@@ -153,22 +139,14 @@ def AIplot(Mod, ax=None):
     ax.set_xlabel('A/I Ratio')
     ax.set_xscale('log')
 
-def RequiredComponents(ax=None):
+def RequiredComponents(ax):
     """ Plot model components. """
-
-    # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
 
     ax.set_ylabel('LOO Perc Explained')
     ax.set_xlabel('Components')
 
-def InVivoPredictVsActualAffinities(Mod, ax=None):
+def InVivoPredictVsActualAffinities(Mod, ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
-
-    # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
 
     _, _, data = Mod.NimmerjahnPredictByAffinities()
     data['Ig'] = data.apply(lambda x: x.name.split('-')[0], axis=1)
@@ -184,16 +162,12 @@ def InVivoPredictVsActualAffinities(Mod, ax=None):
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
 
-def ClassAvidityPredict(Mod, ax=None):
+def ClassAvidityPredict(Mod, ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
     from ..StoneModMouse import MultiAvidityPredict, StoneModelMouse
     from copy import deepcopy
 
     Mod = deepcopy(Mod)
-
-    # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
 
     _, _, _, _, model, normV = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
