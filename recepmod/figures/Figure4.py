@@ -101,8 +101,9 @@ def InVivoPredictVsActual(Mod, ax=None):
         ax = plt.gca()
 
     _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
+    tbN['Ig'] = tbN.apply(lambda x: x.name.split('-')[0], axis=1)
 
-    for _, row in data.iterrows():
+    for _, row in tbN.iterrows():
         colorr = Igidx[row['Ig']]
         ax.errorbar(x=row['CrossPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
 
