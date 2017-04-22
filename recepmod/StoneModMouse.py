@@ -40,7 +40,7 @@ class StoneModelMouse:
         self.kaMouse = self.kaM[:, list(range(4))]
         self.kaIgG2b_Fucose = self.kaM[:, 4].reshape(4,1)
         self.L0 = 1E-9
-        self.v = 10
+        self.v = 4
         self.Kx = getMedianKx()
         self.logR = np.full((len(self.FcgRs),), np.log10(10**5), dtype = np.float64)
 
@@ -106,7 +106,6 @@ class StoneModelMouse:
                 idx.append(Ig+'-'+str(j))
             
         tb1.index = idx
-        self.v = 10
         return tb1
         
     def NimmerjahnEffectTable(self):
@@ -244,20 +243,37 @@ class StoneModelMouse:
         
         # set up tbK5 for IgG2b-Fucose-/-
         # Add effectiveness
-        IgG2b_fucose = np.insert(IgG2b_fucose, [16], [[0], [0.70]], axis=1)
+        IgG2b_fucose = np.insert(IgG2b_fucose, 16, [0, 0.70], axis=1)
         tbK5idx = funcAppend(tbK.index[4:6], '-Fucose-/-')
         tbK5 = pd.DataFrame(IgG2b_fucose, index = tbK5idx, columns = tbK.columns)
 
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         return tbK.append([tbK1, tbK2, tbK3, tbK4, tbK5])
 
-    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
+    def writeModelData(self, filename, logspace=False, addavidity1=False):
+        import pytablewriter
+
+        # Collect data
+        _, _, tbN = self.modelPrep(logspace, addavidity1)
+
+        writer = pytablewriter.MarkdownTableWriter()
+
+        writer.from_dataframe(tbN)
+
+        # change output stream to a file
+        with open(filename, 'w') as f:
+            writer.stream = f
+            writer.write_table()
+
+        writer.close()
+
+    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
         las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)
         scale = StandardScaler()
 
         # Collect data
-        X, y, tbN = self.modelPrep(logspace)
+        X, y, tbN = self.modelPrep(logspace, addavidity1)
 
         X = scale.fit_transform(X)
 
@@ -286,40 +302,43 @@ class StoneModelMouse:
         # How well did we do on direct?
         direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
 
-        if printt is True:
-            print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
+        print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
 
         tbN['DirectPredict'] = las.predict(X)
         tbN['CrossPredict'] = predict
 
         return (direct_perf, crossval_perf, tbN, components, las, scale)
 
-    def modelPrep(self, logspace=False):
+    def modelPrep(self, logspace, addavidity1):
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown()
         tbN = tbN.select(lambda x: not re.search('Lbnd', x), axis=1)
         tbN = tbN.select(lambda x: not re.search('nX', x), axis=1)
-        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
+
+        if addavidity1 is False:
+            temp = tbN.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+            tbN = tbN.loc[temp > 1, :]
+
+        # Assign independent variables and dependent variable
+        X = tbN.drop('Effectiveness', axis=1)
+
         # Log transform if needed
         if logspace is True:
-            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -5)
+            X = X.apply(np.log2).replace(-np.inf, -5)
 
-        # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbNparam)
-        effect = np.array(tbN['Effectiveness'])
+        y = tbN['Effectiveness'].as_matrix()
 
-        return (independent, effect, tbN)
+        return (X.as_matrix(), y, tbN)
     
     def PCA(self, plott = False):
         """ Principle Components Analysis of FcgR binding predictions """
         pca = PCA(n_components=5)
         table = self.pdAvidityTable()
-        scale = StandardScaler()
         
         # remove Req columns
         table = table.select(lambda x: not re.search('Req', x), axis=1)
 
-        X = scale.fit_transform(np.array(table))
+        X = StandardScaler().fit_transform(np.array(table))
         
         # Fit PCA
         result = pca.fit_transform(X)
