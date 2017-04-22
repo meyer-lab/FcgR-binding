@@ -40,7 +40,7 @@ class StoneModelMouse:
         self.kaMouse = self.kaM[:, list(range(4))]
         self.kaIgG2b_Fucose = self.kaM[:, 4].reshape(4,1)
         self.L0 = 1E-9
-        self.v = 10
+        self.v = 4
         self.Kx = getMedianKx()
         self.logR = np.full((len(self.FcgRs),), np.log10(10**5), dtype = np.float64)
 
@@ -253,7 +253,7 @@ class StoneModelMouse:
 
     def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=10000)
+        las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)
         scale = StandardScaler()
 
         # Collect data
