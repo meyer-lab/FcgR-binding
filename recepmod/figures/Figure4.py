@@ -123,6 +123,7 @@ def InVivoPredictComponents(Mod, ax):
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
 
+
 def AIplot(Mod, ax):
     """ Plot A/I vs effectiveness. """
 
