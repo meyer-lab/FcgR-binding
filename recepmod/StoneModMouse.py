@@ -1,3 +1,4 @@
+from .StoneModel import StoneMod
 import re
 from itertools import product
 import pandas as pd
@@ -30,11 +31,14 @@ class StoneModelMouse:
         self.Igs = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
         self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV']
         # Read in csv file of murine binding affinities
-        self.kaMouse = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), 
+        self.kaM = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), 
                                      delimiter=',', 
                                      skip_header=1, 
-                                     usecols=list(range(1,5)),
+                                     usecols=list(range(1,6)),
                                      dtype=np.float64)
+        
+        self.kaMouse = self.kaM[:, list(range(4))]
+        self.kaIgG2b_Fucose = self.kaM[:, 4].reshape(4,1)
         self.L0 = 1E-9
         self.v = 10
         self.Kx = getMedianKx()
@@ -48,7 +52,6 @@ class StoneModelMouse:
         other receptors with crosslinking constant Kx = 10^logKx. All
         equations derived from Stone et al. (2001).
         '''
-        from .StoneModel import StoneMod
 
         # Initiate numpy arrays for StoneMod outputs
         output = np.full((len(self.Igs), 5, len(self.FcgRs)), np.nan)
@@ -157,9 +160,13 @@ class StoneModelMouse:
         tbK2.iloc[1, 2] = 0.0
         tbK2.iloc[2, 0] = 0.0
         tbK2.iloc[2, 3] = 0.0
+        
+        # set up IgG2b, -Fucose
+        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index = ['IgG2b-Fucose-/-'], columns = self.FcgRs)
+        tbK3.loc[:,'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
 
         # Join tbK, tbK1, tbK2 into one table
-        return tbK.append([tbK1, tbK2])
+        return tbK.append([tbK1, tbK2, tbK3])
 
     def NimmerjahnPredictByAffinities(self, fixed=False, simple=False, logspace=False):
         """ This will run ordinary linear regression using just affinities of receptors. """
@@ -174,7 +181,7 @@ class StoneModelMouse:
 
         # Log transform if needed
         if logspace is True:
-            data = data.apply(np.log2).replace(-np.inf, -5)
+            data = data.apply(np.log2).replace(-np.inf, -3)
 
         X = data.iloc[:, 0:4]
         y = data['Effectiveness']
@@ -184,7 +191,7 @@ class StoneModelMouse:
             X.loc[:, 1] = -X.iloc[:, 1]
 
         # Run crossvalidation predictions at the same time
-        predicted = cross_val_predict(lr, X, y, cv=11)
+        predicted = cross_val_predict(lr, X, y, cv=12)
 
         # How well did we do on crossvalidation?
         crossval_perf = sklearn.metrics.explained_variance_score(y, predicted)
@@ -199,9 +206,20 @@ class StoneModelMouse:
         data['CrossPredict'] = predicted
 
         return (direct_perf, crossval_perf, data)
+    
+    def IgG2b_Fucose(self):
+        output = np.full((2, len(self.FcgRs), 4), np.nan)
+        v = [1, self.v]
+        for k in range(len(self.FcgRs)):
+            for i in range(2):
+                Ka = self.kaIgG2b_Fucose[k]
+                stoneModOut = np.asarray(StoneMod(self.logR[k],Ka,v[i],self.Kx*Ka,self.L0, fullOutput = True), dtype = np.float)
+                output[i, k, :] = stoneModOut[:4]
+        return output.reshape(2,16)
 
     def NimmerjahnTb_Knockdown(self):
         tbK = self.NimmerjahnEffectTable()
+        IgG2b_fucose = self.IgG2b_Fucose()
         # remove Req columns
         tbK = tbK.select(lambda x: not re.search('Req', x), axis=1)
 
@@ -230,9 +248,15 @@ class StoneModelMouse:
         tbK4.loc[:,'Effectiveness'] = pd.Series([0, 0.35], index=tbK4.index)
         tbK4.iloc[:, 0:4] = 0.0
         tbK4.iloc[:, 12:16] = 0.0
+        
+        # set up tbK5 for IgG2b-Fucose-/-
+        # Add effectiveness
+        IgG2b_fucose = np.insert(IgG2b_fucose, [16], [[0], [0.70]], axis=1)
+        tbK5idx = funcAppend(tbK.index[4:6], '-Fucose-/-')
+        tbK5 = pd.DataFrame(IgG2b_fucose, index = tbK5idx, columns = tbK.columns)
 
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
-        return tbK.append([tbK1, tbK2, tbK3, tbK4])
+        return tbK.append([tbK1, tbK2, tbK3, tbK4, tbK5])
 
     def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
@@ -250,7 +274,7 @@ class StoneModelMouse:
             looI = loo.split(X, y)
         else:
             loo = LeaveOneGroupOut()
-            looI = loo.split(X, y, groups = rep(range(11), 2))
+            looI = loo.split(X, y, groups = rep(range(12), 2))
 
         # Run crossvalidation
         predict = cross_val_predict(las, X, y, cv = looI, n_jobs=-1)

@@ -16,6 +16,7 @@ class TestStoneMouse(unittest.TestCase):
 
     def test_dataImport_kaMouse(self):
         self.assertTrue(self.Mod.kaMouse.shape == (4, 4))
+        self.assertTrue(self.Mod.kaIgG2b_Fucose.shape == (4,1))
 
     def test_dataOutput_StoneModMouse(self):
         # Checks size of fullOutput
@@ -73,6 +74,7 @@ class TestStoneMouse(unittest.TestCase):
 
     def test_NimmerjahnTb_Knockdown(self):
         """ Check NimmerjahnTb_Knockdown """
+        self.Mod.IgG2b_Fucose()
         tbNK = self.Mod.NimmerjahnTb_Knockdown()
         # tbNK.to_csv('out.csv')
         self.Mod.KnockdownLassoCrossVal()
@@ -82,10 +84,8 @@ class TestStoneMouse(unittest.TestCase):
 
     def test_NimmerjahnEffectTableAffinities(self):
         """ Test that table for prediction off of just affinities is correct. """
-
         tbN = self.Mod.NimmerjahnEffectTableAffinities()
         # tbN.to_csv('out.csv')
-
         self.Mod.NimmerjahnPredictByAffinities(simple=True)
         self.Mod.NimmerjahnPredictByAffinities()
         self.Mod.NimmerjahnPredictByAffinities(simple=True, logspace=True)
@@ -94,7 +94,7 @@ class TestStoneMouse(unittest.TestCase):
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
 
-        self.assertTrue(tbN.shape == (11, 5))
+        self.assertTrue(tbN.shape == (12, 5))
 
     def test_PCA(self):
         scores, expVar = self.Mod.PCA()
