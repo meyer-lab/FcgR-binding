@@ -30,25 +30,25 @@ def makeFigure():
     ax[0].axis('off')
 
     # Plot A/I vs effectiveness.
-    AIplot(Mod, ax=ax[1])
+    AIplot(Mod, ax[1])
 
     # Show performance of affinity prediction
-    InVivoPredictVsActualAffinities(Mod, ax=ax[2])
+    InVivoPredictVsActualAffinities(Mod, ax[2])
 
     # Make binding data PCA plot
-    ClassAvidityPCA(Mod, ax=ax[3])
+    ClassAvidityPCA(Mod, ax[3])
 
     # Show performance of in vivo regression model
-    InVivoPredictVsActual(Mod, ax=ax[4])
+    InVivoPredictVsActual(Mod, ax[4])
 
     # Show model components
-    InVivoPredictComponents(Mod, ax=ax[5])
+    InVivoPredictComponents(Mod, ax[5])
 
     # Leave components out plot
-    RequiredComponents(ax=ax[6])
+    RequiredComponents(ax[6])
 
     # Predict class/avidity effect
-    ClassAvidityPredict(Mod, ax=ax[7])
+    ClassAvidityPredict(Mod, ax[7])
 
     # Blank out for the cartoon
     ax[8].axis('off')
@@ -91,7 +91,7 @@ def ClassAvidityPCA(Mod, ax):
     ax.set_ylabel('PC 2')
     ax.set_xlabel('PC 1')
 
-def InVivoPredictVsActual(Mod):
+def InVivoPredictVsActual(Mod, ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
 
     _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)

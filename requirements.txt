@@ -7,3 +7,4 @@ numpy>=1.12.1
 emcee>=2.2.1
 h5py>=2.7.0
 memoize2>=0.1.1
+pytablewriter

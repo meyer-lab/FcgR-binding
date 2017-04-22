@@ -32,6 +32,7 @@ clean:
 	rm -f .coverage
 	rm -f nosetests.xml
 	rm -rf cov
+	rm -f Manuscript/Figures/ModelData.md
 
 test:
 	nosetests -s --with-timer --timer-top-n 5

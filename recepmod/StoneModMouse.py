@@ -250,6 +250,23 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         return tbK.append([tbK1, tbK2, tbK3, tbK4, tbK5])
 
+    def writeModelData(self, filename, logspace=False, addavidity1=False):
+        import pytablewriter
+
+        # Collect data
+        _, _, tbN = self.modelPrep(logspace, addavidity1)
+
+        writer = pytablewriter.MarkdownTableWriter()
+
+        writer.from_dataframe(tbN)
+
+        # change output stream to a file
+        with open(filename, 'w') as f:
+            writer.stream = f
+            writer.write_table()
+
+        writer.close()
+
     def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
         las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)

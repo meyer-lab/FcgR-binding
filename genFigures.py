@@ -1,5 +1,6 @@
 import svgutils.transform as st
 from recepmod.figures import Figure1, Figure2, FigureSS, Figure3, Figure4, Figure5
+from recepmod.StoneModMouse import StoneModelMouse
 
 def runFunc(figClass, nameOut):
 	print('Starting on ' + nameOut)
@@ -23,5 +24,7 @@ runFunc(FigureSS, 'FigureSS')
 runFunc(Figure3, 'Figure3')
 
 runFunc(Figure4, 'Figure4')
+
+StoneModelMouse().writeModelData('./Manuscript/Figures/ModelData.md')
 
 runFunc(Figure5, 'Figure5')
