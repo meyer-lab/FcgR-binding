@@ -34,6 +34,8 @@ def makeFigure():
     ax[0].axis('off')
     ax[1].axis('off')
 
+    ax[1].legend(handles=makeFcIgLegend())
+
     # Show predicted versus actual
     plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[2])
 
@@ -52,40 +54,6 @@ def makeFigure():
         subplotLabel(item, string.ascii_uppercase[ii+1])
 
     return f
-
-
-def plotQuant(fitMean, nameFieldX, nameFieldY, ax=None, legend=True, ylabelpad=-5):
-    # This should take a merged and summarized data frame
-
-    if ax is None:
-        fig = plt.figure(figsize=(7,6))
-        ax = fig.add_subplot(1, 1, 1)
-
-    for j in Igs:
-        for f in FcgRidx:
-            for x in range(2):
-                temp = fitMean[fitMean['Ig'] == j]
-                temp = temp[temp['FcgR'] == f]
-                color = FcgRidx[f]
-
-                if x == 0:
-                    temp = temp[temp['TNP'] == 'TNP-4']
-                    mfcVal = 'None'
-                else:
-                    temp = temp[temp['TNP'] != 'TNP-4']
-                    mfcVal = color
-
-                ax.errorbar(temp[nameFieldX], temp[nameFieldY], marker=Igs[j],
-                            mfc=mfcVal, mec=color, ecolor=color,
-                            linestyle='None')
-
-    if legend:
-        ax.legend(handles=makeFcIgLegend())
-
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    plt.ylabel(nameFieldY, labelpad=ylabelpad)
-    plt.xlabel(nameFieldX)
 
 
 def violinPlot(dset, ax=None):
@@ -151,8 +119,6 @@ def plotFit(fitMean, ax=None):
                     ms=3,
                     ecolor=colorr,
                     linestyle='None')
-
-    ax.legend(handles=makeFcIgLegend(), bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
     ax.set_ylabel('Fitted prediction')
     ax.set_xlabel('Measured ligand binding')
