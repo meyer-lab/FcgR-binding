@@ -146,7 +146,7 @@ class StoneModelMouse:
         tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
         tbK1.loc[:,'Effectiveness'] = pd.Series([0.7, 1, 0.75, 0],
                                                 index=tbK1.index)
-        tbK1.iloc[:, 4:8] = 0.0
+        tbK1.iloc[:, 1] = 0.0
 
         # set up tbK2 for FcgRI, FcgRIII, FcgRI/IV knockdown, IgG2a treatment
         tbK2 = tbK.iloc[(1, 1, 1), :].copy()
@@ -162,36 +162,29 @@ class StoneModelMouse:
         tbK2.iloc[2, 3] = 0.0
         
         # set up IgG2b, -Fucose
-        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index = ['IgG2b-Fucose-/-'], columns = self.FcgRs)
+        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index = ['IgG2b-Fucose-'], columns = self.FcgRs)
         tbK3.loc[:,'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
 
         # Join tbK, tbK1, tbK2 into one table
         return tbK.append([tbK1, tbK2, tbK3])
 
-    def NimmerjahnPredictByAffinities(self, fixed=False, simple=False, logspace=False):
+    def NimmerjahnPredictByAffinities(self):
         """ This will run ordinary linear regression using just affinities of receptors. """
 
         # Run ridge regression with forced direction or simple OLS
-        if simple is True:
-            lr = linear_model.LinearRegression()
-        else:
-            lr = linear_model.ElasticNet(positive=fixed, max_iter=10000)
+        lr = linear_model.LinearRegression()
 
         data = self.NimmerjahnEffectTableAffinities()
+        data['ActMax'] = data.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV), axis=1)
 
-        # Log transform if needed
-        if logspace is True:
-            data = data.apply(np.log2).replace(-np.inf, -3)
-
-        X = data.iloc[:, 0:4]
+        X = data[['ActMax', 'FcgRIIB']]
         y = data['Effectiveness']
 
-        # If we're fixing the parameters, we need to make the inhibitory receptor negative
-        if fixed is True:
-            X.loc[:, 1] = -X.iloc[:, 1]
+        # Log transform to keep ratios
+        X = X.apply(np.log2).replace(-np.inf, -3)
 
         # Run crossvalidation predictions at the same time
-        predicted = cross_val_predict(lr, X, y, cv=12)
+        predicted = cross_val_predict(lr, X, y, cv=X.shape[0])
 
         # How well did we do on crossvalidation?
         crossval_perf = sklearn.metrics.explained_variance_score(y, predicted)
