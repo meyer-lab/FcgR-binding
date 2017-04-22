@@ -9,12 +9,6 @@ pipeline {
         sh 'make clean'
       }
     }
-    stage('Profile') {
-      steps {
-        sh 'make profile'
-        archiveArtifacts artifacts: 'profile.png', onlyIfSuccessful: true
-      }
-    }
     stage('Build') {
       steps {
         sh 'make'
