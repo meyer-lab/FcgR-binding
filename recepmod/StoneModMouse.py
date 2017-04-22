@@ -146,7 +146,7 @@ class StoneModelMouse:
         tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
         tbK1.loc[:,'Effectiveness'] = pd.Series([0.7, 1, 0.75, 0],
                                                 index=tbK1.index)
-        tbK1.iloc[:, 4:8] = 0.0
+        tbK1.iloc[:, 1] = 0.0
 
         # set up tbK2 for FcgRI, FcgRIII, FcgRI/IV knockdown, IgG2a treatment
         tbK2 = tbK.iloc[(1, 1, 1), :].copy()
