@@ -106,7 +106,6 @@ class StoneModelMouse:
                 idx.append(Ig+'-'+str(j))
             
         tb1.index = idx
-        self.v = 10
         return tb1
         
     def NimmerjahnEffectTable(self):
