@@ -104,8 +104,10 @@ def InVivoPredictVsActual(Mod, ax=None):
 
     tbN.plot(ax=ax, x='Effectiveness', y='CrossPredict', kind='scatter')
 
-    ax.set_ylim(0, 1.1)
-    ax.set_xlim(0, 1.1)
+    ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
+
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlim(-0.05, 1.05)
     ax.set_ylabel('Predicted Effect')
     ax.set_xlabel('Actual Effect')
 
@@ -172,9 +174,12 @@ def InVivoPredictVsActualAffinities(Mod, ax=None):
         colorr = Igidx[row['Ig']]
         ax.errorbar(x=row['DirectPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
 
+    ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
+
     ax.set_xlabel('Regressed Effect')
     ax.set_ylabel('Effectiveness')
     ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
 
 def ClassAvidityPredict(Mod, ax=None):
     """ Plot prediction of in vivo model with varying avidity and class. """

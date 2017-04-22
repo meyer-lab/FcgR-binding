@@ -17,7 +17,7 @@ pipeline {
     }
     stage('Test'){
       steps {
-        sh 'coverage run -m unittest discover'
+        sh 'make testcover'
         sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
 
         step([

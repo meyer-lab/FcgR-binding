@@ -8,11 +8,6 @@ from ..StoneModMouse import StoneModelMouse, MultiAvidityPredict
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
         self.Mod = StoneModelMouse()
-        self.startTime = time.time()
-
-    def tearDown(self):
-        t = time.time() - self.startTime
-        print("%s: %.3f" % (self.id(), t*1000))
 
     def test_dataImport_kaMouse(self):
         self.assertTrue(self.Mod.kaMouse.shape == (4, 4))

@@ -11,12 +11,7 @@ from ..StoneHelper import getFitMeasMergedSummarized, read_chain, getMeasuredDat
 class TestFigMethods(unittest.TestCase):
     def setUp(self):
         self.M = StoneModel()
-        self.startTime = time.time()
         self.Mread, self.dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
-
-    def tearDown(self):
-        t = time.time() - self.startTime
-        print("%s: %.3f" % (self.id(), t*1000))
 
     def test_kaBinding_plot(self):
         # Return the fit and binding data summary data set
