@@ -79,7 +79,7 @@ class TestStoneMouse(unittest.TestCase):
         # tbNK.to_csv('out.csv')
         self.Mod.KnockdownLassoCrossVal()
         self.Mod.KnockdownLassoCrossVal(logspace=True)
-        self.Mod.KnockdownLassoCrossVal(addavidity1=True, printt=True)
+        self.Mod.KnockdownLassoCrossVal(addavidity1=True)
         self.Mod.KnockdownLassoCrossVal(logspace=True, addavidity1=True)
 
     def test_NimmerjahnEffectTableAffinities(self):

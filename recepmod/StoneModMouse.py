@@ -250,7 +250,7 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
         return tbK.append([tbK1, tbK2, tbK3, tbK4, tbK5])
 
-    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
+    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
         las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)
         scale = StandardScaler()
@@ -292,7 +292,7 @@ class StoneModelMouse:
 
         return (direct_perf, crossval_perf, tbN, components, las, scale)
 
-    def modelPrep(self, logspace=False, addavidity1=False):
+    def modelPrep(self, logspace, addavidity1):
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown()
         tbN = tbN.select(lambda x: not re.search('Lbnd', x), axis=1)
@@ -302,16 +302,16 @@ class StoneModelMouse:
             temp = tbN.apply(lambda x: int(x.name.split('-')[1]), axis=1)
             tbN = tbN.loc[temp > 1, :]
 
-        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
+        # Assign independent variables and dependent variable
+        X = tbN.drop('Effectiveness', axis=1)
+
         # Log transform if needed
         if logspace is True:
-            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -5)
+            X = X.apply(np.log2).replace(-np.inf, -5)
 
-        # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbNparam)
-        effect = np.array(tbN['Effectiveness'])
+        y = tbN['Effectiveness'].as_matrix()
 
-        return (independent, effect, tbN)
+        return (X.as_matrix(), y, tbN)
     
     def PCA(self, plott = False):
         """ Principle Components Analysis of FcgR binding predictions """

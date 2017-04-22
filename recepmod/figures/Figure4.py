@@ -97,7 +97,7 @@ def InVivoPredictVsActual(Mod, ax=None):
     if ax is None:
         ax = plt.gca()
 
-    _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal()
+    _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
     tbN.plot(ax=ax, x='Effectiveness', y='CrossPredict', kind='scatter')
 
@@ -113,7 +113,7 @@ def InVivoPredictComponents(Mod, ax=None):
     if ax is None:
         ax = plt.gca()
 
-    _, _, _, components, _, _ = Mod.KnockdownLassoCrossVal()
+    _, _, _, components, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
     sns.barplot(ax=ax, y='Weight', x='Name', data=components)
 
