@@ -47,9 +47,6 @@ class TestFigMethods(unittest.TestCase):
         # Create fit of measured vs. predicted
         Figure2.plotFit(fitFrame)
 
-        # Create the LL of the fit plot
-        Figure2.plotQuant(fitFrame, 'Meas_mean', 'Meas_mean')
-
     # Test hist subplots
     def test_Fig2_histSubplots(self):
 

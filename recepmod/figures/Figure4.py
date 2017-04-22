@@ -18,7 +18,7 @@ def makeFigure():
     Mod = StoneModelMouse()
 
     # Setup plotting space
-    f = plt.figure(figsize=(7, 5))
+    f = plt.figure(figsize=(7, 6))
 
     # Make grid
     gs1 = gridspec.GridSpec(3, 3)
@@ -49,6 +49,9 @@ def makeFigure():
 
     # Predict class/avidity effect
     ClassAvidityPredict(Mod, ax=ax[7])
+
+    # Blank out for the cartoon
+    ax[8].axis('off')
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -184,7 +187,7 @@ def ClassAvidityPredict(Mod, ax=None):
     if ax is None:
         ax = plt.gca()
 
-    _, _, _, _, model, normV = Mod.KnockdownLassoCrossVal()
+    _, _, _, _, model, normV = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
     Mod.v = 30
 
