@@ -1,14 +1,14 @@
+import re
+import numpy as np
+import pandas as pd
 import matplotlib
 matplotlib.use('AGG')
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn as sns
-import pandas as pd
-from ..StoneModMouse import StoneModelMouse
-from ..StoneModel import StoneModel
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-import re
+from ..StoneModMouse import StoneModelMouse
+from ..StoneModel import StoneModel
 
 # Compare across species
 
@@ -163,12 +163,12 @@ def PCAhuman(axes):
             patches.append(mpatches.Patch(color=FcgRidxL[f], label=f))
 
         for j in DatType:
-            patches.append(mlines.Line2D([], 
-                                         [], 
-                                         color='black', 
-                                         marker=DatType[j], 
-                                         markersize=7, 
-                                         label=j, 
+            patches.append(mlines.Line2D([],
+                                         [],
+                                         color='black',
+                                         marker=DatType[j],
+                                         markersize=7,
+                                         label=j,
                                          linestyle='None'))
 
         return patches
@@ -180,22 +180,3 @@ def PCAhuman(axes):
     axes[1].legend(handles=makeFcLegend(), bbox_to_anchor=(1.05, 1), loc=2)
     axes[0].set_title('Human Scores')
     axes[1].set_title('Human Loadings')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

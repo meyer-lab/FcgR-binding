@@ -43,9 +43,12 @@ def StoneRbnd(vGrid):
 
     return np.array((np.sum(vGridSone), np.sum(vGridStwo)))
 
-# This calculates the RmultiAll quantity from a v_ij grid
-# This is the number of receptors multimerized with self or non-self
+
 def StoneRmultiAll(vGrid):
+    """
+    This calculates the RmultiAll quantity from a v_ij grid
+    This is the number of receptors multimerized with self or non-self
+    """
     vGrid = np.copy(vGrid)
 
     # We can calculate gnu from the size of the v_ij grid
