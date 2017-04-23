@@ -17,6 +17,9 @@ def makeFigure():
     # Load murine class
     Mod = StoneModelMouse()
 
+    # Run the in vivo regression model
+    _, _, tbN, components, model, normV = Mod.KnockdownLassoCrossVal(addavidity1=True)
+
     # Setup plotting space
     f = plt.figure(figsize=(7, 6))
 
@@ -39,16 +42,16 @@ def makeFigure():
     ClassAvidityPCA(Mod, ax[3])
 
     # Show performance of in vivo regression model
-    InVivoPredictVsActual(Mod, ax[4])
+    InVivoPredictVsActual(tbN, ax[4])
 
     # Show model components
-    InVivoPredictComponents(Mod, ax[5])
+    InVivoPredictComponents(components, ax[5])
 
     # Leave components out plot
     RequiredComponents(ax[6])
 
     # Predict class/avidity effect
-    ClassAvidityPredict(Mod, ax[7])
+    ClassAvidityPredict(Mod, model, normV, ax[7])
 
     # Blank out for the cartoon
     ax[8].axis('off')
@@ -91,10 +94,9 @@ def ClassAvidityPCA(Mod, ax):
     ax.set_ylabel('PC 2')
     ax.set_xlabel('PC 1')
 
-def InVivoPredictVsActual(Mod, ax):
+def InVivoPredictVsActual(tbN, ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
 
-    _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
     tbN['Ig'] = tbN.apply(lambda x: x.name.split('-')[0], axis=1)
 
     for _, row in tbN.iterrows():
@@ -108,10 +110,8 @@ def InVivoPredictVsActual(Mod, ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('Predicted Effect')
 
-def InVivoPredictComponents(Mod, ax):
+def InVivoPredictComponents(components, ax):
     """ Plot model components. """
-
-    _, _, _, components, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
     sns.barplot(ax=ax, y='Weight', x='Name', data=components)
 
@@ -163,14 +163,12 @@ def InVivoPredictVsActualAffinities(Mod, ax):
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
 
-def ClassAvidityPredict(Mod, ax):
+def ClassAvidityPredict(Mod, model, normV, ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
-    from ..StoneModMouse import MultiAvidityPredict, StoneModelMouse
+    from ..StoneModMouse import MultiAvidityPredict
     from copy import deepcopy
 
     Mod = deepcopy(Mod)
-
-    _, _, _, _, model, normV = Mod.KnockdownLassoCrossVal(addavidity1=True)
 
     Mod.v = 30
 
@@ -179,7 +177,6 @@ def ClassAvidityPredict(Mod, ax):
     for _, row in table.iterrows():
         colorr = Igidx[row['Ig']]
         ax.errorbar(x=row['Avidity'], y=row['Predict'], marker='.', mfc=colorr)
-
 
     ax.set_ylabel('Predicted Effect')
 
