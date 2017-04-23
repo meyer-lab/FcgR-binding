@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn as sns
-import pandas as pd
 from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
@@ -9,7 +7,6 @@ from ..StoneModMouse import StoneModelMouse
 def makeFigure():
     import string
     from matplotlib import gridspec
-    from ..StoneHelper import getMedianKx
     from .FigureCommon import subplotLabel
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")

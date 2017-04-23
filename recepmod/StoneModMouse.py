@@ -6,7 +6,6 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import explained_variance_score
-import matplotlib.pyplot as plt
 import seaborn as sns
 from .StoneHelper import rep, getMedianKx
 sns.set(style="ticks")
