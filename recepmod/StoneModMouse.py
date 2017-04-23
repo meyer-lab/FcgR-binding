@@ -325,30 +325,30 @@ class StoneModelMouse:
         y = tbN['Effectiveness'].as_matrix()
 
         return (X.as_matrix(), y, tbN)
-    
+
     def PCA(self, plott = False):
         """ Principle Components Analysis of FcgR binding predictions """
         from sklearn.decomposition import PCA
-        
+
         pca = PCA(n_components=5)
         table = self.pdAvidityTable()
-        
+
         # remove Req columns
         table = table.select(lambda x: not re.search('Req', x), axis=1)
 
         X = StandardScaler().fit_transform(np.array(table))
-        
+
         # Fit PCA
         result = pca.fit_transform(X)
-        
+
         # Assemble scores
         scores = pd.DataFrame(result, index=table.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
         scores['Avidity'] = scores.apply(lambda x: int(x.name.split('-')[1]), axis=1)
         scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
 
         return (scores, pca.explained_variance_ratio_)
-        
-            
+
+
 def MultiAvidityPredict(M, las, scale):
     """ Make predictions for the effect of avidity and class. """
     table = M.pdAvidityTable().select(lambda x: not re.search('Req', x), axis=1)
