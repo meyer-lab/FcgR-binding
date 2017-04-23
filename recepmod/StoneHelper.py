@@ -58,8 +58,11 @@ def getMedianKx():
 
     return Kx
 
-# Return a dataframe with the measured data labeled with the condition variables
+
 def getMeasuredDataFrame(self):
+    """
+    Return a dataframe with the measured data labeled with the condition variables
+    """
     normData = pd.DataFrame(self.mfiAdjMean)
     normData = pd.melt(normData, value_name = "Meas")
 
@@ -73,8 +76,11 @@ def getMeasuredDataFrame(self):
 
     return normData
 
-# Return a dataframe with the fit data labeled with the condition variables
+
 def getFitPrediction(self, x):
+    """
+    Return a dataframe with the fit data labeled with the condition variables
+    """
     _, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = self.NormalErrorCoef(x, fullOutput = True)
 
     outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
@@ -113,8 +119,11 @@ def mapMCMC(dFunction, pSet):
     # Concatenate all the dataframes vertically and return
     return pd.concat(retVals)
 
-# Reduce the collection of predictions to various summary statistics.
+
 def reduceMCMC(frameList, groupByC = None, dropC = None):
+    """
+    Reduce the collection of predictions to various summary statistics.
+    """
     if groupByC is None:
         groupByC = ['Ig', 'FcgR', 'TNP']
 
@@ -143,8 +152,11 @@ def reduceMCMC(frameList, groupByC = None, dropC = None):
 
     return frameAgg
 
-# Return the fit and measured data merged into a single dataframe
+
 def getFitMeasMerged(self, x):
+    """
+    Return the fit and measured data merged into a single dataframe
+    """
     fit = getFitPrediction(self, x)
     data = getMeasuredDataFrame(self)
 
@@ -199,7 +211,9 @@ def reduce():
 
 
 def geweke(chain1, chain2=None):
-    # Perform the Geweke Diagnostic between two univariate chains. If two chains are input instead of one, Student's t-test is performed instead.
+    """
+    Perform the Geweke Diagnostic between two univariate chains. If two chains are input instead of one, Student's t-test is performed instead.
+    """
     from scipy.stats import ttest_ind
     
     len0 = chain1.shape[0]
@@ -210,7 +224,9 @@ def geweke(chain1, chain2=None):
     return statistic, pvalue
             
 def geweke_chain(dset):
-    # Perform the Geweke Diagnostic on multiple chains of data contained in a Pandas DataFrame "dset" output by read_chain.
+    """
+    Perform the Geweke Diagnostic on multiple chains of data contained in a Pandas DataFrame "dset" output by read_chain.
+    """
     statistics = []
     pvalues = []
     dsett = dset.drop(['LL','walker'],1).as_matrix()
