@@ -3,11 +3,9 @@ import re
 from itertools import product
 import pandas as pd
 import numpy as np
-import sklearn
-from sklearn import linear_model
-from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGroupOut
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import explained_variance_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 from .StoneHelper import rep, getMedianKx
@@ -169,6 +167,8 @@ class StoneModelMouse:
 
     def NimmerjahnPredictByAffinities(self):
         """ This will run ordinary linear regression using just affinities of receptors. """
+        from sklearn import linear_model
+        from sklearn.model_selection import cross_val_predict
 
         # Run ridge regression with forced direction or simple OLS
         lr = linear_model.LinearRegression()
@@ -186,13 +186,13 @@ class StoneModelMouse:
         predicted = cross_val_predict(lr, X, y, cv=X.shape[0])
 
         # How well did we do on crossvalidation?
-        crossval_perf = sklearn.metrics.explained_variance_score(y, predicted)
+        crossval_perf = explained_variance_score(y, predicted)
 
         # Do direct regression too
         lr.fit(X, y)
 
         # How well did we do on direct?
-        direct_perf = sklearn.metrics.explained_variance_score(y, lr.predict(X))
+        direct_perf = explained_variance_score(y, lr.predict(X))
 
         data['DirectPredict'] = lr.predict(X)
         data['CrossPredict'] = predicted
@@ -267,14 +267,17 @@ class StoneModelMouse:
 
         writer.close()
 
-    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False):
+    def InVivoPredict(self, logspace=False, addavidity1=True):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)
+        from sklearn.cross_decomposition import PLSRegression
+        from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGroupOut
+
+        las = PLSRegression(n_components=3, scale=False)
         scale = StandardScaler()
 
         # Collect data
         X, y, tbN = self.modelPrep(logspace, addavidity1)
-
+        
         X = scale.fit_transform(X)
 
         # Setup the crossvalidation iterators
@@ -289,31 +292,24 @@ class StoneModelMouse:
         predict = cross_val_predict(las, X, y, cv = looI, n_jobs=-1)
 
         # How well did we do on crossvalidation?
-        crossval_perf = sklearn.metrics.explained_variance_score(y, predict)
+        crossval_perf = explained_variance_score(y, predict)
 
         # Do direct regression too
         las.fit(X, y)
 
-        components = pd.Series(las.coef_, tbN.columns[:-1], dtype=np.float64)
-        components['Intercept'] = las.intercept_
-        components = components.to_frame(name='Weight')
-        components['Name'] = components.index
-
         # How well did we do on direct?
-        direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
+        direct_perf = explained_variance_score(y, las.predict(X))
 
-        print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
+        print("Performance of the plsr in vivo model on crossval: " + str(crossval_perf))
 
         tbN['DirectPredict'] = las.predict(X)
         tbN['CrossPredict'] = predict
 
-        return (direct_perf, crossval_perf, tbN, components, las, scale)
+        return (direct_perf, crossval_perf, tbN, las, scale)
 
     def modelPrep(self, logspace, addavidity1):
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown()
-        tbN = tbN.select(lambda x: not re.search('Lbnd', x), axis=1)
-        tbN = tbN.select(lambda x: not re.search('nX', x), axis=1)
 
         if addavidity1 is False:
             temp = tbN.apply(lambda x: int(x.name.split('-')[1]), axis=1)
@@ -351,22 +347,11 @@ class StoneModelMouse:
         return (scores, pca.explained_variance_ratio_)
         
             
-def MultiAvidityPredict(M, paramV, normV):
+def MultiAvidityPredict(M, las, scale):
     """ Make predictions for the effect of avidity and class. """
-    table = M.pdAvidityTable()
+    table = M.pdAvidityTable().select(lambda x: not re.search('Req', x), axis=1)
 
-    # remove Req columns
-    table = table.select(lambda x: not re.search('nX', x), axis=1)
-    table = table.select(lambda x: not re.search('Lbnd', x), axis=1)
-    table = table.select(lambda x: not re.search('Req', x), axis=1)
-
-    if len(paramV) != (table.shape[1] + 1):
-        raise ValueError('Weighting list doesn\'t match data.')
-
-    def transF(inVal):
-        return np.dot(paramV[1::], np.squeeze(normV.transform(inVal.values.reshape(1, -1)))) + paramV[0]
-
-    table['Predict'] = table.apply(transF, axis=1)
+    table['Predict'] = las.predict(scale.transform(table))
     table['Avidity'] = table.apply(lambda x: int(x.name.split('-')[1]), axis=1)
     table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
 

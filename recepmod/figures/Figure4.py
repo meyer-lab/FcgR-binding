@@ -18,7 +18,7 @@ def makeFigure():
     Mod = StoneModelMouse()
 
     # Run the in vivo regression model
-    _, _, tbN, components, model, normV = Mod.KnockdownLassoCrossVal(addavidity1=True)
+    _, _, tbN, model, normV = Mod.InVivoPredict()
 
     # Setup plotting space
     f = plt.figure(figsize=(7, 6))
@@ -45,7 +45,7 @@ def makeFigure():
     InVivoPredictVsActual(tbN, ax[4])
 
     # Show model components
-    InVivoPredictComponents(components, ax[5])
+    InVivoPredictComponents(model, ax[5])
 
     # Leave components out plot
     RequiredComponents(ax[6])
@@ -110,15 +110,10 @@ def InVivoPredictVsActual(tbN, ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('Predicted Effect')
 
-def InVivoPredictComponents(components, ax):
+def InVivoPredictComponents(model, ax):
     """ Plot model components. """
 
-    sns.barplot(ax=ax, y='Weight', x='Name', data=components)
-
-    ax.set_xticklabels(ax.get_xticklabels(),
-                       rotation=40,
-                       rotation_mode="anchor",
-                       ha="right")
+    #sns.barplot(ax=ax, y='Weight', x='Name', data=components)
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
@@ -172,7 +167,7 @@ def ClassAvidityPredict(Mod, model, normV, ax):
 
     Mod.v = 30
 
-    table = MultiAvidityPredict(Mod, np.insert(model.coef_, 0, model.intercept_), normV)
+    table = MultiAvidityPredict(Mod, model, normV)
 
     for _, row in table.iterrows():
         colorr = Igidx[row['Ig']]
