@@ -45,6 +45,9 @@ def makeFigure():
 Igs = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3'}
 Igidx = dict(zip(Igs, sns.color_palette()))
 
+DatType = {'Lbnd':'o', 'Rbnd':'d', 'Three':'s', 'Four':'^'}
+
+
 def PCAmurine(axes):
     """ Principle Components Analysis of FcgR binding predictions """
     # Load murine class
@@ -90,6 +93,36 @@ def PCAmurine(axes):
     for _, row in coefs.iterrows():
         axes[1].errorbar(x=row['PC1'], y=row['PC2'], marker='.')
 
+
+
+    def makeFcLegend():
+        import matplotlib.lines as mlines
+        import matplotlib.patches as mpatches
+
+        FcgRidxL = [r'Fc$\gamma$RI',
+                    r'Fc$\gamma$RIIB',
+                    r'Fc$\gamma$RIII',
+                    r'Fc$\gamma$RIV']
+        FcgRidxL = dict(zip(FcgRidxL, sns.color_palette()))
+
+        patches = list()
+
+        for f in FcgRidxL:
+            patches.append(mpatches.Patch(color=FcgRidxL[f], label=f))
+
+        for j in DatType:
+            patches.append(mlines.Line2D([], 
+                                         [], 
+                                         color='black', 
+                                         marker=DatType[j], 
+                                         markersize=7, 
+                                         label=j, 
+                                         linestyle='None'))
+
+        return patches
+
+    axes[1].legend(handles=makeFcLegend(), bbox_to_anchor=(1.05, 1), loc=2)
+
     axes[0].set_title('Murine Scores')
     axes[1].set_title('Murine Loadings')
 
@@ -116,11 +149,51 @@ def getFitPrediction(M, x):
 def PCAhuman(axes):
     Mod = StoneModel()
     from ..StoneHelper import getMedianKx
+    from .FigureCommon import FcgRidxL
+
+    def makeFcLegend():
+        import matplotlib.lines as mlines
+        import matplotlib.patches as mpatches
+
+        patches = list()
+
+        for f in FcgRidxL:
+            patches.append(mpatches.Patch(color=FcgRidxL[f], label=f))
+
+        for j in DatType:
+            patches.append(mlines.Line2D([], 
+                                         [], 
+                                         color='black', 
+                                         marker=DatType[j], 
+                                         markersize=7, 
+                                         label=j, 
+                                         linestyle='None'))
+
+        return patches
 
     x = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, getMedianKx(), 1, 1, 4, 5, 1, 1], dtype=np.float64)
 
     #outt = getFitPrediction(Mod, x)
 
-
+    axes[1].legend(handles=makeFcLegend(), bbox_to_anchor=(1.05, 1), loc=2)
     axes[0].set_title('Human Scores')
     axes[1].set_title('Human Loadings')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
