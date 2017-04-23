@@ -215,14 +215,14 @@ def geweke(chain1, chain2=None):
     Perform the Geweke Diagnostic between two univariate chains. If two chains are input instead of one, Student's t-test is performed instead.
     """
     from scipy.stats import ttest_ind
-    
+
     len0 = chain1.shape[0]
     if not chain2:
         chain2 = chain1[int(np.ceil(len0/2)):len0]
         chain1 = chain1[0:int(np.ceil(len0*0.1))]
     statistic, pvalue = ttest_ind(chain1,chain2)
     return statistic, pvalue
-            
+
 def geweke_chain(dset):
     """
     Perform the Geweke Diagnostic on multiple chains of data contained in a Pandas DataFrame "dset" output by read_chain.

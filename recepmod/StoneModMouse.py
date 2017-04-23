@@ -32,7 +32,7 @@ class StoneModelMouse:
                                      skip_header=1, 
                                      usecols=list(range(1,6)),
                                      dtype=np.float64)
-        
+
         self.kaMouse = self.kaM[:, list(range(4))]
         self.kaIgG2b_Fucose = self.kaM[:, 4].reshape(4,1)
         self.L0 = 1E-9
@@ -197,7 +197,7 @@ class StoneModelMouse:
         data['CrossPredict'] = predicted
 
         return (direct_perf, crossval_perf, data)
-    
+
     def IgG2b_Fucose(self):
         output = np.full((2, len(self.FcgRs), 4), np.nan)
         v = [1, self.v]
@@ -239,7 +239,7 @@ class StoneModelMouse:
         tbK4.loc[:,'Effectiveness'] = pd.Series([0, 0.35], index=tbK4.index)
         tbK4.iloc[:, 0:4] = 0.0
         tbK4.iloc[:, 12:16] = 0.0
-        
+
         # set up tbK5 for IgG2b-Fucose-/-
         # Add effectiveness
         IgG2b_fucose = np.insert(IgG2b_fucose, 16, [0, 0.70], axis=1)
@@ -277,7 +277,7 @@ class StoneModelMouse:
 
         # Collect data
         X, y, tbN = self.modelPrep(logspace, addavidity1)
-        
+
         X = scale.fit_transform(X)
 
         # Setup the crossvalidation iterators
