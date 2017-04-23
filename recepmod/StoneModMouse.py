@@ -1,7 +1,6 @@
 import re
 import pandas as pd
 import numpy as np
-from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import explained_variance_score
 import seaborn as sns
@@ -329,6 +328,8 @@ class StoneModelMouse:
     
     def PCA(self, plott = False):
         """ Principle Components Analysis of FcgR binding predictions """
+        from sklearn.decomposition import PCA
+        
         pca = PCA(n_components=5)
         table = self.pdAvidityTable()
         

@@ -4,7 +4,6 @@
 import numpy as np
 import pandas as pd
 from memoize import memoize
-from scipy.stats import ttest_ind
 
 try:
     import cPickle as pickle
@@ -201,6 +200,8 @@ def reduce():
 
 def geweke(chain1, chain2=None):
     # Perform the Geweke Diagnostic between two univariate chains. If two chains are input instead of one, Student's t-test is performed instead.
+    from scipy.stats import ttest_ind
+    
     len0 = chain1.shape[0]
     if not chain2:
         chain2 = chain1[int(np.ceil(len0/2)):len0]

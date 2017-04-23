@@ -1,15 +1,15 @@
 import matplotlib
 matplotlib.use('AGG')
-import matplotlib.pyplot as plt
 import seaborn as sns
-from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
 
 def makeFigure():
     import string
+    import matplotlib.pyplot as plt
     from matplotlib import gridspec
     from .FigureCommon import subplotLabel
+    from ..StoneModMouse import StoneModelMouse
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 

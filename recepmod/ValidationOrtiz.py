@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from .StoneTwoRecep import StoneTwo
 
 class Ortiz:
     def __init__(self):
@@ -23,6 +22,7 @@ class Ortiz:
 
     def predictResponse(self):
         ''' Predict the response measured. '''
+        from .StoneTwoRecep import StoneTwo
 
         Ka = [self.kaBruhns[0][0], self.kaBruhns[0][0]] # The affinity of the relevant interaction
         L0 = 1E-4 # This is known
