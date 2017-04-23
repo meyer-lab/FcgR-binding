@@ -1,6 +1,4 @@
-
 import re
-from itertools import product
 import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
@@ -8,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import explained_variance_score
 import seaborn as sns
 from .StoneModel import StoneMod
-from .StoneHelper import rep, getMedianKx
+
 sns.set(style="ticks")
 
 np.seterr(over = 'raise')
@@ -23,6 +21,7 @@ class StoneModelMouse:
     # Takes in a list of shape (9) for x: Rexp for FcgRs logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):
         import os
+        from .StoneHelper import getMedianKx
 
         path = os.path.dirname(os.path.abspath(__file__))
 
@@ -73,6 +72,7 @@ class StoneModelMouse:
         the 24 Ig-FcgR pairs calculated by StoneModMouse(x). Outputs a pandas
         table of binding prediction
         """
+        from itertools import product
 
         # Set labels for columns of pandas table
         labels = []
@@ -271,6 +271,7 @@ class StoneModelMouse:
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
         from sklearn.cross_decomposition import PLSRegression
         from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGroupOut
+        from .StoneHelper import rep
 
         las = PLSRegression(n_components=3, scale=False)
         scale = StandardScaler()
