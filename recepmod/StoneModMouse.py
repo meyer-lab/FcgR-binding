@@ -1,4 +1,4 @@
-from .StoneModel import StoneMod
+
 import re
 from itertools import product
 import pandas as pd
@@ -7,6 +7,7 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import explained_variance_score
 import seaborn as sns
+from .StoneModel import StoneMod
 from .StoneHelper import rep, getMedianKx
 sns.set(style="ticks")
 
