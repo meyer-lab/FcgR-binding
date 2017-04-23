@@ -18,9 +18,18 @@ def runFunc(nameOut):
 
 if parallel is True:
 	pool = multiprocessing.Pool()
-	pool.map(runFunc, figList)
+	pool.map_async(runFunc, figList)
 else:
 	list(map(runFunc, figList))
+
+# Output data table
+StoneModelMouse().writeModelData('./Manuscript/Figures/ModelData.md')
+
+# IF we're running in parallel we need to wait for Figure 2 to finish
+# Close the pool
+if parallel is True:
+	pool.close()
+	pool.join()
 
 
 # Overlay cartoon
@@ -31,7 +40,4 @@ cartoon.moveto(10, -15)
 
 template.append(cartoon)
 template.save('./Manuscript/Figures/Figure2.svg')
-
-# Output data table
-StoneModelMouse().writeModelData('./Manuscript/Figures/ModelData.md')
 
