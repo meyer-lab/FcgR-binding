@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('AGG')
 from itertools import product
 import matplotlib.pyplot as plt
 import numpy as np

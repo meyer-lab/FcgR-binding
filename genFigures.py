@@ -1,16 +1,29 @@
+import matplotlib
+matplotlib.use('AGG')
 import svgutils.transform as st
-from recepmod.figures import Figure1, Figure2, FigureSS, Figure3, Figure4, Figure5
+import multiprocessing
+from recepmod.figures.FigureCommon import figList
 from recepmod.StoneModMouse import StoneModelMouse
 
-def runFunc(figClass, nameOut):
+parallel = True
+
+def runFunc(nameOut):
 	print('Starting on ' + nameOut)
-	ff = figClass.makeFigure()
+	exec('from recepmod.figures import ' + nameOut)
+	ff = eval(nameOut + '.makeFigure()')
 	ff.savefig('./Manuscript/Figures/' + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
 	ff.savefig('./Manuscript/Figures/' + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+	print('Done with ' + nameOut)
+	return 0
 
-runFunc(Figure1, 'Figure1')
+if parallel is True:
+	pool = multiprocessing.Pool()
+	pool.map(runFunc, figList)
+else:
+	list(map(runFunc, figList))
 
-runFunc(Figure2, 'Figure2')
+
+# Overlay cartoon
 template = st.fromfile('./Manuscript/Figures/Figure2.svg')
 cartoon = st.fromfile('./recepmod/figures/Figure2_model_diagram.svg').getroot()
 
@@ -19,12 +32,6 @@ cartoon.moveto(10, -15)
 template.append(cartoon)
 template.save('./Manuscript/Figures/Figure2.svg')
 
-runFunc(FigureSS, 'FigureSS')
-
-runFunc(Figure3, 'Figure3')
-
-runFunc(Figure4, 'Figure4')
-
+# Output data table
 StoneModelMouse().writeModelData('./Manuscript/Figures/ModelData.md')
 
-runFunc(Figure5, 'Figure5')

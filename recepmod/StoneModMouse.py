@@ -288,7 +288,7 @@ class StoneModelMouse:
             looI = loo.split(X, y, groups = rep(range(12), 2))
 
         # Run crossvalidation
-        predict = cross_val_predict(las, X, y, cv = looI, n_jobs=-1)
+        predict = cross_val_predict(las, X, y, cv = looI)
 
         # How well did we do on crossvalidation?
         crossval_perf = explained_variance_score(y, predict)
