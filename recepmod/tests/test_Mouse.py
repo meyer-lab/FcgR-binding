@@ -67,6 +67,7 @@ class TestStoneMouse(unittest.TestCase):
         # tbNK.to_csv('out.csv')
         _, _, _, las, scale = self.Mod.InVivoPredict()
         self.Mod.InVivoPredict(logspace=True)
+        self.Mod.InVivoPredict(addavidity1=False)
 
         table = MultiAvidityPredict(self.Mod, las, scale)
 
