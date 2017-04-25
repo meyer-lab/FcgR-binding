@@ -13,3 +13,4 @@ nose-timer>=0.7.0
 svgutils>=0.2.0
 pandocfilters>=1.4.1
 tqdm>=4.11.2
+coverage>=4.3.4
