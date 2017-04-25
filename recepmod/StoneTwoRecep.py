@@ -56,15 +56,8 @@ def StoneRmultiAll(vGrid):
     vGrid[1,0] = 0.0
     vGrid[0,1] = 0.0
 
-    # Sum along each axis to get the number of receptors in each pool
-    vGridSone = np.sum(vGrid, axis=1)
-    vGridStwo = np.sum(vGrid, axis=0)
-
-    # Multiply by number of receptors in each case
-    vGridSone = np.multiply(vGridSone, np.arange(gnu+1))
-    vGridStwo = np.multiply(vGridStwo, np.arange(gnu+1))
-
-    return np.array((np.sum(vGridSone), np.sum(vGridStwo)))
+    # Just Rbnd from here
+    return StoneRbnd(vGrid)
 
 def activityBias(vGrid):
     vGrid = np.copy(vGrid)
