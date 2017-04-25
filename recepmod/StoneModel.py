@@ -23,6 +23,13 @@ def nchoosek(n):
 
     return comb(n, np.arange(n + 1))
 
+@memoize
+def nchoosek1(n, k):
+    """ A fast cached version of nchoosek. """
+    from scipy.misc import comb
+
+    return comb(n, k)
+
 
 def normalizeData(filepath):
     """ Import Lux et al data and normalize by experiment. """
