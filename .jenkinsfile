@@ -30,14 +30,18 @@ pipeline {
           usePreviousBuildAsReference: true
           ])
 
-        publishHTML([
-          allowMissing: false,
-          alwaysLinkToLastBuild: false,
-          keepAll: false,
-          reportDir: 'cov',
-          reportFiles: 'index.html',
-          reportName: 'Coverage Report',
-          reportTitles: ''])
+        step([
+          $class: 'CoberturaPublisher',
+          autoUpdateHealth: true,
+          autoUpdateStability: true,
+          coberturaReportFile: 'coverage.xml',
+          failNoReports: true,
+          failUnhealthy: true,
+          failUnstable: true,
+          maxNumberOfBuilds: 0,
+          onlyStable: false,
+          sourceEncoding: 'UTF_8',
+          zoomCoverageChart: true])
       }
     }
     stage('Deploy') {
