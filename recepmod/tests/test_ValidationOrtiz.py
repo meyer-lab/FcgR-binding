@@ -5,12 +5,7 @@ from ..ValidationOrtiz import Ortiz
 
 class TestOrtizMethods(unittest.TestCase):
     def setUp(self):
-        self.startTime = time.time()
         self.Ortiz = Ortiz()
-
-    def tearDown(self):
-        t = time.time() - self.startTime
-        print("%s: %.3f" % (self.id(), t*1000))
 
     def test_classSetup(self):
         # Make sure we were given a Pandas dataframe
