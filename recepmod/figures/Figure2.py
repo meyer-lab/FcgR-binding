@@ -177,23 +177,27 @@ def plotFit(fitMean, ax=None):
     ax.set_xlim(0.01, 5)
 
 def GewekeDiagPlot(M,dset,ax=None):
+    # Make axes object if there is not one passed in.
     if not ax:
         ax = plt.gca()
+    # Get pvalues from geweke diagnostic from the dataset
     _, pvalues = geweke_chains(dset)
-    ax.plot([j for j in range(M.Nparams)],[0.05]*M.Nparams,'r-')
-##    ax.set_xticks(np.array([j for j in range(len(pvalues))]))
-    
-##    templist = []
-##    for j in range(2,dset.shape[1]):
-##        templist.append(dset.columns[j])
+    # Get number of walkers from pvalues
+    nwalkers = len(pvalues)
+    # Plot horizontal red line to discriminate between acceptable (<=0.05) and
+    # unacceptable (>0.05) pvalues from Geweke diagnostic
+    ax.plot([j-1 for j in range(M.Nparams+2)],[0.05]*(M.Nparams+2),'r-')
 
-##    ax.set_xticklabels(templist,rotation=90,rotation_mode="anchor",ha="right")
-    pvallist = []
-    pvalues = np.array(pvalues)
+    # Transpose pvalues from an array of shape 52, 13 to one of shape
+    # 13, 52
+    pvalues = np.array(pvalues).T.tolist()
+
+    # Plot green Xs per walker per parameter
     for j in range(M.Nparams):
-        pvallist.append(np.max(pvalues[:,j]))
-    ax.plot(np.arange(M.Nparams),pvallist,'gx')
+        ax.plot([j]*nwalkers,pvalues[j],'gx')
+        
+    ax.set_xbound(-1,M.Nparams)
     ax.set_xticks([j for j in range(M.Nparams)])
-    ax.set_xticklabels(M.FcgRs+M.pNames,rotation=40)
+    ax.set_xticklabels(M.FcgRs+M.pNames[6:-1],rotation=40)
     ax.set_ylabel('p-values')
     ax.xaxis.grid(False)
