@@ -41,7 +41,7 @@ FcγRIIIA-158V IgG4         122    136    262    91     313    558    1026   239
 
 ## Binding Experiment
 
-![**XXX. *** XXX.](./Figures/FigureSS.svg){#fig:BindingDeconv}
+![**Predicted binding and multimerization within the *in vitro* immune complex-FcγR binding experiment.*** A) Predicted FcγR bound to IgG within each condition of the *in vitro* binding experiment. B) Predicted multimerized FcγR within each *in vitro* binding condition.](./Figures/FigureSS.svg){#fig:BindingDeconv}
 
 
 # References

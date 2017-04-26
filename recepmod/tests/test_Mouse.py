@@ -8,14 +8,10 @@ from ..StoneModMouse import StoneModelMouse, MultiAvidityPredict
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
         self.Mod = StoneModelMouse()
-        self.startTime = time.time()
-
-    def tearDown(self):
-        t = time.time() - self.startTime
-        print("%s: %.3f" % (self.id(), t*1000))
 
     def test_dataImport_kaMouse(self):
         self.assertTrue(self.Mod.kaMouse.shape == (4, 4))
+        self.assertTrue(self.Mod.kaIgG2b_Fucose.shape == (4,1))
 
     def test_dataOutput_StoneModMouse(self):
         # Checks size of fullOutput
@@ -73,28 +69,24 @@ class TestStoneMouse(unittest.TestCase):
 
     def test_NimmerjahnTb_Knockdown(self):
         """ Check NimmerjahnTb_Knockdown """
+        self.Mod.IgG2b_Fucose()
         tbNK = self.Mod.NimmerjahnTb_Knockdown()
         # tbNK.to_csv('out.csv')
         self.Mod.KnockdownLassoCrossVal()
         self.Mod.KnockdownLassoCrossVal(logspace=True)
-        self.Mod.KnockdownLassoCrossVal(addavidity1=True, printt=True)
+        self.Mod.KnockdownLassoCrossVal(addavidity1=True)
         self.Mod.KnockdownLassoCrossVal(logspace=True, addavidity1=True)
 
     def test_NimmerjahnEffectTableAffinities(self):
         """ Test that table for prediction off of just affinities is correct. """
-
         tbN = self.Mod.NimmerjahnEffectTableAffinities()
         # tbN.to_csv('out.csv')
-
-        self.Mod.NimmerjahnPredictByAffinities(simple=True)
         self.Mod.NimmerjahnPredictByAffinities()
-        self.Mod.NimmerjahnPredictByAffinities(simple=True, logspace=True)
-        self.Mod.NimmerjahnPredictByAffinities(logspace=True)
 
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
 
-        self.assertTrue(tbN.shape == (11, 5))
+        self.assertTrue(tbN.shape == (12, 5))
 
     def test_PCA(self):
         scores, expVar = self.Mod.PCA()
