@@ -1,3 +1,4 @@
+from .StoneModel import StoneMod
 import re
 from itertools import product
 import pandas as pd
@@ -30,13 +31,16 @@ class StoneModelMouse:
         self.Igs = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
         self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV']
         # Read in csv file of murine binding affinities
-        self.kaMouse = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), 
+        self.kaM = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), 
                                      delimiter=',', 
                                      skip_header=1, 
-                                     usecols=list(range(1,5)),
+                                     usecols=list(range(1,6)),
                                      dtype=np.float64)
+        
+        self.kaMouse = self.kaM[:, list(range(4))]
+        self.kaIgG2b_Fucose = self.kaM[:, 4].reshape(4,1)
         self.L0 = 1E-9
-        self.v = 10
+        self.v = 4
         self.Kx = getMedianKx()
         self.logR = np.full((len(self.FcgRs),), np.log10(10**5), dtype = np.float64)
 
@@ -48,7 +52,6 @@ class StoneModelMouse:
         other receptors with crosslinking constant Kx = 10^logKx. All
         equations derived from Stone et al. (2001).
         '''
-        from .StoneModel import StoneMod
 
         # Initiate numpy arrays for StoneMod outputs
         output = np.full((len(self.Igs), 5, len(self.FcgRs)), np.nan)
@@ -103,7 +106,6 @@ class StoneModelMouse:
                 idx.append(Ig+'-'+str(j))
             
         tb1.index = idx
-        self.v = 10
         return tb1
         
     def NimmerjahnEffectTable(self):
@@ -143,7 +145,7 @@ class StoneModelMouse:
         tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
         tbK1.loc[:,'Effectiveness'] = pd.Series([0.7, 1, 0.75, 0],
                                                 index=tbK1.index)
-        tbK1.iloc[:, 4:8] = 0.0
+        tbK1.iloc[:, 1] = 0.0
 
         # set up tbK2 for FcgRI, FcgRIII, FcgRI/IV knockdown, IgG2a treatment
         tbK2 = tbK.iloc[(1, 1, 1), :].copy()
@@ -157,34 +159,31 @@ class StoneModelMouse:
         tbK2.iloc[1, 2] = 0.0
         tbK2.iloc[2, 0] = 0.0
         tbK2.iloc[2, 3] = 0.0
+        
+        # set up IgG2b, -Fucose
+        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index = ['IgG2b-Fucose-'], columns = self.FcgRs)
+        tbK3.loc[:,'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
 
         # Join tbK, tbK1, tbK2 into one table
-        return tbK.append([tbK1, tbK2])
+        return tbK.append([tbK1, tbK2, tbK3])
 
-    def NimmerjahnPredictByAffinities(self, fixed=False, simple=False, logspace=False):
+    def NimmerjahnPredictByAffinities(self):
         """ This will run ordinary linear regression using just affinities of receptors. """
 
         # Run ridge regression with forced direction or simple OLS
-        if simple is True:
-            lr = linear_model.LinearRegression()
-        else:
-            lr = linear_model.ElasticNet(positive=fixed, max_iter=10000)
+        lr = linear_model.LinearRegression()
 
         data = self.NimmerjahnEffectTableAffinities()
+        data['ActMax'] = data.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV), axis=1)
 
-        # Log transform if needed
-        if logspace is True:
-            data = data.apply(np.log2).replace(-np.inf, -5)
-
-        X = data.iloc[:, 0:4]
+        X = data[['ActMax', 'FcgRIIB']]
         y = data['Effectiveness']
 
-        # If we're fixing the parameters, we need to make the inhibitory receptor negative
-        if fixed is True:
-            X.loc[:, 1] = -X.iloc[:, 1]
+        # Log transform to keep ratios
+        X = X.apply(np.log2).replace(-np.inf, -3)
 
         # Run crossvalidation predictions at the same time
-        predicted = cross_val_predict(lr, X, y, cv=11)
+        predicted = cross_val_predict(lr, X, y, cv=X.shape[0])
 
         # How well did we do on crossvalidation?
         crossval_perf = sklearn.metrics.explained_variance_score(y, predicted)
@@ -199,9 +198,20 @@ class StoneModelMouse:
         data['CrossPredict'] = predicted
 
         return (direct_perf, crossval_perf, data)
+    
+    def IgG2b_Fucose(self):
+        output = np.full((2, len(self.FcgRs), 4), np.nan)
+        v = [1, self.v]
+        for k in range(len(self.FcgRs)):
+            for i in range(2):
+                Ka = self.kaIgG2b_Fucose[k]
+                stoneModOut = np.asarray(StoneMod(self.logR[k],Ka,v[i],self.Kx*Ka,self.L0, fullOutput = True), dtype = np.float)
+                output[i, k, :] = stoneModOut[:4]
+        return output.reshape(2,16)
 
     def NimmerjahnTb_Knockdown(self):
         tbK = self.NimmerjahnEffectTable()
+        IgG2b_fucose = self.IgG2b_Fucose()
         # remove Req columns
         tbK = tbK.select(lambda x: not re.search('Req', x), axis=1)
 
@@ -230,17 +240,40 @@ class StoneModelMouse:
         tbK4.loc[:,'Effectiveness'] = pd.Series([0, 0.35], index=tbK4.index)
         tbK4.iloc[:, 0:4] = 0.0
         tbK4.iloc[:, 12:16] = 0.0
+        
+        # set up tbK5 for IgG2b-Fucose-/-
+        # Add effectiveness
+        IgG2b_fucose = np.insert(IgG2b_fucose, 16, [0, 0.70], axis=1)
+        tbK5idx = funcAppend(tbK.index[4:6], '-Fucose-/-')
+        tbK5 = pd.DataFrame(IgG2b_fucose, index = tbK5idx, columns = tbK.columns)
 
         # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
-        return tbK.append([tbK1, tbK2, tbK3, tbK4])
+        return tbK.append([tbK1, tbK2, tbK3, tbK4, tbK5])
 
-    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False, printt=False):
+    def writeModelData(self, filename, logspace=False, addavidity1=False):
+        import pytablewriter
+
+        # Collect data
+        _, _, tbN = self.modelPrep(logspace, addavidity1)
+
+        writer = pytablewriter.MarkdownTableWriter()
+
+        writer.from_dataframe(tbN)
+
+        # change output stream to a file
+        with open(filename, 'w') as f:
+            writer.stream = f
+            writer.write_table()
+
+        writer.close()
+
+    def KnockdownLassoCrossVal(self, logspace=False, addavidity1=False):
         """ Cross validate KnockdownLasso by using a pair of rows as test set """
         las = linear_model.ElasticNetCV(l1_ratio=0.95, max_iter=100000)
         scale = StandardScaler()
 
         # Collect data
-        X, y, tbN = self.modelPrep(logspace)
+        X, y, tbN = self.modelPrep(logspace, addavidity1)
 
         X = scale.fit_transform(X)
 
@@ -250,7 +283,7 @@ class StoneModelMouse:
             looI = loo.split(X, y)
         else:
             loo = LeaveOneGroupOut()
-            looI = loo.split(X, y, groups = rep(range(11), 2))
+            looI = loo.split(X, y, groups = rep(range(12), 2))
 
         # Run crossvalidation
         predict = cross_val_predict(las, X, y, cv = looI, n_jobs=-1)
@@ -269,40 +302,43 @@ class StoneModelMouse:
         # How well did we do on direct?
         direct_perf = sklearn.metrics.explained_variance_score(y, las.predict(X))
 
-        if printt is True:
-            print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
+        print("Performance of the enet in vivo model on crossval: " + str(crossval_perf))
 
         tbN['DirectPredict'] = las.predict(X)
         tbN['CrossPredict'] = predict
 
         return (direct_perf, crossval_perf, tbN, components, las, scale)
 
-    def modelPrep(self, logspace=False):
+    def modelPrep(self, logspace, addavidity1):
         """ Collect the data and split into X and Y blocks. """
         tbN = self.NimmerjahnTb_Knockdown()
         tbN = tbN.select(lambda x: not re.search('Lbnd', x), axis=1)
         tbN = tbN.select(lambda x: not re.search('nX', x), axis=1)
-        tbNparam = tbN.select(lambda x: not re.search('Effectiveness', x), axis=1)
+
+        if addavidity1 is False:
+            temp = tbN.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+            tbN = tbN.loc[temp > 1, :]
+
+        # Assign independent variables and dependent variable
+        X = tbN.drop('Effectiveness', axis=1)
+
         # Log transform if needed
         if logspace is True:
-            tbNparam = tbNparam.apply(np.log2).replace(-np.inf, -5)
+            X = X.apply(np.log2).replace(-np.inf, -5)
 
-        # Assign independent variables and dependent variable "effect"
-        independent = np.array(tbNparam)
-        effect = np.array(tbN['Effectiveness'])
+        y = tbN['Effectiveness'].as_matrix()
 
-        return (independent, effect, tbN)
+        return (X.as_matrix(), y, tbN)
     
     def PCA(self, plott = False):
         """ Principle Components Analysis of FcgR binding predictions """
         pca = PCA(n_components=5)
         table = self.pdAvidityTable()
-        scale = StandardScaler()
         
         # remove Req columns
         table = table.select(lambda x: not re.search('Req', x), axis=1)
 
-        X = scale.fit_transform(np.array(table))
+        X = StandardScaler().fit_transform(np.array(table))
         
         # Fit PCA
         result = pca.fit_transform(X)

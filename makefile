@@ -4,7 +4,7 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc -f markdown ./Manuscript/Text
 fdir = ./Manuscript/Figures
 tdir = ./Manuscript/Templates
 
-.PHONY: clean upload test profile
+.PHONY: clean upload test profile testcover
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf
 
@@ -29,14 +29,16 @@ clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html
 	rm -f $(fdir)/Figure*
 	rm -f profile.p*
+	rm -f .coverage
+	rm -f nosetests.xml
+	rm -rf cov
+	rm -f Manuscript/Figures/ModelData.md
 
 test:
-	python3 -m unittest discover
+	nosetests -s --with-timer --timer-top-n 5
 
-profile:
-	mkdir -p ./Manuscript/Figures
-	python3 -m cProfile -o profile.pstats genFigures.py
-	python3 -m gprof2dot -n 2.0 -f pstats profile.pstats | dot -Tpng -o profile.png
+testcover:
+	nosetests --with-xunit --with-coverage --cover-package=recepmod -s --with-timer --timer-top-n 5 --cover-html-dir=./cov --cover-html
 
 upload:
 	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
