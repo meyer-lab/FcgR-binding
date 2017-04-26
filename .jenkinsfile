@@ -2,17 +2,12 @@ pipeline {
   agent any
   environment {
     PATH = "/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/texlive/2016/bin/x86_64-darwin/"
+    LC_CTYPE = "en_US.UTF-8"
   }
   stages {
     stage('Clean') {
       steps {
         sh 'make clean'
-      }
-    }
-    stage('Profile') {
-      steps {
-        sh 'make profile'
-        archiveArtifacts artifacts: 'profile.png', onlyIfSuccessful: true
       }
     }
     stage('Build') {
@@ -22,7 +17,7 @@ pipeline {
     }
     stage('Test'){
       steps {
-        sh 'coverage run -m unittest discover'
+        sh 'make testcover'
         sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
 
         step([
@@ -34,6 +29,15 @@ pipeline {
           unstableTotalAll           : '1000',
           usePreviousBuildAsReference: true
           ])
+
+        publishHTML([
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: false,
+          reportDir: 'cov',
+          reportFiles: 'index.html',
+          reportName: 'Coverage Report',
+          reportTitles: ''])
       }
     }
     stage('Deploy') {

@@ -154,8 +154,10 @@ def makeFigure():
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
-    f = plt.figure(figsize=(7,6))
-    gs1 = gridspec.GridSpec(3,4)
+    f = plt.figure(figsize=(7, 6))
+
+    gs1 = gridspec.GridSpec(3, 4)
+    
     ax = f.add_subplot(gs1[0])
     FcgRQuantificationFigureMaker(StoneM,ax)
 

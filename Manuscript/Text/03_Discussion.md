@@ -1,28 +1,8 @@
 # Discussion
 
+A unified model for the coordinate contributions of immune complex avidity and affinity provides a framework for reasoning about the effects of changing antibody antigen binding or constant region composition ([@Fig:Fit]). Glycosylation forms and engineered mutants, in addition to variation in antigen binding, exponentially expand the repretior of antibody variants possible. The quantitative model here makes it possible to reason about the effects of changing each of these variables, important since it would not be feasible to explore all combinations of these changes. Further, a unified model for immune complex engagement makes it possible to consider the effects of antibody combinations in a rational manner.
 
-
-
-
-
-
-
-
-
-#### Future directions in FcgR engineering
-
-A unified model for FcgR engagement will enable further refinement for the function of these receptors.
-
-
-
-
-
-  - Examining interaction of multiple antibodies
-  - More precisely engineered glycosylation variants of Fc region
-  - Improved systems view of effector function
-
-
-
-#### Immune engineering most generally
+In addition to forward design of immune complex composition, we show that a model for immune complex engagement makes it feasible to infer the factors contributing to *in vivo* efficacy in a reverse fashion ([@Fig:InVivoResults]). In particular, we show that a model for immune complex engagement can predict the effect of tumor-targeted antibodies better than affinity for each FcγR alone. While we lack information about the effective avidity for TA99 engagement, more detailed characterization of antigen binding potentially would enable coordinate rational design of antibody class and antigen avidity. This approach has broad applicability to many diseases in which effector function plays an important role, including therapeutic antibodies in infectious disease, autoimmune disorders, and other cancers.
 
 More generally, these results demonstrate the potential of molecular models linked to data-driven inferrence to deconvolve *in vivo* function. Model-driven design is vital for more effective manipulation of immune system operation---the complexity of immune system operation defies intuition. Like Fc receptors, many innate immune receptors are extensively characterized in their interactions and knockout effects, and yet likely operate through combinatorial complexity introduced by sets of protein species. With this "parts list" of immune system components, model-driven design with be an essential component of immune engineering.
+
