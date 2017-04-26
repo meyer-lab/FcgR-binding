@@ -38,7 +38,7 @@ test:
 	nosetests -s --with-timer --timer-top-n 5
 
 testcover:
-	nosetests --with-xunit --with-coverage --cover-package=recepmod -s --with-timer --timer-top-n 5 --cover-html-dir=./cov --cover-html
+	nosetests --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
 
 upload:
 	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
