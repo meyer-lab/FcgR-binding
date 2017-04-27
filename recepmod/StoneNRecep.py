@@ -166,6 +166,13 @@ class StoneN:
     def getActivity(self):
         return activityBias(self.vgridOut)
 
+    def getActBnd(self):
+        """ TODO: Define this quantity in a rigorous fashion. """
+        outt = StoneRbnd(self.vgridOut)
+
+        return np.log(np.fmax(np.sum(outt) - 2*outt[1], 1.0))
+
+
     def __init__(self, logR, Ka, Kx, gnu, L0):
         self.logR = np.array(logR, dtype=np.float64, copy=True)
         self.Ka = np.array(Ka, dtype=np.float64, copy=True)
