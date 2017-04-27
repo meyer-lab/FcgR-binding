@@ -32,26 +32,9 @@ class TestStoneNRecpMethods(unittest.TestCase):
         # Check that detailed balance holds
         self.assertTrue(np.all(np.isclose(output, np.transpose(output2))))
 
-    def test_Equal(self):
-        Req = np.array([1000, 1000], dtype = np.float64)
-        Ka = np.array([1000, 2000], dtype = np.float64)
-        L0 = 1.000E-7
-        Kx = 1.0E-5
-        gnu = 8
 
-        def old(Req,Ka,gnu,Kx,L0):
-            from ..StoneTwoRecep import StoneVgrid
-
-            return StoneVgrid(Req,Ka,gnu,Kx,L0)
-
-        output = StoneVgrid(Req,Ka,gnu,Kx,L0)
-        outold = old(Req,Ka,gnu,Kx,L0)
-
-        
-        self.assertTrue(np.all(np.isclose(output, outold)))
-
-    # Test that varying Req and Ka provides the expected results
     def test_vGridVar(self):
+        """ Test that varying Req and Ka provides the expected results. """
         Req = np.array([1E4, 1E3], dtype = np.float64)
         Ka = np.array([1E3, 1E3], dtype = np.float64)
         L0 = 1.000E-7

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from .StoneTwoRecep import StoneTwo
+from .StoneNRecep import StoneN
 
 class Ortiz:
     def __init__(self):
@@ -25,16 +25,14 @@ class Ortiz:
         ''' Predict the response measured. '''
 
         Ka = [self.kaBruhns[0][0], self.kaBruhns[0][0]] # The affinity of the relevant interaction
-        L0 = 1E-4 # This is known
         logR = [2, 3]
-        Kx = 1E-9
-
-        TwoModel = StoneTwo(logR, Ka, Kx)
 
         outt = []
 
         for ii, item in enumerate(self.structs):
-            result = TwoModel.getAllProps(self.valency[ii], L0)
+            TwoModel = StoneN(logR, Ka, Kx=1E-9, gnu=self.valency[ii], L0=1E-4)
+
+            result = TwoModel.getAllProps()
             result.name = item
 
             outt.append(result)
