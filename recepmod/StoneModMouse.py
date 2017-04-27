@@ -349,8 +349,27 @@ class StoneModelMouse:
         scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
 
         return (scores, pca.explained_variance_ratio_)
-        
-            
+    
+    def KnockdownPCA(self, logspace = False, addavidity1 = True):
+        pca = PCA(n_components=5)
+        scale = StandardScaler()
+        X, y, tbN = self.modelPrep(logspace, addavidity1)
+        X = scale.fit_transform(X)
+        result = pca.fit_transform(X, y)
+        scores = pd.DataFrame(result, index=tbN.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
+        scores['Avidity'] = scores.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+        scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
+        knockdown = []
+        for i in tbN.index:
+            string = i.split('-')[0]+'-'+i.split('-')[1]
+            i = i.replace(string, '')
+            if i == '':
+                knockdown.append('None')
+            else:
+                knockdown.append(i[1:])
+        scores['Knockdown'] = knockdown
+        return (scores, pca.explained_variance_ratio_)
+
 def MultiAvidityPredict(M, paramV, normV):
     """ Make predictions for the effect of avidity and class. """
     table = M.pdAvidityTable()
