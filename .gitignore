@@ -4,5 +4,9 @@
 .Rproj.user
 *.py~
 *.gitignore~
+Manuscript/Figures/
 Manuscript/Figures/Figure*
 Manuscript/Manuscript.pdf
+temp.py
+temp2.py
+temp3.py
