@@ -2,7 +2,6 @@ import re
 import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator
-from .StoneTwoRecep import StoneTwo
 from .StoneNRecep import StoneN
 from .StoneHelper import getMedianKx
 
@@ -12,11 +11,9 @@ def modelPrepAffinity(M):
     data = M.NimmerjahnEffectTableAffinities()
 
     def NKapply(row):
-        aa = StoneTwo(logR=[4.0, -6.0], Ka=[row.FcgRIII, 1.0], Kx=getMedianKx())
+        from .StoneModel import StoneMod
 
-        outt = aa.getAllProps(v, L0)
-
-        return outt.activity
+        return StoneMod(logR=4.0, Ka=row.FcgRIII, v=v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
 
     def DCapply(row):
         aa = StoneN(logR=[1.0, 4.0, 3.0, 3.0], 
@@ -48,10 +45,8 @@ def InVivoPredict(M):
     # Collect data
     X, y, table = modelPrepAffinity(M)
     model = regFunc()
-
     
-
-    table.to_csv('out.csv')
+    # table.to_csv('out.csv')
 
 
     model.fit(X, y)

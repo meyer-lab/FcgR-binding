@@ -5,8 +5,8 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     """
     This function takes in the relevant parameters and creates the v_ij grid
     Kx should be the Kx of Ka[0]
-    Ka should be a tuple of size 2 with each affinity
-    Req should be a tuple of size 2
+    Ka should be a tuple of size N with each affinity
+    Req should be a tuple of size N
     """
     from .StoneModel import nchoosek1
 
@@ -172,6 +172,12 @@ class StoneN:
 
         return np.log(np.fmax(np.sum(outt) - 2*outt[1], 1.0))
 
+    def getAllProps(self):
+        return pd.Series(dict(ligand = self.L0,
+                              avidity = self.gnu,
+                              ligandEff = self.L0*self.gnu,
+                              Kx = self.Kx), dtype = np.float64)
+
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
         self.logR = np.array(logR, dtype=np.float64, copy=True)
@@ -183,18 +189,3 @@ class StoneN:
         self.Req = reqSolver(self.logR, self.Ka, self.gnu, self.Kx, self.L0)
 
         self.vgridOut = StoneVgrid(np.power(10, self.Req), self.Ka, self.gnu, self.Kx, self.L0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

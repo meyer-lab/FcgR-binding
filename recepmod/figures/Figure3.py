@@ -6,7 +6,7 @@ from cycler import cycler
 import seaborn as sns
 from ..StoneModel import StoneMod
 from .FigureCommon import subplotLabel
-from ..StoneTwoRecep import StoneTwo
+from ..StoneNRecep import StoneN
 
 # Specific predictions regarding the coordinate effects of immune complex parameters.
 
@@ -114,21 +114,20 @@ def TwoRecep(Kx, ax = None):
     """
     E) Predicted multimerized receptor versus avidity for RIII-Phe + RIIB
     F) The predicted ratio (E)
+    TODO: Reimplement using StoneN
     """
     ligand, avidity, Ka, logR = plotRanges()
 
     skipColor(ax[0])
     skipColor(ax[1])
 
-    acl = StoneTwo(logR, Ka, Kx)
+    #inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
-    inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
+    #outputs = inputs.apply(lambda x: StoneN(logR, Ka, Kx, gnu=int(x['avidity']), L0=x['ligand']).getAllProps(), axis = 1)
 
-    outputs = inputs.apply(lambda x: acl.getAllProps(int(x['avidity']), x['ligand']), axis = 1)
-
-    for ii in avidity[1::]:
-        outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], legend = False)
-        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
+    #for ii in avidity[1::]:
+    #    outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], legend = False)
+    #    outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
 
     ax[0].set_xlabel(r'Multimerized Fc$\gamma$RIIIA-F')
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
