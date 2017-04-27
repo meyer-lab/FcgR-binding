@@ -13,7 +13,7 @@ import re
 def makeFigure():
     import string
     from matplotlib import gridspec
-    from .FigureCommon import subplotLabel
+    from .FigureCommon import subplotLabel, makeFcIgLegend
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
@@ -21,10 +21,10 @@ def makeFigure():
     f = plt.figure(figsize=(5, 5))
 
     # Make grid
-    gs1 = gridspec.GridSpec(2, 2)
+    gs1 = gridspec.GridSpec(2,4,width_ratios=[32,11,32,11])
 
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(4)]
+    ax = [f.add_subplot(gs1[2*x]) for x in range(4)]
 
     PCAmurine(ax[0:2])
 
@@ -36,6 +36,8 @@ def makeFigure():
     for ii, item in enumerate(ax):
         ax[ii].set_ylabel('PC 2')
         ax[ii].set_xlabel('PC 1')
+        # Temporary spacefiller for legend
+        ax[ii].legend(handles=makeFcIgLegend(),loc=2,bbox_to_anchor=(1.05,1))
 
     # Tweak layout
     plt.tight_layout()
