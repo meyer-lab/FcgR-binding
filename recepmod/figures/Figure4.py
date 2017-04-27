@@ -61,35 +61,46 @@ def makeFigure():
 
     return f
 
-Igs = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3'}
-Igidx = dict(zip(Igs, sns.color_palette()))
+Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s'}
+Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3'} 
+Igidx = dict(zip(Ig, sns.color_palette()))
+Knockdown = {'None', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-'}
+Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
+KnockdownidxL = ['None', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-/-']
+KnockdownidxL = dict(zip(KnockdownidxL, sns.color_palette()))
 
-def MurineIgLegend():
+def MurineFcIgLegend(Mod):
     # Make Legend by Ig subclass
     import matplotlib.lines as mlines
-    Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'v', 'IgG3':'s'}
-    Igc = {'IgG1':'r', 'IgG2a':'y', 'IgG2b':'g', 'IgG3':'b'}
+    import matplotlib.patches as mpatches
+
     patches = list()
 
-    for j in Igs:
-        patches.append(mlines.Line2D([], [], color = Igc[j], 
-                       marker=Igs[j], markersize=7, label=j, 
-                       linestyle='None'))
+    for f in KnockdownidxL:
+        patches.append(mpatches.Patch(color=KnockdownidxL[f], label=f))
 
+    for j in Igs:
+        patches.append(mlines.Line2D([], [], color='black', marker=Igs[j], markersize=7, label=j, linestyle='None'))
+    patches.append(mpatches.Patch(color='black', label='Avidity 1', fill = False, lw = 1))
+    patches.append(mpatches.Patch(color = 'black', label='Avidity '+str(Mod.v)))
+    
     return patches
 
 def ClassAvidityPCA(Mod, ax):
     """ Plot the generated binding data for different classes and avidities in PCA space. """
     # If no axis was provided make our own
     
-    scores, _ = Mod.PCA()
+    scores, _ = Mod.KnockdownPCA()
 
     for _, row in scores.iterrows():
-        colorr = Igidx[row['Ig']]
-        ax.errorbar(x=row['PC1'], y=row['PC2'], marker='.', mfc=colorr)
+        colorr = Knockdownidx[row['Knockdown']]
+        fill = {float(1): 'white', float(Mod.v): Knockdownidx[row['Knockdown']]}
+        ax.errorbar(x=row['PC1'], y=row['PC2'], marker=Igs[row['Ig']], markeredgewidth = 1, mfc=fill[row['Avidity']], mec = colorr, ms=3)
 
     ax.set_ylabel('PC 2')
     ax.set_xlabel('PC 1')
+    
+    ax.legend(handles=MurineFcIgLegend(Mod), bbox_to_anchor=(3.5, 2.3), loc=2)
 
 def InVivoPredictVsActual(Mod, ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
@@ -182,5 +193,3 @@ def ClassAvidityPredict(Mod, ax):
 
 
     ax.set_ylabel('Predicted Effect')
-
-
