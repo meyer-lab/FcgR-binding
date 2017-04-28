@@ -1,5 +1,5 @@
 from memoize import memoize
-
+from scipy.misc import comb
 import numpy as np
 
 np.seterr(over='raise')
@@ -19,8 +19,6 @@ def logpdf_sum(x, loc, scale):
 @memoize
 def nchoosek(n):
     """ A fast cached version of nchoosek. """
-    from scipy.misc import comb
-
     return comb(n, np.arange(n + 1))
 
 
