@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy as np

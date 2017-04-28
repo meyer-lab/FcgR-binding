@@ -1,21 +1,23 @@
-import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib
+matplotlib.use('AGG')
 import seaborn as sns
-import pandas as pd
-from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
 
 def makeFigure():
     import string
+    import matplotlib.pyplot as plt
     from matplotlib import gridspec
-    from ..StoneHelper import getMedianKx
     from .FigureCommon import subplotLabel
+    from ..StoneModMouse import StoneModelMouse
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
     # Load murine class
     Mod = StoneModelMouse()
+
+    # Run the in vivo regression model
+    _, _, tbN, model, normV = Mod.InVivoPredict()
 
     # Setup plotting space
     f = plt.figure(figsize=(7, 6))
@@ -39,16 +41,16 @@ def makeFigure():
     ClassAvidityPCA(Mod, ax[3])
 
     # Show performance of in vivo regression model
-    InVivoPredictVsActual(Mod, ax[4])
+    InVivoPredictVsActual(tbN, ax[4])
 
     # Show model components
-    InVivoPredictComponents(Mod, ax[5])
+    InVivoPredictComponents(model, ax[5])
 
     # Leave components out plot
     RequiredComponents(ax[6])
 
     # Predict class/avidity effect
-    ClassAvidityPredict(Mod, ax[7])
+    ClassAvidityPredict(Mod, model, normV, ax[7])
 
     # Blank out for the cartoon
     ax[8].axis('off')
@@ -102,10 +104,9 @@ def ClassAvidityPCA(Mod, ax):
     
     ax.legend(handles=MurineFcIgLegend(Mod), bbox_to_anchor=(3.5, 2.3), loc=2)
 
-def InVivoPredictVsActual(Mod, ax):
+def InVivoPredictVsActual(tbN, ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
 
-    _, _, tbN, _, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
     tbN['Ig'] = tbN.apply(lambda x: x.name.split('-')[0], axis=1)
 
     for _, row in tbN.iterrows():
@@ -119,17 +120,10 @@ def InVivoPredictVsActual(Mod, ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('Predicted Effect')
 
-def InVivoPredictComponents(Mod, ax):
+def InVivoPredictComponents(model, ax):
     """ Plot model components. """
 
-    _, _, _, components, _, _ = Mod.KnockdownLassoCrossVal(addavidity1=True)
-
-    sns.barplot(ax=ax, y='Weight', x='Name', data=components)
-
-    ax.set_xticklabels(ax.get_xticklabels(),
-                       rotation=40,
-                       rotation_mode="anchor",
-                       ha="right")
+    #sns.barplot(ax=ax, y='Weight', x='Name', data=components)
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
@@ -174,22 +168,21 @@ def InVivoPredictVsActualAffinities(Mod, ax):
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
 
-def ClassAvidityPredict(Mod, ax):
+def ClassAvidityPredict(Mod, model, normV, ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
-    from ..StoneModMouse import MultiAvidityPredict, StoneModelMouse
+    from ..StoneModMouse import MultiAvidityPredict
     from copy import deepcopy
 
     Mod = deepcopy(Mod)
 
-    _, _, _, _, model, normV = Mod.KnockdownLassoCrossVal(addavidity1=True)
-
     Mod.v = 30
 
-    table = MultiAvidityPredict(Mod, np.insert(model.coef_, 0, model.intercept_), normV)
+    table = MultiAvidityPredict(Mod, model, normV)
 
     for _, row in table.iterrows():
         colorr = Igidx[row['Ig']]
         ax.errorbar(x=row['Avidity'], y=row['Predict'], marker='.', mfc=colorr)
 
-
     ax.set_ylabel('Predicted Effect')
+
+
