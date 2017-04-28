@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
+from .StoneModel import nchoosek
 
+
+#@profile
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
     """
     This function takes in the relevant parameters and creates the v_ij grid
@@ -8,7 +11,6 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     Ka should be a tuple of size N with each affinity
     Req should be a tuple of size N
     """
-    from .StoneModel import nchoosek1
 
     if len(Req) != len(Ka):
         raise IndexError("Req and Ka must be same length.")
@@ -16,20 +18,22 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     # Initialize the grid of possibilities
     vGrid = np.zeros(np.full((len(Req),), gnu+1), dtype=np.float)
 
+    # Precalculate outside terms
+    vGridBegin = L0 * Ka[0] / Kx * nchoosek(gnu)
+    KKRK = np.multiply(Ka, Req)/Ka[0]*Kx
+
     # ii, jj is the number of receptor one, two bound
     it = np.nditer(vGrid, flags=['multi_index'])
 
     while not it.finished:
         cur_pos = it.multi_index
+        scur = sum(cur_pos)
 
-        if sum(cur_pos) <= gnu and sum(cur_pos) > 0:
-        	vGrid[cur_pos] = L0 * Ka[0] / Kx * nchoosek1(gnu, sum(cur_pos))
-
-        	for ii in range(len(Req)):
-        		vGrid[cur_pos] *= np.power(Ka[ii]/Ka[0]*Req[ii]*Kx, cur_pos[ii])
-
-        	for ii in range(1, len(Req)):
-        		vGrid[cur_pos] *= nchoosek1(sum(cur_pos), sum(cur_pos[0:ii]))
+        if scur <= gnu and scur > 0:
+            vGrid[cur_pos] = vGridBegin[scur] * np.power(KKRK, cur_pos).prod()
+            
+            if len(Req) > 2 and scur > cur_pos[0]:
+                vGrid[cur_pos] *= nchoosek(scur)[np.cumsum(cur_pos)[1:]].prod()
 
         it.iternext()
 
