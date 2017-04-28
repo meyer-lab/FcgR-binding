@@ -3,7 +3,6 @@ import pandas as pd
 from .StoneModel import nchoosek
 
 
-#@profile
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
     """
     This function takes in the relevant parameters and creates the v_ij grid
@@ -23,17 +22,17 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     KKRK = np.multiply(Ka, Req)/Ka[0]*Kx
 
     # ii, jj is the number of receptor one, two bound
-    it = np.nditer(vGrid, flags=['multi_index'])
+    it = np.nditer(vGrid, flags=['multi_index'], op_flags=['readwrite'])
 
     while not it.finished:
         cur_pos = it.multi_index
         scur = sum(cur_pos)
 
         if scur <= gnu and scur > 0:
-            vGrid[cur_pos] = vGridBegin[scur] * np.power(KKRK, cur_pos).prod()
+            it[0] = vGridBegin[scur] * np.power(KKRK, cur_pos).prod()
             
             if len(Req) > 2 and scur > cur_pos[0]:
-                vGrid[cur_pos] *= nchoosek(scur)[np.cumsum(cur_pos)[1:]].prod()
+                it[0] *= nchoosek(scur)[np.cumsum(cur_pos)[1:]].prod()
 
         it.iternext()
 
