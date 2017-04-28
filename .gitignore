@@ -4,5 +4,9 @@
 .Rproj.user
 *.py~
 *.gitignore~
-Manuscript/Figures/Figure*
+Manuscript/Figures/
 Manuscript/Manuscript.pdf
+temp.py
+temp2.py
+temp3.py
+recepmod.sublime-workspace
