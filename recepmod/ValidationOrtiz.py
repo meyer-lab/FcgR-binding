@@ -23,7 +23,6 @@ class Ortiz:
 
     def predictResponse(self):
         ''' Predict the response measured. '''
-        from .StoneTwoRecep import StoneTwo
 
         Ka = [self.kaBruhns[0][0], self.kaBruhns[0][0]] # The affinity of the relevant interaction
         logR = [2, 3]
