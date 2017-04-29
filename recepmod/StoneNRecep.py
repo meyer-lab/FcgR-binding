@@ -3,8 +3,8 @@ import pandas as pd
 from memoize import memoize
 from .StoneModel import nchoosek
 
-@profile
-def StoneVgrid(Req,Ka,gnu,Kx,L0):
+
+def StoneVgrid(Req, Ka, gnu, Kx, L0):
     """
     This function takes in the relevant parameters and creates the v_ij grid
     Kx should be the Kx of Ka[0]
@@ -15,24 +15,20 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     if len(Req) != len(Ka):
         raise IndexError("Req and Ka must be same length.")
 
-    # Initialize the grid of possibilities
-    vGrid = np.zeros(np.full((len(Req),), gnu+1), dtype=np.float)
+    # Get vGrid with the combinatorics all worked out
+    vGrid = vGridInit(gnu, len(Req))
 
     # Precalculate outside terms
-    vGridBegin = L0 * Ka[0] / Kx * nchoosek(gnu)
-    KKRK = np.multiply(Ka, Req)/Ka[0]*Kx
+    vGrid = vGrid * L0 * Ka[0] / Kx
+    KKRK = np.multiply(Ka, Req) / Ka[0] * Kx
 
     for cur_pos in np.ndindex(vGrid.shape):
-        scur = sum(cur_pos)
-
-        if scur <= gnu and scur > 0:
-            vGrid[cur_pos] = vGridBegin[scur]
+        if vGrid[cur_pos] > 0:
             vGrid[cur_pos] *= np.power(KKRK, cur_pos).prod()
-            vGrid[cur_pos] *= boundMult(cur_pos)
 
     return vGrid
 
-@profile
+
 def boundMult(cur_pos):
     """ Deal with the combinatorics of different species bound. """
     upos = np.array(cur_pos, dtype=np.int)
@@ -41,13 +37,6 @@ def boundMult(cur_pos):
     if len(upos) == 1:
         return 1
 
-    a = boundInner(upos)
-
-    return a
-
-
-@memoize
-def boundInner(upos):
     outt = 1
 
     while len(upos) > 1:
@@ -55,6 +44,24 @@ def boundInner(upos):
         upos = np.delete(upos, 0)
 
     return outt
+
+
+@memoize
+def vGridInit(gnu, Nrep):
+
+    # Initialize the grid of possibilities
+    vGrid = np.zeros(np.full((Nrep, ), gnu+1), dtype=np.float)
+
+    # Precalculate outside terms
+    nk = nchoosek(gnu)
+
+    for cur_pos in np.ndindex(vGrid.shape):
+        scur = sum(cur_pos)
+
+        if scur <= gnu and scur > 0:
+            vGrid[cur_pos] = nk[scur] * boundMult(cur_pos)
+
+    return(vGrid)
 
 
 def sumNonDims(vGridIn, dimm):
