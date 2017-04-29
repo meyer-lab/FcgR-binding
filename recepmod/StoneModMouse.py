@@ -158,7 +158,7 @@ class StoneModelMouse:
         tbK2.iloc[2, 3] = 0.0
         
         # set up IgG2b, -Fucose
-        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index = ['IgG2b-Fucose-'], columns = self.FcgRs)
+        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index = ['IgG2b-Fucose-/-'], columns = self.FcgRs)
         tbK3.loc[:,'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
 
         # Join tbK, tbK1, tbK2 into one table
@@ -349,6 +349,7 @@ class StoneModelMouse:
         return (scores, pca.explained_variance_ratio_)
 
     def KnockdownPCA(self, logspace = False, addavidity1 = True):
+        """ Principle Components Analysis of FcgR binding predictions used in PLSR """
         from sklearn.decomposition import PCA
         pca = PCA(n_components=5)
         scale = StandardScaler()
@@ -363,7 +364,7 @@ class StoneModelMouse:
             string = i.split('-')[0]+'-'+i.split('-')[1]
             i = i.replace(string, '')
             if i == '':
-                knockdown.append('None')
+                knockdown.append('Wild-type')
             else:
                 knockdown.append(i[1:])
         scores['Knockdown'] = knockdown
