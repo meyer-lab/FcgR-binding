@@ -1,7 +1,7 @@
 import unittest
 import time
 import numpy as np
-from ..StoneNRecep import StoneVgrid, StoneRmultiAll, reqSolver, StoneRbnd, StoneN
+from ..StoneNRecep import StoneVgrid, reqSolver, StoneRbnd, StoneN
 
 class TestStoneNRecpMethods(unittest.TestCase):
     def test_StoneVgrid(self):
@@ -32,6 +32,28 @@ class TestStoneNRecpMethods(unittest.TestCase):
         # Check that detailed balance holds
         self.assertTrue(np.all(np.isclose(output, np.transpose(output2))))
 
+    def test_boundMult(self):
+        from itertools import permutations
+        from ..StoneNRecep import boundMult
+
+        for ii in range(2, 5):
+            self.assertEqual(boundMult([0] * ii), 1)
+
+        for ii in range(1, 10):
+            self.assertEqual(boundMult([ii, 0, 0, 0, 0]), 1)
+
+        a = [10, 0, 0, 0, 0, 0]
+        for perm in permutations(a):
+            self.assertEqual(boundMult(perm), 1)
+
+        a = [3, 1, 0, 0, 0, 0]
+        for perm in permutations(a):
+            self.assertEqual(boundMult(perm), 4, "Testing vector: " + str(perm))
+
+        a = [3, 1, 1, 0, 0, 0]
+        for perm in permutations(a):
+            self.assertEqual(boundMult(perm), 20, "Testing vector: " + str(perm))
+
 
     def test_vGridVar(self):
         """ Test that varying Req and Ka provides the expected results. """
@@ -59,6 +81,8 @@ class TestStoneNRecpMethods(unittest.TestCase):
         self.assertLess(output[3,0], output[0,3])
 
     def test_StoneRbnd(self):
+        from ..StoneNRecep import StoneRmultiAll
+
         gnu = 4
 
         vGrid = np.ones([gnu+1, gnu+1], dtype = np.float64)

@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
+from memoize import memoize
 from .StoneModel import nchoosek
 
-
+@profile
 def StoneVgrid(Req,Ka,gnu,Kx,L0):
     """
     This function takes in the relevant parameters and creates the v_ij grid
@@ -21,22 +22,39 @@ def StoneVgrid(Req,Ka,gnu,Kx,L0):
     vGridBegin = L0 * Ka[0] / Kx * nchoosek(gnu)
     KKRK = np.multiply(Ka, Req)/Ka[0]*Kx
 
-    # ii, jj is the number of receptor one, two bound
-    it = np.nditer(vGrid, flags=['multi_index'], op_flags=['readwrite'])
-
-    while not it.finished:
-        cur_pos = it.multi_index
+    for cur_pos in np.ndindex(vGrid.shape):
         scur = sum(cur_pos)
 
         if scur <= gnu and scur > 0:
-            it[0] = vGridBegin[scur] * np.power(KKRK, cur_pos).prod()
-            
-            if len(Req) > 2 and scur > cur_pos[0]:
-                it[0] *= nchoosek(scur)[np.cumsum(cur_pos)[1:]].prod()
-
-        it.iternext()
+            vGrid[cur_pos] = vGridBegin[scur]
+            vGrid[cur_pos] *= np.power(KKRK, cur_pos).prod()
+            vGrid[cur_pos] *= boundMult(cur_pos)
 
     return vGrid
+
+@profile
+def boundMult(cur_pos):
+    """ Deal with the combinatorics of different species bound. """
+    upos = np.array(cur_pos, dtype=np.int)
+    upos = np.sort(upos[upos > 0])
+
+    if len(upos) == 1:
+        return 1
+
+    a = boundInner(upos)
+
+    return a
+
+
+@memoize
+def boundInner(upos):
+    outt = 1
+
+    while len(upos) > 1:
+        outt *= nchoosek(sum(upos))[upos[0]]
+        upos = np.delete(upos, 0)
+
+    return outt
 
 
 def sumNonDims(vGridIn, dimm):
@@ -132,33 +150,6 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
     return failV
 
 
-def activityBias(vGrid):
-    vGrid = np.copy(vGrid)
-
-    # We can calculate gnu from the size of the v_ij grid
-    gnu = vGrid.shape[0] - 1
-
-    activity = 0.0
-
-    # ii, jj is the number of receptor one, two bound
-    it = np.nditer(vGrid, flags=['multi_index'])
-
-    while not it.finished:
-        cur_pos = it.multi_index
-
-        for jj in range(len(cur_pos)):
-            if jj == 1:
-                sign = -1.0
-            else:
-                sign = 1.0
-
-            activity += sign * np.fmax(vGrid[cur_pos] * (cur_pos[jj]-1), 0.0)
-
-        it.iternext()
-
-    return activity
-
-
 class StoneN:
     def getRbnd(self):
         return StoneRbnd(self.vgridOut)
@@ -166,20 +157,31 @@ class StoneN:
     def getRmultiAll(self):
         return StoneRmultiAll(self.vgridOut)
 
-    def getActivity(self):
-        return activityBias(self.vgridOut)
+    def getActivity(self, actV):
+        vGrid = np.copy(self.vgridOut)
+        actV = np.array(actV, dtype=np.float)
 
-    def getActBnd(self):
-        """ TODO: Define this quantity in a rigorous fashion. """
-        outt = StoneRbnd(self.vgridOut)
+        # ii, jj is the number of receptor one, two bound
+        it = np.nditer(vGrid, flags=['multi_index'], op_flags=['readwrite'])
 
-        return np.log(np.fmax(np.sum(outt) - 2*outt[1], 1.0))
+        while not it.finished:
+            if np.dot(it.multi_index, actV) < 0:
+                it[0] = 0.0
+            elif np.sum(it.multi_index) < 2:
+                it[0] = 0.0
+            else:
+                it[0] *= np.dot(it.multi_index, actV)
+
+            it.iternext()
+
+        return np.sum(vGrid)
 
     def getAllProps(self):
-        return pd.Series(dict(ligand = self.L0,
-                              avidity = self.gnu,
-                              ligandEff = self.L0*self.gnu,
-                              Kx = self.Kx), dtype = np.float64)
+        return pd.Series(dict(ligand=self.L0,
+                              avidity=self.gnu,
+                              ligandEff=self.L0*self.gnu,
+                              Kx=self.Kx,
+                              Rbnd=self.getRbnd()))
 
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
