@@ -18,7 +18,7 @@ def parallelize_dataframe(df, func):
 
 correct = np.log10([0.0055, 0.358, 2.895, 0.0049])
 
-def modelPrepAffinity(M):
+def modelPrepAffinity(M, inn):
     from .StoneHelper import getMedianKx
 
     L0 = 1E-9
@@ -34,7 +34,7 @@ def modelPrepAffinity(M):
         from .StoneNRecep import StoneN
 
         aa = StoneN(logR=Rin, 
-                    Ka=[row.FcgRI+0.0001, row.FcgRIIB, row.FcgRIII, row.FcgRIV], 
+                    Ka=[row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV], 
                     Kx=getMedianKx(),
                     gnu = v,
                     L0 = L0)
@@ -43,19 +43,9 @@ def modelPrepAffinity(M):
 
         return np.sum(rmulti) - 2*rmulti[1]
 
-    pool = ThreadPoolExecutor(cpu_count())
-
-    NKfuture = pool.submit(lambda: data.apply(NKapply, axis=1))
-    DCfuturec = pool.submit(lambda: data.apply(lambda x: DCapply(x, [1.0, 2.0, 1.0, 1.0] + correct), axis=1))
-    neutfuturec = pool.submit(lambda: data.apply(lambda x: DCapply(x, [1.0, 2.0, 4.0, 4.0] + correct), axis=1))
-    DCfuture = pool.submit(lambda: data.apply(lambda x: DCapply(x, [1.0, 2.0, 1.0, 1.0]), axis=1))
-    neutfuture = pool.submit(lambda: data.apply(lambda x: DCapply(x, [1.0, 2.0, 4.0, 4.0]), axis=1))
-
-    data['NK'] = NKfuture.result()
-    data['DCc'] = DCfuturec.result()
-    data['neutc'] = neutfuturec.result()
-    data['DC'] = DCfuture.result()
-    data['neut'] = neutfuture.result()
+    data['NK'] = data.apply(NKapply, axis=1)
+    data['DC'] = data.apply(lambda x: DCapply(x, [1.0, 2.0, 1.0, 1.0] + correct + inn), axis=1)
+    data['neut'] = data.apply(lambda x: DCapply(x, [1.0, 2.0, 4.0, 4.0] + correct + inn), axis=1)
 
     data.loc['None', :] = 0.0
 
@@ -70,29 +60,31 @@ def modelPrepAffinity(M):
 
 
 def varyExpr():
-    lvls = np.arange(0.0, 5.0, 0.5, dtype=np.float)
+    lvls = np.arange(-1.0, 3.0, 0.5, dtype=np.float)
 
     pp = pd.DataFrame(np.array(np.meshgrid(lvls, lvls, lvls, lvls)).T.reshape(-1,4))
     pp.columns = ['R1', 'R2', 'R3', 'R4']
 
     pp['Fit'] = parallelize_dataframe(pp.as_matrix(), InVivoPredict)
 
-    #ppp.to_csv('outtt.csv')
+    ppp.to_csv('outtt.csv')
 
 
-def InVivoPredict():
+def InVivoPredict(inn=[0, 0, 0, 0]):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import explained_variance_score
     from .StoneModMouse import StoneModelMouse
 
+    inn = np.squeeze(inn)
+
     # Collect data
-    X, y, table = modelPrepAffinity(StoneModelMouse())
+    X, y, table = modelPrepAffinity(StoneModelMouse(), inn)
     model = regFunc()
 
     model.fit(X, y)
 
-    pd.set_option('expand_frame_repr', False)
+    #pd.set_option('expand_frame_repr', False)
     
     #xx = cross_val_predict(model, X, y, cv=len(y))
 
@@ -100,11 +92,11 @@ def InVivoPredict():
     #table['CPredict'] = xx
     table['DPredict'] = model.predict(X)
 
-    print('')
+    #print('')
 
-    print(table)
+    #print(table)
 
-    print(explained_variance_score(model.predict(X), y))
+    #print(explained_variance_score(model.predict(X), y))
 
     return explained_variance_score(model.predict(X), y)
 

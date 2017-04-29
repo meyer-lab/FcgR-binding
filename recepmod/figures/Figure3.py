@@ -123,13 +123,24 @@ def TwoRecep(Kx, ax = None):
     skipColor(ax[0])
     skipColor(ax[1])
 
-    #inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
+    def appFunc(x):
+        aa = StoneN(logR, Ka, Kx, x.avidity, x.ligand)
 
-    #outputs = inputs.apply(lambda x: StoneN(logR, Ka, Kx, gnu=int(x['avidity']), L0=x['ligand']).getAllProps(), axis = 1)
+        rmulti = aa.getRmultiAll()
 
-    #for ii in avidity[1::]:
-    #    outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], legend = False)
-    #    outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
+        x['RmultiOne'] = rmulti[0]
+        x['RmultiTwo'] = rmulti[1]
+        x['activity'] = x.RmultiOne - x.RmultiTwo
+
+        return x
+
+    inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
+
+    outputs = inputs.apply(appFunc, axis=1)
+
+    for ii in avidity[1::]:
+        outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], legend = False)
+        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
 
     ax[0].set_xlabel(r'Multimerized Fc$\gamma$RIIIA-F')
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
