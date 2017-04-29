@@ -4,13 +4,11 @@ import numpy
 from ..StoneModMouse import StoneModelMouse
 
 class TestStoneModMouseFit(unittest.TestCase):
-    def setUp(self):
-        self.M = StoneModelMouse()
 
     def test_fitter(self):
-    	from ..StoneModMouseFit import InVivoPredict
+    	from ..StoneModMouseFit import InVivoPredict, varyExpr
 
-    	InVivoPredict(self.M)
+    	#InVivoPredict()
 
 
 

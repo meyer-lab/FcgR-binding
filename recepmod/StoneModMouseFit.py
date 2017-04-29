@@ -1,13 +1,28 @@
-import re
 import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator
-from .StoneNRecep import StoneN
-from .StoneHelper import getMedianKx
+from multiprocessing import Pool, cpu_count
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
+
+def parallelize_dataframe(df, func):
+    pool = Pool(cpu_count())
+
+    iterpool = tqdm(pool.imap(func, np.vsplit(df, df.shape[0])), total=df.shape[0])
+
+    df = np.fromiter(iterpool, dtype=np.float, count=df.shape[0])
+
+    pool.close()
+    pool.join()
+    return df
+
+correct = np.log10([0.0055, 0.358, 2.895, 0.0049])
 
 def modelPrepAffinity(M):
-    L0 = 1E-8
-    v = 2
+    from .StoneHelper import getMedianKx
+
+    L0 = 1E-9
+    v = 5
     data = M.NimmerjahnEffectTableAffinities()
 
     def NKapply(row):
@@ -15,17 +30,34 @@ def modelPrepAffinity(M):
 
         return StoneMod(logR=4.0, Ka=row.FcgRIII, v=v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
 
-    def DCapply(row):
-        aa = StoneN(logR=[1.0, 4.0, 3.0, 3.0], 
-                    Ka=[row.FcgRI+1, row.FcgRIIB, row.FcgRIII, row.FcgRIV], 
+    def DCapply(row, Rin):
+        from .StoneNRecep import StoneN
+
+        aa = StoneN(logR=Rin, 
+                    Ka=[row.FcgRI+0.0001, row.FcgRIIB, row.FcgRIII, row.FcgRIV], 
                     Kx=getMedianKx(),
                     gnu = v,
                     L0 = L0)
 
-        return aa.getActBnd()
+        rmulti = aa.getRmultiAll()
 
-    data['NK'] = data.apply(NKapply, axis=1)
-    data['DC'] = data.apply(DCapply, axis=1)
+        return np.sum(rmulti) - 2*rmulti[1]
+
+    pool = ThreadPoolExecutor(cpu_count())
+
+    NKfuture = pool.submit(lambda: data.apply(NKapply, axis=1))
+    DCfuturec = pool.submit(lambda: data.apply(lambda x: DCapply(x, [1.0, 2.0, 1.0, 1.0] + correct), axis=1))
+    neutfuturec = pool.submit(lambda: data.apply(lambda x: DCapply(x, [1.0, 2.0, 4.0, 4.0] + correct), axis=1))
+    DCfuture = pool.submit(lambda: data.apply(lambda x: DCapply(x, [1.0, 2.0, 1.0, 1.0]), axis=1))
+    neutfuture = pool.submit(lambda: data.apply(lambda x: DCapply(x, [1.0, 2.0, 4.0, 4.0]), axis=1))
+
+    data['NK'] = NKfuture.result()
+    data['DCc'] = DCfuturec.result()
+    data['neutc'] = neutfuturec.result()
+    data['DC'] = DCfuture.result()
+    data['neut'] = neutfuture.result()
+
+    data.loc['None', :] = 0.0
 
     data = data.iloc[:, 4:]
 
@@ -37,51 +69,76 @@ def modelPrepAffinity(M):
     return (X.as_matrix(), y, data)
 
 
-def InVivoPredict(M):
+def varyExpr():
+    lvls = np.arange(0.0, 5.0, 0.5, dtype=np.float)
+
+    pp = pd.DataFrame(np.array(np.meshgrid(lvls, lvls, lvls, lvls)).T.reshape(-1,4))
+    pp.columns = ['R1', 'R2', 'R3', 'R4']
+
+    pp['Fit'] = parallelize_dataframe(pp.as_matrix(), InVivoPredict)
+
+    #ppp.to_csv('outtt.csv')
+
+
+def InVivoPredict():
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import explained_variance_score
+    from .StoneModMouse import StoneModelMouse
 
     # Collect data
-    X, y, table = modelPrepAffinity(M)
+    X, y, table = modelPrepAffinity(StoneModelMouse())
     model = regFunc()
-    
-    # table.to_csv('out.csv')
-
 
     model.fit(X, y)
-    print(explained_variance_score(model.predict(X), y))
 
     pd.set_option('expand_frame_repr', False)
     
-    xx = cross_val_predict(model, X, y, cv=len(y))
+    #xx = cross_val_predict(model, X, y, cv=len(y))
 
-    print(explained_variance_score(xx, y))
+    table['Error'] = abs(model.predict(X) - y)
+    #table['CPredict'] = xx
+    table['DPredict'] = model.predict(X)
 
-    table['Error'] = abs(xx - y)
-    table['CPredict'] = xx
+    print('')
 
     print(table)
 
-    return None
+    print(explained_variance_score(model.predict(X), y))
+
+    return explained_variance_score(model.predict(X), y)
 
 
 
 class regFunc(BaseEstimator):
-    def outF(self, X, p):
-        from scipy.special import expit
+    def outF(self, p, X=None):
+        from scipy.stats import norm
 
-        return expit(np.dot(X, p[1:]) - p[0])
+        p = np.power(10, p)
+
+        if X is None:
+            X = self.trainX
+
+        return norm.cdf(np.dot(X, p[2:]), loc=p[0], scale=p[1])
+
+    def diffF(self, p):
+        return self.trainy - self.outF(p)
+
+    def errF(self, p):
+        from numpy.linalg import norm
+
+        return norm(self.diffF(p))
 
     def fit(self, X, y):
         from scipy.optimize import least_squares
 
-        x0 = np.zeros((X.shape[1]+1,), dtype=np.float64)
+        self.trainX, self.trainy = X, y
 
-        lb = np.full(x0.shape, -10)
-        ub = np.full(x0.shape, 10)
+        x0 = np.zeros((X.shape[1] + 2, ), dtype=np.float)
 
-        self.res = least_squares(lambda p: y - self.outF(X, p), x0, bounds=(lb, ub))
+        self.res = least_squares(lambda p: self.diffF(p), 
+                            x0=x0, 
+                            jac='3-point')
 
     def predict(self, X):
-        return self.outF(X, self.res.x)
+        return self.outF(self.res.x, X)
