@@ -66,9 +66,9 @@ def makeFigure():
 Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s'}
 Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3'} 
 Igidx = dict(zip(Ig, sns.color_palette()))
-Knockdown = {'None', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-'}
+Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
-KnockdownidxL = ['None', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-/-']
+KnockdownidxL = ['Wild-type', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-/-']
 KnockdownidxL = dict(zip(KnockdownidxL, sns.color_palette()))
 
 def MurineFcIgLegend(Mod):
@@ -88,6 +88,17 @@ def MurineFcIgLegend(Mod):
     
     return patches
 
+def PrepforLegend(table):
+    knockdowntype = []
+    table['Knockdown'] = table.apply(lambda x: x.name.replace(x.name.split('-')[0], ''), axis = 1)
+    for i in table['Knockdown']:
+        if i == '':
+            knockdowntype.append('Wild-type')
+        else:
+            knockdowntype.append(i[1:])
+    table['Knockdown'] = knockdowntype
+    return table
+
 def ClassAvidityPCA(Mod, ax):
     """ Plot the generated binding data for different classes and avidities in PCA space. """
     # If no axis was provided make our own
@@ -97,12 +108,12 @@ def ClassAvidityPCA(Mod, ax):
     for _, row in scores.iterrows():
         colorr = Knockdownidx[row['Knockdown']]
         fill = {float(1): 'white', float(Mod.v): Knockdownidx[row['Knockdown']]}
-        ax.errorbar(x=row['PC1'], y=row['PC2'], marker=Igs[row['Ig']], markeredgewidth = 1, mfc=fill[row['Avidity']], mec = colorr, ms=3)
+        ax.errorbar(x=row['PC1'], y=row['PC2'], marker=Igs[row['Ig']], markeredgewidth = 0.8, mfc=fill[row['Avidity']], mec = colorr, ms=2.5)
 
     ax.set_ylabel('PC 2')
     ax.set_xlabel('PC 1')
     
-    ax.legend(handles=MurineFcIgLegend(Mod), bbox_to_anchor=(3.5, 2.3), loc=2)
+    ax.legend(handles=MurineFcIgLegend(Mod), bbox_to_anchor=(3.7, 2.4), loc=2)
 
 def InVivoPredictVsActual(tbN, ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
@@ -136,10 +147,11 @@ def AIplot(Mod, ax):
     table = table.loc[table.FcgRIIB > 0, :]
     table['AtoI'] = table.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV)/x.FcgRIIB, axis=1)
     table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
-
+    table = PrepforLegend(table)
     for _, row in table.iterrows():
-        colorr = Igidx[row['Ig']]
-        ax.errorbar(x=row['AtoI'], y=row['Effectiveness'], marker='.', mfc=colorr)
+        markerr=Igs[row['Ig']]
+        colorr = Knockdownidx[row['Knockdown']]
+        ax.errorbar(x=row['AtoI'], y=row['Effectiveness'], marker = markerr, mfc = colorr, ms = 3.5)
 
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('A/I Ratio')
@@ -156,10 +168,11 @@ def InVivoPredictVsActualAffinities(Mod, ax):
 
     _, _, data = Mod.NimmerjahnPredictByAffinities()
     data['Ig'] = data.apply(lambda x: x.name.split('-')[0], axis=1)
-
+    data = PrepforLegend(data)
     for _, row in data.iterrows():
-        colorr = Igidx[row['Ig']]
-        ax.errorbar(x=row['DirectPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
+        markerr=Igs[row['Ig']]
+        colorr = Knockdownidx[row['Knockdown']]
+        ax.errorbar(x=row['DirectPredict'], y=row['Effectiveness'], marker=markerr, mfc=colorr, ms = 3.5)
 
     ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
 
