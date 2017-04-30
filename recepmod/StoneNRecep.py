@@ -96,15 +96,15 @@ def StoneRbnd(vGrid):
 
 def StoneRmultiAll(vGrid):
     """ This is the number of receptors multimerized with self or non-self """
+    from itertools import permutations
 
     vGrid = np.copy(vGrid)
+    idx = np.zeros((len(vGrid.shape), ), dtype=np.intp)
+    idx[0] = 1
 
     # Erase species that are bound all on their own
-    for ii in range(len(vGrid.shape)):
-        idx = np.zeros((len(vGrid.shape), ), dtype=np.int)
-        idx[ii] = 1
-
-        vGrid[idx] = 0.0
+    for perm in permutations(idx):
+        vGrid[perm] = 0.0
 
     # Just Rbnd from here
     return StoneRbnd(vGrid)
@@ -113,8 +113,7 @@ def StoneRmultiAll(vGrid):
 def reqSolver(logR,Ka,gnu,Kx,L0):
     """ Solve for Req """
     from scipy.optimize import brentq
-
-    failV = np.full(logR.shape, np.nan, dtype=np.float64)
+    from numpy.linalg import norm
 
     R = np.power(10.0, logR)
 
@@ -138,23 +137,25 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
         return rootF(curr)[ii]
 
-    curReq = np.full(logR.shape, -40, dtype = np.float64)
+    curReq = np.full(logR.shape, -60, dtype = np.float)
     prevReq = curReq.copy()
 
     if np.max(np.multiply(rootF(curReq), rootF(logR))) > 0:
-        return failV
+        return np.full(logR.shape, np.nan, dtype=np.float)
 
     # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
-    for ii in range(50):
-        for jj in range(len(curReq)):
-            curReq[jj] = brentq(lambda x: overF(curReq, jj, x), -40, logR[jj], disp=False)
-
-        if np.max(np.abs(rootF(curReq))) < 1.0E-6 and ii > 3 and np.max(np.abs(curReq - prevReq)) < 1E-6:
+    for ii in range(200):
+        if norm(rootF(curReq)) < 1.0E-7 and norm(curReq - prevReq) < 1E-7:
             return curReq
         else:
             prevReq = curReq
 
-    return failV
+        # Dig up the index to optimize
+        jj = ii % len(curReq)
+
+        curReq[jj] = brentq(lambda x: overF(curReq, jj, x), -60, logR[jj], disp=False)
+
+    return np.full(logR.shape, np.nan, dtype=np.float)
 
 
 class StoneN:
@@ -192,11 +193,11 @@ class StoneN:
 
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
-        self.logR = np.array(logR, dtype=np.float64, copy=True)
-        self.Ka = np.array(Ka, dtype=np.float64, copy=True)
-        self.Kx = np.array(Kx*Ka[0], dtype=np.float64, copy=True)
+        self.logR = np.array(logR, dtype=np.float, copy=True)
+        self.Ka = np.array(Ka, dtype=np.float, copy=True)
+        self.Kx = np.array(Kx*Ka[0], dtype=np.float, copy=True)
         self.gnu = np.array(gnu, dtype=np.int, copy=True)
-        self.L0 = np.array(L0, dtype=np.float64, copy=True)
+        self.L0 = np.array(L0, dtype=np.float, copy=True)
 
         self.Req = reqSolver(self.logR, self.Ka, self.gnu, self.Kx, self.L0)
 

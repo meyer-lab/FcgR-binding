@@ -98,8 +98,8 @@ class TestStoneNRecpMethods(unittest.TestCase):
 
         self.assertEqual(output[0], 20)
         self.assertEqual(output[1], 20)
-        #self.assertEqual(outputmulti[0], 19)
-        #self.assertEqual(outputmulti[1], 19)
+        self.assertEqual(outputmulti[0], 19)
+        self.assertEqual(outputmulti[1], 19)
 
         vGrid[2,0] = 2
 
@@ -108,8 +108,8 @@ class TestStoneNRecpMethods(unittest.TestCase):
 
         self.assertEqual(output[0], 22)
         self.assertEqual(output[1], 20)
-        #self.assertEqual(outputmulti[0], 21)
-        #self.assertEqual(outputmulti[1], 19)
+        self.assertEqual(outputmulti[0], 21)
+        self.assertEqual(outputmulti[1], 19)
 
     # This processes checks that the relationships with Rbnd make sense when
     # considering variation in Req and Ka
@@ -194,6 +194,19 @@ class TestStoneNRecpMethods(unittest.TestCase):
         Ka = np.array([1E5, 1E6, 1E5, 1E5], dtype=np.float64)
 
         bb = StoneN(logR, Ka, Kx, gnu, L0)
+
+        Ka = np.array([1E5, 1E5, 1E5, 1E5], dtype=np.float64)
+
+        cc = StoneN(logR, Ka, Kx, gnu, L0)
+
+        rmulti = cc.getRmultiAll()
+        rbnd = cc.getRbnd()
+
+        for ii in range(4):
+            self.assertTrue(np.isclose(rmulti[0], rmulti[ii]))
+            self.assertTrue(np.isclose(rbnd[0], rbnd[ii]))
+
+
 
 if __name__ == '__main__':
     unittest.main()

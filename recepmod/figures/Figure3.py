@@ -124,9 +124,7 @@ def TwoRecep(Kx, ax = None):
     skipColor(ax[1])
 
     def appFunc(x):
-        aa = StoneN(logR, Ka, Kx, x.avidity, x.ligand)
-
-        rmulti = aa.getRmultiAll()
+        rmulti = StoneN(logR, Ka, Kx, x.avidity, x.ligand).getRmultiAll()
 
         x['RmultiOne'] = rmulti[0]
         x['RmultiTwo'] = rmulti[1]
@@ -140,11 +138,11 @@ def TwoRecep(Kx, ax = None):
 
     for ii in avidity[1::]:
         outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], legend = False)
-        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax = ax[1], logx = True, legend = False)
+        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax=ax[1], logx=True, legend=False)
 
     ax[0].set_xlabel(r'Multimerized Fc$\gamma$RIIIA-F')
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
     ax[1].set_xlabel('IC Concentration (M)')
     ax[1].set_ylabel('Activity Index')
-    ax[0].set_ylim(0, 1E3)
-    ax[0].set_xlim(0, 1E3)
+    #ax[0].set_ylim(0, 1E3)
+    #ax[0].set_xlim(0, 1E3)
