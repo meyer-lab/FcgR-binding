@@ -144,5 +144,5 @@ def TwoRecep(Kx, ax = None):
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
     ax[1].set_xlabel('IC Concentration (M)')
     ax[1].set_ylabel('Activity Index')
-    #ax[0].set_ylim(0, 1E3)
-    #ax[0].set_xlim(0, 1E3)
+    ax[0].set_ylim(0, 1E3)
+    ax[0].set_xlim(0, 1E3)
