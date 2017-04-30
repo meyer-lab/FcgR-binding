@@ -14,6 +14,8 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
 
     if len(Req) != len(Ka):
         raise IndexError("Req and Ka must be same length.")
+    elif np.any(np.isnan(Req)):
+        raise ValueError("Req has nan value.")
 
     # Get vGrid with the combinatorics all worked out
     vGrid = vGridInit(gnu, len(Req))
@@ -25,6 +27,9 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
     for cur_pos in np.ndindex(vGrid.shape):
         if vGrid[cur_pos] > 0:
             vGrid[cur_pos] *= np.power(KKRK, cur_pos).prod()
+
+    if np.any(np.isnan(vGrid)):
+        raise ValueError("Nan encountered in vGrid.")
 
     return vGrid
 
@@ -137,15 +142,18 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
         return rootF(curr)[ii]
 
-    curReq = np.full(logR.shape, -60, dtype = np.float)
+    # Reasonable approximation for curReq
+    curReq = np.array(logR - Ka*L0, dtype=np.float)
     prevReq = curReq.copy()
 
-    if np.max(np.multiply(rootF(curReq), rootF(logR))) > 0:
-        return np.full(logR.shape, np.nan, dtype=np.float)
+    if np.max(np.multiply(rootF(np.full(logR.shape, -200, dtype=np.float)), rootF(logR))) > 0:
+        raise RuntimeError("No reasonable value for Req exists.")
 
     # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
     for ii in range(200):
-        if norm(rootF(curReq)) < 1.0E-7 and norm(curReq - prevReq) < 1E-7:
+        if norm(rootF(curReq)) < 1.0E-9 and norm(curReq - prevReq) < 1.0E-9:
+            return curReq
+        elif norm(rootF(curReq)) < 1.0E-5 and norm(curReq - prevReq) < 1.0E-5 and ii > 100:
             return curReq
         else:
             prevReq = curReq
@@ -153,9 +161,9 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
         # Dig up the index to optimize
         jj = ii % len(curReq)
 
-        curReq[jj] = brentq(lambda x: overF(curReq, jj, x), -60, logR[jj], disp=False)
+        curReq[jj] = brentq(lambda x: overF(curReq, jj, x), -200, logR[jj], disp=False)
 
-    return np.full(logR.shape, np.nan, dtype=np.float)
+    raise RuntimeError("The reqSolver couldn't find Req in a reasonable number of iterations.")
 
 
 class StoneN:
