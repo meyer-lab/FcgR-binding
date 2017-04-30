@@ -8,7 +8,7 @@ class TestStoneModMouseFit(unittest.TestCase):
     def test_fitter(self):
     	from ..StoneModMouseFit import InVivoPredict, varyExpr
 
-    	#InVivoPredict()
+    	InVivoPredict()
 
 
 

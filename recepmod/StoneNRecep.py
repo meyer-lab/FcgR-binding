@@ -169,18 +169,13 @@ class StoneN:
         vGrid = np.copy(self.vgridOut)
         actV = np.array(actV, dtype=np.float)
 
-        # ii, jj is the number of receptor one, two bound
-        it = np.nditer(vGrid, flags=['multi_index'], op_flags=['readwrite'])
-
-        while not it.finished:
-            if np.dot(it.multi_index, actV) < 0:
-                it[0] = 0.0
-            elif np.sum(it.multi_index) < 2:
-                it[0] = 0.0
+        for cur_pos in np.ndindex(vGrid.shape):
+            if np.dot(cur_pos, actV) < 0:
+                vGrid[cur_pos] = 0.0
+            elif np.sum(cur_pos) < 2:
+                vGrid[cur_pos] = 0.0
             else:
-                it[0] *= np.dot(it.multi_index, actV)
-
-            it.iternext()
+                vGrid[cur_pos] *= np.dot(cur_pos, actV)
 
         return np.sum(vGrid)
 

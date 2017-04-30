@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator
-from multiprocessing import Pool, cpu_count
-from tqdm import tqdm
-from concurrent.futures import ThreadPoolExecutor
+
 
 def parallelize_dataframe(df, func):
+    from multiprocessing import Pool, cpu_count
+    from tqdm import tqdm
+
     pool = Pool(cpu_count())
 
     iterpool = tqdm(pool.imap(func, np.vsplit(df, df.shape[0])), total=df.shape[0])
@@ -21,31 +22,26 @@ correct = np.log10([0.0055, 0.358, 2.895, 0.0049])
 def modelPrepAffinity(M, inn):
     from .StoneHelper import getMedianKx
 
-    L0 = 1E-9
-    v = 5
+    L0, v = 1E-12, 5
     data = M.NimmerjahnEffectTableAffinities()
+    DCexpr = [3.0, 4.0, 3.0, 3.0] + correct + inn
+    NEUTexpr = [1.0, 2.0, 4.0, 4.0] + correct + inn
 
-    def NKapply(row):
+    def CALCapply(row):
         from .StoneModel import StoneMod
-
-        return StoneMod(logR=4.0, Ka=row.FcgRIII, v=v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
-
-    def DCapply(row, Rin):
         from .StoneNRecep import StoneN
 
-        aa = StoneN(logR=Rin, 
-                    Ka=[row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV], 
-                    Kx=getMedianKx(),
-                    gnu = v,
-                    L0 = L0)
+        KaFull = [row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
 
-        rmulti = aa.getRmultiAll()
+        aa = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(), gnu=v, L0=L0)
+        bb = StoneN(logR=NEUTexpr, Ka=KaFull, Kx=getMedianKx(), gnu=v, L0=L0)
 
-        return np.sum(rmulti) - 2*rmulti[1]
+        row['NK'] = StoneMod(logR=4.0, Ka=row.FcgRIII, v=v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
+        row['DC'] = aa.getActivity([1, -1, 1, 1])
+        row['neut'] = bb.getActivity([1, -1, 1, 1])
+        return row
 
-    data['NK'] = data.apply(NKapply, axis=1)
-    data['DC'] = data.apply(lambda x: DCapply(x, [1.0, 2.0, 1.0, 1.0] + correct + inn), axis=1)
-    data['neut'] = data.apply(lambda x: DCapply(x, [1.0, 2.0, 4.0, 4.0] + correct + inn), axis=1)
+    data = data.apply(CALCapply, axis=1)
 
     data.loc['None', :] = 0.0
 
@@ -60,7 +56,7 @@ def modelPrepAffinity(M, inn):
 
 
 def varyExpr():
-    lvls = np.arange(-1.0, 3.0, 0.5, dtype=np.float)
+    lvls = np.arange(-1.0, 4.0, 0.5, dtype=np.float)
 
     pp = pd.DataFrame(np.array(np.meshgrid(lvls, lvls, lvls, lvls)).T.reshape(-1,4))
     pp.columns = ['R1', 'R2', 'R3', 'R4']
@@ -84,7 +80,7 @@ def InVivoPredict(inn=[0, 0, 0, 0]):
 
     model.fit(X, y)
 
-    #pd.set_option('expand_frame_repr', False)
+    pd.set_option('expand_frame_repr', False)
     
     #xx = cross_val_predict(model, X, y, cv=len(y))
 
@@ -92,14 +88,12 @@ def InVivoPredict(inn=[0, 0, 0, 0]):
     #table['CPredict'] = xx
     table['DPredict'] = model.predict(X)
 
-    #print('')
+    print('')
+    print(table)
 
-    #print(table)
-
-    #print(explained_variance_score(model.predict(X), y))
+    print(explained_variance_score(model.predict(X), y))
 
     return explained_variance_score(model.predict(X), y)
-
 
 
 class regFunc(BaseEstimator):
