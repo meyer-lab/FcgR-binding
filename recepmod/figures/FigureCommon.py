@@ -9,6 +9,19 @@ FcgRidx = dict(zip(FcgRidx, sns.color_palette()))
 
 FcgRTex = [r'Fc$\gamma$RI', r'Fc$\gamma$RIIA-Arg', r'Fc$\gamma$RIIA-His', r'Fc$\gamma$RIIB', r'Fc$\gamma$RIIIA-Phe', r'Fc$\gamma$RIIIA-Val']
 
+def texRename(name):
+    name = r'K$_x$' if name=='Kx1' else name
+    name = 'MFI-to-TNP-4 c.f.' if name=='sigConv1' else name
+    name = 'MFI-to-TNP-26 c.f.' if name=='sigConv2' else name
+    name = 'deviation parameter 1' if name=='sigma' else name
+    name = 'deviation parameter 2' if name=='sigma2' else name
+    name = 'TNP-4 effective avidity' if name=='gnu1' else name
+    name = 'TNP-26 effective avidity' if name=='gnu2' else name
+    return name
+
+def texRenameList(names):
+    return [texRename(name) for name in names]
+
 FcgRidxL = [r'Fc$\gamma$RI',r'Fc$\gamma$RIIA-131R',r'Fc$\gamma$RIIA-131H',r'Fc$\gamma$RIIB',r'Fc$\gamma$RIIIA-158F',r'Fc$\gamma$RIIIA-158V']
 FcgRidxL = dict(zip(FcgRidxL, sns.color_palette()))
 
