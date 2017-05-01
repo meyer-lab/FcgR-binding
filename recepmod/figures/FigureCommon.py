@@ -11,12 +11,14 @@ FcgRTex = [r'Fc$\gamma$RI', r'Fc$\gamma$RIIA-Arg', r'Fc$\gamma$RIIA-His', r'Fc$\
 
 def texRename(name):
     name = r'K$_x$' if name=='Kx1' else name
-    name = 'MFI-to-TNP-4 c.f.' if name=='sigConv1' else name
-    name = 'MFI-to-TNP-26 c.f.' if name=='sigConv2' else name
-    name = 'deviation parameter 1' if name=='sigma' else name
-    name = 'deviation parameter 2' if name=='sigma2' else name
-    name = 'TNP-4 effective avidity' if name=='gnu1' else name
-    name = 'TNP-26 effective avidity' if name=='gnu2' else name
+    name = 'TNP-4 c.f.' if name=='sigConv1' else name
+    name = 'TNP-26 c.f.' if name=='sigConv2' else name
+    name = r'$\sigma_1$' if name=='sigma' else name
+    name = r'$\sigma_2$' if name=='sigma2' else name
+##    name = 'TNP-4 effective avidity' if name=='gnu1' else name
+##    name = 'TNP-26 effective avidity' if name=='gnu2' else name
+    name = r'$\nu_4$' if name=='gnu1' else name
+    name = r'$\nu_{26}$' if name=='gnu2' else name
     return name
 
 def texRenameList(names):
