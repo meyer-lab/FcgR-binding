@@ -16,6 +16,8 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
         raise IndexError("Req and Ka must be same length.")
     elif np.any(np.isnan(Req)):
         raise ValueError("Req has nan value.")
+    elif np.any(np.isnan(Ka)):
+        raise ValueError("Ka has nan value.")
 
     # Get vGrid with the combinatorics all worked out
     vGrid = vGridInit(gnu, len(Req))
@@ -30,9 +32,6 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
             slicing = (slice(None), ) * ii + (jj, ) + (slice(None), ) * (vGrid.ndim - ii - 1)
 
             vGrid[slicing] *= np.power(KKRK[ii], jj)
-
-    if np.any(np.isnan(vGrid)):
-        raise ValueError("Nan encountered in vGrid.")
 
     return vGrid
 

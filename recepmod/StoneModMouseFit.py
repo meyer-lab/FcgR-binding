@@ -63,7 +63,7 @@ def varyExpr():
 
     pp['Fit'] = parallelize_dataframe(pp.as_matrix(), InVivoPredict)
 
-    ppp.to_csv('outtt.csv')
+    pp.to_csv('outtt.csv')
 
 
 def InVivoPredict(inn=[0, 0, 0, 0], printt=False):
