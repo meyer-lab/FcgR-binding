@@ -123,7 +123,7 @@ class regFunc(BaseEstimator):
 
         self.trainX, self.trainy = X, y
 
-        x0 = np.zeros((X.shape[1] + 2, ), dtype=np.float)
+        x0 = np.zeros((X.shape[1] + 2, ), dtype=np.float64)
 
         self.res = least_squares(lambda p: self.diffF(p), 
                             x0=x0, 
