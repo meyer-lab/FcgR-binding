@@ -56,7 +56,7 @@ def modelPrepAffinity(M, inn):
 
 
 def varyExpr():
-    lvls = np.arange(-1.0, 4.0, 0.5, dtype=np.float)
+    lvls = np.arange(-2.0, 2.0, 0.5, dtype=np.float)
 
     pp = pd.DataFrame(np.array(np.meshgrid(lvls, lvls, lvls, lvls)).T.reshape(-1,4))
     pp.columns = ['R1', 'R2', 'R3', 'R4']
@@ -66,7 +66,7 @@ def varyExpr():
     ppp.to_csv('outtt.csv')
 
 
-def InVivoPredict(inn=[0, 0, 0, 0]):
+def InVivoPredict(inn=[0, 0, 0, 0], printt=False):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import explained_variance_score
@@ -75,23 +75,26 @@ def InVivoPredict(inn=[0, 0, 0, 0]):
     inn = np.squeeze(inn)
 
     # Collect data
-    X, y, table = modelPrepAffinity(StoneModelMouse(), inn)
-    model = regFunc()
+    try:
+        X, y, table = modelPrepAffinity(StoneModelMouse(), inn)
+    except RuntimeError:
+        return np.nan
 
+    model = regFunc()
     model.fit(X, y)
 
     pd.set_option('expand_frame_repr', False)
     
-    #xx = cross_val_predict(model, X, y, cv=len(y))
+    xx = cross_val_predict(model, X, y, cv=len(y))
 
     table['Error'] = abs(model.predict(X) - y)
-    #table['CPredict'] = xx
+    table['CPredict'] = xx
     table['DPredict'] = model.predict(X)
 
-    print('')
-    print(table)
-
-    print(explained_variance_score(model.predict(X), y))
+    if printt is True:
+        print('')
+        print(table)
+        print(explained_variance_score(model.predict(X), y))
 
     return explained_variance_score(model.predict(X), y)
 
