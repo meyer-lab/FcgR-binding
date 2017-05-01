@@ -75,7 +75,7 @@ def violinPlot(dset, ax=None):
                        rotation_mode="anchor",
                        ha="right")
 
-    ax.set_ylabel(r'Log$_{10}$ Fc$\gamma$R Expression')
+    ax.set_ylabel(r'$\log_{10}$(Fc$\gamma$R Expression)')
 
 def histSubplots(dset, axes=None):
     if axes is None:
@@ -145,15 +145,21 @@ def GewekeDiagPlot(M,dset,ax=None):
     ax.plot([j-1 for j in range(M.Nparams+2)],[0.05]*(M.Nparams+2),'r-')
 
     # Transpose pvalues from an array of shape 52, 13 to one of shape
-    # 13, 52
-    pvalues = np.array(pvalues).T.tolist()
+    # 13, 52, while taking the negative logarithms of the pvalues
+    pvalues = (-np.log(np.array(pvalues))).T.tolist()
 
     # Plot green Xs per walker per parameter
     for j in range(M.Nparams):
-        ax.plot([j]*nwalkers,pvalues[j],'gx')
+        for pval in pvalues[j]:
+            if pval > -np.log(0.05):
+                x = 'kx'
+            else:
+                x = 'gx'
+            ax.plot([j],[pval],x)
         
     ax.set_xbound(-1,M.Nparams)
     ax.set_xticks([j for j in range(M.Nparams)])
     ax.set_xticklabels(FcgRTex+texRenameList(M.pNames[6:-1]),rotation=40)
-    ax.set_ylabel('p-values')
+    ax.set_ylabel(r'$-\log$(p-values)')
     ax.xaxis.grid(False)
+    leg = ax.legend((r'$p=0.05$','pass','fail'),framealpha=0.0)
