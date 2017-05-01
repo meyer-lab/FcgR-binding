@@ -1,5 +1,5 @@
 from memoize import memoize
-from scipy.misc import comb
+from scipy.special import binom
 import numpy as np
 
 np.seterr(over='raise')
@@ -19,7 +19,7 @@ def logpdf_sum(x, loc, scale):
 @memoize
 def nchoosek(n):
     """ A fast cached version of nchoosek. """
-    return comb(n, np.arange(n + 1))
+    return binom(n, np.arange(n + 1))
 
 
 def normalizeData(filepath):

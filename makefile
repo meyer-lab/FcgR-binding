@@ -26,16 +26,16 @@ Manuscript/Manuscript.tex: Manuscript/Text/*.md
 	pandoc -s $(pan_common) --filter=$(tdir)/figure-filter.py --template=$(tdir)/default.latex --latex-engine=xelatex -o ./Manuscript/Manuscript.tex
 
 clean:
-	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html
+	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/Figures/ModelData.md
 	rm -f $(fdir)/Figure*
-	rm -f profile.p*
-	rm -f .coverage
-	rm -f nosetests.xml
-	rm -rf cov
-	rm -f Manuscript/Figures/ModelData.md
+	rm -f profile.p* stats.dat .coverage nosetests.xml
 
 test:
 	nosetests -s --with-timer --timer-top-n 5
+
+profile:
+	nosetests -s --with-timer --timer-top-n 5 --with-cprofile
+	gprof2dot -f pstats stats.dat | dot -Tpng -o profile.png
 
 testcover:
 	nosetests --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
