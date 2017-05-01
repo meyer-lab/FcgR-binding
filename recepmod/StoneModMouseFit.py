@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -17,15 +18,12 @@ def parallelize_dataframe(df, func):
     pool.join()
     return df
 
-correct = np.log10([0.0055, 0.358, 2.895, 0.0049])
-
-def modelPrepAffinity(M, inn):
+def modelPrepAffinity(M, v=5, L0=1E-12):
     from .StoneHelper import getMedianKx
 
-    L0, v = 1E-12, 5
     data = M.NimmerjahnEffectTableAffinities()
-    DCexpr = [3.0, 4.0, 3.0, 3.0] + correct + inn
-    NEUTexpr = [1.0, 2.0, 4.0, 4.0] + correct + inn
+
+    DCexpr = [3.0, 4.0, 3.0, 3.0]
 
     def CALCapply(row):
         from .StoneModel import StoneMod
@@ -33,12 +31,14 @@ def modelPrepAffinity(M, inn):
 
         KaFull = [row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
 
-        aa = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(), gnu=v, L0=L0)
-        bb = StoneN(logR=NEUTexpr, Ka=KaFull, Kx=getMedianKx(), gnu=v, L0=L0)
-
         row['NK'] = StoneMod(logR=4.0, Ka=row.FcgRIII, v=v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
-        row['DC'] = aa.getActivity([1, -1, 1, 1])
-        row['neut'] = bb.getActivity([1, -1, 1, 1])
+        row['DC'] = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(), gnu=v, L0=L0).getActivity([1, -1, 1, 1])
+
+        if re.search('FcgRIIB-', row.name) is None:
+            row['2B-KO'] = 0
+        else:
+            row['2B-KO'] = 1
+
         return row
 
     data = data.apply(CALCapply, axis=1)
@@ -56,17 +56,18 @@ def modelPrepAffinity(M, inn):
 
 
 def varyExpr():
-    lvls = np.arange(-2.0, 2.0, 0.5, dtype=np.float)
+    gnus = np.arange(2, 10, 1, dtype=np.float)
+    Los = np.power(10, np.arange(-12, -6, 0.5, dtype=np.float))
 
-    pp = pd.DataFrame(np.array(np.meshgrid(lvls, lvls, lvls, lvls)).T.reshape(-1,4))
-    pp.columns = ['R1', 'R2', 'R3', 'R4']
+    pp = pd.DataFrame(np.array(np.meshgrid(gnus, Los)).T.reshape(-1,2))
+    pp.columns = ['gnus', 'Los']
 
     pp['Fit'] = parallelize_dataframe(pp.as_matrix(), InVivoPredict)
 
     pp.to_csv('outtt.csv')
 
 
-def InVivoPredict(inn=[0, 0, 0, 0], printt=False):
+def InVivoPredict(inn=[5, 1E-12], printt=False):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import explained_variance_score
@@ -76,7 +77,7 @@ def InVivoPredict(inn=[0, 0, 0, 0], printt=False):
 
     # Collect data
     try:
-        X, y, table = modelPrepAffinity(StoneModelMouse(), inn)
+        X, y, table = modelPrepAffinity(StoneModelMouse(), v=inn[0], L0=inn[1])
     except RuntimeError:
         return np.nan
 
@@ -85,18 +86,21 @@ def InVivoPredict(inn=[0, 0, 0, 0], printt=False):
 
     pd.set_option('expand_frame_repr', False)
     
-    xx = cross_val_predict(model, X, y, cv=len(y))
-
-    table['Error'] = abs(model.predict(X) - y)
-    table['CPredict'] = xx
+    table['CPredict'] = cross_val_predict(model, X, y, cv=len(y))
     table['DPredict'] = model.predict(X)
+    table['NKeff'] = table.NK * model.res.x[2]
+    table['DCeff'] = table.DC * model.res.x[3]
+    table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff)
+
+    table['Error'] = abs(table.CPredict - y)
 
     if printt is True:
         print('')
         print(table)
-        print(explained_variance_score(model.predict(X), y))
+        print(explained_variance_score(table.DPredict, y))
+        print(explained_variance_score(table.CPredict, y))
 
-    return explained_variance_score(model.predict(X), y)
+    return explained_variance_score(table.DPredict, y)
 
 
 class regFunc(BaseEstimator):
@@ -124,10 +128,13 @@ class regFunc(BaseEstimator):
         self.trainX, self.trainy = X, y
 
         x0 = np.zeros((X.shape[1] + 2, ), dtype=np.float64)
+        lb = np.full(x0.shape, -20, dtype=np.float64)
+        ub = np.full(x0.shape, 20, dtype=np.float64)
 
         self.res = least_squares(lambda p: self.diffF(p), 
                             x0=x0, 
-                            jac='3-point')
+                            jac='3-point',
+                            bounds=(lb, ub))
 
     def predict(self, X):
         return self.outF(self.res.x, X)
