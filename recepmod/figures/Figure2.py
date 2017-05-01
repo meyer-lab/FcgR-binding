@@ -96,8 +96,8 @@ def histSubplots(dset, axes=None):
     # Set all the x-labels based on which histogram is displayed
     axes[0].set_xlabel(r'$\log_{10}$(K$_x$)')
     axes[1].set_xlabel(r'$\log_{10}$(Conversion Factor)')
-    axes[2].set_xlabel('Effective Avidity')
-    axes[3].set_xlabel('Deviation Parameter')
+    axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
+    axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
 
     # Try and fix overlapping elements
     plt.tight_layout()
