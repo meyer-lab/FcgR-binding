@@ -16,3 +16,5 @@ tqdm>=4.11.2
 coverage>=4.3.4
 pylint>=1.7.1
 nosexcover
+nose-cprof
+gprof2dot
