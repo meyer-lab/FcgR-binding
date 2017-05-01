@@ -7,7 +7,7 @@ import seaborn as sns
 import pandas as pd
 from ..StoneModel import StoneModel
 from ..StoneHelper import getFitMeasSummarized, getMeasuredDataFrame
-from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRidxL
+from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRidxL, FcgRTex
 
 def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, ylabelpad=-0.3, ytickx=0.08):
     # Select the subset of data we want
@@ -135,10 +135,10 @@ def mfiAdjMeanFigureMaker(measAll, axarr=None):
         # Create 6 axes for each FcgR
         axarr = [ f.add_subplot(gs1[x]) for x in range(6) ]
 
-    fcIter = zip(axarr, FcgRidx.keys())
+    fcIter = zip(axarr, FcgRidx.keys(), FcgRTex)
 
     # Loop through receptors creating plot
-    for axx, fcr in fcIter:
+    for axx, fcr, tex in fcIter:
         sns.barplot(x="Ig",
                     y = "Meas",
                     hue="TNP",
@@ -149,7 +149,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr=None):
         axx.set_ylabel("Binding (RU)")
         axx.set_xlabel("")
         axx.legend_.remove()
-        axx.set_title(fcr)
+        axx.set_title(tex)
 
 def makeFigure():
     StoneM = StoneModel()
