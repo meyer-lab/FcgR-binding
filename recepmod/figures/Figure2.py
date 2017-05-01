@@ -11,7 +11,7 @@ import numpy as np
 
 import seaborn as sns
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chains
-from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
+from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRTex, texRename, texRenameList
 
 
 def makeFigure():
@@ -65,7 +65,8 @@ def violinPlot(dset, ax=None):
         ax = plt.gca()
 
     dset = dset[['Rexp']]
-    dset.columns = FcgRidx.keys()
+##    dset.columns = FcgRidx.keys()
+    dset.columns = FcgRTex
 
     sns.violinplot(data=dset, cut=0, ax=ax, linewidth=0)
 
@@ -82,26 +83,28 @@ def histSubplots(dset, axes=None):
 
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 10)),:]
 
-    dsetFilter[['Kx1']].plot.hist(ax=axes[0], bins = 20, color=sns.color_palette()[0])
-    dsetFilter[['sigConv1', 'sigConv2']].plot.hist(ax=axes[1], bins = 20, color=sns.color_palette()[0:2])
-    dsetFilter[['gnu1', 'gnu2']].plot.hist(ax=axes[2],
+    dsetFilter.columns = texRenameList(dsetFilter.columns)
+
+    dsetFilter[[texRename('Kx1')]].plot.hist(ax=axes[0], bins = 20, color=sns.color_palette()[0])
+    dsetFilter[[texRename('sigConv1'), texRename('sigConv2')]].plot.hist(ax=axes[1], bins = 20, color=sns.color_palette()[0:2])
+    dsetFilter[[texRename('gnu1'), texRename('gnu2')]].plot.hist(ax=axes[2],
                                            bins = np.arange(-0.5, 32.5, 1.0),
                                            color=sns.color_palette()[0:2],
                                            xlim = (-0.5, 32.5))
-    dsetFilter[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
+    dsetFilter[[texRename('sigma'), texRename('sigma2')]].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
 
     # Set all the x-labels based on which histogram is displayed
-    axes[0].set_xlabel('Log10(Kx)')
-    axes[1].set_xlabel('Log10(Conversion Factor)')
+    axes[0].set_xlabel(r'$\log_{10}$(K$_x$)')
+    axes[1].set_xlabel(r'$\log_{10}$(Conversion Factor)')
     axes[2].set_xlabel('Effective Avidity')
     axes[3].set_xlabel('Deviation Parameter')
 
     # Try and fix overlapping elements
     plt.tight_layout()
 
-    print(np.mean(np.power(10, dsetFilter.sigConv2 - dsetFilter.sigConv1)))
+    print(np.mean(np.power(10, dsetFilter[texRename('sigConv2')] - dsetFilter[texRename('sigConv1')])))
 
-    print(np.power(10, np.std(dsetFilter.sigma2)))
+    print(np.power(10, np.std(dsetFilter[texRename('sigma2')])))
 
 
 def plotFit(fitMean, ax=None):
@@ -151,6 +154,6 @@ def GewekeDiagPlot(M,dset,ax=None):
         
     ax.set_xbound(-1,M.Nparams)
     ax.set_xticks([j for j in range(M.Nparams)])
-    ax.set_xticklabels(M.FcgRs+M.pNames[6:-1],rotation=40)
+    ax.set_xticklabels(FcgRTex+texRenameList(M.pNames[6:-1]),rotation=40)
     ax.set_ylabel('p-values')
     ax.xaxis.grid(False)
