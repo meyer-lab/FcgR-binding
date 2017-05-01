@@ -24,9 +24,12 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
     vGrid = vGrid * L0 * Ka[0] / Kx
     KKRK = np.multiply(Ka, Req) / Ka[0] * Kx
 
-    for cur_pos in np.ndindex(vGrid.shape):
-        if vGrid[cur_pos] > 0:
-            vGrid[cur_pos] *= np.power(KKRK, cur_pos).prod()
+    for ii in range(vGrid.ndim):
+        for jj in range(vGrid.shape[0]):
+            # Setup the slicing for the matrix portion we want
+            slicing = (slice(None), ) * ii + (jj, ) + (slice(None), ) * (vGrid.ndim - ii - 1)
+
+            vGrid[slicing] *= np.power(KKRK[ii], jj)
 
     if np.any(np.isnan(vGrid)):
         raise ValueError("Nan encountered in vGrid.")
