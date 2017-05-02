@@ -173,21 +173,24 @@ class StoneModelMouse:
 
 
     def writeModelData(self, filename, logspace=False, addavidity1=False):
-        import pytablewriter
+        #import pytablewriter
 
         # Collect data
-        _, _, tbN = self.modelPrep(logspace, addavidity1)
+        #_, _, tbN = self.modelPrep(logspace, addavidity1)
 
-        writer = pytablewriter.MarkdownTableWriter()
+        #writer = pytablewriter.MarkdownTableWriter()
 
-        writer.from_dataframe(tbN)
+        #writer.from_dataframe(tbN)
 
         # change output stream to a file
-        with open(filename, 'w') as f:
-            writer.stream = f
-            writer.write_table()
+        #with open(filename, 'w') as f:
+        #    writer.stream = f
+        #    writer.write_table()
 
-        writer.close()
+        #writer.close()
+
+        # TODO: Reimplement with new model data
+        return None
 
 
     def modelPrep(self, logspace, addavidity1):

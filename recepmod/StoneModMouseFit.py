@@ -120,16 +120,13 @@ def InVivoPredict(inn=[5, 1E-12], printt=False):
     table['NKeff'] = table.NK * model.res.x[2]
     table['DCeff'] = table.DC * model.res.x[3]
     table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff)
-
     table['Error'] = abs(table.CPredict - y)
 
     if printt is True:
         print('')
         print(table)
-        print(explained_variance_score(table.DPredict, y))
-        print(explained_variance_score(table.CPredict, y))
 
-    return explained_variance_score(table.DPredict, y)
+    return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table)
 
 
 class regFunc(BaseEstimator):
