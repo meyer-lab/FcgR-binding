@@ -2,7 +2,39 @@ import re
 import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import explained_variance_score
+from .StoneModMouse import StoneModelMouse
 
+def NimmerjahnPredictByAffinities():
+    """ This will run ordinary linear regression using just affinities of receptors. """
+
+    # Run regression with our setup
+    lr = regFunc()
+
+    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
+    data['ActMax'] = data.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV), axis=1)
+
+    X = data[['ActMax', 'FcgRIIB']]
+    y = data['Effectiveness']
+
+    # Log transform to keep ratios
+    X = X.apply(np.log2).replace(-np.inf, -3)
+
+    # Do direct regression too
+    lr.fit(X, y)
+    data['DirectPredict'] = lr.predict(X)
+
+    # Run crossvalidation predictions at the same time
+    data['CrossPredict'] = cross_val_predict(lr, X, y, cv=X.shape[0])
+
+    # How well did we do on crossvalidation?
+    crossval_perf = explained_variance_score(y, data.CrossPredict)
+
+    # How well did we do on direct?
+    direct_perf = explained_variance_score(y, data.DirectPredict)
+
+    return (direct_perf, crossval_perf, data)
 
 def parallelize_dataframe(df, func):
     from multiprocessing import Pool, cpu_count
@@ -69,9 +101,6 @@ def varyExpr():
 
 def InVivoPredict(inn=[5, 1E-12], printt=False):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
-    from sklearn.model_selection import cross_val_predict
-    from sklearn.metrics import explained_variance_score
-    from .StoneModMouse import StoneModelMouse
 
     inn = np.squeeze(inn)
 
