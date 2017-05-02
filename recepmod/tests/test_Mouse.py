@@ -60,22 +60,9 @@ class TestStoneMouse(unittest.TestCase):
 
         self.assertTrue(tbN.shape == (8,5*len(self.Mod.FcgRs)+1))
 
-    def test_NimmerjahnTb_Knockdown(self):
-        """ Check NimmerjahnTb_Knockdown, MultiAvidityPredict """
-        self.Mod.IgG2b_Fucose()
-        tbNK = self.Mod.NimmerjahnTb_Knockdown()
-        # tbNK.to_csv('out.csv')
-        _, _, _, las, scale = self.Mod.InVivoPredict()
-        self.Mod.InVivoPredict(logspace=True)
-        self.Mod.InVivoPredict(addavidity1=False)
-
-        table = MultiAvidityPredict(self.Mod, las, scale)
-
     def test_NimmerjahnEffectTableAffinities(self):
         """ Test that table for prediction off of just affinities is correct. """
         tbN = self.Mod.NimmerjahnEffectTableAffinities()
-        # tbN.to_csv('out.csv')
-        self.Mod.NimmerjahnPredictByAffinities()
 
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)

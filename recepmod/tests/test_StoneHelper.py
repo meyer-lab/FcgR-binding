@@ -1,5 +1,4 @@
 import unittest
-import time
 import numpy
 from ..StoneModel import StoneModel
 
