@@ -27,11 +27,15 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
     KKRK = np.multiply(Ka, Req) / Ka[0] * Kx
 
     for ii in range(vGrid.ndim):
-        for jj in range(vGrid.shape[0]):
+        term = 1.0
+
+        for jj in range(1, gnu+1):
             # Setup the slicing for the matrix portion we want
             slicing = (slice(None), ) * ii + (jj, ) + (slice(None), ) * (vGrid.ndim - ii - 1)
 
-            vGrid[slicing] *= np.power(KKRK[ii], jj)
+            term *= KKRK[ii]
+
+            vGrid[slicing] *= term
 
     return vGrid
 
