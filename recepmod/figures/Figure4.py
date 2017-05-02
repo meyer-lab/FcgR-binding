@@ -1,6 +1,7 @@
 import matplotlib
 matplotlib.use('AGG')
 import seaborn as sns
+from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
 
@@ -9,15 +10,8 @@ def makeFigure():
     import matplotlib.pyplot as plt
     from matplotlib import gridspec
     from .FigureCommon import subplotLabel
-    from ..StoneModMouseFit import InVivoPredict
-    from ..StoneModMouse import StoneModelMouse
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
-
-    Mod = StoneModelMouse()
-
-    # Run the in vivo regression model
-    _, _, tbN = InVivoPredict()
 
     # Setup plotting space
     f = plt.figure(figsize=(7, 6))
@@ -32,7 +26,7 @@ def makeFigure():
     ax[0].axis('off')
 
     # Plot A/I vs effectiveness.
-    AIplot(Mod, ax[1])
+    AIplot(ax[1])
 
     # Show performance of affinity prediction
     InVivoPredictVsActualAffinities(ax[2])
@@ -41,7 +35,7 @@ def makeFigure():
     # ClassAvidityPCA(Mod, ax[3])
 
     # Show performance of in vivo regression model
-    InVivoPredictVsActual(tbN, ax[4])
+    InVivoPredictVsActual(ax[5])
 
     # Show model components
     #InVivoPredictComponents(model, ax[5])
@@ -115,14 +109,18 @@ def ClassAvidityPCA(Mod, ax):
     
     ax.legend(handles=MurineFcIgLegend(Mod), bbox_to_anchor=(3.7, 2.4), loc=2)
 
-def InVivoPredictVsActual(tbN, ax):
+def InVivoPredictVsActual(ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
+    from ..StoneModMouseFit import InVivoPredict
+
+    # Run the in vivo regression model
+    devar, cevar, tbN = InVivoPredict()
 
     tbN['Ig'] = tbN.apply(lambda x: x.name.split('-')[0], axis=1)
 
     for _, row in tbN.iterrows():
         colorr = Igidx[row['Ig']]
-        ax.errorbar(x=row['CPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
+        ax.errorbar(x=row['DPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
 
     ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
 
@@ -140,8 +138,9 @@ def InVivoPredictComponents(model, ax):
     ax.set_xlabel('Components')
 
 
-def AIplot(Mod, ax):
+def AIplot(ax):
     """ Plot A/I vs effectiveness. """
+    Mod = StoneModelMouse()
 
     table = Mod.NimmerjahnEffectTableAffinities()
     table = table.loc[table.FcgRIIB > 0, :]
@@ -167,8 +166,10 @@ def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
     from ..StoneModMouseFit import NimmerjahnPredictByAffinities
 
-    _, _, data = NimmerjahnPredictByAffinities()
+    dperf, cperf, data = NimmerjahnPredictByAffinities()
+
     data['Ig'] = data.apply(lambda x: x.name.split('-')[0], axis=1)
+
     data = PrepforLegend(data)
     for _, row in data.iterrows():
         markerr=Igs[row['Ig']]

@@ -12,6 +12,7 @@ def NimmerjahnPredictByAffinities():
 
     # Run regression with our setup
     lr = regFunc()
+    lr.logg = False
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
     data['ActMax'] = data.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV), axis=1)
@@ -20,7 +21,7 @@ def NimmerjahnPredictByAffinities():
     y = data['Effectiveness']
 
     # Log transform to keep ratios
-    X = X.apply(np.log2).replace(-np.inf, -3)
+    X = X.apply(np.log10).replace(-np.inf, -3)
 
     # Do direct regression too
     lr.fit(X, y)
@@ -117,10 +118,14 @@ def InVivoPredict(inn=[5, 1E-12], printt=False):
 
 
 class regFunc(BaseEstimator):
+    def __init__(self):
+        self.logg = True
+
     def outF(self, p, X=None):
         from scipy.stats import norm
 
-        p = np.power(10, p)
+        if self.logg is True:
+            p = np.power(10, p)
 
         if X is None:
             X = self.trainX
@@ -141,6 +146,10 @@ class regFunc(BaseEstimator):
         self.trainX, self.trainy = X, y
 
         x0 = np.zeros((X.shape[1] + 2, ), dtype=np.float64)
+
+        if self.logg is False:
+            x0[:] = 1.0
+
         lb = np.full(x0.shape, -20, dtype=np.float64)
         ub = np.full(x0.shape, 20, dtype=np.float64)
 
