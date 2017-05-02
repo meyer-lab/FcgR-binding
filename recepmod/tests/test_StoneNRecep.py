@@ -1,5 +1,4 @@
 import unittest
-import time
 import numpy as np
 from ..StoneNRecep import StoneVgrid, reqSolver, StoneRbnd, StoneN
 
@@ -159,6 +158,8 @@ class TestStoneNRecpMethods(unittest.TestCase):
         return (output, vGrid, Rbnd)
 
     def test_reqSolver(self):
+        """ Run various tests to verify reqSolver function. """
+
         logR = np.array([5, 5], dtype=np.float64)
         Ka = np.array([1E5, 1E4], dtype=np.float64)
 
