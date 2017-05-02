@@ -11,11 +11,13 @@ fdir = './Manuscript/Figures/'
 
 
 def runFunc(nameOut):
+    """ Run the code for a particular figure. """
     try:
         exec('from recepmod.figures import ' + nameOut)
         ff = eval(nameOut + '.makeFigure()')
         ff.savefig(fdir + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
         ff.savefig(fdir + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+        print(nameOut)
     except Exception as e:
         return e
 
@@ -38,7 +40,7 @@ if __name__ == '__main__':
         pool.join()
 
         for i in result.get():
-            if not i is None:
+            if isinstance(i, Exception):
                 raise i
 
     # Overlay cartoon

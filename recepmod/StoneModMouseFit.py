@@ -5,6 +5,7 @@ from sklearn.base import BaseEstimator
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import explained_variance_score
 from .StoneModMouse import StoneModelMouse
+from .StoneHelper import parallelize_dataframe
 
 def NimmerjahnPredictByAffinities():
     """ This will run ordinary linear regression using just affinities of receptors. """
@@ -35,20 +36,6 @@ def NimmerjahnPredictByAffinities():
     direct_perf = explained_variance_score(y, data.DirectPredict)
 
     return (direct_perf, crossval_perf, data)
-
-def parallelize_dataframe(df, func):
-    from multiprocessing import Pool, cpu_count
-    from tqdm import tqdm
-
-    pool = Pool(cpu_count())
-
-    iterpool = tqdm(pool.imap(func, np.vsplit(df, df.shape[0])), total=df.shape[0])
-
-    df = np.fromiter(iterpool, dtype=np.float, count=df.shape[0])
-
-    pool.close()
-    pool.join()
-    return df
 
 def modelPrepAffinity(M, v=5, L0=1E-12):
     from .StoneHelper import getMedianKx

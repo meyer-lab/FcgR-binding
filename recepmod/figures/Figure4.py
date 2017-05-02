@@ -41,7 +41,7 @@ def makeFigure():
     # ClassAvidityPCA(Mod, ax[3])
 
     # Show performance of in vivo regression model
-    # InVivoPredictVsActual(tbN, ax[4])
+    InVivoPredictVsActual(tbN, ax[4])
 
     # Show model components
     #InVivoPredictComponents(model, ax[5])
@@ -63,8 +63,8 @@ def makeFigure():
 
     return f
 
-Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s'}
-Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3'} 
+Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s', 'None':'.'}
+Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'} 
 Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
