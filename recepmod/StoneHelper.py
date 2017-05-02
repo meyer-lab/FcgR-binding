@@ -102,7 +102,7 @@ def getFitPrediction(self, x):
 
     return dd
 
-def mapMCMC(dFunction, pSet):
+def mapMCMC(dFunction, pSet, quiet=False):
     """
     This function takes (1) a function that takes a parameter set and
     returns a dataframe and (2) a list of parameter sets. It returns a dataframe
@@ -115,10 +115,25 @@ def mapMCMC(dFunction, pSet):
     funFunc = lambda ii: dFunction(pSet.iloc[ii,:]).assign(pSetNum = ii)
 
     # Iterate over each parameter set, output to a list
-    retVals = map(funFunc, trange(pSet.shape[0]))
+    retVals = map(funFunc, trange(pSet.shape[0], disable=quiet))
 
     # Concatenate all the dataframes vertically and return
     return pd.concat(retVals)
+
+
+def parallelize_dataframe(df, func):
+    from multiprocessing import Pool, cpu_count
+    from tqdm import tqdm
+
+    pool = Pool(cpu_count())
+
+    iterpool = tqdm(pool.imap(func, np.vsplit(df, df.shape[0])), total=df.shape[0])
+
+    df = np.fromiter(iterpool, dtype=np.float, count=df.shape[0])
+
+    pool.close()
+    pool.join()
+    return df
 
 
 def getFitMeasMerged(self, x):

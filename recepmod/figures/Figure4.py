@@ -1,6 +1,9 @@
 import matplotlib
 matplotlib.use('AGG')
 import seaborn as sns
+import pandas as pd
+import numpy as np
+from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
 
@@ -9,15 +12,8 @@ def makeFigure():
     import matplotlib.pyplot as plt
     from matplotlib import gridspec
     from .FigureCommon import subplotLabel
-    from ..StoneModMouseFit import InVivoPredict
-    from ..StoneModMouse import StoneModelMouse
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
-
-    Mod = StoneModelMouse()
-
-    # Run the in vivo regression model
-    _, _, tbN = InVivoPredict()
 
     # Setup plotting space
     f = plt.figure(figsize=(7, 6))
@@ -32,7 +28,7 @@ def makeFigure():
     ax[0].axis('off')
 
     # Plot A/I vs effectiveness.
-    AIplot(Mod, ax[1])
+    AIplot(ax[1])
 
     # Show performance of affinity prediction
     InVivoPredictVsActualAffinities(ax[2])
@@ -40,20 +36,20 @@ def makeFigure():
     # Make binding data PCA plot
     # ClassAvidityPCA(Mod, ax[3])
 
-    # Show performance of in vivo regression model
-    # InVivoPredictVsActual(tbN, ax[4])
-
     # Show model components
-    #InVivoPredictComponents(model, ax[5])
+    InVivoPredictComponents(ax[4])
+
+    # Show performance of in vivo regression model
+    InVivoPredictVsActual(ax[5])
 
     # Leave components out plot
-    #RequiredComponents(ax[6])
+    RequiredComponents(ax[6])
+
+    # Predicted contribution plot
+    ComponentContrib(ax[7])
 
     # Predict class/avidity effect
-    #ClassAvidityPredict(Mod, model, normV, ax[7])
-
-    # Blank out for the cartoon
-    ax[8].axis('off')
+    #ClassAvidityPredict(Mod, model, normV, ax[8])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -63,8 +59,8 @@ def makeFigure():
 
     return f
 
-Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s'}
-Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3'} 
+Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s', 'None':'.'}
+Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'} 
 Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
@@ -115,14 +111,18 @@ def ClassAvidityPCA(Mod, ax):
     
     ax.legend(handles=MurineFcIgLegend(Mod), bbox_to_anchor=(3.7, 2.4), loc=2)
 
-def InVivoPredictVsActual(tbN, ax):
+def InVivoPredictVsActual(ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
+    from ..StoneModMouseFit import InVivoPredict
+
+    # Run the in vivo regression model
+    devar, cevar, tbN = InVivoPredict()
 
     tbN['Ig'] = tbN.apply(lambda x: x.name.split('-')[0], axis=1)
 
     for _, row in tbN.iterrows():
         colorr = Igidx[row['Ig']]
-        ax.errorbar(x=row['CPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
+        ax.errorbar(x=row['DPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
 
     ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
 
@@ -131,17 +131,65 @@ def InVivoPredictVsActual(tbN, ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('Predicted Effect')
 
-def InVivoPredictComponents(model, ax):
-    """ Plot model components. """
 
-    #sns.barplot(ax=ax, y='Weight', x='Name', data=components)
+def ComponentContrib(ax):
+    """ Plot the predicted contribution of NK cells. """
+    from ..StoneModMouseFit import InVivoPredict
+
+    # Run the in vivo regression model
+    _, _, tbN = InVivoPredict()
+
+    tbN = tbN.drop('None')
+
+    tbN.index.name = 'condition'
+    tbN.reset_index(inplace=True)
+
+    tbN.plot(x='Effectiveness', y="NKfrac", ax=ax, kind='scatter')
+
+    ax.set_xlabel('Effectiveness')
+    ax.set_ylabel('Predicted NK Contribution')
+
+
+def InVivoPredictComponents(ax):
+    """ Plot model components. """
+    from ..StoneModMouseFit import InVivoPredict
+
+    # Run the in vivo regression model
+    _, _, tbN = InVivoPredict()
+    tbN = tbN[['NKeff', 'DCeff', '2Beff']]
+
+    tbN.index.name = 'condition'
+    tbN.reset_index(inplace=True)
+
+    tbN = pd.melt(tbN, id_vars=['condition'])
+
+    sns.factorplot(x="condition",
+                   hue="variable",
+                   y="value",
+                   data=tbN,
+                   ax=ax,
+                   kind='bar')
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
 
-def AIplot(Mod, ax):
+def RequiredComponents(ax):
+    """ Plot model components. """
+    from ..StoneModMouseFit import InVivoPredictMinusComponents
+
+    table = InVivoPredictMinusComponents()
+
+    table.plot(kind='bar', y='CrossVal', ax=ax)
+
+    ax.set_ylabel('LOO Var Explained')
+    ax.set_ylim(-1.0, 1.0)
+
+
+def AIplot(ax):
     """ Plot A/I vs effectiveness. """
+    Mod = StoneModelMouse()
 
     table = Mod.NimmerjahnEffectTableAffinities()
     table = table.loc[table.FcgRIIB > 0, :]
@@ -157,18 +205,15 @@ def AIplot(Mod, ax):
     ax.set_xlabel('A/I Ratio')
     ax.set_xscale('log')
 
-def RequiredComponents(ax):
-    """ Plot model components. """
-
-    ax.set_ylabel('LOO Perc Explained')
-    ax.set_xlabel('Components')
 
 def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
     from ..StoneModMouseFit import NimmerjahnPredictByAffinities
 
-    _, _, data = NimmerjahnPredictByAffinities()
+    dperf, cperf, data = NimmerjahnPredictByAffinities()
+
     data['Ig'] = data.apply(lambda x: x.name.split('-')[0], axis=1)
+
     data = PrepforLegend(data)
     for _, row in data.iterrows():
         markerr=Igs[row['Ig']]
@@ -187,16 +232,16 @@ def ClassAvidityPredict(Mod, model, normV, ax):
     from ..StoneModMouse import MultiAvidityPredict
     from copy import deepcopy
 
-    Mod = deepcopy(Mod)
+    #Mod = deepcopy(Mod)
 
-    Mod.v = 30
+    #Mod.v = 30
 
-    table = MultiAvidityPredict(Mod, model, normV)
+    #table = MultiAvidityPredict(Mod, model, normV)
 
-    for _, row in table.iterrows():
-        colorr = Igidx[row['Ig']]
-        ax.errorbar(x=row['Avidity'], y=row['Predict'], marker='.', mfc=colorr)
+    #for _, row in table.iterrows():
+    #    colorr = Igidx[row['Ig']]
+    #    ax.errorbar(x=row['Avidity'], y=row['Predict'], marker='.', mfc=colorr)
 
-    ax.set_ylabel('Predicted Effect')
+    #ax.set_ylabel('Predicted Effect')
 
 
