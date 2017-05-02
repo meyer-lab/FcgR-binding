@@ -9,15 +9,15 @@ def makeFigure():
     import matplotlib.pyplot as plt
     from matplotlib import gridspec
     from .FigureCommon import subplotLabel
+    from ..StoneModMouseFit import InVivoPredict
     from ..StoneModMouse import StoneModelMouse
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
-    # Load murine class
     Mod = StoneModelMouse()
 
     # Run the in vivo regression model
-    _, _, tbN, model, normV = Mod.InVivoPredict()
+    _, _, tbN = InVivoPredict()
 
     # Setup plotting space
     f = plt.figure(figsize=(7, 6))
@@ -35,22 +35,22 @@ def makeFigure():
     AIplot(Mod, ax[1])
 
     # Show performance of affinity prediction
-    InVivoPredictVsActualAffinities(Mod, ax[2])
+    InVivoPredictVsActualAffinities(ax[2])
 
     # Make binding data PCA plot
-    ClassAvidityPCA(Mod, ax[3])
+    # ClassAvidityPCA(Mod, ax[3])
 
     # Show performance of in vivo regression model
-    InVivoPredictVsActual(tbN, ax[4])
+    # InVivoPredictVsActual(tbN, ax[4])
 
     # Show model components
-    InVivoPredictComponents(model, ax[5])
+    #InVivoPredictComponents(model, ax[5])
 
     # Leave components out plot
-    RequiredComponents(ax[6])
+    #RequiredComponents(ax[6])
 
     # Predict class/avidity effect
-    ClassAvidityPredict(Mod, model, normV, ax[7])
+    #ClassAvidityPredict(Mod, model, normV, ax[7])
 
     # Blank out for the cartoon
     ax[8].axis('off')
@@ -122,7 +122,7 @@ def InVivoPredictVsActual(tbN, ax):
 
     for _, row in tbN.iterrows():
         colorr = Igidx[row['Ig']]
-        ax.errorbar(x=row['CrossPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
+        ax.errorbar(x=row['CPredict'], y=row['Effectiveness'], marker='.', mfc=colorr)
 
     ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
 
@@ -163,10 +163,11 @@ def RequiredComponents(ax):
     ax.set_ylabel('LOO Perc Explained')
     ax.set_xlabel('Components')
 
-def InVivoPredictVsActualAffinities(Mod, ax):
+def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
+    from ..StoneModMouseFit import NimmerjahnPredictByAffinities
 
-    _, _, data = Mod.NimmerjahnPredictByAffinities()
+    _, _, data = NimmerjahnPredictByAffinities()
     data['Ig'] = data.apply(lambda x: x.name.split('-')[0], axis=1)
     data = PrepforLegend(data)
     for _, row in data.iterrows():
