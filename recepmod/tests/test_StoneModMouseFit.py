@@ -3,7 +3,7 @@ import random
 import time
 import pandas
 import numpy as np
-from ..StoneModMouseFit import NimmerjahnPredictByAffinities
+from ..StoneModMouseFit import NimmerjahnPredictByAffinities, InVivoPredictMinusComponents
 from sklearn.metrics import explained_variance_score
 
 class TestFit(unittest.TestCase):
@@ -20,3 +20,6 @@ class TestFit(unittest.TestCase):
         self.assertAlmostEqual(output[1], 
                                explained_variance_score(output[2].Effectiveness, output[2].CrossPredict),
                                delta = 1.0E-6)
+
+    def test_InVivoPredictMinusComponents(self):
+        InVivoPredictMinusComponents()
