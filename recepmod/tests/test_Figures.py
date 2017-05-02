@@ -15,6 +15,12 @@ class TestFigures(unittest.TestCase):
 
         Figure4.InVivoPredictVsActual(ax)
 
+        Figure4.InVivoPredictComponents(ax)
+
+        Figure4.ComponentContrib(ax)
+
+        Figure4.RequiredComponents(ax)
+
 
 if __name__ == '__main__':
     unittest.main()

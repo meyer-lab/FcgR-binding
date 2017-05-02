@@ -38,10 +38,10 @@ def NimmerjahnPredictByAffinities():
 
     return (direct_perf, crossval_perf, data)
 
-def modelPrepAffinity(M, v=5, L0=1E-12):
+def modelPrepAffinity(v=5, L0=1E-12):
     from .StoneHelper import getMedianKx
 
-    data = M.NimmerjahnEffectTableAffinities()
+    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
 
     DCexpr = [3.0, 4.0, 3.0, 3.0]
 
@@ -94,20 +94,22 @@ def InVivoPredict(inn=[5, 1E-12], printt=False):
 
     # Collect data
     try:
-        X, y, table = modelPrepAffinity(StoneModelMouse(), v=inn[0], L0=inn[1])
+        X, y, table = modelPrepAffinity(v=inn[0], L0=inn[1])
     except RuntimeError:
         return np.nan
 
     model = regFunc()
     model.fit(X, y)
 
+    table['NKeff'] = table.NK * np.power(10, model.res.x[2])
+    table['DCeff'] = table.DC * np.power(10, model.res.x[3])
+    table['2Beff'] = table['2B-KO'] * np.power(10, model.res.x[4])
+
     pd.set_option('expand_frame_repr', False)
     
     table['CPredict'] = cross_val_predict(model, X, y, cv=len(y))
     table['DPredict'] = model.predict(X)
-    table['NKeff'] = table.NK * model.res.x[2]
-    table['DCeff'] = table.DC * model.res.x[3]
-    table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff)
+    table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
     table['Error'] = abs(table.CPredict - y)
 
     if printt is True:
@@ -115,6 +117,28 @@ def InVivoPredict(inn=[5, 1E-12], printt=False):
         print(table)
 
     return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table)
+
+def crossValF(table):
+    yy = cross_val_predict(regFunc(), 
+                           table.drop('Effectiveness', axis=1), 
+                           table['Effectiveness'], 
+                           cv=table.shape[0])
+
+    return explained_variance_score(yy, table['Effectiveness'])
+
+
+def InVivoPredictMinusComponents():
+    _, cperf, data = InVivoPredict()
+
+    data = data[['Effectiveness', 'NK', 'DC', '2B-KO']]
+
+    table = pd.DataFrame(cperf, columns=['CrossVal'], index=['Full Model'])
+
+    table.loc['No 2B',:] = crossValF(data.drop('2B-KO', axis=1))
+    table.loc['No NK',:] = crossValF(data.drop('NK', axis=1))
+    table.loc['No DC',:] = crossValF(data.drop('DC', axis=1))
+
+    return table
 
 
 class regFunc(BaseEstimator):

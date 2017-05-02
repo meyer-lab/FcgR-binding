@@ -1,6 +1,8 @@
 import matplotlib
 matplotlib.use('AGG')
 import seaborn as sns
+import pandas as pd
+import numpy as np
 from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
@@ -34,20 +36,20 @@ def makeFigure():
     # Make binding data PCA plot
     # ClassAvidityPCA(Mod, ax[3])
 
+    # Show model components
+    InVivoPredictComponents(ax[4])
+
     # Show performance of in vivo regression model
     InVivoPredictVsActual(ax[5])
 
-    # Show model components
-    #InVivoPredictComponents(model, ax[5])
-
     # Leave components out plot
-    #RequiredComponents(ax[6])
+    RequiredComponents(ax[6])
+
+    # Predicted contribution plot
+    ComponentContrib(ax[7])
 
     # Predict class/avidity effect
-    #ClassAvidityPredict(Mod, model, normV, ax[7])
-
-    # Blank out for the cartoon
-    ax[8].axis('off')
+    #ClassAvidityPredict(Mod, model, normV, ax[8])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -129,13 +131,60 @@ def InVivoPredictVsActual(ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('Predicted Effect')
 
-def InVivoPredictComponents(model, ax):
-    """ Plot model components. """
 
-    #sns.barplot(ax=ax, y='Weight', x='Name', data=components)
+def ComponentContrib(ax):
+    """ Plot the predicted contribution of NK cells. """
+    from ..StoneModMouseFit import InVivoPredict
+
+    # Run the in vivo regression model
+    _, _, tbN = InVivoPredict()
+
+    tbN = tbN.drop('None')
+
+    tbN.index.name = 'condition'
+    tbN.reset_index(inplace=True)
+
+    tbN.plot(x='Effectiveness', y="NKfrac", ax=ax, kind='scatter')
+
+    ax.set_xlabel('Effectiveness')
+    ax.set_ylabel('Predicted NK Contribution')
+
+
+def InVivoPredictComponents(ax):
+    """ Plot model components. """
+    from ..StoneModMouseFit import InVivoPredict
+
+    # Run the in vivo regression model
+    _, _, tbN = InVivoPredict()
+    tbN = tbN[['NKeff', 'DCeff', '2Beff']]
+
+    tbN.index.name = 'condition'
+    tbN.reset_index(inplace=True)
+
+    tbN = pd.melt(tbN, id_vars=['condition'])
+
+    sns.factorplot(x="condition",
+                   hue="variable",
+                   y="value",
+                   data=tbN,
+                   ax=ax,
+                   kind='bar')
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
+
+
+def RequiredComponents(ax):
+    """ Plot model components. """
+    from ..StoneModMouseFit import InVivoPredictMinusComponents
+
+    table = InVivoPredictMinusComponents()
+
+    table.plot(kind='bar', y='CrossVal', ax=ax)
+
+    ax.set_ylabel('LOO Var Explained')
+    ax.set_ylim(-1.0, 1.0)
 
 
 def AIplot(ax):
@@ -156,11 +205,6 @@ def AIplot(ax):
     ax.set_xlabel('A/I Ratio')
     ax.set_xscale('log')
 
-def RequiredComponents(ax):
-    """ Plot model components. """
-
-    ax.set_ylabel('LOO Perc Explained')
-    ax.set_xlabel('Components')
 
 def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
