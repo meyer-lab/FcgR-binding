@@ -178,7 +178,7 @@ def varyAffinity(ax):
 
     tableAct = tableAct.apply(lambda x: appFunc(x, 0), axis=1)
 
-    tableAct.plot(ax=ax, x='ratio', y='activity', legend=False, logx=True)
+    tableAct.plot(ax=ax, x='ratio', y='activity', legend=False, loglog=True)
 
     ax.set_xlabel('Log Ka Ratio (Activating/Inhibitory)')
     ax.set_ylabel('Activity Index')
