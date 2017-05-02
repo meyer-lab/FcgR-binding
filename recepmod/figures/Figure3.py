@@ -1,14 +1,12 @@
 import matplotlib
 matplotlib.use('AGG')
 from itertools import product
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from cycler import cycler
 import seaborn as sns
 from ..StoneModel import StoneMod
-from .FigureCommon import subplotLabel
 from ..StoneNRecep import StoneN
+from ..StoneHelper import getMedianKx
 
 # Specific predictions regarding the coordinate effects of immune complex parameters.
 
@@ -16,30 +14,34 @@ from ..StoneNRecep import StoneN
 def makeFigure():
     import string
     from matplotlib import gridspec
-    from ..StoneHelper import getMedianKx
+    from .FigureCommon import subplotLabel
+    import matplotlib.pyplot as plt
 
     sns.set(style="whitegrid",
             font_scale=0.7,
             color_codes=True,
             palette="colorblind")
 
-    # We're going to need Kx
-    Kx = getMedianKx()
-
     # Setup plotting space
-    f = plt.figure(figsize=(7, 5))
+    f = plt.figure(figsize=(9, 5))
 
     # Make grid
-    gs1 = gridspec.GridSpec(2, 3)
+    gs1 = gridspec.GridSpec(2, 4)
 
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(6)]
+    ax = [f.add_subplot(gs1[x]) for x in range(8)]
 
     # Plot subplot A
-    PredictionVersusAvidity(ax[0:4], Kx)
+    PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
-    TwoRecep(Kx, ax=ax[4:6])
+    TwoRecep(ax=ax[4:6])
+
+    # Plot of activity index versus Ka ratio
+    varyAffinity(ax=ax[6])
+
+    # Plot to show that highest affinity activating receptor is most sensitive to adjustment
+    maxAffinity(ax=ax[7])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -60,10 +62,12 @@ def plotRanges():
 
 
 def skipColor(ax):
+    from cycler import cycler
+
     ax.set_prop_cycle(cycler('color', sns.color_palette()[1:]))
 
 
-def PredictionVersusAvidity(ax, Kx):
+def PredictionVersusAvidity(ax):
     '''
     A) Predicted binding v conc of IC for varying avidity.
     B) Predicted multimerized FcgR v conc of IC for varying avidity.
@@ -78,7 +82,7 @@ def PredictionVersusAvidity(ax, Kx):
     skipColor(ax[3])
 
     def calculate(x):
-        a = StoneMod(logR[0],Ka[0],x['avidity'],Kx*Ka[0],x['ligand'], fullOutput = True)
+        a = StoneMod(logR[0],Ka[0],x['avidity'],getMedianKx()*Ka[0],x['ligand'], fullOutput = True)
 
         return pd.Series(dict(bound = a[0],
                               avidity = x['avidity'],
@@ -94,12 +98,12 @@ def PredictionVersusAvidity(ax, Kx):
     for ii in avidity:
         curDat = outputs[outputs['avidity'] == ii]
 
-        curDat.plot(x = "ligand", y = "bound", ax = ax[0], logx = True, legend = False)
+        curDat.plot(x="ligand", y="bound", ax=ax[0], logx=True, legend=False)
 
         if ii > 1:
-            curDat.plot(x = "ligand", y = "Rmulti", ax = ax[1], logx = True, legend = False)
-            curDat.plot(x = "ligand", y = "nXlink", ax = ax[2], logx = True, legend = False)
-            curDat.plot(x = "bound", y = "nXlink", ax = ax[3], loglog = True, legend = False)
+            curDat.plot(x="ligand", y="Rmulti", ax=ax[1], logx=True, legend=False)
+            curDat.plot(x="ligand", y="nXlink", ax=ax[2], logx=True, legend=False)
+            curDat.plot(x="bound", y="nXlink", ax=ax[3], loglog=True, legend=False)
 
     ax[0].set_xlabel('IC Concentration (M)')
     ax[1].set_xlabel('IC Concentration (M)')
@@ -112,32 +116,37 @@ def PredictionVersusAvidity(ax, Kx):
     ax[3].set_ylim(1, 1E3)
     ax[3].set_xlim(1, 1E4)
 
-def TwoRecep(Kx, ax = None):
+def TwoRecep(ax):
     """
     E) Predicted multimerized receptor versus avidity for RIII-Phe + RIIB
     F) The predicted ratio (E)
     """
+    if len(ax) != 2:
+        raise ValueError("TwoRecep requires two axes to work on.")
+
     ligand, avidity, Ka, logR = plotRanges()
 
     skipColor(ax[0])
     skipColor(ax[1])
 
     def appFunc(x):
-        rmulti = StoneN(logR, Ka, Kx, x.avidity, x.ligand).getRmultiAll()
+        model = StoneN(logR, Ka, getMedianKx(), x.avidity, x.ligand)
+
+        rmulti = model.getRmultiAll()
 
         x['RmultiOne'] = rmulti[0]
         x['RmultiTwo'] = rmulti[1]
-        x['activity'] = x.RmultiOne - x.RmultiTwo
+        x['activity'] = model.getActivity([1, -1])
 
         return x
 
-    inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
+    table = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
-    outputs = inputs.apply(appFunc, axis=1)
+    table = table.apply(appFunc, axis=1)
 
     for ii in avidity[1::]:
-        outputs[outputs['avidity'] == ii].plot(x = "RmultiOne", y = "RmultiTwo", ax = ax[0], legend = False)
-        outputs[outputs['avidity'] == ii].plot(x = "ligand", y = "activity", ax=ax[1], logx=True, legend=False)
+        table[table['avidity'] == ii].plot(x="RmultiOne", y="RmultiTwo", ax=ax[0], legend=False)
+        table[table['avidity'] == ii].plot(x="ligand", y="activity", ax=ax[1], logx=True, legend=False)
 
     ax[0].set_xlabel(r'Multimerized Fc$\gamma$RIIIA-F')
     ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
@@ -145,3 +154,66 @@ def TwoRecep(Kx, ax = None):
     ax[1].set_ylabel('Activity Index')
     ax[0].set_ylim(0, 1E3)
     ax[0].set_xlim(0, 1E3)
+
+def varyAffinity(ax):
+    """
+    Figure where affinity of the activating or inhibitory receptor varies.
+    """
+
+    _, _, Ka, logR = plotRanges()
+
+    gnu = 5
+    L0 = 1E-9
+
+    tableAct = pd.DataFrame(Ka[0] * np.logspace(start=0, stop=2, num=10), columns=['affinity'])
+
+    def appFunc(x, ii):
+        KaCur = Ka.copy()
+        KaCur[ii] = x.affinity
+
+        x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1])
+        x['ratio'] = KaCur[0] / KaCur[1]
+
+        return x
+
+    tableAct = tableAct.apply(lambda x: appFunc(x, 0), axis=1)
+
+    tableAct.plot(ax=ax, x='ratio', y='activity', legend=False, loglog=True)
+
+    ax.set_xlabel('Log Ka Ratio (Activating/Inhibitory)')
+    ax.set_ylabel('Activity Index')
+
+def maxAffinity(ax):
+    """ """
+    from ..StoneModMouse import StoneModelMouse
+
+    Kas = np.squeeze(StoneModelMouse().kaMouse[:, 2])
+
+    logR = [4.0, 4.5, 4.0, 4.0]
+    L0, gnu = 1.0E-9, 5
+
+    table = pd.DataFrame(np.logspace(start=-4, stop=4, num=20), columns=['adjust'])
+
+    def appFunc(x, ii):
+        KaCur = Kas.copy()
+        KaCur[ii] *= x.adjust
+
+        x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
+        x['KaCur'] = KaCur[ii]
+
+        return x
+
+    # TODO: Indicate where receptors are when not varied.
+
+    tableA = table.apply(lambda x: appFunc(x, 0), axis=1)
+    tableC = table.apply(lambda x: appFunc(x, 2), axis=1)
+    tableD = table.apply(lambda x: appFunc(x, 3), axis=1)
+
+    tableA.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
+    tableC.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
+    tableD.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
+
+    ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
+    ax.set_ylabel('Activity Index')
+
+    ax.set_xlim(1.0E4, 1.0E9)
