@@ -5,12 +5,14 @@ from sklearn.base import BaseEstimator
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import explained_variance_score
 from .StoneModMouse import StoneModelMouse
+from .StoneHelper import parallelize_dataframe
 
 def NimmerjahnPredictByAffinities():
     """ This will run ordinary linear regression using just affinities of receptors. """
 
     # Run regression with our setup
     lr = regFunc()
+    lr.logg = False
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
     data['ActMax'] = data.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV), axis=1)
@@ -19,7 +21,7 @@ def NimmerjahnPredictByAffinities():
     y = data['Effectiveness']
 
     # Log transform to keep ratios
-    X = X.apply(np.log2).replace(-np.inf, -3)
+    X = X.apply(np.log10).replace(-np.inf, -3)
 
     # Do direct regression too
     lr.fit(X, y)
@@ -36,24 +38,10 @@ def NimmerjahnPredictByAffinities():
 
     return (direct_perf, crossval_perf, data)
 
-def parallelize_dataframe(df, func):
-    from multiprocessing import Pool, cpu_count
-    from tqdm import tqdm
-
-    pool = Pool(cpu_count())
-
-    iterpool = tqdm(pool.imap(func, np.vsplit(df, df.shape[0])), total=df.shape[0])
-
-    df = np.fromiter(iterpool, dtype=np.float, count=df.shape[0])
-
-    pool.close()
-    pool.join()
-    return df
-
-def modelPrepAffinity(M, v=5, L0=1E-12):
+def modelPrepAffinity(v=5, L0=1E-12):
     from .StoneHelper import getMedianKx
 
-    data = M.NimmerjahnEffectTableAffinities()
+    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
 
     DCexpr = [3.0, 4.0, 3.0, 3.0]
 
@@ -106,20 +94,22 @@ def InVivoPredict(inn=[5, 1E-12], printt=False):
 
     # Collect data
     try:
-        X, y, table = modelPrepAffinity(StoneModelMouse(), v=inn[0], L0=inn[1])
+        X, y, table = modelPrepAffinity(v=inn[0], L0=inn[1])
     except RuntimeError:
         return np.nan
 
     model = regFunc()
     model.fit(X, y)
 
+    table['NKeff'] = table.NK * np.power(10, model.res.x[2])
+    table['DCeff'] = table.DC * np.power(10, model.res.x[3])
+    table['2Beff'] = table['2B-KO'] * np.power(10, model.res.x[4])
+
     pd.set_option('expand_frame_repr', False)
     
     table['CPredict'] = cross_val_predict(model, X, y, cv=len(y))
     table['DPredict'] = model.predict(X)
-    table['NKeff'] = table.NK * model.res.x[2]
-    table['DCeff'] = table.DC * model.res.x[3]
-    table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff)
+    table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
     table['Error'] = abs(table.CPredict - y)
 
     if printt is True:
@@ -128,12 +118,38 @@ def InVivoPredict(inn=[5, 1E-12], printt=False):
 
     return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table)
 
+def crossValF(table):
+    yy = cross_val_predict(regFunc(), 
+                           table.drop('Effectiveness', axis=1), 
+                           table['Effectiveness'], 
+                           cv=table.shape[0])
+
+    return explained_variance_score(yy, table['Effectiveness'])
+
+
+def InVivoPredictMinusComponents():
+    _, cperf, data = InVivoPredict()
+
+    data = data[['Effectiveness', 'NK', 'DC', '2B-KO']]
+
+    table = pd.DataFrame(cperf, columns=['CrossVal'], index=['Full Model'])
+
+    table.loc['No 2B',:] = crossValF(data.drop('2B-KO', axis=1))
+    table.loc['No NK',:] = crossValF(data.drop('NK', axis=1))
+    table.loc['No DC',:] = crossValF(data.drop('DC', axis=1))
+
+    return table
+
 
 class regFunc(BaseEstimator):
+    def __init__(self):
+        self.logg = True
+
     def outF(self, p, X=None):
         from scipy.stats import norm
 
-        p = np.power(10, p)
+        if self.logg is True:
+            p = np.power(10, p)
 
         if X is None:
             X = self.trainX
@@ -154,6 +170,10 @@ class regFunc(BaseEstimator):
         self.trainX, self.trainy = X, y
 
         x0 = np.zeros((X.shape[1] + 2, ), dtype=np.float64)
+
+        if self.logg is False:
+            x0[:] = 1.0
+
         lb = np.full(x0.shape, -20, dtype=np.float64)
         ub = np.full(x0.shape, 20, dtype=np.float64)
 

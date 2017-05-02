@@ -22,7 +22,7 @@ def makeFigure():
 
     runFunc = lambda x: getFitPrediction(M, x[2:])
 
-    output = mapMCMC(runFunc, dsetSamp)
+    output = mapMCMC(runFunc, dsetSamp, quiet=True)
 
     # Setup plotting space
     f = plt.figure(figsize=(7, 6))
