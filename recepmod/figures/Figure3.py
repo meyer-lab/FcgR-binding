@@ -37,6 +37,12 @@ def makeFigure():
     # Plot from two receptor model
     TwoRecep(ax=ax[4:6])
 
+    # Plot of activity index versus Ka ratio
+    varyAffinity(ax=ax[6])
+
+    # Plot to show that highest affinity activating receptor is most sensitive to adjustment
+    maxAffinity(ax=ax[7])
+
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
 
@@ -48,7 +54,7 @@ def makeFigure():
 
 def plotRanges():
     avidity = np.logspace(0, 5, 6, base=2, dtype=np.int)
-    ligand = np.logspace(start=-12, stop=-5, num=20)
+    ligand = np.logspace(start=-12, stop=-5, num=50)
     Ka = [1.2E6, 1.2E5] # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
     logR = [4.0, 4.5]
 
@@ -159,31 +165,50 @@ def varyAffinity(ax):
     gnu = 5
     L0 = 1E-9
 
-    KaRange = np.logspace(start=-3, stop=3, num=20)
+    tableAct = pd.DataFrame(Ka[0] * np.logspace(start=0, stop=2, num=10), columns=['affinity'])
 
-    
+    def appFunc(x, ii):
+        KaCur = Ka.copy()
+        KaCur[ii] = x.affinity
 
+        x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1])
+        x['ratio'] = KaCur[0] / KaCur[1]
 
+        return x
 
+    tableAct = tableAct.apply(lambda x: appFunc(x, 0), axis=1)
 
+    tableAct.plot(ax=ax, x='ratio', y='activity', legend=False, logx=True)
 
+    ax.set_xlabel('Log Ka Ratio (Activating/Inhibitory)')
+    ax.set_ylabel('Activity Index')
 
+def maxAffinity(ax):
+    """ """
+    from ..StoneModMouse import StoneModelMouse
 
+    Kas = np.squeeze(StoneModelMouse().kaMouse[:, 2])
 
+    logR = [4.0, 4.5, 4.0, 4.0]
+    L0, gnu = 1.0E-9, 5
 
+    table = pd.DataFrame(np.logspace(start=-2, stop=2, num=20), columns=['adjust'])
 
+    def appFunc(x, ii):
+        KaCur = Kas.copy()
+        KaCur[ii] *= x.adjust
 
+        x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
 
+        return x
 
+    tableA = table.apply(lambda x: appFunc(x, 0), axis=1)
+    tableC = table.apply(lambda x: appFunc(x, 2), axis=1)
+    tableD = table.apply(lambda x: appFunc(x, 3), axis=1)
 
+    tableA.plot(ax=ax, x='adjust', y='activity', legend=False, logx=True)
+    tableC.plot(ax=ax, x='adjust', y='activity', legend=False, logx=True)
+    tableD.plot(ax=ax, x='adjust', y='activity', legend=False, logx=True)
 
-
-
-
-
-
-
-
-
-
-
+    ax.set_xlabel('Activating FcgR Ka Adjustment')
+    ax.set_ylabel('Activity Index')
