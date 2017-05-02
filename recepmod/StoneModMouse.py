@@ -1,12 +1,5 @@
-import re
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import explained_variance_score
-import seaborn as sns
-from .StoneModel import StoneMod
-
-sns.set(style="ticks")
 
 np.seterr(over = 'raise')
 
@@ -48,6 +41,7 @@ class StoneModelMouse:
         other receptors with crosslinking constant Kx = 10^logKx. All
         equations derived from Stone et al. (2001).
         '''
+        from .StoneModel import StoneMod
 
         # Initiate numpy arrays for StoneMod outputs
         output = np.full((len(self.Igs), 5, len(self.FcgRs)), np.nan)
@@ -164,41 +158,10 @@ class StoneModelMouse:
         # Join tbK, tbK1, tbK2 into one table
         return tbK.append([tbK1, tbK2, tbK3])
 
-    def NimmerjahnPredictByAffinities(self):
-        """ This will run ordinary linear regression using just affinities of receptors. """
-        from sklearn import linear_model
-        from sklearn.model_selection import cross_val_predict
-
-        # Run ridge regression with forced direction or simple OLS
-        lr = linear_model.LinearRegression()
-
-        data = self.NimmerjahnEffectTableAffinities()
-        data['ActMax'] = data.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV), axis=1)
-
-        X = data[['ActMax', 'FcgRIIB']]
-        y = data['Effectiveness']
-
-        # Log transform to keep ratios
-        X = X.apply(np.log2).replace(-np.inf, -3)
-
-        # Run crossvalidation predictions at the same time
-        predicted = cross_val_predict(lr, X, y, cv=X.shape[0])
-
-        # How well did we do on crossvalidation?
-        crossval_perf = explained_variance_score(y, predicted)
-
-        # Do direct regression too
-        lr.fit(X, y)
-
-        # How well did we do on direct?
-        direct_perf = explained_variance_score(y, lr.predict(X))
-
-        data['DirectPredict'] = lr.predict(X)
-        data['CrossPredict'] = predicted
-
-        return (direct_perf, crossval_perf, data)
 
     def IgG2b_Fucose(self):
+        from .StoneModel import StoneMod
+
         output = np.full((2, len(self.FcgRs), 4), np.nan)
         v = [1, self.v]
         for k in range(len(self.FcgRs)):
@@ -208,46 +171,6 @@ class StoneModelMouse:
                 output[i, k, :] = stoneModOut[:4]
         return output.reshape(2,16)
 
-    def NimmerjahnTb_Knockdown(self):
-        tbK = self.NimmerjahnEffectTable()
-        IgG2b_fucose = self.IgG2b_Fucose()
-        # remove Req columns
-        tbK = tbK.select(lambda x: not re.search('Req', x), axis=1)
-
-        # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
-        tbK1 = tbK.copy()
-        tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
-        tbK1.loc[:,'Effectiveness'] = pd.Series([0, 0.7, 0, 1, 0, 0.75, 0, 0],
-                                                index=tbK1.index)
-        tbK1.iloc[:, 4:8] = 0.0
-
-        # set up tbK2 for FcgRI knockdown, IgG2a treatment
-        tbK2 = tbK.iloc[(2, 3), :].copy()
-        tbK2.index = funcAppend(tbK2.index, '-FcgRI-/-')
-        tbK2.loc[:,'Effectiveness'] = pd.Series([0, 0.8], index=tbK2.index)
-        tbK2.iloc[:, 0:4] = 0.0
-
-        # set up tbK3 for FcgRIII knockdown, IgG2a treatment
-        tbK3 = tbK.iloc[(2, 3), :].copy()
-        tbK3.index = funcAppend(tbK3.index, '-FcgRIII-/-')
-        tbK3.loc[:,'Effectiveness'] = pd.Series([0, 0.93], index=tbK3.index)
-        tbK3.iloc[:, 8:12] = 0.0
-
-        # set up tbK4 table for FcgRI knockdown, FcgRIV blocking, IgG2a treatment
-        tbK4 = tbK.iloc[(2, 3), :].copy()
-        tbK4.index = funcAppend(tbK4.index, '-FcgRI,IV-/-')
-        tbK4.loc[:,'Effectiveness'] = pd.Series([0, 0.35], index=tbK4.index)
-        tbK4.iloc[:, 0:4] = 0.0
-        tbK4.iloc[:, 12:16] = 0.0
-
-        # set up tbK5 for IgG2b-Fucose-/-
-        # Add effectiveness
-        IgG2b_fucose = np.insert(IgG2b_fucose, 16, [0, 0.70], axis=1)
-        tbK5idx = funcAppend(tbK.index[4:6], '-Fucose-/-')
-        tbK5 = pd.DataFrame(IgG2b_fucose, index = tbK5idx, columns = tbK.columns)
-
-        # Join tbK, tbK1, tbK2, tbK3, and TbK4 into one table
-        return tbK.append([tbK1, tbK2, tbK3, tbK4, tbK5])
 
     def writeModelData(self, filename, logspace=False, addavidity1=False):
         import pytablewriter
@@ -266,46 +189,6 @@ class StoneModelMouse:
 
         writer.close()
 
-    def InVivoPredict(self, logspace=False, addavidity1=True):
-        """ Cross validate KnockdownLasso by using a pair of rows as test set """
-        from sklearn.cross_decomposition import PLSRegression
-        from sklearn.model_selection import cross_val_predict, LeaveOneOut, LeaveOneGroupOut
-        from .StoneHelper import rep
-
-        las = PLSRegression(n_components=3, scale=False)
-        scale = StandardScaler()
-
-        # Collect data
-        X, y, tbN = self.modelPrep(logspace, addavidity1)
-
-        X = scale.fit_transform(X)
-
-        # Setup the crossvalidation iterators
-        if addavidity1 is False:
-            loo = LeaveOneOut()
-            looI = loo.split(X, y)
-        else:
-            loo = LeaveOneGroupOut()
-            looI = loo.split(X, y, groups = rep(range(12), 2))
-
-        # Run crossvalidation
-        predict = cross_val_predict(las, X, y, cv = looI)
-
-        # How well did we do on crossvalidation?
-        crossval_perf = explained_variance_score(y, predict)
-
-        # Do direct regression too
-        las.fit(X, y)
-
-        # How well did we do on direct?
-        direct_perf = explained_variance_score(y, las.predict(X))
-
-        print("Performance of the plsr in vivo model on crossval: " + str(crossval_perf))
-
-        tbN['DirectPredict'] = las.predict(X)
-        tbN['CrossPredict'] = predict
-
-        return (direct_perf, crossval_perf, tbN, las, scale)
 
     def modelPrep(self, logspace, addavidity1):
         """ Collect the data and split into X and Y blocks. """
@@ -329,12 +212,10 @@ class StoneModelMouse:
     def PCA(self, plott = False):
         """ Principle Components Analysis of FcgR binding predictions """
         from sklearn.decomposition import PCA
+        from sklearn.preprocessing import StandardScaler
 
         pca = PCA(n_components=5)
         table = self.pdAvidityTable()
-
-        # remove Req columns
-        table = table.select(lambda x: not re.search('Req', x), axis=1)
 
         X = StandardScaler().fit_transform(np.array(table))
 
@@ -351,6 +232,7 @@ class StoneModelMouse:
     def KnockdownPCA(self, logspace = False, addavidity1 = True):
         """ Principle Components Analysis of FcgR binding predictions used in PLSR """
         from sklearn.decomposition import PCA
+        from sklearn.preprocessing import StandardScaler
         pca = PCA(n_components=5)
         scale = StandardScaler()
         X, y, tbN = self.modelPrep(logspace, addavidity1)
@@ -373,10 +255,11 @@ class StoneModelMouse:
 
 def MultiAvidityPredict(M, las, scale):
     """ Make predictions for the effect of avidity and class. """
-    table = M.pdAvidityTable().select(lambda x: not re.search('Req', x), axis=1)
+    # TODO: Reimplement for new modeling approach
 
-    table['Predict'] = las.predict(scale.transform(table))
-    table['Avidity'] = table.apply(lambda x: int(x.name.split('-')[1]), axis=1)
-    table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
+    #table['Predict'] = las.predict(scale.transform(table))
+    #table['Avidity'] = table.apply(lambda x: int(x.name.split('-')[1]), axis=1)
+    #table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
 
-    return table
+    #return table
+    return None

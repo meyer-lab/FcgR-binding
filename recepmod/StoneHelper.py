@@ -42,6 +42,7 @@ def read_chain(filename):
     return (StoneM, pdset)
 
 def rep(x, N):
+    """ Returns a range with repeated elements. """
     return [item for item in x for i in range(N)]
 
 @memoize
@@ -120,39 +121,6 @@ def mapMCMC(dFunction, pSet):
     return pd.concat(retVals)
 
 
-def reduceMCMC(frameList, groupByC = None, dropC = None):
-    """
-    Reduce the collection of predictions to various summary statistics.
-    """
-    if groupByC is None:
-        groupByC = ['Ig', 'FcgR', 'TNP']
-
-    if dropC is None:
-        dropC = ['Expression', 'pSetNum']
-
-    # Drop indicated columns
-    frameList = frameList.drop(dropC, axis = 1).groupby(groupByC)
-
-    # Summarize the collections in various ways
-    frameListMean = frameList.mean().reset_index()
-    frameListStd = frameList.std().reset_index()
-    frameListMedian = frameList.median().reset_index()
-    frameListMin = frameList.min().reset_index()
-    frameListMax = frameList.max().reset_index()
-    frameListLowCI = frameList.quantile(0.025).reset_index()
-    frameListHighCI = frameList.quantile(0.975).reset_index()
-
-    # Merge each frame together with a suffix to indicate what each quantity is
-    frameAgg = frameListMean.merge(frameListStd, on = groupByC, suffixes = ('_mean', '_std'))
-    frameAgg = frameAgg.merge(frameListMedian, on = groupByC, suffixes = ('', '_median'))
-    frameAgg = frameAgg.merge(frameListMin, on = groupByC, suffixes = ('', '_min'))
-    frameAgg = frameAgg.merge(frameListMax, on = groupByC, suffixes = ('', '_max'))
-    frameAgg = frameAgg.merge(frameListLowCI, on = groupByC, suffixes = ('', '_lCI'))
-    frameAgg = frameAgg.merge(frameListHighCI, on = groupByC, suffixes = ('', '_uCI'))
-
-    return frameAgg
-
-
 def getFitMeasMerged(self, x):
     """
     Return the fit and measured data merged into a single dataframe
@@ -200,14 +168,6 @@ def getFitMeasSummarized(M):
                             suffixes = ['_mean', '_std'])
 
     return fitMean
-
-def mapStore(dset, M):
-    frameList = mapMCMC(lambda x: getFitPrediction(M,x),dset.as_matrix()[:,2:])
-    frameList.to_pickle('mapped_chain.pkl')
-
-def reduce():
-    frameList = pd.read_pickle('mapped_chain.pkl')
-    return reduceMCMC(frameList)
 
 
 def geweke(chain1, chain2=None):
