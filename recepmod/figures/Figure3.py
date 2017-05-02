@@ -116,7 +116,6 @@ def TwoRecep(Kx, ax = None):
     """
     E) Predicted multimerized receptor versus avidity for RIII-Phe + RIIB
     F) The predicted ratio (E)
-    TODO: Reimplement using StoneN
     """
     ligand, avidity, Ka, logR = plotRanges()
 
