@@ -206,9 +206,9 @@ def maxAffinity(ax):
     tableC = table.apply(lambda x: appFunc(x, 2), axis=1)
     tableD = table.apply(lambda x: appFunc(x, 3), axis=1)
 
-    tableA.plot(ax=ax, x='adjust', y='activity', legend=False, logx=True)
-    tableC.plot(ax=ax, x='adjust', y='activity', legend=False, logx=True)
-    tableD.plot(ax=ax, x='adjust', y='activity', legend=False, logx=True)
+    tableA.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True)
+    tableC.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True)
+    tableD.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True)
 
     ax.set_xlabel('Activating FcgR Ka Adjustment')
     ax.set_ylabel('Activity Index')
