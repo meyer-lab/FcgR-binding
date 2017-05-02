@@ -187,16 +187,16 @@ def ClassAvidityPredict(Mod, model, normV, ax):
     from ..StoneModMouse import MultiAvidityPredict
     from copy import deepcopy
 
-    Mod = deepcopy(Mod)
+    #Mod = deepcopy(Mod)
 
-    Mod.v = 30
+    #Mod.v = 30
 
-    table = MultiAvidityPredict(Mod, model, normV)
+    #table = MultiAvidityPredict(Mod, model, normV)
 
-    for _, row in table.iterrows():
-        colorr = Igidx[row['Ig']]
-        ax.errorbar(x=row['Avidity'], y=row['Predict'], marker='.', mfc=colorr)
+    #for _, row in table.iterrows():
+    #    colorr = Igidx[row['Ig']]
+    #    ax.errorbar(x=row['Avidity'], y=row['Predict'], marker='.', mfc=colorr)
 
-    ax.set_ylabel('Predicted Effect')
+    #ax.set_ylabel('Predicted Effect')
 
 

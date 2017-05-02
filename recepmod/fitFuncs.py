@@ -31,7 +31,7 @@ def getUniformStart(StoneM):
 
     return (p0, ndims, nwalkers)
 
-def runSampler(niters=100000, thin=200, newData=True, filname="mcmc_chain.h5"):
+def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
     from emcee import EnsembleSampler
     from .StoneModel import StoneModel
 
