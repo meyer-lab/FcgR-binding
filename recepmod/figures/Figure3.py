@@ -192,23 +192,28 @@ def maxAffinity(ax):
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
 
-    table = pd.DataFrame(np.logspace(start=-2, stop=2, num=20), columns=['adjust'])
+    table = pd.DataFrame(np.logspace(start=-4, stop=4, num=20), columns=['adjust'])
 
     def appFunc(x, ii):
         KaCur = Kas.copy()
         KaCur[ii] *= x.adjust
 
         x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
+        x['KaCur'] = KaCur[ii]
 
         return x
+
+    # TODO: Indicate where receptors are when not varied.
 
     tableA = table.apply(lambda x: appFunc(x, 0), axis=1)
     tableC = table.apply(lambda x: appFunc(x, 2), axis=1)
     tableD = table.apply(lambda x: appFunc(x, 3), axis=1)
 
-    tableA.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True)
-    tableC.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True)
-    tableD.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True)
+    tableA.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
+    tableC.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
+    tableD.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
 
-    ax.set_xlabel('Activating FcgR Ka Adjustment')
+    ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
+
+    ax.set_xlim(1.0E4, 1.0E9)
