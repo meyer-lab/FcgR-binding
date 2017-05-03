@@ -44,7 +44,7 @@ We fit our model to binding measurements for each FcγR-IgG pair using Markov Ch
 
 In addition to immune complex binding, the receptor expression of each cell line was quantitatively measured. These measurements were treated similarly, with a separate variance parameter σ~2~, and likelihood calculated by comparison to a normal distribution with mean equal to the predicted receptor expression and standard deviation equal to that prediction times σ~2~. The overall likelihood of the model at each parameter set was calculated by the product of all individual likelihoods. The priors for each parameter were therefore otherwise specified to be uniform.
 
-### Two Receptor Model
+### Generalized Multi-Receptor Model
 
 To account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of two receptors. Assuming K~x~ for each receptor was proportional to K~a~ was necessary to fulfill detailed balance. Under the same assumptions as before, the relative proportion of receptor complexes with receptors one and two respectively bound i- and j-valently is specified as:
 
