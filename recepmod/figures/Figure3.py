@@ -215,9 +215,9 @@ def maxAffinity(ax):
     tableC.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
     tableD.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
 
-    ax.plot(M.kaMouse[0, 2], 1000, 'k.')
-    ax.plot(M.kaMouse[1, 2], 1000, 'k.')
-    ax.plot(M.kaMouse[3, 2], 1000, 'k.')
+    ax.plot(M.kaMouse[0, 2], 500, 'k.')
+    ax.plot(M.kaMouse[1, 2], 500, 'k.')
+    ax.plot(M.kaMouse[3, 2], 500, 'k.')
 
     ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
