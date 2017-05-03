@@ -35,6 +35,7 @@ def makeFigure():
 
     # Make binding data PCA plot
     # ClassAvidityPCA(Mod, ax[3])
+    ax[3].axis('off')
 
     # Show model components
     InVivoPredictComponents(ax[4])
@@ -50,6 +51,7 @@ def makeFigure():
 
     # Predict class/avidity effect
     #ClassAvidityPredict(Mod, model, normV, ax[8])
+    ax[8].axis('off')
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
