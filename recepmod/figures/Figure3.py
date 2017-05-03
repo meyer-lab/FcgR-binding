@@ -47,7 +47,7 @@ def makeFigure():
         subplotLabel(item, string.ascii_uppercase[ii])
 
     # Tweak layout
-    plt.tight_layout()
+    f.tight_layout()
 
     return f
 
