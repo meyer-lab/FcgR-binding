@@ -6,9 +6,9 @@ tdir = ./Manuscript/Templates
 
 .PHONY: clean upload test profile testcover
 
-all: Manuscript/index.html Manuscript/Manuscript.pdf
+all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx
 
-$(fdir)/Figure1%pdf $(fdir)/Figure2%pdf $(fdir)/Figure3%pdf $(fdir)/Figure1%svg $(fdir)/Figure2%svg $(fdir)/Figure3%svg: genFigures.py
+$(fdir)/Figure1%svg $(fdir)/Figure2%svg $(fdir)/Figure3%svg $(fdir)/Figure4%svg $(fdir)/Figure5%svg: genFigures.py
 	mkdir -p ./Manuscript/Figures
 	python3 genFigures.py
 
@@ -19,13 +19,13 @@ Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
 	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
 
-Manuscript/index.html: Manuscript/Text/*.md $(fdir)/Figure1.svg $(fdir)/Figure2.svg $(fdir)/Figure3.svg
+Manuscript/index.html: Manuscript/Text/*.md $(fdir)/Figure1.svg $(fdir)/Figure2.svg $(fdir)/Figure3.svg $(fdir)/Figure4.svg $(fdir)/Figure5.svg $(fdir)/FigureSS.svg
 	pandoc -s $(pan_common) -t html5 --mathjax -c ./Templates/kultiad.css --template=$(tdir)/html.template -o ./Manuscript/index.html
 
-Manuscript/Manuscript.docx: Manuscript/Text/*.md
+Manuscript/Manuscript.docx: Manuscript/Text/*.md Manuscript/index.html
 	pandoc -s $(pan_common) -o ./Manuscript/Manuscript.docx
 
-Manuscript/Manuscript.tex: Manuscript/Text/*.md
+Manuscript/Manuscript.tex: Manuscript/Text/*.md Manuscript/index.html
 	pandoc -s $(pan_common) --filter=$(tdir)/figure-filter.py --template=$(tdir)/default.latex --latex-engine=xelatex -o ./Manuscript/Manuscript.tex
 
 clean:
