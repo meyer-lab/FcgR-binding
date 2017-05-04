@@ -20,7 +20,7 @@ def makeFigure():
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
     # Setup plotting space
-    f = plt.figure(figsize=(5, 5))
+    f = plt.figure(figsize=(7, 5))
 
     # Make grid
     gs1 = gridspec.GridSpec(2,4,width_ratios=[32,11,32,11])
@@ -38,11 +38,9 @@ def makeFigure():
     for ii, item in enumerate(ax):
         ax[ii].set_ylabel('PC 2')
         ax[ii].set_xlabel('PC 1')
-        # Temporary spacefiller for legend
-        ax[ii].legend(handles=makeFcIgLegend(),loc=2,bbox_to_anchor=(1.05,1))
 
     # Tweak layout
-    plt.tight_layout()
+    f.tight_layout()
 
     return f
 
