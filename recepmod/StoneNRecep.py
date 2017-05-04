@@ -190,6 +190,9 @@ class StoneN:
         vGrid = np.copy(self.vgridOut)
         actV = np.array(actV, dtype=np.float)
 
+        if actV.size != vGrid.ndim:
+            raise ValueError('The activity vector must be equal to the number of receptors.')
+
         for cur_pos in np.ndindex(vGrid.shape):
             if np.dot(cur_pos, actV) < 0:
                 vGrid[cur_pos] = 0.0
