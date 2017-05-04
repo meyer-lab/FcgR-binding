@@ -32,12 +32,6 @@ class Ortiz:
         for ii, item in enumerate(self.structs):
             TwoModel = StoneN(logR, Ka, Kx=1E-9, gnu=self.valency[ii], L0=1E-4)
 
-            result = TwoModel.getAllProps()
-            result.name = item
-
-            outt.append(result)
-
-        pTable = pd.concat(outt, axis=1).T
 
 
 

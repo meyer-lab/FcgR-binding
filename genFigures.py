@@ -16,7 +16,6 @@ def runFunc(nameOut):
         exec('from recepmod.figures import ' + nameOut)
         ff = eval(nameOut + '.makeFigure()')
         ff.savefig(fdir + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
-        ff.savefig(fdir + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
         print(nameOut)
     except Exception as e:
         return e
