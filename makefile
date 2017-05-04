@@ -6,7 +6,7 @@ tdir = ./Manuscript/Templates
 
 .PHONY: clean upload test profile testcover
 
-all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx
+all: Manuscript/index.html Manuscript/Manuscript.pdf
 
 $(fdir)/Figure1%svg $(fdir)/Figure2%svg $(fdir)/Figure3%svg $(fdir)/Figure4%svg $(fdir)/Figure5%svg: genFigures.py
 	mkdir -p ./Manuscript/Figures
@@ -15,7 +15,7 @@ $(fdir)/Figure1%svg $(fdir)/Figure2%svg $(fdir)/Figure3%svg $(fdir)/Figure4%svg 
 $(fdir)/Figure%pdf: $(fdir)/Figure%svg
 	cairosvg $< -o $@
 
-Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex
+Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/Figure5.pdf $(fdir)/FigureSS.pdf
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
 	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
 
