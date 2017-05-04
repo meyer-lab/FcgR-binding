@@ -174,14 +174,24 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
 class StoneN:
     def getRbnd(self):
+        """ Return the amount of each receptor that is bound. """
         return StoneRbnd(self.vgridOut)
 
+    def getLbnd(self):
+        """ Return the amount of ligand bound. """
+        return np.sum(self.vgridOut)
+
     def getRmultiAll(self):
+        """ Return the amount of each receptor that is found in more than a monovalent complex. """
         return StoneRmultiAll(self.vgridOut)
 
     def getActivity(self, actV):
+        """ Return the activity index. """
         vGrid = np.copy(self.vgridOut)
         actV = np.array(actV, dtype=np.float)
+
+        if actV.size != vGrid.ndim:
+            raise ValueError('The activity vector must be equal to the number of receptors.')
 
         for cur_pos in np.ndindex(vGrid.shape):
             if np.dot(cur_pos, actV) < 0:
@@ -192,14 +202,6 @@ class StoneN:
                 vGrid[cur_pos] *= np.dot(cur_pos, actV)
 
         return np.sum(vGrid)
-
-    def getAllProps(self):
-        return pd.Series(dict(ligand=self.L0,
-                              avidity=self.gnu,
-                              ligandEff=self.L0*self.gnu,
-                              Kx=self.Kx,
-                              Rbnd=self.getRbnd()))
-
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
         self.logR = np.array(logR, dtype=np.float, copy=True)
