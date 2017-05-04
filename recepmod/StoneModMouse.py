@@ -193,66 +193,16 @@ class StoneModelMouse:
         return None
 
 
-    def modelPrep(self, logspace, addavidity1):
-        """ Collect the data and split into X and Y blocks. """
-        tbN = self.NimmerjahnTb_Knockdown()
-
-        if addavidity1 is False:
-            temp = tbN.apply(lambda x: int(x.name.split('-')[1]), axis=1)
-            tbN = tbN.loc[temp > 1, :]
-
-        # Assign independent variables and dependent variable
-        X = tbN.drop('Effectiveness', axis=1)
-
-        # Log transform if needed
-        if logspace is True:
-            X = X.apply(np.log2).replace(-np.inf, -5)
-
-        y = tbN['Effectiveness'].as_matrix()
-
-        return (X.as_matrix(), y, tbN)
-
-    def PCA(self, plott = False):
-        """ Principle Components Analysis of FcgR binding predictions """
+    def KnockdownPCA(self):
+        """ Principle Components Analysis of FcgR-IgG affinities. """
         from sklearn.decomposition import PCA
-        from sklearn.preprocessing import StandardScaler
 
-        pca = PCA(n_components=5)
-        table = self.pdAvidityTable()
+        pca = PCA(n_components=4)
 
-        X = StandardScaler().fit_transform(np.array(table))
+        X = self.NimmerjahnEffectTableAffinities().drop('Effectiveness', axis=1)
 
-        # Fit PCA
-        result = pca.fit_transform(X)
+        scores = pd.DataFrame(pca.fit_transform(X), index=X.index, columns=['PC1', 'PC2', 'PC3', 'PC4'])
 
-        # Assemble scores
-        scores = pd.DataFrame(result, index=table.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
-        scores['Avidity'] = scores.apply(lambda x: int(x.name.split('-')[1]), axis=1)
-        scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
-
-        return (scores, pca.explained_variance_ratio_)
-
-    def KnockdownPCA(self, logspace = False, addavidity1 = True):
-        """ Principle Components Analysis of FcgR binding predictions used in PLSR """
-        from sklearn.decomposition import PCA
-        from sklearn.preprocessing import StandardScaler
-        pca = PCA(n_components=5)
-        scale = StandardScaler()
-        X, y, tbN = self.modelPrep(logspace, addavidity1)
-        X = scale.fit_transform(X)
-        result = pca.fit_transform(X, y)
-        scores = pd.DataFrame(result, index=tbN.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
-        scores['Avidity'] = scores.apply(lambda x: int(x.name.split('-')[1]), axis=1)
-        scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
-        knockdown = []
-        for i in tbN.index:
-            string = i.split('-')[0]+'-'+i.split('-')[1]
-            i = i.replace(string, '')
-            if i == '':
-                knockdown.append('Wild-type')
-            else:
-                knockdown.append(i[1:])
-        scores['Knockdown'] = knockdown
         return (scores, pca.explained_variance_ratio_)
 
 
