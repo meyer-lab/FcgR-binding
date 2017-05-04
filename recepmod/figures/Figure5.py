@@ -1,21 +1,18 @@
-import re
-import numpy as np
-import pandas as pd
+import os
 import matplotlib
 matplotlib.use('AGG')
-import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from ..StoneModMouse import StoneModelMouse
-from ..StoneModel import StoneModel
 
 # Compare across species
+path = os.path.dirname(os.path.abspath(__file__))
 
 def makeFigure():
     import string
     from matplotlib import gridspec
-    from .FigureCommon import subplotLabel, makeFcIgLegend
+    import matplotlib.pyplot as plt
+    from .FigureCommon import subplotLabel
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
@@ -23,14 +20,20 @@ def makeFigure():
     f = plt.figure(figsize=(7, 5))
 
     # Make grid
-    gs1 = gridspec.GridSpec(2,4,width_ratios=[32,11,32,11])
+    gs1 = gridspec.GridSpec(2, 4, width_ratios=[32, 11, 32, 11])
 
     # Get list of axis objects
     ax = [f.add_subplot(gs1[2*x]) for x in range(4)]
 
-    PCAmurine(ax[0:2])
+    # Run the murine plots
+    PCAplot(ax[0:2],
+            pd.read_csv(os.path.join(path, '../data/pca-murine.csv'), index_col=0),
+            'Murine')
 
-    PCAhuman(ax[2:4])
+    # Run the human plots
+    PCAplot(ax[2:4],
+            pd.read_csv(os.path.join(path, '../data/pca-human.csv'), index_col=0),
+            'Human')
 
     subplotLabel(ax[0], 'A')
     subplotLabel(ax[2], 'B')
@@ -44,139 +47,73 @@ def makeFigure():
 
     return f
 
-Igs = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3'}
-Igidx = dict(zip(Igs, sns.color_palette()))
+Igs = {0:'o', 1:'d', 2:'^', 3:'s'}
+mIgs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s'}
+hIgs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'^', 'IgG4':'s'}
+quantShape = {'Lbnd':'o', 'activity':'d'}
 
-DatType = {'Lbnd':'o', 'Rbnd':'d', 'Three':'s', 'Four':'^'}
 
+def Legend(ax, colors, shapes):
+    """ Make legend. """
+    import matplotlib.lines as mlines
+    import matplotlib.patches as mpatches
 
-def PCAmurine(axes):
-    """ Principle Components Analysis of FcgR binding predictions """
-    # Load murine class
-    Mod = StoneModelMouse()
-    Mod.v = 20
-    Mod.L0 = 1E-9
-    table = Mod.pdAvidityTable()
-    table['L0'] = Mod.L0
+    patches = list()
 
-    Mod.L0 = 1E-8
-    temp = Mod.pdAvidityTable()
-    temp['L0'] = Mod.L0
-    table = pd.concat([temp, table])
+    for key, val in colors.items():
+        patches.append(mpatches.Patch(color=val, label=key))
 
-    Mod.L0 = 1E-7
-    temp = Mod.pdAvidityTable()
-    temp['L0'] = Mod.L0
-    table = pd.concat([temp, table])
-
-    pca = PCA(n_components=5)
+    for key, val in shapes.items():
+        patches.append(mlines.Line2D([], [], color='black', marker=val, markersize=7, label=key, linestyle='None'))
     
-    scale = StandardScaler()
-    
-    # remove Req columns
-    table = table.select(lambda x: not re.search('Req', x), axis=1)
-    table = table.select(lambda x: not re.search('L0', x), axis=1)
-    
-    # Fit PCA
-    result = pca.fit_transform(scale.fit_transform(np.array(table)))
-    
-    # Assemble scores
-    scores = pd.DataFrame(result, index=table.index, columns=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'])
-    scores['Avidity'] = scores.apply(lambda x: int(x.name.split('-')[1]), axis=1)
-    scores['Ig'] = scores.apply(lambda x: x.name.split('-')[0], axis=1)
-
-    # Assemble loadings
-    coefs = pd.DataFrame(pca.components_, index=['PC1', 'PC2', 'PC3', 'PC4', 'PC5'], columns=table.columns).transpose()
-
-    for _, row in scores.iterrows():
-        colorr = Igidx[row['Ig']]
-        axes[0].errorbar(x=row['PC1'], y=row['PC2'], marker='.', mfc=colorr)
-
-    for _, row in coefs.iterrows():
-        axes[1].errorbar(x=row['PC1'], y=row['PC2'], marker='.')
+    ax.legend(handles=patches, bbox_to_anchor=(1, 1), loc=2)
 
 
+def PCAplot(axes, dataIn, species):
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
 
-    def makeFcLegend():
-        import matplotlib.lines as mlines
-        import matplotlib.patches as mpatches
+    colors = dict(zip(range(5), sns.color_palette()))
 
-        FcgRidxL = [r'Fc$\gamma$RI',
-                    r'Fc$\gamma$RIIB',
-                    r'Fc$\gamma$RIII',
-                    r'Fc$\gamma$RIV']
-        FcgRidxL = dict(zip(FcgRidxL, sns.color_palette()))
+    pca = PCA(n_components=4)
 
-        patches = list()
+    X = dataIn.drop(['avidity', 'ligand', 'IgID'], axis=1)
 
-        for f in FcgRidxL:
-            patches.append(mpatches.Patch(color=FcgRidxL[f], label=f))
+    terms = X.columns
 
-        for j in DatType:
-            patches.append(mlines.Line2D([], 
-                                         [], 
-                                         color='black', 
-                                         marker=DatType[j], 
-                                         markersize=7, 
-                                         label=j, 
-                                         linestyle='None'))
+    X = pca.fit_transform(StandardScaler().fit_transform(X))
 
-        return patches
+    print(pca.explained_variance_)
 
-    axes[1].legend(handles=makeFcLegend(), bbox_to_anchor=(1.05, 1), loc=2)
+    avcolors = dict(zip(dataIn['avidity'].unique(), sns.color_palette()))
 
-    axes[0].set_title('Murine Scores')
-    axes[1].set_title('Murine Loadings')
+    # Move PCs into dataframe
+    for ii in range(4):
+        dataIn['PC' + str(ii+1)] = X[:, ii]
 
-# Return a dataframe with the fit data labeled with the condition variables
-def getFitPrediction(M, x):
-    from ..StoneHelper import rep
+    for _, row in dataIn.iterrows():
+        markerr=Igs[row['IgID']]
+        avc = avcolors[row['avidity']]
+        axes[0].errorbar(x=row['PC1'], y=row['PC2'], marker=markerr, mfc=avc, ms=3.5)
 
-    _, outputFit, _, outputRbnd, outputRmulti, outputnXlink, outputLbnd, _ = M.NormalErrorCoef(x, fullOutput = True)
+    loadings = pd.DataFrame(pca.components_.T, columns=['PC1', 'PC2', 'PC3', 'PC4'])
+    loadings['terms'] = terms
+    loadings['cells'], loadings['quantity'] = loadings['terms'].str.split('_', 1).str
 
-    outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
+    colors = dict(zip(loadings['cells'].unique(), sns.color_palette()))
 
-    dd = (pd.DataFrame(data = outputFit, columns = ['Fit'])
-          .assign(Ig = M.Igs*12)
-          .assign(FcgR = rep(M.FcgRs, 4)*2)
-          .assign(TNP = rep(M.TNPs, 24))
-          .assign(RbndPred = np.reshape(np.transpose(outputRbnd), (-1, 1)))
-          .assign(RmultiPred = np.reshape(np.transpose(outputRmulti), (-1, 1)))
-          .assign(nXlinkPred = np.reshape(np.transpose(outputnXlink), (-1, 1)))
-          .assign(LbndPred = np.reshape(np.transpose(outputLbnd), (-1, 1)))
-         )
+    for _, row in loadings.iterrows():
+        markerr=quantShape[row['quantity']]
+        colorr = colors[row['cells']]
+        axes[1].errorbar(x=row['PC1'], y=row['PC2'], marker=markerr, mfc=colorr, ms=5)
 
-    return dd
+    axes[0].set_title(species + ' Scores')
+    axes[1].set_title(species + ' Loadings')
 
-def PCAhuman(axes):
-    Mod = StoneModel()
-    from ..StoneHelper import getMedianKx
-    from .FigureCommon import FcgRidxL
+    # Ok, now start on legend
+    Legend(axes[1], colors, quantShape)
 
-    def makeFcLegend():
-        import matplotlib.lines as mlines
-        import matplotlib.patches as mpatches
-
-        patches = list()
-
-        for f in FcgRidxL:
-            patches.append(mpatches.Patch(color=FcgRidxL[f], label=f))
-
-        for j in DatType:
-            patches.append(mlines.Line2D([],
-                                         [],
-                                         color='black',
-                                         marker=DatType[j],
-                                         markersize=7,
-                                         label=j,
-                                         linestyle='None'))
-
-        return patches
-
-    x = np.array([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, getMedianKx(), 1, 1, 4, 5, 1, 1], dtype=np.float64)
-
-    #outt = getFitPrediction(Mod, x)
-
-    axes[1].legend(handles=makeFcLegend(), bbox_to_anchor=(1.05, 1), loc=2)
-    axes[0].set_title('Human Scores')
-    axes[1].set_title('Human Loadings')
+    if species == 'Human':
+        Legend(axes[0], avcolors, hIgs)
+    else:
+        Legend(axes[0], avcolors, mIgs)
