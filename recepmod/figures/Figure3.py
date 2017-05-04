@@ -47,7 +47,7 @@ def makeFigure():
         subplotLabel(item, string.ascii_uppercase[ii])
 
     # Tweak layout
-    plt.tight_layout()
+    f.tight_layout()
 
     return f
 
@@ -187,7 +187,9 @@ def maxAffinity(ax):
     """ """
     from ..StoneModMouse import StoneModelMouse
 
-    Kas = np.squeeze(StoneModelMouse().kaMouse[:, 2])
+    M = StoneModelMouse()
+
+    Kas = np.squeeze(M.kaMouse[:, 2])
 
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
@@ -212,6 +214,10 @@ def maxAffinity(ax):
     tableA.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
     tableC.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
     tableD.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
+
+    ax.plot(M.kaMouse[0, 2], 500, 'k.')
+    ax.plot(M.kaMouse[1, 2], 500, 'k.')
+    ax.plot(M.kaMouse[3, 2], 500, 'k.')
 
     ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
