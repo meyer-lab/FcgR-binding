@@ -12,6 +12,9 @@ $(fdir)/Figure1%pdf $(fdir)/Figure2%pdf $(fdir)/Figure3%pdf $(fdir)/Figure1%svg 
 	mkdir -p ./Manuscript/Figures
 	python3 genFigures.py
 
+$(fdir)/Figure%pdf: $(fdir)/Figure%svg
+	cairosvg $< -o $@
+
 Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
 	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
