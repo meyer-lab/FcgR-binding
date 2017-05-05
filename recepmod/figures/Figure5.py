@@ -94,17 +94,18 @@ def PCAplot(axes, dataIn, species):
     for _, row in dataIn.iterrows():
         markerr=Igs[row['IgID']]
         avc = avcolors[row['avidity']]
-        axes[0].errorbar(x=row['PC1'], y=row['PC2'], marker=markerr, mfc=avc, ms=3.5)
+        axes[0].errorbar(x=row['PC1'], y=row['PC2'], marker=markerr, mfc=avc, ms=5)
 
     loadings = pd.DataFrame(pca.components_.T, columns=['PC1', 'PC2', 'PC3', 'PC4'])
     loadings['terms'] = terms
     loadings['cells'], loadings['quantity'] = loadings['terms'].str.split('_', 1).str
+    loadings['cellType'], loadings['cellGeno'] = loadings['cells'].str.split('-', 1).str
 
-    colors = dict(zip(loadings['cells'].unique(), sns.color_palette()))
+    colors = dict(zip(loadings['cellType'].unique(), sns.color_palette()))
 
     for _, row in loadings.iterrows():
         markerr=quantShape[row['quantity']]
-        colorr = colors[row['cells']]
+        colorr = colors[row['cellType']]
         axes[1].errorbar(x=row['PC1'], y=row['PC2'], marker=markerr, mfc=colorr, ms=5)
 
     axes[0].set_title(species + ' Scores')
@@ -117,3 +118,9 @@ def PCAplot(axes, dataIn, species):
         Legend(axes[0], avcolors, hIgs)
     else:
         Legend(axes[0], avcolors, mIgs)
+
+    # Fix axis limits
+    for ii in range(2):
+        ylim, xlim = np.max(np.absolute(axes[ii].get_ylim())), np.max(np.absolute(axes[ii].get_xlim()))
+        axes[ii].set_ylim(-ylim*1.1, ylim*1.1)
+        axes[ii].set_xlim(-xlim*1.1, xlim*1.1)
