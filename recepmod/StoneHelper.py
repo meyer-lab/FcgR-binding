@@ -121,21 +121,6 @@ def mapMCMC(dFunction, pSet, quiet=False):
     return pd.concat(retVals)
 
 
-def parallelize_dataframe(df, func):
-    from multiprocessing import Pool, cpu_count
-    from tqdm import tqdm
-
-    pool = Pool(cpu_count())
-
-    iterpool = tqdm(pool.imap(func, np.vsplit(df, df.shape[0])), total=df.shape[0])
-
-    df = np.fromiter(iterpool, dtype=np.float, count=df.shape[0])
-
-    pool.close()
-    pool.join()
-    return df
-
-
 def getFitMeasMerged(self, x):
     """
     Return the fit and measured data merged into a single dataframe

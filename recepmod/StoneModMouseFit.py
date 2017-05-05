@@ -5,7 +5,6 @@ from sklearn.base import BaseEstimator
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import explained_variance_score
 from .StoneModMouse import StoneModelMouse
-from .StoneHelper import parallelize_dataframe
 
 def NimmerjahnPredictByAffinities():
     """ This will run ordinary linear regression using just affinities of receptors. """
@@ -82,9 +81,9 @@ def varyExpr():
     pp = pd.DataFrame(np.array(np.meshgrid(gnus, Los)).T.reshape(-1,2))
     pp.columns = ['gnus', 'Los']
 
-    pp['Fit'] = parallelize_dataframe(pp.as_matrix(), InVivoPredict)
+    #pp['Fit'] = parallelize_dataframe(pp.as_matrix(), InVivoPredict)
 
-    pp.to_csv('outtt.csv')
+    #pp.to_csv('outtt.csv')
 
 
 def InVivoPredict(inn=[5, 1E-12], printt=False):
