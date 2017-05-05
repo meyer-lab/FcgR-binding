@@ -1,6 +1,7 @@
 ## Comparing human and mouse IgG-FcγR interactions
 
-![**Comparing human and mouse IgG-FcγR interactions.** A) Principal components analysis of predicted binding with coordinate changes in murine IgG class, immune complex avidity, and concentration. B) Corresponding principle components analysis for the human case.](./Figures/Figure5.svg){#fig:SpeciesCompare}
+![**Comparing human and mouse IgG-FcγR interactions.** A) Principal components analysis of predicted 1 nM IC binding and activation at with coordinate changes in murine IgG class and immune complex avidity. B) Corresponding principle components analysis for the human case.](./Figures/Figure5.svg){#fig:SpeciesCompare}
 
-As a multivalent binding model can predict FcγR binding and effector function *in vivo*, we examined the multivariate effects on activation predicted with receptors from each species, to evaluate the conserved aspects.
+As a multivalent binding model can predict FcγR binding and effector function *in vivo*, we examined the multivariate effects on activation predicted with receptors from each species. We expected that the activation model might help identify conserved aspects of FcγR signaling between species.
 
+By assembling predictions for ligand binding and activity indeces for NK and DC-like cell populations, we observed divergent effects dependent upon IC class. Principal component (PC) 1 was observed to separate IC responses at higher avidities, while PC 2 separated most prominently along IC class [@Fig:SpeciesCompare]A). IgG1 and IgG2b showed bias towards positive PC 2 scores, while IgG2b toward negative scores. Examining the loadings, decreasing PC 2 corresponded to DC-like cell ligand binding and activation, while NK cells showed positive PC 2 weighting in both aspects. This is consistent with these IgG classes showing divergent effects *in vivo*, and our predicted effects of the classes on NK and DC-like cells ([@Fig:InVivoResults]E).
