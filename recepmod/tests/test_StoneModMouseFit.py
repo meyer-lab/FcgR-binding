@@ -3,7 +3,7 @@ import random
 import time
 import pandas
 import numpy as np
-from ..StoneModMouseFit import NimmerjahnPredictByAffinities, InVivoPredictMinusComponents
+from ..StoneModMouseFit import NimmerjahnPredictByAffinities, InVivoPredictMinusComponents, NimmerjahnPredictByAIratio
 from sklearn.metrics import explained_variance_score
 
 class TestFit(unittest.TestCase):
@@ -23,3 +23,6 @@ class TestFit(unittest.TestCase):
 
     def test_InVivoPredictMinusComponents(self):
         InVivoPredictMinusComponents()
+    
+    def test_NimmerjahnPredictByAIratio(self):
+        NimmerjahnPredictByAIratio()
