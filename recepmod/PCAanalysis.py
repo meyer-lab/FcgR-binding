@@ -86,8 +86,28 @@ def PCAmurine(conditions):
     outt.to_csv(os.path.join(path, './data/pca-murine.csv'))
 
 
+def genoComb(begin, vecc):
+    """ Builds up all the different genotypes of a single cell type. """
+
+    init = [na] * 9
+    outt = {}
+
+    for ii in range(2):
+        for jj in range(2):
+            for kk in range(2):
+                name = begin + '-' + ('HR'[ii]) + ('IT'[jj]) + ('VF'[kk])
+                vecCur = vecc.copy()
+
+                vecCur.insert(2-ii, na)
+                vecCur.insert(4-jj, na)
+                vecCur.insert(7-kk, na)
+                outt[name] = vecCur
+
+    return outt
+
+
 def PCAhuman(conditions):
-    # 'FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val'
+    from collections import defaultdict
     
     actV = [1, 1, -1, 1, 1, 0]
 
@@ -100,12 +120,12 @@ def PCAhuman(conditions):
                         dtype=np.float64)
 
     expressions = {'NK-Phe': [na,   na,  na,  na,  na,  na, 4.0,  na,  na],
-                   'NK-Val': [na,   na,  na,  na,  na,  na,  na, 4.0,  na],
-                   'pDC-HIV':[2.0, 3.0,  na, 3.0,  na, 2.0, 3.0,  na, 3.0],
-                   'MO-HIV': [3.0, 3.0,  na, 3.0,  na, 4.0, 3.0,  na, 3.0],
-                   'MO-RIV': [3.0,  na, 3.0, 3.0,  na, 4.0, 3.0,  na, 3.0],
-                   'MO-HIF': [3.0, 3.0,  na, 3.0,  na, 4.0,  na, 3.0, 3.0]}
-    activities = {'pDC-HIV':actV, 'MO-HIV':actV, 'MO-RIV':actV, 'MO-HIF':actV}
+                   'NK-Val': [na,   na,  na,  na,  na,  na,  na, 4.0,  na]}
+
+    expressions.update(genoComb('MO', [3.0, 3.0, 3.0, 4.0, 3.0, 3.0]))
+    expressions.update(genoComb('pDC', [2.0, 3.0, 3.0, 2.0, 3.0, 3.0]))
+
+    activities = defaultdict(lambda: actV)
 
     outt = parallelize_dataframe(conditions, lambda x: calcActivity(x, expressions, affinities, activities))
 
