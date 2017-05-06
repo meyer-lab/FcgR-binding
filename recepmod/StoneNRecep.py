@@ -20,11 +20,15 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
     KKRK = np.multiply(Ka, Req) / Ka[0] * Kx
 
     for ii in range(vGrid.ndim):
-        term = 1.0
+        # Setup the slicing for the matrix portion we want
+        slicing = list((slice(None), ) * ii + (1, ) + (slice(None), ) * (vGrid.ndim - ii - 1))
 
-        for jj in range(1, gnu+1):
-            # Setup the slicing for the matrix portion we want
-            slicing = (slice(None), ) * ii + (jj, ) + (slice(None), ) * (vGrid.ndim - ii - 1)
+        term = KKRK[ii]
+
+        vGrid[slicing] *= term
+
+        for jj in range(2, gnu+1):
+            slicing[ii] = jj
 
             term *= KKRK[ii]
 
@@ -126,11 +130,8 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
         # Convert out of logs
         x = np.power(10, x)
 
-        # Collect the v_ij grid
-        gridd = StoneVgrid(x,Ka,gnu,Kx,L0)
-
         # Collect the Rbnd quantities
-        Rbnd = StoneRbnd(gridd)
+        Rbnd = StoneRbnd(StoneVgrid(x, Ka, gnu, Kx, L0))
 
         # Req is the unbound receptor, so perform a mass balance
         return R - x - Rbnd
@@ -143,16 +144,13 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
     # Reasonable approximation for curReq
     curReq = np.array(logR - Ka*L0, dtype=np.float)
-    prevReq = curReq.copy()
 
     if np.max(np.multiply(rootF(np.full(logR.shape, -200, dtype=np.float)), rootF(logR))) > 0:
         raise RuntimeError("No reasonable value for Req exists.")
 
     # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
     for ii in range(200):
-        if norm(rootF(curReq)) < 1.0E-9 and norm(curReq - prevReq) < 1.0E-9:
-            return curReq
-        elif norm(rootF(curReq)) < 1.0E-5 and norm(curReq - prevReq) < 1.0E-5 and ii > 100:
+        if norm(rootF(curReq)) < 1.0E-6:
             return curReq
         else:
             prevReq = curReq
