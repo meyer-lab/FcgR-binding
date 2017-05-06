@@ -3,13 +3,13 @@ matplotlib.use('AGG')
 import seaborn as sns
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
 
 def makeFigure():
     import string
-    import matplotlib.pyplot as plt
     from matplotlib import gridspec
     from .FigureCommon import subplotLabel
 
@@ -64,7 +64,7 @@ Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'}
 Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
-KnockdownidxL = ['Wild-type', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-/-']
+KnockdownidxL = ['Wild-type', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-']
 KnockdownidxL = dict(zip(KnockdownidxL, sns.color_palette()))
 
 def MurineFcIgLegend():
@@ -116,10 +116,14 @@ def InVivoPredictVsActual(ax):
 
     ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
 
-    ax.set_ylim(-0.05, 1.05)
-    ax.set_xlim(-0.05, 1.05)
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('Predicted Effect')
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlim(-0.05, 1.05)
+#    devar = r'$\sigma$d = '+str(round(devar, 3))
+#    cevar = r'$\sigma$c = '+str(round(cevar, 3))
+#    plt.text(0.1, 2, devar, transform=ax.transAxes)
+#    plt.text(0.1, 1.9, cevar, transform = ax.transAxes)
 
 
 def ComponentContrib(ax):
@@ -187,18 +191,22 @@ def commonPlot(ax, table, xcol, ycol):
 
 def AIplot(ax):
     """ Plot A/I vs effectiveness. """
-    Mod = StoneModelMouse()
-
-    table = Mod.NimmerjahnEffectTableAffinities()
-    table = table.loc[table.FcgRIIB > 0, :]
-    table['AtoI'] = table.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV)/x.FcgRIIB, axis=1)
+    from ..StoneModMouseFit import NimmerjahnPredictByAIratio
+    
+    dperf, cperf, table, coe, inter = NimmerjahnPredictByAIratio()
     
     commonPlot(ax, table, 'AtoI', 'Effectiveness')
-    
+    x = [10**(-2), 10**3]
+    ax.plot(x, coe * np.log10(x) + inter, color='k', linestyle='-', linewidth=1)
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('A/I Ratio')
     ax.set_xscale('log')
-
+    ax.set_xlim(10**(-1.2), 10**(2.6))
+    ax.set_ylim(-0.05, 1.05)
+    dperf = r'$\sigma$d = '+str(round(dperf, 3))
+    cperf = r'$\sigma$c = '+str(round(cperf, 3))
+    plt.text(0.1, 0.88, dperf, transform = ax.transAxes)
+    plt.text(0.1, 0.8, cperf, transform = ax.transAxes)
 
 def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
@@ -214,6 +222,10 @@ def InVivoPredictVsActualAffinities(ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
+    dperf = r'$\sigma$d = '+str(round(dperf, 3))
+    cperf = r'$\sigma$c = '+str(round(cperf, 3))
+    plt.text(0.1, 0.88, dperf, transform = ax.transAxes)
+    plt.text(0.1, 0.8, cperf, transform = ax.transAxes)
 
     ax.legend(handles=MurineFcIgLegend(), bbox_to_anchor=(1, 1), loc=2)
 
