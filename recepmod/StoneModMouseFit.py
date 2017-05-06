@@ -4,8 +4,31 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import explained_variance_score
+from sklearn.linear_model import LinearRegression
 from .StoneModMouse import StoneModelMouse
 
+def NimmerjahnPredictByAIratio():
+    lr = LinearRegression()
+    table = StoneModelMouse().NimmerjahnEffectTableAffinities()
+    table = table.loc[table.FcgRIIB > 0, :]
+    table['AtoI'] = table.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV)/x.FcgRIIB, axis=1)
+    X = table[['AtoI']].apply(np.log10)
+    y = table['Effectiveness']
+    # Do direct regression too
+    lr.fit(X, y)
+    table['DirectPredict'] = lr.predict(X)
+    coe = lr.coef_
+    inter = lr.intercept_
+    
+    # Run crossvalidation predictions at the same time
+    table['CrossPredict'] = cross_val_predict(lr, X, y, cv=X.shape[0])
+
+    # How well did we do on crossvalidation?
+    crossval_perf = explained_variance_score(y, table.CrossPredict)
+
+    # How well did we do on direct?
+    direct_perf = explained_variance_score(y, table.DirectPredict)
+    return (direct_perf, crossval_perf, table, coe, inter)
 def NimmerjahnPredictByAffinities():
     """ This will run ordinary linear regression using just affinities of receptors. """
 
