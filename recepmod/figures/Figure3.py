@@ -181,7 +181,10 @@ def maxAffinity(ax):
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
 
-    table = pd.DataFrame(np.logspace(start=-4, stop=4, num=20), columns=['adjust'])
+    table = pd.DataFrame(np.logspace(start=-4, stop=4, num=40), columns=['adjust'])
+    tableNull = pd.Series(1.0, index=['adjust'])
+
+    colors = sns.color_palette()
 
     def appFunc(x, ii):
         KaCur = Kas.copy()
@@ -192,19 +195,19 @@ def maxAffinity(ax):
 
         return x
 
-    # TODO: Indicate where receptors are when not varied.
-
     tableA = table.apply(lambda x: appFunc(x, 0), axis=1)
     tableC = table.apply(lambda x: appFunc(x, 2), axis=1)
     tableD = table.apply(lambda x: appFunc(x, 3), axis=1)
 
-    tableA.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
-    tableC.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
-    tableD.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
+    tableA.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True, color=colors[0])
+    tableC.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True, color=colors[1])
+    tableD.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True, color=colors[2])
 
-    ax.plot(M.kaMouse[0, 2], 500, 'k.')
-    ax.plot(M.kaMouse[1, 2], 500, 'k.')
-    ax.plot(M.kaMouse[3, 2], 500, 'k.')
+    tableNull = appFunc(tableNull, 0)
+
+    ax.loglog(M.kaMouse[0, 2], tableNull.activity, color=colors[0], marker='o')
+    ax.loglog(M.kaMouse[2, 2], tableNull.activity, color=colors[1], marker='o')
+    ax.loglog(M.kaMouse[3, 2], tableNull.activity, color=colors[2], marker='o')
 
     ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
