@@ -39,8 +39,8 @@ def makeFigure():
     subplotLabel(ax[2], 'B')
 
     for ii, item in enumerate(ax):
-        ax[ii].set_ylabel('PC 2')
-        ax[ii].set_xlabel('PC 1')
+        ax[ii].set_ylabel('PC 3')
+        ax[ii].set_xlabel('PC 2')
 
     # Tweak layout
     f.tight_layout()
@@ -94,7 +94,7 @@ def PCAplot(axes, dataIn, species):
     for _, row in dataIn.iterrows():
         markerr=Igs[row['IgID']]
         avc = avcolors[row['avidity']]
-        axes[0].errorbar(x=row['PC1'], y=row['PC2'], marker=markerr, mfc=avc, ms=5)
+        axes[0].errorbar(x=row['PC2'], y=row['PC3'], marker=markerr, mfc=avc, ms=5)
 
     loadings = pd.DataFrame(pca.components_.T, columns=['PC1', 'PC2', 'PC3', 'PC4'])
     loadings['terms'] = terms
@@ -106,7 +106,7 @@ def PCAplot(axes, dataIn, species):
     for _, row in loadings.iterrows():
         markerr=quantShape[row['quantity']]
         colorr = colors[row['cellType']]
-        axes[1].errorbar(x=row['PC1'], y=row['PC2'], marker=markerr, mfc=colorr, ms=5)
+        axes[1].errorbar(x=row['PC2'], y=row['PC3'], marker=markerr, mfc=colorr, ms=5)
 
     axes[0].set_title(species + ' Scores')
     axes[1].set_title(species + ' Loadings')
