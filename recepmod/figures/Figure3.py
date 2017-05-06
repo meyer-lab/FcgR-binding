@@ -13,23 +13,10 @@ from ..StoneHelper import getMedianKx
 
 def makeFigure():
     import string
-    from matplotlib import gridspec
-    from .FigureCommon import subplotLabel
-    import matplotlib.pyplot as plt
-
-    sns.set(style="whitegrid",
-            font_scale=0.7,
-            color_codes=True,
-            palette="colorblind")
-
-    # Setup plotting space
-    f = plt.figure(figsize=(9, 5))
-
-    # Make grid
-    gs1 = gridspec.GridSpec(2, 4)
+    from .FigureCommon import subplotLabel, getSetup
 
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(8)]
+    ax, f = getSetup((9, 5), (2, 4))
 
     # Plot subplot A
     PredictionVersusAvidity(ax[0:4])

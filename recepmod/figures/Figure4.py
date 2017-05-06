@@ -10,19 +10,10 @@ from ..StoneModMouse import StoneModelMouse
 
 def makeFigure():
     import string
-    from matplotlib import gridspec
-    from .FigureCommon import subplotLabel
-
-    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
-
-    # Setup plotting space
-    f = plt.figure(figsize=(7, 6))
-
-    # Make grid
-    gs1 = gridspec.GridSpec(3, 3)
+    from .FigureCommon import subplotLabel, getSetup
 
     # Get list of axis objects
-    ax = [ f.add_subplot(gs1[x]) for x in range(9) ]
+    ax, f = getSetup((7, 6), (3, 3))
 
     # Blank out for the cartoon
     ax[0].axis('off')

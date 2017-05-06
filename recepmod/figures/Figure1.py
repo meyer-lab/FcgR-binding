@@ -1,26 +1,17 @@
 import matplotlib
 matplotlib.use('AGG')
-import matplotlib.pyplot as plt
-from matplotlib import gridspec
 import numpy as np
 import seaborn as sns
 import pandas as pd
-from ..StoneModel import StoneModel
-from ..StoneHelper import getFitMeasSummarized, getMeasuredDataFrame
-from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRidxL, FcgRTex
+from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, FcgRidxL, FcgRTex
 
-def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, ylabelpad=-0.3, ytickx=0.08):
+def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
     # Normalize the binding data to expression
     fitMean = fitMean.assign(Meas_mean = fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
     fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
-
-    if ax1 is None or ax2 is None:
-        fig = plt.figure(figsize=(9,5))
-        ax1 = fig.add_subplot(1, 2, 1)
-        ax2 = fig.add_subplot(1, 2, 2)
 
     def plotF(axInt, data):
         for _, row in data.iterrows():
@@ -51,10 +42,7 @@ def plotNormalizedBindingvsKA(fitMean, ax1=None, ax2=None, ylabelpad=-0.3, ytick
     for elem in ax2.get_yticklabels():
         elem.set_x(ytickx)
 
-def plotAvidityEffectVsKA(fitMean, ax1=None, ylabelpad=-0.3, ytickx = 0.08):
-    # Make axes if none exist
-    if ax1 is None:
-        ax1 = plt.figure().add_subplot(121)
+def plotAvidityEffectVsKA(fitMean, ax1, ylabelpad=-0.3, ytickx = 0.08):
 
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std']]
@@ -94,7 +82,7 @@ def plotAvidityEffectVsKA(fitMean, ax1=None, ylabelpad=-0.3, ytickx = 0.08):
     ax1.legend(handles=makeFcIgLegend(), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
 
-def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelpad=0, ytickx=0):
+def FcgRQuantificationFigureMaker(StoneM, ax, ylabelpad=0, ytickx=0):
     # Put receptor expression measurements into a dataframe
     df = pd.DataFrame(StoneM.Rquant).T
 
@@ -107,10 +95,6 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelpad=0, ytickx=0):
     # Remove nan values and transform to absolute scale
     dfm = dfm[np.isfinite(dfm['value'])]
     dfm['value'] = dfm['value'].apply(lambda x: np.power(10,x))
-
-    ## Create bars and error bars per species
-    if ax is None:
-        ax = plt.figure().add_subplot(121)
 
     # Plot everything
     axx = sns.barplot(x = "variable", y = "value", data = dfm, ax = ax)
@@ -125,15 +109,7 @@ def FcgRQuantificationFigureMaker(StoneM, ax=None, ylabelpad=0, ytickx=0):
         elem.set_x(ytickx)
     axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
-def mfiAdjMeanFigureMaker(measAll, axarr=None):
-    if axarr is None:
-        f = plt.figure()
-
-        # Make grid
-        gs1 = gridspec.GridSpec(2,3)
-
-        # Create 6 axes for each FcgR
-        axarr = [ f.add_subplot(gs1[x]) for x in range(6) ]
+def mfiAdjMeanFigureMaker(measAll, axarr):
 
     fcIter = zip(axarr, FcgRidx.keys(), FcgRTex)
 
@@ -152,45 +128,37 @@ def mfiAdjMeanFigureMaker(measAll, axarr=None):
         axx.set_title(tex)
 
 def makeFigure():
+    from ..StoneModel import StoneModel
+    from ..StoneHelper import getFitMeasSummarized, getMeasuredDataFrame
+    from .FigureCommon import subplotLabel, getSetup
+
     StoneM = StoneModel()
 
-    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
-
-    f = plt.figure(figsize=(7, 6))
-
-    gs1 = gridspec.GridSpec(3, 4)
+    # Get list of axis objects
+    ax, f = getSetup((7, 6), (3, 4))
     
-    ax = f.add_subplot(gs1[0])
-    FcgRQuantificationFigureMaker(StoneM,ax)
+    FcgRQuantificationFigureMaker(StoneM, ax[0])
 
-    subplotLabel(ax, 'A')
-
-    ax2 = f.add_subplot(gs1[1])
-    ax3 = f.add_subplot(gs1[2])
+    subplotLabel(ax[0], 'A')
 
     fitMean = getFitMeasSummarized(StoneM)
     measAll = getMeasuredDataFrame(StoneM)
 
-    plotNormalizedBindingvsKA(fitMean, ax2, ax3)
+    plotNormalizedBindingvsKA(fitMean, ax[1], ax[2])
 
-    subplotLabel(ax2, 'C')
-    subplotLabel(ax3, 'D')
+    subplotLabel(ax[1], 'C')
+    subplotLabel(ax[2], 'D')
 
-    ax4 = f.add_subplot(gs1[3])
-    plotAvidityEffectVsKA(fitMean,ax4)
+    plotAvidityEffectVsKA(fitMean, ax[3])
 
-    subplotLabel(ax4, 'E')
+    subplotLabel(ax[3], 'E')
 
-    axarr = []
-    for j in range(6):
-        if j < 3:
-            axarr.append(f.add_subplot(gs1[j+4]))
-        else:
-            axarr.append(f.add_subplot(gs1[j+5]))
+    subplotLabel(ax[4], 'B')
 
-    subplotLabel(axarr[0], 'B')
+    mfiAdjMeanFigureMaker(measAll, (ax[4], ax[5], ax[6], ax[8], ax[9], ax[10]))
 
-    mfiAdjMeanFigureMaker(measAll,axarr)
+    ax[7].axis('off')
+    ax[11].axis('off')
 
     f.tight_layout()
 

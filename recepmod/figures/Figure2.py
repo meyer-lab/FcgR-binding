@@ -4,19 +4,17 @@ matplotlib.use('AGG')
 import os
 import string
 
-from matplotlib import gridspec, rcParams
+from matplotlib import rcParams
 import matplotlib.pyplot as plt
 
 import numpy as np
 
 import seaborn as sns
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chains
-from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRTex, texRename, texRenameList
+from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel, FcgRTex, texRename, texRenameList, getSetup
 
 
 def makeFigure():
-    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
-
     # Retrieve model and fit from hdf5 file
     M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
 
@@ -24,14 +22,8 @@ def makeFigure():
     
     rcParams['lines.markeredgewidth'] = 1.0
 
-    # Setup plotting space
-    f = plt.figure(figsize=(7, 6))
-
-    # Make grid
-    gs1 = gridspec.GridSpec(3, 3)
-
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(9)]
+    ax, f = getSetup((7, 6), (3, 3))
 
     # Blank out for the cartoon
     ax[0].axis('off')
