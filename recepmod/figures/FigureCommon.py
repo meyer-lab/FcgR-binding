@@ -4,10 +4,12 @@ figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'Figure5', 'FigureSS']
 
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
-FcgRidx = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-FcgRidx = dict(zip(FcgRidx, sns.color_palette()))
-
-FcgRTex = [r'Fc$\gamma$RI', r'Fc$\gamma$RIIA-Arg', r'Fc$\gamma$RIIA-His', r'Fc$\gamma$RIIB', r'Fc$\gamma$RIIIA-Phe', r'Fc$\gamma$RIIIA-Val']
+FcgRidx = dict(zip(['FcgRI',
+                    'FcgRIIA-Arg',
+                    'FcgRIIA-His',
+                    'FcgRIIB',
+                    'FcgRIIIA-Phe',
+                    'FcgRIIIA-Val'], sns.color_palette()))
 
 def texRename(name):
     name = r'K$_x$' if name=='Kx1' else name
@@ -24,22 +26,12 @@ def texRename(name):
 def texRenameList(names):
     return [texRename(name) for name in names]
 
-FcgRidxL = [r'Fc$\gamma$RI',r'Fc$\gamma$RIIA-131R',r'Fc$\gamma$RIIA-131H',r'Fc$\gamma$RIIB',r'Fc$\gamma$RIIIA-158F',r'Fc$\gamma$RIIIA-158V']
-FcgRidxL = dict(zip(FcgRidxL, sns.color_palette()))
-
-def makeFcIgLegend():
-    import matplotlib.lines as mlines
-    import matplotlib.patches as mpatches
-
-    patches = list()
-
-    for f in FcgRidxL:
-        patches.append(mpatches.Patch(color=FcgRidxL[f], label=f))
-
-    for j in Igs:
-        patches.append(mlines.Line2D([], [], color='black', marker=Igs[j], markersize=7, label=j, linestyle='None'))
-
-    return patches
+FcgRidxL = dict(zip([r'Fc$\gamma$RI',
+                     r'Fc$\gamma$RIIA-131R',
+                     r'Fc$\gamma$RIIA-131H',
+                     r'Fc$\gamma$RIIB',
+                     r'Fc$\gamma$RIIIA-158F',
+                     r'Fc$\gamma$RIIIA-158V'], sns.color_palette()))
 
 def subplotLabel(ax, letter):
     ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
@@ -60,3 +52,17 @@ def getSetup(figsize, gridd):
     ax = [f.add_subplot(gs1[x]) for x in range(gridd[0] * gridd[1])]
 
     return (ax, f)
+
+def Legend(colors, shapes):
+    """ Make legend. """
+    import matplotlib
+    
+    patches = list()
+
+    for key, val in colors.items():
+        patches.append(matplotlib.patches.Patch(color=val, label=key))
+
+    for key, val in shapes.items():
+        patches.append(matplotlib.lines.Line2D([], [], color='black', marker=val, markersize=7, label=key, linestyle='None'))
+    
+    return patches

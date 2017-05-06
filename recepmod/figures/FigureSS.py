@@ -1,7 +1,3 @@
-import matplotlib
-matplotlib.use('AGG')
-import os
-import numpy as np
 import seaborn as sns
 from .FigureCommon import FcgRidx, subplotLabel, getSetup
 
@@ -12,10 +8,7 @@ def makeFigure():
     ax, f = getSetup((7, 6), (4, 3))
 
     # Retrieve model and fit from hdf5 file
-    M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
-
-    # Filter for only remotely likely parameter sets
-    dset = dset.loc[dset['LL'] > np.min(dset['LL']) - 3,:]
+    M, dset = read_chain()
 
     dsetSamp = dset.sample(40)
 

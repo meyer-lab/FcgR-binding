@@ -69,7 +69,7 @@ def PredictionVersusAvidity(ax):
     skipColor(ax[3])
 
     def calculate(x):
-        a = StoneMod(logR[0],Ka[0],x['avidity'],getMedianKx()*Ka[0],x['ligand'], fullOutput = True)
+        a = StoneMod(logR[0],Ka[0],x['avidity'],getMedianKx()*Ka[0],x['ligand'], fullOutput=True)
 
         return pd.Series(dict(bound = a[0],
                               avidity = x['avidity'],

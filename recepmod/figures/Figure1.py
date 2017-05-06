@@ -3,7 +3,7 @@ matplotlib.use('AGG')
 import numpy as np
 import seaborn as sns
 import pandas as pd
-from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, FcgRidxL, FcgRTex
+from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx
 
 def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
     # Select the subset of data we want
@@ -79,7 +79,7 @@ def plotAvidityEffectVsKA(fitMean, ax1, ylabelpad=-0.3, ytickx = 0.08):
         ax1.get_yticklabels()[j].set_x(ytickx)
     ax1.set_ylim(1, 20)
 
-    ax1.legend(handles=makeFcIgLegend(), bbox_to_anchor=(-0.1, -0.3), loc=2)
+    ax1.legend(handles=Legend(FcgRidxL, Igs), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
 
 def FcgRQuantificationFigureMaker(StoneM, ax, ylabelpad=0, ytickx=0):
@@ -111,10 +111,10 @@ def FcgRQuantificationFigureMaker(StoneM, ax, ylabelpad=0, ytickx=0):
 
 def mfiAdjMeanFigureMaker(measAll, axarr):
 
-    fcIter = zip(axarr, FcgRidx.keys(), FcgRTex)
+    fcIter = zip(axarr, FcgRidx.keys())
 
     # Loop through receptors creating plot
-    for axx, fcr, tex in fcIter:
+    for axx, fcr in fcIter:
         sns.barplot(x="Ig",
                     y = "Meas",
                     hue="TNP",
@@ -125,7 +125,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
         axx.set_ylabel("Binding (RU)")
         axx.set_xlabel("")
         axx.legend_.remove()
-        axx.set_title(tex)
+        axx.set_title(fcr)
 
 def makeFigure():
     from ..StoneModel import StoneModel

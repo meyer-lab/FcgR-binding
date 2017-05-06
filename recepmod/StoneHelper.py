@@ -10,9 +10,13 @@ try:
 except ImportError:
     import pickle
 
-def read_chain(filename):
+def read_chain(filename=None, filter=True):
     """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
+    import os
     import h5py
+
+    if filename is None:
+        filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5")
 
     # Open hdf5 file
     f = h5py.File(filename, 'r')
@@ -39,6 +43,11 @@ def read_chain(filename):
 
     f.close()
 
+    # Filter burn in period, etc
+    if filter is True:
+        pdset = pdset
+        # TODO: Implement filter
+
     return (StoneM, pdset)
 
 def rep(x, N):
@@ -48,10 +57,9 @@ def rep(x, N):
 @memoize
 def getMedianKx():
     """ Read the MCMC chain and find the median Kx. Cheched for sanity. """
-    import os
 
     # Retrieve model and fit from hdf5 file
-    _, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5"))
+    _, dset = read_chain()
 
     # Only keep good samples
     dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 3)),:]

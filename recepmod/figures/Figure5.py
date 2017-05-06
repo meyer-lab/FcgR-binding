@@ -1,5 +1,3 @@
-import matplotlib
-matplotlib.use('AGG')
 import numpy as np
 import pandas as pd
 
@@ -37,23 +35,11 @@ def makeSupp():
     return makeFigure(pcOne='PC 1', pcTwo='PC 2')
 
 
-def Legend(ax, colors, shapes):
-    """ Make legend. """
-    patches = list()
-
-    for key, val in colors.items():
-        patches.append(matplotlib.patches.Patch(color=val, label=key))
-
-    for key, val in shapes.items():
-        patches.append(matplotlib.lines.Line2D([], [], color='black', marker=val, markersize=7, label=key, linestyle='None'))
-    
-    ax.legend(handles=patches, bbox_to_anchor=(1, 1), loc=2)
-
-
 def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     from sklearn.decomposition import PCA
     from sklearn.preprocessing import StandardScaler
     import seaborn as sns
+    from .FigureCommon import Legend
 
     colors = dict(zip(range(5), sns.color_palette()))
     Igs = {0:'o', 1:'d', 2:'^', 3:'s'}
@@ -98,12 +84,12 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     axes[1].set_title(species + ' Loadings')
 
     # Ok, now start on legend
-    Legend(axes[1], colors, quantShape)
+    axes[1].legend(handles=Legend(colors, quantShape), bbox_to_anchor=(1, 1), loc=2)
 
     if species == 'Human':
-        Legend(axes[0], avcolors, hIgs)
+        axes[0].legend(handles=Legend(avcolors, hIgs), bbox_to_anchor=(1, 1), loc=2)
     else:
-        Legend(axes[0], avcolors, mIgs)
+        axes[0].legend(handles=Legend(avcolors, mIgs), bbox_to_anchor=(1, 1), loc=2)
 
     # Fix axis limits
     for ii in range(2):

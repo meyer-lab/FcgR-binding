@@ -13,6 +13,8 @@ fdir = './Manuscript/Figures/'
 def runFunc(nameOut):
     """ Run the code for a particular figure. """
     try:
+        import matplotlib
+        matplotlib.use('AGG')
         exec('from recepmod.figures import ' + nameOut)
         ff = eval(nameOut + '.makeFigure()')
         ff.savefig(fdir + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)

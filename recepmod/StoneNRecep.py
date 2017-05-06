@@ -12,13 +12,6 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
     Req should be a tuple of size N
     """
 
-    if len(Req) != len(Ka):
-        raise IndexError("Req and Ka must be same length.")
-    elif np.any(np.isnan(Req)):
-        raise ValueError("Req has nan value.")
-    elif np.any(np.isnan(Ka)):
-        raise ValueError("Ka has nan value.")
-
     # Get vGrid with the combinatorics all worked out
     vGrid = vGridInit(gnu, len(Req))
 
@@ -209,6 +202,13 @@ class StoneN:
         self.Kx = np.array(Kx*Ka[0], dtype=np.float, copy=True)
         self.gnu = np.array(gnu, dtype=np.int, copy=True)
         self.L0 = np.array(L0, dtype=np.float, copy=True)
+
+        if len(self.logR) != len(self.Ka):
+            raise IndexError("logR and Ka must be same length.")
+        elif np.any(np.isnan(self.logR)):
+            raise ValueError("logR has nan value.")
+        elif np.any(np.isnan(self.Ka)):
+            raise ValueError("Ka has nan value.")
 
         self.Req = reqSolver(self.logR, self.Ka, self.gnu, self.Kx, self.L0)
 
