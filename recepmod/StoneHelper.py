@@ -45,7 +45,7 @@ def read_chain(filename=None, filter=True):
 
     # Filter burn in period, etc
     if filter is True:
-        pdset = pdset
+        pdset = pdset.iloc[5000:, :]
         # TODO: Implement filter
 
     return (StoneM, pdset)
