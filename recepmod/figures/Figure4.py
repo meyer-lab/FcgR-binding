@@ -168,7 +168,7 @@ def RequiredComponents(ax):
 
     table = InVivoPredictMinusComponents()
 
-    table.plot(kind='bar', y='CrossVal', ax=ax)
+    table.plot(kind='bar', y='CrossVal', ax=ax, legend=False)
 
     ax.set_ylabel('LOO Var Explained')
     ax.set_ylim(-1.0, 1.0)
