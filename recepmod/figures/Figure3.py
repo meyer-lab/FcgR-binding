@@ -181,7 +181,7 @@ def maxAffinity(ax):
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
 
-    table = pd.DataFrame(np.logspace(start=-4, stop=4, num=40), columns=['adjust'])
+    table = pd.DataFrame(np.logspace(start=-4, stop=4, num=30), columns=['adjust'])
     tableNull = pd.Series(1.0, index=['adjust'])
 
     colors = sns.color_palette()

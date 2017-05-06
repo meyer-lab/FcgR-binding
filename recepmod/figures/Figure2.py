@@ -48,7 +48,7 @@ def makeFigure():
 
 def violinPlot(dset, ax):
     dset = dset[['Rexp']]
-    dset.columns = FcgRidx.keys()
+    dset.columns = FcgRidxL.keys()
 
     sns.violinplot(data=dset, cut=0, ax=ax, linewidth=0)
 
