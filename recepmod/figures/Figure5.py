@@ -96,3 +96,5 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
         ylim, xlim = np.max(np.absolute(axes[ii].get_ylim())), np.max(np.absolute(axes[ii].get_xlim()))
         axes[ii].set_ylim(-ylim*1.1, ylim*1.1)
         axes[ii].set_xlim(-xlim*1.1, xlim*1.1)
+        axes[ii].set_xlabel(pcOne)
+        axes[ii].set_ylabel(pcTwo)
