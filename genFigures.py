@@ -44,7 +44,7 @@ if __name__ == '__main__':
             if isinstance(i, Exception):
                 raise i
 
-    # Overlay cartoon
+    # Overlay Figure 2 cartoon
     template = st.fromfile(fdir + 'Figure2.svg')
     cartoon = st.fromfile('./recepmod/figures/Figure2_model_diagram.svg').getroot()
 
@@ -52,3 +52,12 @@ if __name__ == '__main__':
 
     template.append(cartoon)
     template.save(fdir + 'Figure2.svg')
+
+    # Overlay Figure 4 cartoon
+    template = st.fromfile(fdir + 'Figure4.svg')
+    cartoon = st.fromfile('./recepmod/figures/Figure4_regression_approach.svg').getroot()
+
+    cartoon.moveto(10, -15)
+
+    template.append(cartoon)
+    template.save(fdir + 'Figure4.svg')

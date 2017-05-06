@@ -38,10 +38,10 @@ def read_chain(filename=None, filter=True):
     # Read in dataset to Pandas frame
     pdset = pd.DataFrame(dset.value, columns = cNames)
 
+    f.close()
+
     pdset['gnu1'] = np.floor(pdset['gnu1'])
     pdset['gnu2'] = np.floor(pdset['gnu2'])
-
-    f.close()
 
     # Filter burn in period, etc
     if filter is True:
@@ -50,22 +50,16 @@ def read_chain(filename=None, filter=True):
 
     return (StoneM, pdset)
 
+
 def rep(x, N):
     """ Returns a range with repeated elements. """
     return [item for item in x for i in range(N)]
 
+
 @memoize
 def getMedianKx():
-    """ Read the MCMC chain and find the median Kx. Cheched for sanity. """
-
-    # Retrieve model and fit from hdf5 file
-    _, dset = read_chain()
-
-    # Only keep good samples
-    dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 3)),:]
-    Kx = np.power(10, np.median(dsetFilter['Kx1']))
-
-    return Kx
+    """ Read the MCMC chain and find the median Kx. Cached for sanity. """
+    return np.power(10, np.median((read_chain()[1])['Kx1']))
 
 
 def getMeasuredDataFrame(self):
