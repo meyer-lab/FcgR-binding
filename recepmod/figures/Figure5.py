@@ -55,7 +55,7 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
 
     X = pca.fit_transform(StandardScaler().fit_transform(X))
 
-    print(pca.explained_variance_)
+    #print(pca.explained_variance_)
 
     avcolors = dict(zip(dataIn['avidity'].unique(), sns.color_palette()))
 

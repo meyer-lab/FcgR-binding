@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import matplotlib
 matplotlib.use('AGG')
 import svgutils.transform as st
@@ -15,6 +17,8 @@ def runFunc(nameOut):
     try:
         import matplotlib
         matplotlib.use('AGG')
+        import warnings
+        warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
         exec('from recepmod.figures import ' + nameOut)
         ff = eval(nameOut + '.makeFigure()')
         ff.savefig(fdir + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
@@ -57,7 +61,7 @@ if __name__ == '__main__':
     template = st.fromfile(fdir + 'Figure4.svg')
     cartoon = st.fromfile('./recepmod/figures/Figure4_regression_approach.svg').getroot()
 
-    cartoon.moveto(10, 0)
+    cartoon.moveto(10, 20, scale=0.66)
 
     template.append(cartoon)
     template.save(fdir + 'Figure4.svg')

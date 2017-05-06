@@ -10,6 +10,7 @@ from ..StoneHelper import getMedianKx
 
 # Specific predictions regarding the coordinate effects of immune complex parameters.
 
+subsplits = 15
 
 def makeFigure():
     import string
@@ -41,7 +42,7 @@ def makeFigure():
 
 def plotRanges():
     avidity = np.logspace(0, 5, 6, base=2, dtype=np.int)
-    ligand = np.logspace(start=-12, stop=-5, num=50)
+    ligand = np.logspace(start=-12, stop=-5, num=subsplits)
     Ka = [1.2E6, 1.2E5] # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
     logR = [4.0, 4.5]
 
@@ -152,7 +153,7 @@ def varyAffinity(ax):
     gnu = 5
     L0 = 1E-9
 
-    tableAct = pd.DataFrame(Ka[0] * np.logspace(start=0, stop=2, num=10), columns=['affinity'])
+    tableAct = pd.DataFrame(Ka[0] * np.logspace(start=0, stop=2, num=subsplits), columns=['affinity'])
 
     def appFunc(x, ii):
         KaCur = Ka.copy()
@@ -181,17 +182,15 @@ def maxAffinity(ax):
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
 
-    table = pd.DataFrame(np.logspace(start=-4, stop=4, num=30), columns=['adjust'])
-    tableNull = pd.Series(1.0, index=['adjust'])
+    table = pd.DataFrame(np.logspace(start=4, stop=9, num=subsplits), columns=['adjust'])
 
     colors = sns.color_palette()
 
     def appFunc(x, ii):
         KaCur = Kas.copy()
-        KaCur[ii] *= x.adjust
+        KaCur[ii] = x.adjust
 
         x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
-        x['KaCur'] = KaCur[ii]
 
         return x
 
@@ -199,15 +198,13 @@ def maxAffinity(ax):
     tableC = table.apply(lambda x: appFunc(x, 2), axis=1)
     tableD = table.apply(lambda x: appFunc(x, 3), axis=1)
 
-    tableA.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True, color=colors[0])
-    tableC.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True, color=colors[1])
-    tableD.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True, color=colors[2])
+    tableA.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[0])
+    tableC.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[1])
+    tableD.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[2])
 
-    tableNull = appFunc(tableNull, 0)
-
-    ax.loglog(M.kaMouse[0, 2], tableNull.activity, color=colors[0], marker='o')
-    ax.loglog(M.kaMouse[2, 2], tableNull.activity, color=colors[1], marker='o')
-    ax.loglog(M.kaMouse[3, 2], tableNull.activity, color=colors[2], marker='o')
+    ax.loglog(M.kaMouse[0, 2], 512, color=colors[0], marker='o')
+    ax.loglog(M.kaMouse[2, 2], 512, color=colors[1], marker='o')
+    ax.loglog(M.kaMouse[3, 2], 512, color=colors[2], marker='o')
 
     ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
