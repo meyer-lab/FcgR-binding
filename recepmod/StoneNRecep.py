@@ -13,10 +13,9 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
     """
 
     # Get vGrid with the combinatorics all worked out
-    vGrid = vGridInit(gnu, len(Req))
+    vGrid = vGridInit(gnu, len(Req)) * (L0 * Ka[0] / Kx)
 
     # Precalculate outside terms
-    vGrid = vGrid * L0 * Ka[0] / Kx
     KKRK = np.multiply(Ka, Req) / Ka[0] * Kx
 
     for ii in range(vGrid.ndim):
