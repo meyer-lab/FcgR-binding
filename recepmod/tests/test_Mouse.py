@@ -51,13 +51,6 @@ class TestStoneMouse(unittest.TestCase):
 
         self.assertTrue(tba2.shape == (self.Mod.v*len(self.Mod.Igs),5*len(self.Mod.FcgRs)))
         
-    def test_MultiAvidityPredict(self):
-        """ Check MultiAvidityPredict """
-
-        _, _, _, _, model, normV = self.Mod.KnockdownLassoCrossVal()
-
-        table = MultiAvidityPredict(self.Mod, np.insert(model.coef_, 0, model.intercept_), normV)
-
     def test_NimmerjahnEffectTable(self):
         """ Check NimmerjahnEffectTable """
         tbN = self.Mod.NimmerjahnEffectTable()
@@ -67,21 +60,9 @@ class TestStoneMouse(unittest.TestCase):
 
         self.assertTrue(tbN.shape == (8,5*len(self.Mod.FcgRs)+1))
 
-    def test_NimmerjahnTb_Knockdown(self):
-        """ Check NimmerjahnTb_Knockdown """
-        self.Mod.IgG2b_Fucose()
-        tbNK = self.Mod.NimmerjahnTb_Knockdown()
-        # tbNK.to_csv('out.csv')
-        self.Mod.KnockdownLassoCrossVal()
-        self.Mod.KnockdownLassoCrossVal(logspace=True)
-        self.Mod.KnockdownLassoCrossVal(addavidity1=True)
-        self.Mod.KnockdownLassoCrossVal(logspace=True, addavidity1=True)
-
     def test_NimmerjahnEffectTableAffinities(self):
         """ Test that table for prediction off of just affinities is correct. """
         tbN = self.Mod.NimmerjahnEffectTableAffinities()
-        # tbN.to_csv('out.csv')
-        self.Mod.NimmerjahnPredictByAffinities()
 
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(tbN, pandas.core.frame.DataFrame)
@@ -89,7 +70,7 @@ class TestStoneMouse(unittest.TestCase):
         self.assertTrue(tbN.shape == (12, 5))
 
     def test_PCA(self):
-        scores, expVar = self.Mod.PCA()
+        scores, expVar = self.Mod.KnockdownPCA()
         
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(scores, pandas.core.frame.DataFrame)

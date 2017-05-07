@@ -1,30 +1,67 @@
+#!/usr/bin/env python3
+
+import matplotlib
+matplotlib.use('AGG')
 import svgutils.transform as st
-from recepmod.figures import Figure1, Figure2, FigureSS, Figure3, Figure4, Figure5
+import multiprocessing
+from recepmod.figures.FigureCommon import figList
 from recepmod.StoneModMouse import StoneModelMouse
 
-def runFunc(figClass, nameOut):
-	print('Starting on ' + nameOut)
-	ff = figClass.makeFigure()
-	ff.savefig('./Manuscript/Figures/' + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
-	ff.savefig('./Manuscript/Figures/' + nameOut + '.pdf', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+parallel = True
 
-runFunc(Figure1, 'Figure1')
+fdir = './Manuscript/Figures/'
 
-runFunc(Figure2, 'Figure2')
-template = st.fromfile('./Manuscript/Figures/Figure2.svg')
-cartoon = st.fromfile('./recepmod/figures/Figure2_model_diagram.svg').getroot()
 
-cartoon.moveto(10, -15)
+def runFunc(nameOut):
+    """ Run the code for a particular figure. """
+    try:
+        import matplotlib
+        matplotlib.use('AGG')
+        import warnings
+        warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
+        exec('from recepmod.figures import ' + nameOut)
+        ff = eval(nameOut + '.makeFigure()')
+        ff.savefig(fdir + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
+        print(nameOut)
+    except Exception as e:
+        return e
 
-template.append(cartoon)
-template.save('./Manuscript/Figures/Figure2.svg')
 
-runFunc(FigureSS, 'FigureSS')
+if __name__ == '__main__':
 
-runFunc(Figure3, 'Figure3')
+    if parallel is True:
+        pool = multiprocessing.Pool()
+        result = pool.map_async(runFunc, figList)
+    else:
+        list(map(runFunc, figList))
 
-runFunc(Figure4, 'Figure4')
+    # Output data table
+    StoneModelMouse().writeModelData(fdir + 'ModelData.md')
 
-StoneModelMouse().writeModelData('./Manuscript/Figures/ModelData.md')
+    # IF we're running in parallel we need to wait for Figure 2 to finish
+    # Close the pool
+    if parallel is True:
+        pool.close()
+        pool.join()
 
-runFunc(Figure5, 'Figure5')
+        for i in result.get():
+            if isinstance(i, Exception):
+                raise i
+
+    # Overlay Figure 2 cartoon
+    template = st.fromfile(fdir + 'Figure2.svg')
+    cartoon = st.fromfile('./recepmod/figures/Figure2_model_diagram.svg').getroot()
+
+    cartoon.moveto(10, -15)
+
+    template.append(cartoon)
+    template.save(fdir + 'Figure2.svg')
+
+    # Overlay Figure 4 cartoon
+    template = st.fromfile(fdir + 'Figure4.svg')
+    cartoon = st.fromfile('./recepmod/figures/Figure4_regression_approach.svg').getroot()
+
+    cartoon.moveto(10, 20, scale=0.66)
+
+    template.append(cartoon)
+    template.save(fdir + 'Figure4.svg')
