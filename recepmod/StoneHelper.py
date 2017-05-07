@@ -4,16 +4,19 @@
 import numpy as np
 import pandas as pd
 from memoize import memoize
-from scipy.stats import ttest_ind
 
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
 
-def read_chain(filename):
+def read_chain(filename=None, filter=True):
     """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
+    import os
     import h5py
+
+    if filename is None:
+        filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5")
 
     # Open hdf5 file
     f = h5py.File(filename, 'r')
@@ -35,32 +38,34 @@ def read_chain(filename):
     # Read in dataset to Pandas frame
     pdset = pd.DataFrame(dset.value, columns = cNames)
 
+    f.close()
+
     pdset['gnu1'] = np.floor(pdset['gnu1'])
     pdset['gnu2'] = np.floor(pdset['gnu2'])
 
-    f.close()
+    # Filter burn in period, etc
+    if filter is True:
+        pdset = pdset.iloc[5000:, :]
+        # TODO: Implement filter
 
     return (StoneM, pdset)
 
+
 def rep(x, N):
+    """ Returns a range with repeated elements. """
     return [item for item in x for i in range(N)]
+
 
 @memoize
 def getMedianKx():
-    """ Read the MCMC chain and find the median Kx. Cheched for sanity. """
-    import os
+    """ Read the MCMC chain and find the median Kx. Cached for sanity. """
+    return np.power(10, np.median((read_chain()[1])['Kx1']))
 
-    # Retrieve model and fit from hdf5 file
-    _, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5"))
 
-    # Only keep good samples
-    dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 3)),:]
-    Kx = np.power(10, np.median(dsetFilter['Kx1']))
-
-    return Kx
-
-# Return a dataframe with the measured data labeled with the condition variables
 def getMeasuredDataFrame(self):
+    """
+    Return a dataframe with the measured data labeled with the condition variables
+    """
     normData = pd.DataFrame(self.mfiAdjMean)
     normData = pd.melt(normData, value_name = "Meas")
 
@@ -74,8 +79,11 @@ def getMeasuredDataFrame(self):
 
     return normData
 
-# Return a dataframe with the fit data labeled with the condition variables
+
 def getFitPrediction(self, x):
+    """
+    Return a dataframe with the fit data labeled with the condition variables
+    """
     _, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = self.NormalErrorCoef(x, fullOutput = True)
 
     outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
@@ -96,7 +104,7 @@ def getFitPrediction(self, x):
 
     return dd
 
-def mapMCMC(dFunction, pSet):
+def mapMCMC(dFunction, pSet, quiet=False):
     """
     This function takes (1) a function that takes a parameter set and
     returns a dataframe and (2) a list of parameter sets. It returns a dataframe
@@ -109,43 +117,16 @@ def mapMCMC(dFunction, pSet):
     funFunc = lambda ii: dFunction(pSet.iloc[ii,:]).assign(pSetNum = ii)
 
     # Iterate over each parameter set, output to a list
-    retVals = map(funFunc, trange(pSet.shape[0]))
+    retVals = map(funFunc, trange(pSet.shape[0], disable=quiet))
 
     # Concatenate all the dataframes vertically and return
     return pd.concat(retVals)
 
-# Reduce the collection of predictions to various summary statistics.
-def reduceMCMC(frameList, groupByC = None, dropC = None):
-    if groupByC is None:
-        groupByC = ['Ig', 'FcgR', 'TNP']
 
-    if dropC is None:
-        dropC = ['Expression', 'pSetNum']
-
-    # Drop indicated columns
-    frameList = frameList.drop(dropC, axis = 1).groupby(groupByC)
-
-    # Summarize the collections in various ways
-    frameListMean = frameList.mean().reset_index()
-    frameListStd = frameList.std().reset_index()
-    frameListMedian = frameList.median().reset_index()
-    frameListMin = frameList.min().reset_index()
-    frameListMax = frameList.max().reset_index()
-    frameListLowCI = frameList.quantile(0.025).reset_index()
-    frameListHighCI = frameList.quantile(0.975).reset_index()
-
-    # Merge each frame together with a suffix to indicate what each quantity is
-    frameAgg = frameListMean.merge(frameListStd, on = groupByC, suffixes = ('_mean', '_std'))
-    frameAgg = frameAgg.merge(frameListMedian, on = groupByC, suffixes = ('', '_median'))
-    frameAgg = frameAgg.merge(frameListMin, on = groupByC, suffixes = ('', '_min'))
-    frameAgg = frameAgg.merge(frameListMax, on = groupByC, suffixes = ('', '_max'))
-    frameAgg = frameAgg.merge(frameListLowCI, on = groupByC, suffixes = ('', '_lCI'))
-    frameAgg = frameAgg.merge(frameListHighCI, on = groupByC, suffixes = ('', '_uCI'))
-
-    return frameAgg
-
-# Return the fit and measured data merged into a single dataframe
 def getFitMeasMerged(self, x):
+    """
+    Return the fit and measured data merged into a single dataframe
+    """
     fit = getFitPrediction(self, x)
     data = getMeasuredDataFrame(self)
 
@@ -190,28 +171,25 @@ def getFitMeasSummarized(M):
 
     return fitMean
 
-def mapStore(dset, M):
-    frameList = mapMCMC(lambda x: getFitPrediction(M,x),dset.as_matrix()[:,2:])
-    frameList.to_pickle('mapped_chain.pkl')
-
-def reduce():
-    frameList = pd.read_pickle('mapped_chain.pkl')
-    return reduceMCMC(frameList)
-
 
 def geweke(chain1, chain2=None):
-    # Perform the Geweke Diagnostic between two univariate chains. If two
-    # chains are inputinstead of one, Student's t-test is performed instead.
+    """
+    Perform the Geweke Diagnostic between two univariate chains. If two chains are input 
+    instead of one, Student's t-test is performed instead.
+    """
+    from scipy.stats import ttest_ind
+
     len0 = chain1.shape[0]
-    if not chain2:
+    if chain2 is None:
         chain2 = chain1[int(np.ceil(len0/2)):len0]
         chain1 = chain1[0:int(np.ceil(len0*0.1))]
     statistic, pvalue = ttest_ind(chain1,chain2)
     return statistic, pvalue
-            
+
 def geweke_chain(dset):
-    # Perform the Geweke Diagnostic on multiple chains (along a single axis)
-    # of data contained in a Pandas DataFrame "dset" output by read_chain.
+    """
+    Perform the Geweke Diagnostic on multiple chains of data contained in a Pandas DataFrame "dset" output by read_chain.
+    """
     statistics = []
     pvalues = []
     dsett = dset.drop(['LL','walker'],1).as_matrix()

@@ -1,13 +1,14 @@
 import numpy as np
-import h5py
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
 
 def startH5File(StoneM, filename):
     # Dump class to a string to store with MCMC chain
+    import h5py
+
+    try:
+        import cPickle as pickle
+    except ImportError:
+        import pickle
+
     StoneMs = pickle.dumps(StoneM, pickle.HIGHEST_PROTOCOL)
 
     f = h5py.File(filename, 'w', libver='latest')
@@ -29,3 +30,42 @@ def getUniformStart(StoneM):
         p0[ii] = StoneM.lb + (StoneM.ub - StoneM.lb)*p0[ii]
 
     return (p0, ndims, nwalkers)
+
+def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
+    from emcee import EnsembleSampler
+    from .StoneModel import StoneModel
+
+    bestLL = -np.inf
+
+    # Load model
+    StoneM = StoneModel.StoneModel(newData)
+
+    # Get uniform distribution of positions for start
+    p0, ndims, nwalkers = getUniformStart(StoneM)
+
+    ## Set up sampler
+    sampler = EnsembleSampler(nwalkers,ndims,StoneM.NormalErrorCoef,2.0,[],{},None,16)
+
+    if not filename is None:
+        f, dset = startH5File(StoneM, filename)
+
+    # Setup thinning tracking
+    thinTrack = 0
+
+    for p, lnprob, lnlike in sampler.sample(p0, iterations=niters, storechain=False):
+        if thinTrack < thin:
+            thinTrack += 1
+        else:
+            if np.max(lnprob) > bestLL:
+                bestLL = np.max(lnprob)
+
+            matOut = np.concatenate((lnprob.reshape(nwalkers, 1), np.arange(0, nwalkers).reshape(nwalkers, 1), p.reshape(nwalkers, ndims)), axis=1)
+
+            if not filename is None:
+                fShape = dset.shape
+                dset.resize((fShape[0] + np.shape(matOut)[0], fShape[1]))
+                dset[fShape[0]:, :] = matOut
+                f.flush()
+
+            print((dset.shape, bestLL))
+            thinTrack = 1
