@@ -10,9 +10,13 @@ try:
 except ImportError:
     import pickle
 
-def read_chain(filename):
+def read_chain(filename=None, filter=True):
     """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
+    import os
     import h5py
+
+    if filename is None:
+        filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5")
 
     # Open hdf5 file
     f = h5py.File(filename, 'r')
@@ -34,30 +38,28 @@ def read_chain(filename):
     # Read in dataset to Pandas frame
     pdset = pd.DataFrame(dset.value, columns = cNames)
 
+    f.close()
+
     pdset['gnu1'] = np.floor(pdset['gnu1'])
     pdset['gnu2'] = np.floor(pdset['gnu2'])
 
-    f.close()
+    # Filter burn in period, etc
+    if filter is True:
+        pdset = pdset.iloc[5000:, :]
+        # TODO: Implement filter
 
     return (StoneM, pdset)
+
 
 def rep(x, N):
     """ Returns a range with repeated elements. """
     return [item for item in x for i in range(N)]
 
+
 @memoize
 def getMedianKx():
-    """ Read the MCMC chain and find the median Kx. Cheched for sanity. """
-    import os
-
-    # Retrieve model and fit from hdf5 file
-    _, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5"))
-
-    # Only keep good samples
-    dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 3)),:]
-    Kx = np.power(10, np.median(dsetFilter['Kx1']))
-
-    return Kx
+    """ Read the MCMC chain and find the median Kx. Cached for sanity. """
+    return np.power(10, np.median((read_chain()[1])['Kx1']))
 
 
 def getMeasuredDataFrame(self):
@@ -178,7 +180,7 @@ def geweke(chain1, chain2=None):
     from scipy.stats import ttest_ind
 
     len0 = chain1.shape[0]
-    if not chain2:
+    if chain2 is None:
         chain2 = chain1[int(np.ceil(len0/2)):len0]
         chain1 = chain1[0:int(np.ceil(len0*0.1))]
     statistic, pvalue = ttest_ind(chain1,chain2)
