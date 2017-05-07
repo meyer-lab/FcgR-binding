@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import matplotlib
 matplotlib.use('AGG')
 import svgutils.transform as st
@@ -13,6 +15,10 @@ fdir = './Manuscript/Figures/'
 def runFunc(nameOut):
     """ Run the code for a particular figure. """
     try:
+        import matplotlib
+        matplotlib.use('AGG')
+        import warnings
+        warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
         exec('from recepmod.figures import ' + nameOut)
         ff = eval(nameOut + '.makeFigure()')
         ff.savefig(fdir + nameOut + '.svg', dpi=ff.dpi, bbox_inches='tight', pad_inches=0)
@@ -42,7 +48,7 @@ if __name__ == '__main__':
             if isinstance(i, Exception):
                 raise i
 
-    # Overlay cartoon
+    # Overlay Figure 2 cartoon
     template = st.fromfile(fdir + 'Figure2.svg')
     cartoon = st.fromfile('./recepmod/figures/Figure2_model_diagram.svg').getroot()
 
@@ -50,3 +56,12 @@ if __name__ == '__main__':
 
     template.append(cartoon)
     template.save(fdir + 'Figure2.svg')
+
+    # Overlay Figure 4 cartoon
+    template = st.fromfile(fdir + 'Figure4.svg')
+    cartoon = st.fromfile('./recepmod/figures/Figure4_regression_approach.svg').getroot()
+
+    cartoon.moveto(10, 20, scale=0.66)
+
+    template.append(cartoon)
+    template.save(fdir + 'Figure4.svg')

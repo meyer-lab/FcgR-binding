@@ -10,9 +10,9 @@ Immune complex (IC) binding to human FcγRs was analyzed using Chinese hamster o
 
 ## *In vivo* regression
 
-Regression against *in vivo* efficacy of IgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Each efficacy was presented as the percent reduction in the number of lung metastases quantified (TODO: CITE). To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was performed with a hyberbolic relationship, such that:
+Regression against *in vivo* efficacy of IgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Each efficacy was presented as the percent reduction in the number of lung metastases quantified [@Nimmerjahn:2005hu]. To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was performed with a hyberbolic relationship, such that:
 
-$$ y = F (X \dot p) $$ {#eq:lsq}
+$$ y = F (X \cdot p) $$ {#eq:lsq}
 
 where F is the normal distribuion cumulative density function, with mean and standard deviation varied during fitting.
 

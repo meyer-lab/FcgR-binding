@@ -10,26 +10,16 @@ from ..StoneHelper import getMedianKx
 
 # Specific predictions regarding the coordinate effects of immune complex parameters.
 
+subsplits = 15
 
 def makeFigure():
     import string
-    from matplotlib import gridspec
-    from .FigureCommon import subplotLabel
-    import matplotlib.pyplot as plt
 
-    sns.set(style="whitegrid",
-            font_scale=0.7,
-            color_codes=True,
-            palette="colorblind")
-
-    # Setup plotting space
-    f = plt.figure(figsize=(9, 5))
-
-    # Make grid
-    gs1 = gridspec.GridSpec(2, 5, width_ratios=[3,3,3,3,1])
+    from .FigureCommon import subplotLabel, getSetup
 
     # Get list of axis objects
-    ax = [f.add_subplot(x) for x in gs1]
+    ax, f = getSetup((9, 5), (2, 4))
+
     # Plot subplot A
     PredictionVersusAvidity(ax[0:4])
 
@@ -64,7 +54,7 @@ def makeFigure():
 
 def plotRanges():
     avidity = np.logspace(0, 5, 6, base=2, dtype=np.int)
-    ligand = np.logspace(start=-12, stop=-5, num=50)
+    ligand = np.logspace(start=-12, stop=-5, num=subsplits)
     Ka = [1.2E6, 1.2E5] # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
     logR = [4.0, 4.5]
 
@@ -92,7 +82,7 @@ def PredictionVersusAvidity(ax):
     skipColor(ax[3])
 
     def calculate(x):
-        a = StoneMod(logR[0],Ka[0],x['avidity'],getMedianKx()*Ka[0],x['ligand'], fullOutput = True)
+        a = StoneMod(logR[0],Ka[0],x['avidity'],getMedianKx()*Ka[0],x['ligand'], fullOutput=True)
 
         return pd.Series(dict(bound = a[0],
                               avidity = x['avidity'],
@@ -175,7 +165,7 @@ def varyAffinity(ax):
     gnu = 5
     L0 = 1E-9
 
-    tableAct = pd.DataFrame(Ka[0] * np.logspace(start=0, stop=2, num=10), columns=['affinity'])
+    tableAct = pd.DataFrame(Ka[0] * np.logspace(start=0, stop=2, num=subsplits), columns=['affinity'])
 
     def appFunc(x, ii):
         KaCur = Ka.copy()
@@ -204,30 +194,29 @@ def maxAffinity(ax):
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
 
-    table = pd.DataFrame(np.logspace(start=-4, stop=4, num=20), columns=['adjust'])
+    table = pd.DataFrame(np.logspace(start=4, stop=9, num=subsplits), columns=['adjust'])
+
+    colors = sns.color_palette()
 
     def appFunc(x, ii):
         KaCur = Kas.copy()
-        KaCur[ii] *= x.adjust
+        KaCur[ii] = x.adjust
 
         x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
-        x['KaCur'] = KaCur[ii]
 
         return x
-
-    # TODO: Indicate where receptors are when not varied.
 
     tableA = table.apply(lambda x: appFunc(x, 0), axis=1)
     tableC = table.apply(lambda x: appFunc(x, 2), axis=1)
     tableD = table.apply(lambda x: appFunc(x, 3), axis=1)
 
-    tableA.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
-    tableC.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
-    tableD.plot(ax=ax, x='KaCur', y='activity', legend=False, loglog=True)
+    tableA.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[0])
+    tableC.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[1])
+    tableD.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[2])
 
-    ax.plot(M.kaMouse[0, 2], 500, 'k.')
-    ax.plot(M.kaMouse[1, 2], 500, 'k.')
-    ax.plot(M.kaMouse[3, 2], 500, 'k.')
+    ax.loglog(M.kaMouse[0, 2], 512, color=colors[0], marker='o')
+    ax.loglog(M.kaMouse[2, 2], 512, color=colors[1], marker='o')
+    ax.loglog(M.kaMouse[3, 2], 512, color=colors[2], marker='o')
 
     ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
