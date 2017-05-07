@@ -17,8 +17,6 @@ def texRename(name):
     name = 'TNP-26 c.f.' if name=='sigConv2' else name
     name = r'$\sigma_1$' if name=='sigma' else name
     name = r'$\sigma_2$' if name=='sigma2' else name
-##    name = 'TNP-4 effective avidity' if name=='gnu1' else name
-##    name = 'TNP-26 effective avidity' if name=='gnu2' else name
     name = r'$\nu_4$' if name=='gnu1' else name
     name = r'$\nu_{26}$' if name=='gnu2' else name
     return name
@@ -36,17 +34,23 @@ FcgRidxL = dict(zip([r'Fc$\gamma$RI',
 def subplotLabel(ax, letter):
     ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
 
-def getSetup(figsize, gridd):
+def getSetup(figsize, gridd, height_ratios=None, width_ratios=None):
     from matplotlib import gridspec
     import matplotlib.pyplot as plt
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
+    # Set up default grid heigth/width ratios
+    if not height_ratios:
+        height_ratios = [1]*gridd[0]
+    if not width_ratios:
+        width_ratios = [1]*gridd[1]
+
     # Setup plotting space
     f = plt.figure(figsize=figsize)
 
     # Make grid
-    gs1 = gridspec.GridSpec(*gridd)
+    gs1 = gridspec.GridSpec(*gridd, height_ratios=height_ratios, width_ratios=width_ratios)
 
     # Get list of axis objects
     ax = [f.add_subplot(gs1[x]) for x in range(gridd[0] * gridd[1])]
