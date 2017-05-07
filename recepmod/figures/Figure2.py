@@ -3,7 +3,7 @@ import numpy as np
 import seaborn as sns
 from matplotlib import rcParams
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chains
-from .FigureCommon import Igs, FcgRidx, subplotLabel, texRename, texRenameList, getSetup, Legend, FcgRidxL
+from .FigureCommon import Igs, FcgRidx, subplotLabel, texRename, texRenameList, getSetup, Legend, FcgRidxL, getRquant
 
 
 def makeFigure():
@@ -60,7 +60,10 @@ def violinPlot(dset, ax):
     ax.set_yticks([5,6])
     ax.set_yticklabels([r'$10^5$',r'$10^6$'])
     ax.set_ylabel(r'$\log_{10}$(Fc$\gamma$R Expression)')
-    
+
+    # Overlay FcgR quantifications
+    for ii, row in enumerate(getRquant()):
+        ax.plot([ii]*len(row), row, 'k_', mew=.5)
 
 def histSubplots(dset, axes):
     dset.columns = texRenameList(dset.columns)
