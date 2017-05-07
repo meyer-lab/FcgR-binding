@@ -11,8 +11,6 @@ def makeFigure():
     M, dset = read_chain()
 
     pBest = dset.iloc[np.argmax(dset['LL']), :][2:].as_matrix()
-    
-    rcParams['lines.markeredgewidth'] = 1.0
 
     # Get list of axis objects
     ax, f = getSetup((7, 6), (3, 3))
@@ -57,13 +55,15 @@ def violinPlot(dset, ax):
                        rotation_mode="anchor",
                        ha="right")
 
-    ax.set_yticks([5,6])
-    ax.set_yticklabels([r'$10^5$',r'$10^6$'])
+    ax.set_yticks([5, 6, 7])
+    ax.set_yticklabels([r'$10^5$', r'$10^6$', r'$10^7$'])
     ax.set_ylabel(r'$\log_{10}$(Fc$\gamma$R Expression)')
 
     # Overlay FcgR quantifications
     for ii, row in enumerate(getRquant()):
-        ax.plot([ii]*len(row), row, 'k_', mew=.5)
+        ax.plot([ii]*len(row), row, 'k_', mew=1.0)
+
+    ax.set_ylim(5, 7)
 
 def histSubplots(dset, axes):
     dset.columns = texRenameList(dset.columns)
@@ -99,6 +99,7 @@ def plotFit(fitMean, ax):
                     mfc=colorr,
                     mec=colorr,
                     ms=3,
+                    mew=1.0,
                     ecolor=colorr,
                     linestyle='None')
 
@@ -128,7 +129,7 @@ def GewekeDiagPlot(M,dset,ax):
                 x = 'kx'
             else:
                 x = 'gx'
-            ax.plot([j],[pval],x)
+            ax.plot(j, pval, x, mew=1.0)
         
     ax.set_xbound(-1,M.Nparams)
     ax.set_xticks([j for j in range(M.Nparams)])
