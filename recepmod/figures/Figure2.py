@@ -57,7 +57,10 @@ def violinPlot(dset, ax):
                        rotation_mode="anchor",
                        ha="right")
 
+    ax.set_yticks([5,6])
+    ax.set_yticklabels([r'$10^5$',r'$10^6$'])
     ax.set_ylabel(r'$\log_{10}$(Fc$\gamma$R Expression)')
+    
 
 def histSubplots(dset, axes):
     dset.columns = texRenameList(dset.columns)
