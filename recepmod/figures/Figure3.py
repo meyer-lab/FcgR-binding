@@ -26,28 +26,38 @@ def makeFigure():
     f = plt.figure(figsize=(9, 5))
 
     # Make grid
-    gs1 = gridspec.GridSpec(2, 4)
+    gs1 = gridspec.GridSpec(2, 5, width_ratios=[3,3,3,3,1])
 
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(8)]
-
+    ax = [f.add_subplot(x) for x in gs1]
     # Plot subplot A
     PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
-    TwoRecep(ax=ax[4:6])
+    TwoRecep(ax=ax[5:7])
 
     # Plot of activity index versus Ka ratio
-    varyAffinity(ax=ax[6])
+    varyAffinity(ax=ax[7])
 
     # Plot to show that highest affinity activating receptor is most sensitive to adjustment
-    maxAffinity(ax=ax[7])
+    maxAffinity(ax=ax[8])
+
+    # Remove empty figures
+    ax[4].set_axis_off()
+    ax[9].set_axis_off()
 
     for ii, item in enumerate(ax):
-        subplotLabel(item, string.ascii_uppercase[ii])
+        if (ii == 4 or ii == 9):
+            continue
+        if ii < 4:
+            subplotLabel(item, string.ascii_uppercase[ii])
+        elif ii < 9:
+            subplotLabel(item, string.ascii_uppercase[ii-1])
 
     # Tweak layout
     f.tight_layout()
+
+    ax[3].legend([r'$\nu='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],loc=2,bbox_to_anchor=(1.2,1))
 
     return f
 
