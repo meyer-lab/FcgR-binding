@@ -45,6 +45,19 @@ class TestStoneMethods(unittest.TestCase):
 
     	self.assertLess(b, 0.01)
 
+    def test_geweke_chain(self):
+        from ..StoneHelper import geweke_chain
+        import pandas as pd
+
+        data = pd.DataFrame(numpy.random.normal(size=(4000, 10)))
+        data['LL'] = 1
+        data['walker'] = 1
+
+        a, b = geweke_chain(data)
+
+        self.assertGreater(numpy.min(b), 0.01)
+        self.assertEqual(len(b), 10)
+
 
 if __name__ == '__main__':
     unittest.main()
