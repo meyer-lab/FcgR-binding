@@ -1,26 +1,76 @@
 import seaborn as sns
+from ..StoneModel import StoneModel
+
+figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'Figure5', 'FigureSS']
 
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
-FcgRidx = ['FcgRI', 'FcgRIIA-Arg', 'FcgRIIA-His', 'FcgRIIB', 'FcgRIIIA-Phe', 'FcgRIIIA-Val']
-FcgRidx = dict(zip(FcgRidx, sns.color_palette()))
+FcgRidx = dict(zip(['FcgRI',
+                    'FcgRIIA-Arg',
+                    'FcgRIIA-His',
+                    'FcgRIIB',
+                    'FcgRIIIA-Phe',
+                    'FcgRIIIA-Val'], sns.color_palette()))
 
-FcgRidxL = [r'Fc$\gamma$RI',r'Fc$\gamma$RIIA-131R',r'Fc$\gamma$RIIA-131H',r'Fc$\gamma$RIIB',r'Fc$\gamma$RIIIA-158F',r'Fc$\gamma$RIIIA-158V']
-FcgRidxL = dict(zip(FcgRidxL, sns.color_palette()))
+def texRename(name):
+    name = r'K$_x$' if name=='Kx1' else name
+    name = 'TNP-4 c.f.' if name=='sigConv1' else name
+    name = 'TNP-26 c.f.' if name=='sigConv2' else name
+    name = r'$\sigma_1$' if name=='sigma' else name
+    name = r'$\sigma_2$' if name=='sigma2' else name
+    name = r'$\nu_4$' if name=='gnu1' else name
+    name = r'$\nu_{26}$' if name=='gnu2' else name
+    return name
 
-def makeFcIgLegend():
-    import matplotlib.lines as mlines
-    import matplotlib.patches as mpatches
+def texRenameList(names):
+    return [texRename(name) for name in names]
 
-    patches = list()
-
-    for f in FcgRidxL:
-        patches.append(mpatches.Patch(color=FcgRidxL[f], label=f))
-
-    for j in Igs:
-        patches.append(mlines.Line2D([], [], color='black', marker=Igs[j], markersize=7, label=j, linestyle='None'))
-
-    return patches
+FcgRidxL = dict(zip([r'Fc$\gamma$RI',
+                     r'Fc$\gamma$RIIA-131R',
+                     r'Fc$\gamma$RIIA-131H',
+                     r'Fc$\gamma$RIIB',
+                     r'Fc$\gamma$RIIIA-158F',
+                     r'Fc$\gamma$RIIIA-158V'], sns.color_palette()))
 
 def subplotLabel(ax, letter):
     ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
+
+def getSetup(figsize, gridd, height_ratios=None, width_ratios=None):
+    from matplotlib import gridspec
+    import matplotlib.pyplot as plt
+
+    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
+
+    # Set up default grid heigth/width ratios
+    if not height_ratios:
+        height_ratios = [1]*gridd[0]
+    if not width_ratios:
+        width_ratios = [1]*gridd[1]
+
+    # Setup plotting space
+    f = plt.figure(figsize=figsize)
+
+    # Make grid
+    gs1 = gridspec.GridSpec(*gridd, height_ratios=height_ratios, width_ratios=width_ratios)
+
+    # Get list of axis objects
+    ax = [f.add_subplot(gs1[x]) for x in range(gridd[0] * gridd[1])]
+
+    return (ax, f)
+
+def Legend(colors, shapes):
+    """ Make legend. """
+    import matplotlib
+    
+    patches = list()
+
+    for key, val in colors.items():
+        patches.append(matplotlib.patches.Patch(color=val, label=key))
+
+    for key, val in shapes.items():
+        patches.append(matplotlib.lines.Line2D([], [], color='black', marker=val, markersize=7, label=key, linestyle='None'))
+    
+    return patches
+
+def getRquant():
+    return StoneModel(newData=True).Rquant
