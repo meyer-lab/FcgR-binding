@@ -1,4 +1,5 @@
 import seaborn as sns
+from ..StoneModel import StoneModel
 
 figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'Figure5', 'FigureSS']
 
@@ -70,3 +71,6 @@ def Legend(colors, shapes):
         patches.append(matplotlib.lines.Line2D([], [], color='black', marker=val, markersize=7, label=key, linestyle='None'))
     
     return patches
+
+def getRquant():
+    return StoneModel(newData=True).Rquant
