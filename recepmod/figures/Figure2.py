@@ -1,40 +1,27 @@
-import os
 import string
-
-from matplotlib import gridspec, rcParams
-import matplotlib.pyplot as plt
-
 import numpy as np
-
 import seaborn as sns
+from matplotlib import rcParams
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chains
-from .FigureCommon import Igs, FcgRidx, makeFcIgLegend, subplotLabel
+from .FigureCommon import Igs, FcgRidx, subplotLabel, texRename, texRenameList, getSetup, Legend, FcgRidxL, getRquant
 
 
 def makeFigure():
-    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
-
     # Retrieve model and fit from hdf5 file
-    M, dset = read_chain(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/test_chain.h5"))
+    M, dset = read_chain()
 
     pBest = dset.iloc[np.argmax(dset['LL']), :][2:].as_matrix()
     
     rcParams['lines.markeredgewidth'] = 1.0
 
-    # Setup plotting space
-    f = plt.figure(figsize=(7, 6))
-
-    # Make grid
-    gs1 = gridspec.GridSpec(3, 3)
-
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(9)]
+    ax, f = getSetup((7, 6), (3, 3))
 
     # Blank out for the cartoon
     ax[0].axis('off')
     ax[1].axis('off')
 
-    ax[1].legend(handles=makeFcIgLegend())
+    ax[1].legend(handles=Legend(FcgRidxL, Igs))
 
     # Show predicted versus actual
     plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[2])
@@ -53,16 +40,15 @@ def makeFigure():
     for ii, item in enumerate(ax[2:9]):
         subplotLabel(item, string.ascii_uppercase[ii+1])
 
+    # Try and fix overlapping elements
+    f.tight_layout()
+
     return f
 
 
-def violinPlot(dset, ax=None):
-    # If no axis was provided make our own
-    if ax is None:
-        ax = plt.gca()
-
+def violinPlot(dset, ax):
     dset = dset[['Rexp']]
-    dset.columns = FcgRidx.keys()
+    dset.columns = FcgRidxL.keys()
 
     sns.violinplot(data=dset, cut=0, ax=ax, linewidth=0)
 
@@ -71,41 +57,37 @@ def violinPlot(dset, ax=None):
                        rotation_mode="anchor",
                        ha="right")
 
-    ax.set_ylabel(r'Log$_{10}$ Fc$\gamma$R Expression')
+    ax.set_yticks([5,6])
+    ax.set_yticklabels([r'$10^5$',r'$10^6$'])
+    ax.set_ylabel(r'$\log_{10}$(Fc$\gamma$R Expression)')
 
-def histSubplots(dset, axes=None):
-    if axes is None:
-        _, axes = plt.subplots(nrows=1, ncols=4)
+    # Overlay FcgR quantifications
+    for ii, row in enumerate(getRquant()):
+        ax.plot([ii]*len(row), row, 'k_', mew=.5)
 
-    dsetFilter = dset.loc[dset['LL'] > (np.max(dset['LL'] - 10)),:]
+def histSubplots(dset, axes):
+    dset.columns = texRenameList(dset.columns)
 
-    dsetFilter[['Kx1']].plot.hist(ax=axes[0], bins = 20, color=sns.color_palette()[0])
-    dsetFilter[['sigConv1', 'sigConv2']].plot.hist(ax=axes[1], bins = 20, color=sns.color_palette()[0:2])
-    dsetFilter[['gnu1', 'gnu2']].plot.hist(ax=axes[2],
+    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins = 20, color=sns.color_palette()[0])
+    dset[[texRename('sigConv1'), texRename('sigConv2')]].plot.hist(ax=axes[1], bins = 20, color=sns.color_palette()[0:2])
+    dset[[texRename('gnu1'), texRename('gnu2')]].plot.hist(ax=axes[2],
                                            bins = np.arange(-0.5, 32.5, 1.0),
                                            color=sns.color_palette()[0:2],
                                            xlim = (-0.5, 32.5))
-    dsetFilter[['sigma', 'sigma2']].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
+    dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
 
     # Set all the x-labels based on which histogram is displayed
-    axes[0].set_xlabel('Log10(Kx)')
-    axes[1].set_xlabel('Log10(Conversion Factor)')
-    axes[2].set_xlabel('Effective Avidity')
-    axes[3].set_xlabel('Deviation Parameter')
+    axes[0].set_xlabel(r'$\log_{10}$(K$_x$)')
+    axes[1].set_xlabel(r'$\log_{10}$(Conversion Factor)')
+    axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
+    axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
 
-    # Try and fix overlapping elements
-    plt.tight_layout()
+    print(np.mean(np.power(10, dset[texRename('sigConv2')] - dset[texRename('sigConv1')])))
 
-    print(np.mean(np.power(10, dsetFilter.sigConv2 - dsetFilter.sigConv1)))
-
-    print(np.power(10, np.std(dsetFilter.sigma2)))
+    print(np.power(10, np.std(dset[texRename('sigma2')])))
 
 
-def plotFit(fitMean, ax=None):
-    if ax is None:
-        fig = plt.figure(figsize=(8,6))
-        ax = fig.add_subplot(1, 1, 1)
-
+def plotFit(fitMean, ax):
     ax.plot([0.01, 5], [0.01, 5], color='k', linestyle='-', linewidth=1)
 
     for _, row in fitMean.iterrows():
@@ -126,10 +108,7 @@ def plotFit(fitMean, ax=None):
     ax.set_ylim(0.01, 5)
     ax.set_xlim(0.01, 5)
 
-def GewekeDiagPlot(M,dset,ax=None):
-    # Make axes object if there is not one passed in.
-    if not ax:
-        ax = plt.gca()
+def GewekeDiagPlot(M,dset,ax):
     # Get pvalues from geweke diagnostic from the dataset
     _, pvalues = geweke_chains(dset)
     # Get number of walkers from pvalues
@@ -139,15 +118,21 @@ def GewekeDiagPlot(M,dset,ax=None):
     ax.plot([j-1 for j in range(M.Nparams+2)],[0.05]*(M.Nparams+2),'r-')
 
     # Transpose pvalues from an array of shape 52, 13 to one of shape
-    # 13, 52
-    pvalues = np.array(pvalues).T.tolist()
+    # 13, 52, while taking the negative logarithms of the pvalues
+    pvalues = (-np.log(np.array(pvalues))).T.tolist()
 
     # Plot green Xs per walker per parameter
     for j in range(M.Nparams):
-        ax.plot([j]*nwalkers,pvalues[j],'gx')
+        for pval in pvalues[j]:
+            if pval > -np.log(0.05):
+                x = 'kx'
+            else:
+                x = 'gx'
+            ax.plot([j],[pval],x)
         
     ax.set_xbound(-1,M.Nparams)
     ax.set_xticks([j for j in range(M.Nparams)])
-    ax.set_xticklabels(M.FcgRs+M.pNames[6:-1],rotation=40)
-    ax.set_ylabel('p-values')
+    ax.set_xticklabels(list(FcgRidx)+texRenameList(M.pNames[6:-1]),rotation=40)
+    ax.set_ylabel(r'$-\log$(p-values)')
     ax.xaxis.grid(False)
+    leg = ax.legend((r'$p=0.05$','pass','fail'),framealpha=0.0)
