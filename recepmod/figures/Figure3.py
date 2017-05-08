@@ -171,13 +171,14 @@ def varyAffinity(ax):
 
     tableAct = tableAct.apply(lambda x: appFunc(x, 0), axis=1)
 
-    tableAct.plot(ax=ax, x='ratio', y='activity', legend=False, loglog=True)
+    tableAct.plot(ax=ax, x='ratio', y='activity', legend=False, loglog=True, color='black')
 
     ax.set_xlabel('Log Ka Ratio (Activating/Inhibitory)')
     ax.set_ylabel('Activity Index')
 
 def maxAffinity(ax):
     """ """
+    from itertools import product
     from ..StoneModMouse import StoneModelMouse
 
     M = StoneModelMouse()
@@ -187,25 +188,22 @@ def maxAffinity(ax):
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
 
-    table = pd.DataFrame(np.logspace(start=4, stop=9, num=subsplits), columns=['adjust'])
+    table = pd.DataFrame(list(product(np.logspace(start=4, stop=9, num=subsplits), [0, 2, 3])),
+                         columns=['adjust', 'ridx'])
 
     colors = sns.color_palette()
 
-    def appFunc(x, ii):
+    def appFunc(x):
         KaCur = Kas.copy()
-        KaCur[ii] = x.adjust
+        KaCur[int(x.ridx)] = x.adjust
 
         x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
 
         return x
 
-    tableA = table.apply(lambda x: appFunc(x, 0), axis=1)
-    tableC = table.apply(lambda x: appFunc(x, 2), axis=1)
-    tableD = table.apply(lambda x: appFunc(x, 3), axis=1)
+    table = table.apply(appFunc, axis=1)
 
-    tableA.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[0])
-    tableC.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[1])
-    tableD.plot(ax=ax, x='adjust', y='activity', legend=False, loglog=True, color=colors[2])
+    sns.FacetGrid(hue='ridx', data=table).map(ax.loglog, 'adjust', 'activity')
 
     ax.loglog(M.kaMouse[0, 2], 512, color=colors[0], marker='o')
     ax.loglog(M.kaMouse[2, 2], 512, color=colors[1], marker='o')
@@ -213,5 +211,4 @@ def maxAffinity(ax):
 
     ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
-
     ax.set_xlim(1.0E4, 1.0E9)
