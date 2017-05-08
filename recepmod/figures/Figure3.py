@@ -24,30 +24,23 @@ def makeFigure():
     PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
-    TwoRecep(ax=ax[5:7])
+    TwoRecep(ax=ax[4:6])
 
     # Plot of activity index versus Ka ratio
-    varyAffinity(ax=ax[7])
+    varyAffinity(ax=ax[6])
 
     # Plot to show that highest affinity activating receptor is most sensitive to adjustment
-    maxAffinity(ax=ax[8])
-
-    # Remove empty figures
-    ax[4].set_axis_off()
-    ax[9].set_axis_off()
+    maxAffinity(ax=ax[7])
 
     for ii, item in enumerate(ax):
-        if (ii == 4 or ii == 9):
-            continue
-        if ii < 4:
-            subplotLabel(item, string.ascii_uppercase[ii])
-        elif ii < 9:
-            subplotLabel(item, string.ascii_uppercase[ii-1])
+        subplotLabel(item, string.ascii_uppercase[ii])
+
+    ax[0].legend([r'$\nu='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
+                 loc=1,
+                 bbox_to_anchor=(0.5, 1))
 
     # Tweak layout
     f.tight_layout()
-
-    ax[3].legend([r'$\nu='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],loc=2,bbox_to_anchor=(1.2,1))
 
     return f
 
