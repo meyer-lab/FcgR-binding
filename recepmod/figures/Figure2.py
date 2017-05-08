@@ -109,14 +109,14 @@ def plotFit(fitMean, ax):
     ax.set_ylim(0.01, 5)
     ax.set_xlim(0.01, 5)
 
-def GewekeDiagPlot(M,dset,ax):
+def GewekeDiagPlot(M,dset,ax=None,cut=0):
     # Get pvalues from geweke diagnostic from the dataset
-    _, pvalues = geweke_chains(dset)
+    _, pvalues = geweke_chains(dset, cut)
     # Get number of walkers from pvalues
     nwalkers = len(pvalues)
     # Plot horizontal red line to discriminate between acceptable (<=0.05) and
     # unacceptable (>0.05) pvalues from Geweke diagnostic
-    ax.plot([j-1 for j in range(M.Nparams+2)],[0.05]*(M.Nparams+2),'r-')
+    ax.plot([j-1 for j in range(M.Nparams+2)],[-np.log(0.05)]*(M.Nparams+2),'r-')
 
     # Transpose pvalues from an array of shape 52, 13 to one of shape
     # 13, 52, while taking the negative logarithms of the pvalues
