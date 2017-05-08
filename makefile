@@ -13,7 +13,7 @@ $(fdir)/Figure1%svg $(fdir)/Figure2%svg $(fdir)/Figure3%svg $(fdir)/Figure4%svg 
 	python3 genFigures.py
 
 $(fdir)/Figure%pdf: $(fdir)/Figure%svg
-	cairosvg $< -o $@
+	rsvg-convert -f pdf $< -o $@
 
 Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/Figure5.pdf $(fdir)/FigureSS.pdf
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
@@ -44,4 +44,4 @@ testcover:
 	nosetests --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
 
 upload:
-	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --ignore-time --verbose"
+	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --verbose"
