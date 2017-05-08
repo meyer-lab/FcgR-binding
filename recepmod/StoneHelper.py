@@ -36,17 +36,18 @@ def read_chain(filename=None, filter=True):
     cNames.insert(0, 'LL')
 
     # Read in dataset to Pandas frame
-    pdset = pd.DataFrame(dset.value, columns = cNames)
+    # Optionally use burn in
+    if filter is True:
+        pdset = pd.DataFrame(dset.value[11000:,:], columns = cNames)
+    else:
+        pdset = pd.DataFrame(dset.value, columns = cNames)
+
+    print(str(pdset.shape[0]) + ' rows read.')
 
     f.close()
 
     pdset['gnu1'] = np.floor(pdset['gnu1'])
     pdset['gnu2'] = np.floor(pdset['gnu2'])
-
-    # Filter burn in period, etc
-    if filter is True:
-        pdset = pdset.iloc[5000:, :]
-        # TODO: Implement filter
 
     return (StoneM, pdset)
 
