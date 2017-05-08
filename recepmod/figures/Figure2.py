@@ -1,7 +1,7 @@
 import string
 import numpy as np
+import pandas as pd
 import seaborn as sns
-from matplotlib import rcParams
 from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chains
 from .FigureCommon import Igs, FcgRidx, subplotLabel, texRename, texRenameList, getSetup, Legend, FcgRidxL, getRquant
 
@@ -111,29 +111,26 @@ def plotFit(fitMean, ax):
 
 def GewekeDiagPlot(M,dset,ax):
     # Get pvalues from geweke diagnostic from the dataset
+    from statsmodels.sandbox.stats.multicomp import multipletests
+
     _, pvalues = geweke_chains(dset)
-    # Get number of walkers from pvalues
-    nwalkers = len(pvalues)
-    # Plot horizontal red line to discriminate between acceptable (<=0.05) and
-    # unacceptable (>0.05) pvalues from Geweke diagnostic
-    ax.plot([j-1 for j in range(M.Nparams+2)],[0.05]*(M.Nparams+2),'r-')
 
-    # Transpose pvalues from an array of shape 52, 13 to one of shape
-    # 13, 52, while taking the negative logarithms of the pvalues
-    pvalues = (-np.log(np.array(pvalues))).T.tolist()
+    ptable = pd.DataFrame(pvalues, columns=list(FcgRidx)+texRenameList(M.pNames[8:]))
+    ptable = pd.melt(ptable, var_name="param")
 
-    # Plot green Xs per walker per parameter
-    for j in range(M.Nparams):
-        for pval in pvalues[j]:
-            if pval > -np.log(0.05):
-                x = 'kx'
-            else:
-                x = 'gx'
-            ax.plot(j, pval, x, mew=1.0)
-        
-    ax.set_xbound(-1,M.Nparams)
-    ax.set_xticks([j for j in range(M.Nparams)])
-    ax.set_xticklabels(list(FcgRidx)+texRenameList(M.pNames[6:-1]),rotation=40)
-    ax.set_ylabel(r'$-\log$(p-values)')
-    ax.xaxis.grid(False)
-    leg = ax.legend((r'$p=0.05$','pass','fail'),framealpha=0.0)
+    ptable['PassFail'], ptable['cpval'], _, _ = multipletests(ptable.value, method='bonferroni')
+    ptable['nlog'] = -np.log10(ptable.cpval)
+
+    sns.stripplot(x='param',
+                  y='nlog',
+                  hue='PassFail',
+                  ax=ax,
+                  data=ptable)
+
+    ax.set_ylabel('-log10(q-value)')
+    ax.set_xlabel('')
+
+    ax.set_xticklabels(ax.get_xticklabels(),
+                       rotation=40,
+                       rotation_mode="anchor",
+                       ha="right")
