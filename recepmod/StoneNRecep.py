@@ -119,7 +119,7 @@ def StoneRmultiAll(vGrid):
 
 def reqSolver(logR,Ka,gnu,Kx,L0):
     """ Solve for Req """
-    from scipy.optimize import brentq
+    from scipy.optimize import brentq, root
 
     R = np.power(10.0, logR)
 
@@ -130,8 +130,8 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
             curr = curr.copy()
             curr[ii] = x
 
-        # Convert out of logs
-        curr = np.power(10, curr)
+        # Convert out of logs, minimum prevents overflow errors when no bounds
+        curr = np.power(10, np.minimum(curr, logR))
 
         # Collect the Rbnd quantities
         Rbnd = StoneRbnd(StoneVgrid(curr, Ka, gnu, Kx, L0))
@@ -145,6 +145,11 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
     if np.max(np.multiply(rootF(np.full(logR.shape, -200, dtype=np.float)), rootF(logR))) > 0:
         raise RuntimeError("No reasonable value for Req exists.")
 
+    sol = root(fun=rootF, x0=curReq, method='hybr')
+
+    if sol.success is True:
+        return np.minimum(sol.x, logR)
+
     # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
     for ii in range(200):
         # Square the error for each
@@ -152,7 +157,7 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
         # If the norm error is sufficiently reduced leave
         if np.sum(error) < 1.0E-12:
-            return curReq
+            return np.minimum(curReq, logR)
 
         # Dig up the index to optimize. Focus on the worst receptor.
         jj = np.argmax(error)
