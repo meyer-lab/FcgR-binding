@@ -119,45 +119,50 @@ def StoneRmultiAll(vGrid):
 
 def reqSolver(logR,Ka,gnu,Kx,L0):
     """ Solve for Req """
-    from scipy.optimize import brentq
-    from numpy.linalg import norm
+    from scipy.optimize import brentq, root
 
     R = np.power(10.0, logR)
 
     # This is the error function to find the root of
-    def rootF(x):
-        # Convert out of logs
-        x = np.power(10, x)
+    def rootF(curr, ii=None, x=None):
+        # If we're overriding one axis do it here.
+        if not ii is None:
+            curr = curr.copy()
+            curr[ii] = x
+
+        # Convert out of logs, minimum prevents overflow errors when no bounds
+        curr = np.power(10, np.minimum(curr, logR))
 
         # Collect the Rbnd quantities
-        Rbnd = StoneRbnd(StoneVgrid(x, Ka, gnu, Kx, L0))
+        Rbnd = StoneRbnd(StoneVgrid(curr, Ka, gnu, Kx, L0))
 
         # Req is the unbound receptor, so perform a mass balance
-        return R - x - Rbnd
-
-    def overF(curr, ii, x):
-        curr = curr.copy()
-        curr[ii] = x
-
-        return rootF(curr)[ii]
+        return R - curr - Rbnd
 
     # Reasonable approximation for curReq
-    curReq = np.array(logR - Ka*L0, dtype=np.float)
+    curReq = np.array(logR - Ka*L0, dtype=np.float64)
 
     if np.max(np.multiply(rootF(np.full(logR.shape, -200, dtype=np.float)), rootF(logR))) > 0:
         raise RuntimeError("No reasonable value for Req exists.")
 
+    sol = root(fun=rootF, x0=curReq, method='hybr')
+
+    if sol.success is True:
+        return np.minimum(sol.x, logR)
+
     # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
     for ii in range(200):
-        if norm(rootF(curReq)) < 1.0E-6:
-            return curReq
-        else:
-            prevReq = curReq
+        # Square the error for each
+        error = np.square(rootF(curReq))
 
-        # Dig up the index to optimize
-        jj = ii % len(curReq)
+        # If the norm error is sufficiently reduced leave
+        if np.sum(error) < 1.0E-12:
+            return np.minimum(curReq, logR)
 
-        curReq[jj] = brentq(lambda x: overF(curReq, jj, x), -200, logR[jj], disp=False)
+        # Dig up the index to optimize. Focus on the worst receptor.
+        jj = np.argmax(error)
+
+        curReq[jj] = brentq(lambda x: rootF(curReq, jj, x)[jj], -200, logR[jj], disp=False)
 
     raise RuntimeError("The reqSolver couldn't find Req in a reasonable number of iterations.")
 
