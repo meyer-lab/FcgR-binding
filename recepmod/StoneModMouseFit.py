@@ -97,18 +97,6 @@ def modelPrepAffinity(v=5, L0=1E-12):
     return (X.as_matrix(), y, data)
 
 
-def varyExpr():
-    gnus = np.arange(2, 10, 1, dtype=np.float)
-    Los = np.power(10, np.arange(-12, -6, 0.5, dtype=np.float))
-
-    pp = pd.DataFrame(np.array(np.meshgrid(gnus, Los)).T.reshape(-1,2))
-    pp.columns = ['gnus', 'Los']
-
-    #pp['Fit'] = parallelize_dataframe(pp.as_matrix(), InVivoPredict)
-
-    #pp.to_csv('outtt.csv')
-
-
 def InVivoPredict(inn=[5, 1E-12], printt=False):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
 
