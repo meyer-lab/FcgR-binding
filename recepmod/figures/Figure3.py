@@ -175,6 +175,7 @@ def varyAffinity(ax):
 
     ax.set_xlabel('Log Ka Ratio (Activating/Inhibitory)')
     ax.set_ylabel('Activity Index')
+    # TODO: Add various avidities with correct coloring.
 
 def maxAffinity(ax):
     """ """
@@ -212,3 +213,4 @@ def maxAffinity(ax):
     ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
     ax.set_xlim(1.0E4, 1.0E9)
+    # TODO: Add legend.
