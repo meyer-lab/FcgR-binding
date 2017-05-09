@@ -8,6 +8,18 @@ pipeline {
     stage('Clean') {
       steps {
         sh 'make clean'
+
+        step([
+          $class: 'TasksPublisher',
+          canComputeNew: false,
+          defaultEncoding: '', 
+          excludePattern: '',
+          healthy: '',
+          high: 'TODO,FIXME,XXX',
+          low: '',
+          normal: 'CITE',
+          pattern: '**/*.py, **/*.md',
+          unHealthy: ''])
       }
     }
     stage('Build') {
@@ -42,18 +54,6 @@ pipeline {
           onlyStable: false,
           sourceEncoding: 'UTF_8',
           zoomCoverageChart: true])
-
-        step([
-          $class: 'TasksPublisher',
-          canComputeNew: false,
-          defaultEncoding: '', 
-          excludePattern: '',
-          healthy: '',
-          high: 'TODO,FIXME',
-          low: '',
-          normal: '',
-          pattern: '**/*.*',
-          unHealthy: ''])
       }
     }
     stage('Deploy') {
