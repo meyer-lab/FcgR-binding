@@ -1,16 +1,15 @@
-import numpy as np
+import os
 import pandas as pd
 
 # Compare across species
 
 def makeFigure(pcOne='PC 2', pcTwo='PC 3'):
-    import os
     from .FigureCommon import subplotLabel, getSetup
 
     path = os.path.dirname(os.path.abspath(__file__))
 
     # Get list of axis objects
-    ax, f = getSetup(figsize=(7, 5), gridd=(4, 2), height_ratios=[3,1,3,1])
+    ax, f = getSetup((7, 5), (2, 2))
 
     # Run the murine plots
     PCAplot(ax[0:2],
@@ -18,16 +17,12 @@ def makeFigure(pcOne='PC 2', pcTwo='PC 3'):
             'Murine', pcOne, pcTwo)
 
     # Run the human plots
-    PCAplot(ax[4:6],
+    PCAplot(ax[2:4],
             pd.read_csv(os.path.join(path, '../data/pca-human.csv'), index_col=0),
             'Human', pcOne, pcTwo)
 
-    # Turn off empty subplots
-    for j in [2,3,6,7]:
-        ax[j].set_axis_off()
-
     subplotLabel(ax[0], 'A')
-    subplotLabel(ax[4], 'B')
+    subplotLabel(ax[2], 'B')
 
     # Tweak layout
     f.tight_layout(w_pad=12)
@@ -35,11 +30,23 @@ def makeFigure(pcOne='PC 2', pcTwo='PC 3'):
     return f
 
 
-def makeSupp():
-    return makeFigure(pcOne='PC 1', pcTwo='PC 2')
+def makeSupp(ax):
+
+    path = os.path.dirname(os.path.abspath(__file__))
+
+    # Run the murine plots
+    PCAplot(ax[0:2],
+            pd.read_csv(os.path.join(path, '../data/pca-murine.csv'), index_col=0),
+            'Murine', 'PC 1', 'PC 2')
+
+    # Run the human plots
+    PCAplot(ax[2:4],
+            pd.read_csv(os.path.join(path, '../data/pca-human.csv'), index_col=0),
+            'Human', 'PC 1', 'PC 2')
 
 
 def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
+    import numpy as np
     from sklearn.decomposition import PCA
     from sklearn.preprocessing import StandardScaler
     import seaborn as sns
@@ -88,12 +95,13 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     axes[1].set_title(species + ' Loadings')
 
     # Ok, now start on legend
-    axes[1].legend(handles=Legend(colors, quantShape), bbox_to_anchor=(0., -0.55,1.,0.15), loc=2, ncol=3, mode='expand', borderaxespad=0.)
+    axes[1].legend(handles=Legend(colors, quantShape), bbox_to_anchor=(1, 1), loc=2)
 
     if species == 'Human':
-        axes[0].legend(handles=Legend(avcolors, hIgs), bbox_to_anchor=(0., -0.55,1.,0.15), loc=2, ncol=3, mode='expand', borderaxespad=0.)
+        axes[0].legend(handles=Legend(avcolors, hIgs), bbox_to_anchor=(1, 1), loc=2)
     else:
-        axes[0].legend(handles=Legend(avcolors, mIgs), bbox_to_anchor=(0., -0.55,1.,0.15), loc=2, ncol=3, mode='expand', borderaxespad=0.)
+        axes[0].legend(handles=Legend(avcolors, mIgs), bbox_to_anchor=(1, 1), loc=2)
+    
     # Fix axis limits
     for ii in range(2):
         ylim, xlim = np.max(np.absolute(axes[ii].get_ylim())), np.max(np.absolute(axes[ii].get_xlim()))

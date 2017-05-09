@@ -1,7 +1,7 @@
 import seaborn as sns
 from ..StoneModel import StoneModel
 
-figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'Figure5', 'FigureSS']
+figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'Figure5', 'FigureS1', 'FigureS2']
 
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
@@ -35,23 +35,17 @@ FcgRidxL = dict(zip([r'Fc$\gamma$RI',
 def subplotLabel(ax, letter):
     ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
 
-def getSetup(figsize, gridd, height_ratios=None, width_ratios=None):
+def getSetup(figsize, gridd):
     from matplotlib import gridspec
     import matplotlib.pyplot as plt
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
-    # Set up default grid heigth/width ratios
-    if not height_ratios:
-        height_ratios = [1]*gridd[0]
-    if not width_ratios:
-        width_ratios = [1]*gridd[1]
-
     # Setup plotting space
     f = plt.figure(figsize=figsize)
 
     # Make grid
-    gs1 = gridspec.GridSpec(*gridd, height_ratios=height_ratios, width_ratios=width_ratios)
+    gs1 = gridspec.GridSpec(*gridd)
 
     # Get list of axis objects
     ax = [f.add_subplot(gs1[x]) for x in range(gridd[0] * gridd[1])]
