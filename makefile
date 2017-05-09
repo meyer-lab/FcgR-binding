@@ -31,6 +31,7 @@ Manuscript/Manuscript.tex: Manuscript/Text/*.md Manuscript/index.html
 clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/Figures/ModelData.md
 	rm -f $(fdir)/Figure*
+	rm -f Manuscript/Text/07_ModelData.md
 	rm -f profile.p* stats.dat .coverage nosetests.xml
 
 test:

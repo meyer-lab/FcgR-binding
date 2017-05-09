@@ -68,7 +68,7 @@ def violinPlot(dset, ax):
 def histSubplots(dset, axes):
     dset.columns = texRenameList(dset.columns)
 
-    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins = 20, color=sns.color_palette()[0])
+    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins = 20, color=sns.color_palette()[0], legend=False)
     dset[[texRename('sigConv1'), texRename('sigConv2')]].plot.hist(ax=axes[1], bins = 20, color=sns.color_palette()[0:2])
     dset[[texRename('gnu1'), texRename('gnu2')]].plot.hist(ax=axes[2],
                                            bins = np.arange(-0.5, 32.5, 1.0),
@@ -81,6 +81,8 @@ def histSubplots(dset, axes):
     axes[1].set_xlabel(r'$\log_{10}$(Conversion Factor)')
     axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
     axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
+
+    axes[1].set_ylim(0, 5000)
 
     print(np.mean(np.power(10, dset[texRename('sigConv2')] - dset[texRename('sigConv1')])))
 
