@@ -5,9 +5,7 @@ import seaborn as sns
 import pandas as pd
 from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx
 
-# TODO: Add tick mark for 10^4 in C-E
-
-def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
+def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
@@ -30,7 +28,7 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
 
         axInt.loglog()
         axInt.set_xlabel(r'Fc$\gamma$R-IgG Ka')
-        axInt.set_ylabel('Measured TNP-BSA binding',labelpad=ylabelpad)
+        axInt.set_ylabel('Measured TNP-BSA binding')
         axInt.set_ylim(1.0E-3, 1.0E-1)
 
     plotF(ax1, fitMean.loc[fitMean['TNP'] == "TNP-4",:])
@@ -38,13 +36,12 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
 
     ax1.set_title('TNP-4-BSA')
     ax2.set_title('TNP-26-BSA')
+    ax1.set_xlim(1E4, 1E8)
+    ax1.set_xticks([1E4, 1E5, 1E6, 1E7, 1E8])
+    ax2.set_xlim(1E4, 1E8)
+    ax2.set_xticks([1E4, 1E5, 1E6, 1E7, 1E8])
 
-    for elem in ax1.get_yticklabels():
-        elem.set_x(ytickx)
-    for elem in ax2.get_yticklabels():
-        elem.set_x(ytickx)
-
-def plotAvidityEffectVsKA(fitMean, ax1, ylabelpad=-0.3, ytickx = 0.08):
+def plotAvidityEffectVsKA(fitMean, ax1):
 
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std']]
@@ -74,17 +71,22 @@ def plotAvidityEffectVsKA(fitMean, ax1, ylabelpad=-0.3, ytickx = 0.08):
                      ecolor=colorr,
                      linestyle='None')
 
-    ax1.loglog()
+    ax1.set_xscale('log', basex=10)
+    ax1.set_yscale('log', basey=2)
+
     ax1.set_xlabel(r'Fc$\gamma$R-IgG Ka')
-    ax1.set_ylabel('TNP-26 / TNP-4 Binding',labelpad=ylabelpad)
-    for j in range(6):
-        ax1.get_yticklabels()[j].set_x(ytickx)
+    ax1.set_ylabel('TNP-26 / TNP-4 Binding')
+
     ax1.set_ylim(1, 20)
+    ax1.set_yticks([1, 2, 4, 8, 16])
+
+    ax1.set_xlim(1E4, 1E8)
+    ax1.set_xticks([1E4, 1E5, 1E6, 1E7, 1E8])
 
     ax1.legend(handles=Legend(FcgRidxL, Igs), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
 
-def FcgRQuantificationFigureMaker(StoneM, ax, ylabelpad=0, ytickx=0):
+def FcgRQuantificationFigureMaker(StoneM, ax):
     # Put receptor expression measurements into a dataframe
     df = pd.DataFrame(StoneM.Rquant).T
 
@@ -104,11 +106,9 @@ def FcgRQuantificationFigureMaker(StoneM, ax, ylabelpad=0, ytickx=0):
     ## Set up axes
     axx.set_yscale('log')
     axx.set_ylim(1.0E5, 1.0E7)
-    axx.set_ylabel("Receptors/Cell", labelpad=ylabelpad)
+    axx.set_ylabel("Receptors/Cell")
     ax.set_xlabel("")
     axx.set_xlabel("")
-    for elem in axx.get_yticklabels():
-        elem.set_x(ytickx)
     axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
 def mfiAdjMeanFigureMaker(measAll, axarr):
