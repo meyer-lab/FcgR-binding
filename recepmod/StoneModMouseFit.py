@@ -66,7 +66,7 @@ def modelPrepAffinity(v=5, L0=1E-12):
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
 
-    DCexpr = [3.0, 4.0, 3.0, 3.0]
+    DCexpr = [2.0, 3.0, 2.0, 2.0]
 
     def CALCapply(row):
         from .StoneModel import StoneMod
@@ -171,9 +171,7 @@ class regFunc(BaseEstimator):
         return self.trainy - self.outF(p)
 
     def errF(self, p):
-        from numpy.linalg import norm
-
-        return norm(self.diffF(p))
+        return np.linalg.norm(self.diffF(p))
 
     def fit(self, X, y):
         from scipy.optimize import least_squares
@@ -186,7 +184,16 @@ class regFunc(BaseEstimator):
 
         self.res = least_squares(lambda p: self.diffF(p),
                             x0=x0,
+                            jac='3-point',
                             bounds=(lb, ub))
+
+        self.resC = least_squares(lambda p: self.diffF(p),
+                            x0=x0*2,
+                            jac='3-point',
+                            bounds=(lb, ub))
+
+        if self.errF(self.resC.x) < self.errF(self.res.x):
+            self.res = self.resC
 
     def predict(self, X):
         return self.outF(self.res.x, X)
