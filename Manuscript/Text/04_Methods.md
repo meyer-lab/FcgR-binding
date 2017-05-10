@@ -20,7 +20,7 @@ where F is the normal distribuion cumulative density function, with mean and sta
 
 ### Base model
 
-The equilibrium binding of TNP-X-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm] [@Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity K~a~, and then through subsequent cross-linking events with equilibrium partitioning K~x~.
+The equilibrium binding of TNP-X-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity K~a~, and then through subsequent cross-linking events with equilibrium partitioning K~x~.
 
 Therefore, according to the model, the number of ligand bound i-valently to the cell at equilibrium, v~eq~, can be found using the relation:
 
