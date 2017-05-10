@@ -17,8 +17,6 @@ def NimmerjahnPredictByAIratio():
     # Do direct regression too
     lr.fit(X, y)
     table['DirectPredict'] = lr.predict(X)
-    coe = lr.coef_
-    inter = lr.intercept_
     
     # Run crossvalidation predictions at the same time
     table['CrossPredict'] = cross_val_predict(lr, X, y, cv=X.shape[0])
@@ -28,7 +26,10 @@ def NimmerjahnPredictByAIratio():
 
     # How well did we do on direct?
     direct_perf = explained_variance_score(y, table.DirectPredict)
-    return (direct_perf, crossval_perf, table, coe, inter)
+
+    return (direct_perf, crossval_perf, table, lr.coef_, lr.intercept_)
+
+
 def NimmerjahnPredictByAffinities():
     """ This will run ordinary linear regression using just affinities of receptors. """
 
