@@ -184,7 +184,7 @@ class regFunc(BaseEstimator):
         lb = np.full(x0.shape, -20, dtype=np.float64)
         ub = np.full(x0.shape, 20, dtype=np.float64)
 
-        self.resT = least_squares(lambda p: self.diffF(p),
+        self.res = least_squares(lambda p: self.diffF(p),
                             x0=x0,
                             bounds=(lb, ub))
 
