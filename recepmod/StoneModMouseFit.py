@@ -77,10 +77,10 @@ def modelPrepAffinity(v=5, L0=1E-12):
         row['NK'] = StoneMod(logR=4.0, Ka=row.FcgRIII, v=v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
         row['DC'] = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(), gnu=v, L0=L0).getActivity([1, -1, 1, 1])
 
+        row['2B-KO'] = 1
+
         if re.search('FcgRIIB-', row.name) is None:
             row['2B-KO'] = 0
-        else:
-            row['2B-KO'] = 1
 
         return row
 
@@ -180,17 +180,12 @@ class regFunc(BaseEstimator):
 
         self.trainX, self.trainy = X, y
 
-        x0 = np.zeros((X.shape[1] + 2, ), dtype=np.float64)
-
-        if self.logg is False:
-            x0[:] = 1.0
-
+        x0 = np.ones((X.shape[1] + 2, ), dtype=np.float64)
         lb = np.full(x0.shape, -20, dtype=np.float64)
         ub = np.full(x0.shape, 20, dtype=np.float64)
 
-        self.res = least_squares(lambda p: self.diffF(p), 
-                            x0=x0, 
-                            jac='3-point',
+        self.resT = least_squares(lambda p: self.diffF(p),
+                            x0=x0,
                             bounds=(lb, ub))
 
     def predict(self, X):
