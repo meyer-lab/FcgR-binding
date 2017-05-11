@@ -98,7 +98,7 @@ def modelPrepAffinity(v=5, L0=1E-12):
     return (X.as_matrix(), y, data)
 
 
-def InVivoPredict(inn=[5, 1E-12], printt=False):
+def InVivoPredict(inn=[5, 1E-12]):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
 
     inn = np.squeeze(inn)
@@ -123,11 +123,7 @@ def InVivoPredict(inn=[5, 1E-12], printt=False):
     table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
     table['Error'] = abs(table.CPredict - y)
 
-    if printt is True:
-        print('')
-        print(table)
-
-    return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table)
+    return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table, model)
 
 def crossValF(table):
     yy = cross_val_predict(regFunc(), 
@@ -139,7 +135,7 @@ def crossValF(table):
 
 
 def InVivoPredictMinusComponents():
-    _, cperf, data = InVivoPredict()
+    _, cperf, data, _ = InVivoPredict()
 
     data = data[['Effectiveness', 'NK', 'DC', '2B-KO']]
 

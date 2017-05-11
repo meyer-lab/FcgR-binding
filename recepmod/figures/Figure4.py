@@ -86,7 +86,7 @@ def InVivoPredictVsActual(ax):
     from ..StoneModMouseFit import InVivoPredict
 
     # Run the in vivo regression model
-    devar, cevar, tbN = InVivoPredict()
+    devar, cevar, tbN, _ = InVivoPredict()
 
     commonPlot(ax, tbN, 'DPredict', 'Effectiveness')
 
@@ -107,7 +107,7 @@ def ComponentContrib(ax):
     from ..StoneModMouseFit import InVivoPredict
 
     # Run the in vivo regression model
-    _, _, tbN = InVivoPredict()
+    _, _, tbN, _ = InVivoPredict()
 
     tbN = tbN.drop('None')
 
@@ -123,7 +123,7 @@ def InVivoPredictComponents(ax):
     import matplotlib
 
     # Run the in vivo regression model
-    _, _, tbN = InVivoPredict()
+    _, _, tbN, _ = InVivoPredict()
     tbN = PrepforLegend(tbN)
     fcgrs = tbN['Knockdown']
     tbN = tbN[['NKeff', 'DCeff', '2Beff']]
@@ -228,6 +228,19 @@ def InVivoPredictVsActualAffinities(ax):
 
 def ClassAvidityPredict(ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
+    from ..StoneModMouseFit import InVivoPredict
+
+    # Run the in vivo regression model
+    _, _, _, model = InVivoPredict()
+
+
+
+
+
+
+
+
+
     
 
     ax.set_ylabel('Predicted Effect')
