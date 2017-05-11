@@ -229,18 +229,53 @@ def InVivoPredictVsActualAffinities(ax):
 def ClassAvidityPredict(ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
     from ..StoneModMouseFit import InVivoPredict
+    from ..StoneModMouse import StoneModelMouse
+    from ..StoneHelper import getMedianKx
+
+    L0 = 1.0E-12
 
     # Run the in vivo regression model
     _, _, _, model = InVivoPredict()
 
+    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
+    data = data[data.index.str.contains("FcgR") == False]
+    data.drop('Effectiveness', axis=1, inplace=True)
+
+    data['v'] = 1
+    dataOne = data.copy()
+
+    for vv in range(2, 11):
+        dataNew = dataOne.copy()
+
+        dataNew['v'] = vv
+
+        data = data.append(dataNew)
+
+    data['2B-KO'] = 0
 
 
+    def NKapply(row):
+        from ..StoneModel import StoneMod
 
+        return StoneMod(logR=4.0, Ka=row.FcgRIII, v=row.v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
 
+    def CALCapply(row):
+        from ..StoneNRecep import StoneN
 
+        return StoneN(logR=[2.0, 3.0, 2.0, 2.0],
+                      Ka=[row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV],
+                      Kx=getMedianKx(),
+                      gnu=row.v,
+                      L0=L0).getActivity([1, -1, 1, 1])
 
+    data['NK'] = data.apply(NKapply, axis=1)
+    data['DC'] = data.apply(CALCapply, axis=1) 
 
+    data['predict'] = model.predict(data[['NK', 'DC', '2B-KO']].as_matrix())
+    data.reset_index(level=0, inplace=True)
 
+    # Plot the calculated crossvalidation performance
+    sns.FacetGrid(data, hue='index').map(ax.plot, 'v', 'predict')
     
-
-    ax.set_ylabel('Predicted Effect')
+    ax.set_ylabel('Predicted Effectiveness')
+    ax.set_xlabel('Avidity')

@@ -82,6 +82,9 @@ def modelPrepAffinity(v=5, L0=1E-12):
         if re.search('FcgRIIB-', row.name) is None:
             row['2B-KO'] = 0
 
+        row['L0'] = L0
+        row['v'] = v
+
         return row
 
     data = data.apply(CALCapply, axis=1)
@@ -91,11 +94,10 @@ def modelPrepAffinity(v=5, L0=1E-12):
     data = data.iloc[:, 4:]
 
     # Assign independent variables and dependent variable
-    X = data.drop('Effectiveness', axis=1)
-
+    X = data[['NK', 'DC', '2B-KO']].as_matrix()
     y = data['Effectiveness'].as_matrix()
 
-    return (X.as_matrix(), y, data)
+    return (X, y, data)
 
 
 def InVivoPredict(inn=[5, 1E-12]):
