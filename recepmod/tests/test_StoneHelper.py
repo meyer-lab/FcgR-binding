@@ -8,46 +8,50 @@ class TestStoneMethods(unittest.TestCase):
         self.Mold = StoneModel(False)
 
     def test_getMedianKx(self):
-    	from ..StoneHelper import getMedianKx
+        from ..StoneHelper import getMedianKx
 
-    	outt = getMedianKx()
+        outt = getMedianKx()
 
-    	self.assertIsInstance(outt, numpy.float64)
+        self.assertIsInstance(outt, numpy.float64)
 
     def test_rep(self):
-    	from ..StoneHelper import rep
+        from ..StoneHelper import rep
 
-    	outt = rep([2, 3], 3)
+        outt = rep([2, 3], 3)
 
-    	self.assertEquals(len(outt), 6)
-    	self.assertEquals(numpy.sum(outt), 15)
+        self.assertEquals(len(outt), 6)
+        self.assertEquals(numpy.sum(outt), 15)
 
-    	outt = rep([2, 3, 4], 4)
+        outt = rep([2, 3, 4], 4)
 
-    	self.assertEquals(len(outt), 12)
-    	self.assertEquals(numpy.sum(outt), 36)
+        self.assertEquals(len(outt), 12)
+        self.assertEquals(numpy.sum(outt), 36)
 
     def test_geweke(self):
-    	from ..StoneHelper import geweke
+        from ..StoneHelper import geweke
 
-    	input = numpy.random.normal(size=4000)
-    	inputTwo = numpy.random.normal(size=4000)
+        numpy.random.seed(0)
 
-    	a, b = geweke(input)
+        input = numpy.random.normal(size=4000)
+        inputTwo = numpy.random.normal(size=4000)
 
-    	self.assertGreater(b, 0.01)
+        a, b = geweke(input)
 
-    	a, b = geweke(input, inputTwo)
+        self.assertGreater(b, 0.01)
 
-    	self.assertGreater(b, 0.01)
+        a, b = geweke(input, inputTwo)
 
-    	a, b = geweke(input, inputTwo + 2)
+        self.assertGreater(b, 0.01)
 
-    	self.assertLess(b, 0.01)
+        a, b = geweke(input, inputTwo + 2)
+
+        self.assertLess(b, 0.01)
 
     def test_geweke_chain(self):
         from ..StoneHelper import geweke_chain
         import pandas as pd
+
+        numpy.random.seed(0)
 
         data = pd.DataFrame(numpy.random.normal(size=(4000, 10)))
         data['LL'] = 1

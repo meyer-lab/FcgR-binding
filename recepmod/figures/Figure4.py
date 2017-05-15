@@ -53,8 +53,10 @@ Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'}
 Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
-KnockdownidxL = ['Wild-type', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-']
-KnockdownidxL = dict(zip(KnockdownidxL, sns.color_palette()))
+KnockdownL = ['Wild-type', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-']
+KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
+celltypes = ['NK effect', 'DC effect', '2B effect']
+celltypeidx = dict(zip(celltypes, sns.color_palette()))
 
 def PrepforLegend(table):
     knockdowntype = []
@@ -94,10 +96,10 @@ def InVivoPredictVsActual(ax):
     ax.set_xlabel('Predicted Effect')
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlim(-0.05, 1.05)
-#    devar = r'$\sigma$d = '+str(round(devar, 3))
-#    cevar = r'$\sigma$c = '+str(round(cevar, 3))
-#    plt.text(0.1, 2, devar, transform=ax.transAxes)
-#    plt.text(0.1, 1.9, cevar, transform = ax.transAxes)
+    devar = r'$\sigma$d = '+str(round(devar, 3))
+    cevar = r'$\sigma$c = '+str(round(cevar, 3))
+    ax.text(0.05, 0.9, devar)
+    ax.text(0.05, 0.8, cevar)
 
 
 def ComponentContrib(ax):
@@ -118,11 +120,26 @@ def ComponentContrib(ax):
 def InVivoPredictComponents(ax):
     """ Plot model components. """
     from ..StoneModMouseFit import InVivoPredict
+    import matplotlib
 
     # Run the in vivo regression model
     _, _, tbN = InVivoPredict()
+    tbN = PrepforLegend(tbN)
+    fcgrs = tbN['Knockdown']
     tbN = tbN[['NKeff', 'DCeff', '2Beff']]
-
+    
+    # Set up x axis labels 
+    for i in range(len(fcgrs)):
+        for j in range(len(Knockdown)):
+            if fcgrs[i] == Knockdown[j]:
+                fcgrs[i] = KnockdownL[j]
+    idx = list(tbN.index.copy())
+    for k in range(len(idx)):
+        if fcgrs[k] != 'Wild-type':
+            fc = idx[k].replace(idx[k].split('-')[0], '')
+            idx[k] = idx[k].replace(fc, str('-'+fcgrs[k]))
+    tbN.index = idx
+    
     tbN.index.name = 'condition'
     tbN.reset_index(inplace=True)
 
@@ -138,7 +155,11 @@ def InVivoPredictComponents(ax):
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
-
+    # Make legend
+    patches = list()
+    for key, val in celltypeidx.items():
+        patches.append(matplotlib.patches.Patch(color=val, label=key))
+    ax.legend(handles=patches, bbox_to_anchor=(0, 1), loc=2)
 
 def RequiredComponents(ax):
     """ Plot model components. """
@@ -179,8 +200,8 @@ def AIplot(ax):
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$\sigma$d = '+str(round(dperf, 3))
     cperf = r'$\sigma$c = '+str(round(cperf, 3))
-    plt.text(0.1, 0.88, dperf, transform = ax.transAxes)
-    plt.text(0.1, 0.8, cperf, transform = ax.transAxes)
+    ax.text(0.1, 0.9, dperf)
+    ax.text(0.1, 0.8, cperf)
 
 def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
@@ -199,9 +220,9 @@ def InVivoPredictVsActualAffinities(ax):
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$\sigma$d = '+str(round(dperf, 3))
     cperf = r'$\sigma$c = '+str(round(cperf, 3))
-    plt.text(0.1, 0.88, dperf, transform = ax.transAxes)
-    plt.text(0.1, 0.8, cperf, transform = ax.transAxes)
-
+    ax.text(0.05, 0.9, dperf)
+    ax.text(0.05, 0.8, cperf)
+    
     ax.legend(handles=Legend(KnockdownidxL, Igs), bbox_to_anchor=(1, 1), loc=2)
 
 
