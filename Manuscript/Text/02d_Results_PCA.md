@@ -1,6 +1,6 @@
 ## Comparing human and mouse IgG-FcγR interactions
 
-![**Comparing human and mouse IgG-FcγR interactions.** A) Principal components analysis of predicted 1 nM IC binding and activation at with coordinate changes in murine IgG class and immune complex avidity. B) Corresponding principle components analysis for the human case. Points of the same color and shape in the human case display each of the eight possible genotypes between FcgRIIA-131H/R, FcgRIIB-232I/T and FcgRIIIA-158V/F.](./Figures/Figure5.svg){#fig:SpeciesCompare}
+![**Comparing human and mouse IgG-FcγR interactions.** A) Principal components analysis of predicted 1 nM IC binding and activation at with coordinate changes in murine IgG class and immune complex avidity. B) Corresponding principle components analysis for the human case. Points of the same color and shape in the human case display each of the eight possible genotypes between FcγRIIA-131H/R, FcγRIIB-232I/T and FcγRIIIA-158V/F.](./Figures/Figure5.svg){#fig:SpeciesCompare}
 
 As a multivalent binding model can predict FcγR binding and effector function *in vivo*, we examined the multivariate effects on activation predicted with receptors from each species. We expected that the activation model might help identify conserved aspects of FcγR signaling between species.
 

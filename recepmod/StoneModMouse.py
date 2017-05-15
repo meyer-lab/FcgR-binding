@@ -172,25 +172,23 @@ class StoneModelMouse:
         return output.reshape(2,16)
 
 
-    def writeModelData(self, filename, logspace=False, addavidity1=False):
-        #import pytablewriter
+    def writeModelData(self, filename):
+        """ Write out model data to be included as supplementary table. """
+        import pytablewriter
 
         # Collect data
-        #_, _, tbN = self.modelPrep(logspace, addavidity1)
+        tbN = self.NimmerjahnEffectTableAffinities()
 
-        #writer = pytablewriter.MarkdownTableWriter()
+        writer = pytablewriter.MarkdownTableWriter()
 
-        #writer.from_dataframe(tbN)
+        writer.from_dataframe(tbN)
 
         # change output stream to a file
-        #with open(filename, 'w') as f:
-        #    writer.stream = f
-        #    writer.write_table()
+        with open(filename, 'w') as f:
+            writer.stream = f
+            writer.write_table()
 
-        #writer.close()
-
-        # TODO: Reimplement with new model data
-        return None
+        writer.close()
 
 
     def KnockdownPCA(self):
@@ -201,6 +199,7 @@ class StoneModelMouse:
 
         X = self.NimmerjahnEffectTableAffinities().drop('Effectiveness', axis=1)
 
+        X = (X - X.min()) / X.max()
         scores = pd.DataFrame(pca.fit_transform(X), index=X.index, columns=['PC1', 'PC2', 'PC3', 'PC4'])
 
         return (scores, pca.explained_variance_ratio_)
