@@ -1,6 +1,8 @@
 import seaborn as sns
 from .FigureCommon import FcgRidx, subplotLabel, getSetup
 
+# TODO: Greek FcgRs throughout
+
 def makeFigure():
     from ..StoneHelper import read_chain, mapMCMC, getFitPrediction
 
@@ -66,6 +68,6 @@ def Rmultiplot(output, axarr):
 
         axx.set_ylabel(r'Multimerized Fc$\gamma$R')
         axx.set_xlabel("")
-        #axx.set_ylim((0, 4))
+        axx.set_ylim((0, axx.get_ylim()[1]))
         axx.legend_.remove()
         axx.set_title(fcr)

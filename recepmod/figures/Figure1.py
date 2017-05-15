@@ -5,6 +5,8 @@ import seaborn as sns
 import pandas as pd
 from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx
 
+# TODO: Add tick mark for 10^4 in C-E
+
 def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]

@@ -18,4 +18,4 @@ pylint>=1.7.1
 nosexcover
 nose-cprof
 gprof2dot
-cairosvg
+statsmodels

@@ -36,7 +36,7 @@ if __name__ == '__main__':
         list(map(runFunc, figList))
 
     # Output data table
-    StoneModelMouse().writeModelData(fdir + 'ModelData.md')
+    StoneModelMouse().writeModelData('./Manuscript/Text/07_ModelData.md')
 
     # IF we're running in parallel we need to wait for Figure 2 to finish
     # Close the pool
