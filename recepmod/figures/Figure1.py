@@ -115,10 +115,10 @@ def FcgRQuantificationFigureMaker(StoneM, ax, ylabelpad=0, ytickx=0):
 
 def mfiAdjMeanFigureMaker(measAll, axarr):
 
-    fcIter = zip(axarr, FcgRidx.keys())
+    fcIter = zip(axarr, FcgRidx.keys(), FcgRidxL.keys())
 
     # Loop through receptors creating plot
-    for axx, fcr in fcIter:
+    for axx, fcr, name in fcIter:
         sns.barplot(x="Ig",
                     y = "Meas",
                     hue="TNP",
@@ -129,7 +129,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
         axx.set_ylabel("Binding (RU)")
         axx.set_xlabel("")
         axx.legend_.remove()
-        axx.set_title(fcr)
+        axx.set_title(name)
 
 def makeFigure():
     from ..StoneModel import StoneModel
