@@ -122,7 +122,7 @@ def GewekeDiagPlot(M,dset,ax):
 
     _, pvalues = geweke_chains(dset)
 
-    ptable = pd.DataFrame(pvalues, columns=list(FcgRidx)+texRenameList(M.pNames[8:]))
+    ptable = pd.DataFrame(pvalues, columns=list(FcgRidxL)+texRenameList(M.pNames[8:]))
     ptable = pd.melt(ptable, var_name="param")
 
     ptable['PassFail'], ptable['cpval'], _, _ = multipletests(ptable.value, method='bonferroni')
@@ -140,4 +140,5 @@ def GewekeDiagPlot(M,dset,ax):
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
                        rotation_mode="anchor",
-                       ha="right")
+                       ha="right",
+                       fontsize=6)

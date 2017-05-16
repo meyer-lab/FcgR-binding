@@ -173,7 +173,7 @@ def varyAffinity(ax):
 
     tableAct.plot(ax=ax, x='ratio', y='activity', legend=False, loglog=True, color='black')
 
-    ax.set_xlabel('Log Ka Ratio (Activating/Inhibitory)')
+    ax.set_xlabel('Log K$_a$ Ratio (Activating/Inhibitory)')
     ax.set_ylabel('Activity Index')
     # TODO: Add various avidities with correct coloring.
 
@@ -210,7 +210,7 @@ def maxAffinity(ax):
     ax.loglog(M.kaMouse[2, 2], 512, color=colors[1], marker='o')
     ax.loglog(M.kaMouse[3, 2], 512, color=colors[2], marker='o')
 
-    ax.set_xlabel(r'Ka of Fc$\gamma$R Adjusted')
+    ax.set_xlabel(r'K$_a$ of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
     ax.set_xlim(1.0E4, 1.0E9)
     # TODO: Add legend.
