@@ -82,6 +82,11 @@ def histSubplots(dset, axes):
     axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
     axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
 
+    # Set all the x-limites based on which histogram is displayed
+    axes[0].set_xlim(-13.0,axes[0].get_xlim()[1])
+    axes[1].set_xlim(-6.0,axes[1].get_xlim()[1])
+    axes[3].set_xlim(-1.5,axes[3].get_xlim()[1])
+
     axes[1].set_ylim(0, 5000)
 
     print(np.mean(np.power(10, dset[texRename('sigConv2')] - dset[texRename('sigConv1')])))

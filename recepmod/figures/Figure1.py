@@ -32,6 +32,7 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
         axInt.set_xlabel(r'Fc$\gamma$R-IgG Ka')
         axInt.set_ylabel('Measured TNP-BSA binding',labelpad=ylabelpad)
         axInt.set_ylim(1.0E-3, 1.0E-1)
+        axInt.set_xlim(1.0e4,1.0e8)
 
     plotF(ax1, fitMean.loc[fitMean['TNP'] == "TNP-4",:])
     plotF(ax2, fitMean.loc[fitMean['TNP'] == "TNP-26",:])
@@ -80,6 +81,7 @@ def plotAvidityEffectVsKA(fitMean, ax1, ylabelpad=-0.3, ytickx = 0.08):
     for j in range(6):
         ax1.get_yticklabels()[j].set_x(ytickx)
     ax1.set_ylim(1, 20)
+    ax1.set_xlim(1.0e4,1.0e8)
 
     ax1.legend(handles=Legend(FcgRidxL, Igs), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
