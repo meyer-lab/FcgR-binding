@@ -5,8 +5,6 @@ import seaborn as sns
 import pandas as pd
 from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx
 
-# TODO: Add tick mark for 10^4 in C-E
-
 def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
@@ -32,7 +30,6 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2, ylabelpad=-0.3, ytickx=0.08):
         axInt.set_xlabel(r'Fc$\gamma$R-IgG Ka')
         axInt.set_ylabel('Measured TNP-BSA binding',labelpad=ylabelpad)
         axInt.set_ylim(1.0E-3, 1.0E-1)
-        axInt.set_xlim(1.0e4,1.0e8)
 
     plotF(ax1, fitMean.loc[fitMean['TNP'] == "TNP-4",:])
     plotF(ax2, fitMean.loc[fitMean['TNP'] == "TNP-26",:])
@@ -81,7 +78,6 @@ def plotAvidityEffectVsKA(fitMean, ax1, ylabelpad=-0.3, ytickx = 0.08):
     for j in range(6):
         ax1.get_yticklabels()[j].set_x(ytickx)
     ax1.set_ylim(1, 20)
-    ax1.set_xlim(1.0e4,1.0e8)
 
     ax1.legend(handles=Legend(FcgRidxL, Igs), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
@@ -115,10 +111,10 @@ def FcgRQuantificationFigureMaker(StoneM, ax, ylabelpad=0, ytickx=0):
 
 def mfiAdjMeanFigureMaker(measAll, axarr):
 
-    fcIter = zip(axarr, FcgRidx.keys(), FcgRidxL.keys())
+    fcIter = zip(axarr, FcgRidx.keys())
 
     # Loop through receptors creating plot
-    for axx, fcr, name in fcIter:
+    for axx, fcr in fcIter:
         sns.barplot(x="Ig",
                     y = "Meas",
                     hue="TNP",
@@ -129,7 +125,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
         axx.set_ylabel("Binding (RU)")
         axx.set_xlabel("")
         axx.legend_.remove()
-        axx.set_title(name)
+        axx.set_title(fcr)
 
 def makeFigure():
     from ..StoneModel import StoneModel
