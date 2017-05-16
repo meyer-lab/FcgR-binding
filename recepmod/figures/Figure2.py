@@ -141,4 +141,8 @@ def GewekeDiagPlot(M,dset,ax):
                        rotation=40,
                        rotation_mode="anchor",
                        ha="right",
-                       fontsize=6)
+                       fontsize=5,
+                       position=(0,0.075))
+##    print(dir(ax.get_xticklabels()[0]))
+    print('YAAAAAAAAAAAAAAAS')
+    print(ax.get_xticklabels()[0].get_position())
