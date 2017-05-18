@@ -136,3 +136,33 @@ def GewekeDiagPlot(M,dset,ax):
                        rotation=40,
                        rotation_mode="anchor",
                        ha="right")
+
+
+def AverageAvidity():
+    """ Produce the average of avidity of binding in the dilute case. """
+
+    from ..StoneModel import StoneMod
+    import pandas as pd
+    from ..StoneHelper import getMedianKx
+    from itertools import product
+
+    KxIn = getMedianKx()
+
+    logRs = np.linspace(2, 5, 4, dtype=np.float)
+    L0 = 1.0E-12
+    gnus = np.arange(1, 11)
+    Kas = np.logspace(2, 8, 4, dtype=np.float)
+
+    table = pd.DataFrame(list(product(gnus, logRs, Kas)), columns=['gnu', 'logR', 'Ka'])
+
+    def avAv(x):
+        outt = StoneMod(x.logR, x.Ka, x.gnu, KxIn*x.Ka, L0, fullOutput=True)
+
+        x['AvAv'] = outt[1] / outt[0]
+
+        return x
+
+    table = table.apply(avAv, axis=1)
+
+    return table
+
