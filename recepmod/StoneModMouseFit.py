@@ -128,9 +128,9 @@ def InVivoPredict(inn=[5, 1E-12]):
     return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table, model)
 
 def crossValF(table):
-    yy = cross_val_predict(regFunc(), 
-                           table.drop('Effectiveness', axis=1), 
-                           table['Effectiveness'], 
+    yy = cross_val_predict(regFunc(),
+                           table.drop('Effectiveness', axis=1),
+                           table['Effectiveness'],
                            cv=table.shape[0])
 
     return explained_variance_score(yy, table['Effectiveness'])
@@ -166,32 +166,30 @@ class regFunc(BaseEstimator):
         return norm.cdf(np.dot(X, p[2:]), loc=p[0], scale=p[1])
 
     def diffF(self, p):
+        """ Difference function. """
         return self.trainy - self.outF(p)
 
     def errF(self, p):
         return np.linalg.norm(self.diffF(p))
 
     def fit(self, X, y):
+        """ Fit the X-y relationship. Return nothing. """
         from scipy.optimize import least_squares
 
         self.trainX, self.trainy = X, y
 
         x0 = np.ones((X.shape[1] + 2, ), dtype=np.float64)
         lb = np.full(x0.shape, -20, dtype=np.float64)
-        ub = np.full(x0.shape, 20, dtype=np.float64)
 
-        self.res = least_squares(lambda p: self.diffF(p),
-                            x0=x0,
-                            jac='3-point',
-                            bounds=(lb, ub))
+        self.res = least_squares(self.diffF, x0=x0,
+                                 jac='3-point', bounds=(-lb, ub))
 
-        self.resC = least_squares(lambda p: self.diffF(p),
-                            x0=x0*2,
-                            jac='3-point',
-                            bounds=(lb, ub))
+        resC = least_squares(self.diffF, x0=x0*2,
+                             jac='3-point', bounds=(-lb, ub))
 
-        if self.errF(self.resC.x) < self.errF(self.res.x):
-            self.res = self.resC
+        if self.errF(resC.x) < self.errF(self.res.x):
+            self.res = resC
+        # TODO: Maybe return fit y?
 
     def predict(self, X):
         return self.outF(self.res.x, X)
