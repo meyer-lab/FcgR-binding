@@ -187,7 +187,7 @@ def geweke(chain1, chain2=None):
     statistic, pvalue = ttest_ind(chain1,chain2)
     return statistic, pvalue
 
-def geweke_chain(dset):
+def geweke_chain(dset, cut=0):
     """
     Perform the Geweke Diagnostic on multiple chains of data contained in a Pandas DataFrame "dset" output by read_chain.
     """
@@ -195,12 +195,12 @@ def geweke_chain(dset):
     pvalues = []
     dsett = dset.drop(['LL','walker'],1).as_matrix()
     for j in range(dsett.shape[1]):
-        statistic, pvalue = geweke(dsett[:,j])
+        statistic, pvalue = geweke(dsett[cut:-1,j])
         statistics.append(statistic)
         pvalues.append(pvalue)
     return statistics, pvalues
 
-def geweke_chains(DSET):
+def geweke_chains(DSET, cut=0):
     # Perform the Geweke Diagnostic on multiple chains (on along two axes)
     # of data contained in a Pandas Dataframe "dset" output by read_chain.
     nwalkers = int(np.max(DSET['walker']))+1
@@ -209,7 +209,7 @@ def geweke_chains(DSET):
     DSETT = DSET.T
     DSETT.columns = [item % nwalkers for item in DSETT.columns]
     for j in range(nwalkers):
-        statistics, pvalues = geweke_chain(DSETT[j].T)
+        statistics, pvalues = geweke_chain(DSETT[j].T, cut)
         Statistics.append(statistics)
         Pvalues.append(pvalues)
     return Statistics, Pvalues

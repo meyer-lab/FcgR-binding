@@ -82,6 +82,11 @@ def histSubplots(dset, axes):
     axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
     axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
 
+    # Set all the x-limites based on which histogram is displayed
+    axes[0].set_xlim(-13.0,axes[0].get_xlim()[1])
+    axes[1].set_xlim(-6.0,axes[1].get_xlim()[1])
+    axes[3].set_xlim(-1.5,axes[3].get_xlim()[1])
+
     axes[1].set_ylim(0, 5000)
 
     print(np.mean(np.power(10, dset[texRename('sigConv2')] - dset[texRename('sigConv1')])))
@@ -117,7 +122,7 @@ def GewekeDiagPlot(M,dset,ax):
 
     _, pvalues = geweke_chains(dset)
 
-    ptable = pd.DataFrame(pvalues, columns=list(FcgRidx)+texRenameList(M.pNames[8:]))
+    ptable = pd.DataFrame(pvalues, columns=list(FcgRidxL)+texRenameList(M.pNames[8:]))
     ptable = pd.melt(ptable, var_name="param")
 
     ptable['PassFail'], ptable['cpval'], _, _ = multipletests(ptable.value, method='bonferroni')
@@ -135,7 +140,12 @@ def GewekeDiagPlot(M,dset,ax):
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40,
                        rotation_mode="anchor",
-                       ha="right")
+                       ha="right",
+                       fontsize=5,
+                       position=(0,0.075))
+
+    print('YAAAAAAAAAAAAAAAS')
+    print(ax.get_xticklabels()[0].get_position())
 
 
 def AverageAvidity():
@@ -165,4 +175,3 @@ def AverageAvidity():
     table = table.apply(avAv, axis=1)
 
     return table
-
