@@ -17,8 +17,6 @@ def NimmerjahnPredictByAIratio():
     # Do direct regression too
     lr.fit(X, y)
     table['DirectPredict'] = lr.predict(X)
-    coe = lr.coef_
-    inter = lr.intercept_
     
     # Run crossvalidation predictions at the same time
     table['CrossPredict'] = cross_val_predict(lr, X, y, cv=X.shape[0])
@@ -28,7 +26,10 @@ def NimmerjahnPredictByAIratio():
 
     # How well did we do on direct?
     direct_perf = explained_variance_score(y, table.DirectPredict)
-    return (direct_perf, crossval_perf, table, coe, inter)
+
+    return (direct_perf, crossval_perf, table, lr.coef_, lr.intercept_)
+
+
 def NimmerjahnPredictByAffinities():
     """ This will run ordinary linear regression using just affinities of receptors. """
 
@@ -65,7 +66,7 @@ def modelPrepAffinity(v=5, L0=1E-12):
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
 
-    DCexpr = [3.0, 4.0, 3.0, 3.0]
+    DCexpr = [2.0, 3.0, 2.0, 2.0]
 
     def CALCapply(row):
         from .StoneModel import StoneMod
@@ -76,10 +77,13 @@ def modelPrepAffinity(v=5, L0=1E-12):
         row['NK'] = StoneMod(logR=4.0, Ka=row.FcgRIII, v=v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
         row['DC'] = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(), gnu=v, L0=L0).getActivity([1, -1, 1, 1])
 
+        row['2B-KO'] = 1
+
         if re.search('FcgRIIB-', row.name) is None:
             row['2B-KO'] = 0
-        else:
-            row['2B-KO'] = 1
+
+        row['L0'] = L0
+        row['v'] = v
 
         return row
 
@@ -90,14 +94,13 @@ def modelPrepAffinity(v=5, L0=1E-12):
     data = data.iloc[:, 4:]
 
     # Assign independent variables and dependent variable
-    X = data.drop('Effectiveness', axis=1)
-
+    X = data[['NK', 'DC', '2B-KO']].as_matrix()
     y = data['Effectiveness'].as_matrix()
 
-    return (X.as_matrix(), y, data)
+    return (X, y, data)
 
 
-def InVivoPredict(inn=[5, 1E-12], printt=False):
+def InVivoPredict(inn=[5, 1E-12]):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
 
     inn = np.squeeze(inn)
@@ -122,11 +125,7 @@ def InVivoPredict(inn=[5, 1E-12], printt=False):
     table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
     table['Error'] = abs(table.CPredict - y)
 
-    if printt is True:
-        print('')
-        print(table)
-
-    return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table)
+    return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table, model)
 
 def crossValF(table):
     yy = cross_val_predict(regFunc(), 
@@ -138,7 +137,7 @@ def crossValF(table):
 
 
 def InVivoPredictMinusComponents():
-    _, cperf, data = InVivoPredict()
+    _, cperf, data, _ = InVivoPredict()
 
     data = data[['Effectiveness', 'NK', 'DC', '2B-KO']]
 
@@ -170,27 +169,29 @@ class regFunc(BaseEstimator):
         return self.trainy - self.outF(p)
 
     def errF(self, p):
-        from numpy.linalg import norm
-
-        return norm(self.diffF(p))
+        return np.linalg.norm(self.diffF(p))
 
     def fit(self, X, y):
         from scipy.optimize import least_squares
 
         self.trainX, self.trainy = X, y
 
-        x0 = np.zeros((X.shape[1] + 2, ), dtype=np.float64)
-
-        if self.logg is False:
-            x0[:] = 1.0
-
+        x0 = np.ones((X.shape[1] + 2, ), dtype=np.float64)
         lb = np.full(x0.shape, -20, dtype=np.float64)
         ub = np.full(x0.shape, 20, dtype=np.float64)
 
-        self.res = least_squares(lambda p: self.diffF(p), 
-                            x0=x0, 
+        self.res = least_squares(lambda p: self.diffF(p),
+                            x0=x0,
                             jac='3-point',
                             bounds=(lb, ub))
+
+        self.resC = least_squares(lambda p: self.diffF(p),
+                            x0=x0*2,
+                            jac='3-point',
+                            bounds=(lb, ub))
+
+        if self.errF(self.resC.x) < self.errF(self.res.x):
+            self.res = self.resC
 
     def predict(self, X):
         return self.outF(self.res.x, X)

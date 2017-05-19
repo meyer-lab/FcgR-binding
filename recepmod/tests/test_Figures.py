@@ -6,6 +6,7 @@ from ..StoneModel import StoneModel
 class TestFigures(unittest.TestCase):
     def test_Figure4(self):
         from ..figures import Figure4
+        from ..figures import Figure2
 
         ax = plt.gca()
 
@@ -20,6 +21,8 @@ class TestFigures(unittest.TestCase):
         Figure4.ComponentContrib(ax)
 
         Figure4.RequiredComponents(ax)
+
+        Figure2.AverageAvidity()
 
 
 if __name__ == '__main__':
