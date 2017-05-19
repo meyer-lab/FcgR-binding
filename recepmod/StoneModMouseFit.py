@@ -154,8 +154,37 @@ class regFunc(BaseEstimator):
     def __init__(self):
         self.logg = True
 
-    def outF(self, p, X=None):
+    def fit(self, X, y):
+        """ Fit the X-y relationship. Return nothing. """
+        from scipy.optimize import least_squares
+
+        # Fuction for fit residual
+        diffF = lambda p: self.trainy - self.predict(p=p)
+
+        # Error function for comparing fits
+        errF = lambda p: np.linalg.norm(diffF(p))
+
+        self.trainX, self.trainy = X, y
+
+        x0 = np.ones((X.shape[1] + 2, ), dtype=np.float64)
+        lb = np.full(x0.shape, -20, dtype=np.float64)
+
+        self.res = least_squares(diffF, x0=x0,
+                                 jac='3-point', bounds=(lb, -lb))
+
+        resC = least_squares(diffF, x0=x0*2,
+                             jac='3-point', bounds=(lb, -lb))
+
+        if errF(resC.x) < errF(self.res.x):
+            self.res = resC
+        # TODO: Maybe return fit y?
+
+    def predict(self, X=None, p=None):
+        """ Output prediction from parameter set. Use internal X if none given. """
         from scipy.stats import norm
+
+        if p is None:
+            p = self.res.x
 
         if self.logg is True:
             p = np.power(10, p)
@@ -164,32 +193,3 @@ class regFunc(BaseEstimator):
             X = self.trainX
 
         return norm.cdf(np.dot(X, p[2:]), loc=p[0], scale=p[1])
-
-    def diffF(self, p):
-        """ Difference function. """
-        return self.trainy - self.outF(p)
-
-    def errF(self, p):
-        return np.linalg.norm(self.diffF(p))
-
-    def fit(self, X, y):
-        """ Fit the X-y relationship. Return nothing. """
-        from scipy.optimize import least_squares
-
-        self.trainX, self.trainy = X, y
-
-        x0 = np.ones((X.shape[1] + 2, ), dtype=np.float64)
-        lb = np.full(x0.shape, -20, dtype=np.float64)
-
-        self.res = least_squares(self.diffF, x0=x0,
-                                 jac='3-point', bounds=(-lb, ub))
-
-        resC = least_squares(self.diffF, x0=x0*2,
-                             jac='3-point', bounds=(-lb, ub))
-
-        if self.errF(resC.x) < self.errF(self.res.x):
-            self.res = resC
-        # TODO: Maybe return fit y?
-
-    def predict(self, X):
-        return self.outF(self.res.x, X)
