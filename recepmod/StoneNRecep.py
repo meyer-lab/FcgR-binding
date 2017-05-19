@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from memoize import memoize
 from .StoneModel import nchoosek
 
@@ -55,6 +54,7 @@ def boundMult(cur_pos):
 
 @memoize
 def vGridInit(gnu, Nrep):
+    """ Make the grid of all the possible multimerization states. """
 
     # Initialize the grid of possibilities
     vGrid = np.zeros(np.full((Nrep, ), gnu+1), dtype=np.float)
@@ -68,7 +68,7 @@ def vGridInit(gnu, Nrep):
         if scur <= gnu and scur > 0:
             vGrid[cur_pos] = nk[scur] * boundMult(cur_pos)
 
-    return(vGrid)
+    return vGrid
 
 
 def sumNonDims(vGridIn, dimm):
@@ -125,6 +125,7 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
     # This is the error function to find the root of
     def rootF(curr, ii=None, x=None):
+        """ Mass balance calculator we want to solve. """
         # If we're overriding one axis do it here.
         if not ii is None:
             curr = curr.copy()
@@ -151,7 +152,7 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
         return np.minimum(sol.x, logR)
 
     # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
-    for ii in range(200):
+    for _ in range(200):
         # Square the error for each
         error = np.square(rootF(curReq))
 
@@ -168,6 +169,8 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
 
 
 class StoneN:
+    """ Use a class to keep track of the various parameters. """
+
     def getRbnd(self):
         """ Return the amount of each receptor that is bound. """
         return StoneRbnd(self.vgridOut)

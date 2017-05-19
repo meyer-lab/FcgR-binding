@@ -3,7 +3,7 @@ import random
 import time
 import pandas
 import numpy as np
-from ..StoneModMouse import StoneModelMouse, MultiAvidityPredict
+from ..StoneModMouse import StoneModelMouse
 
 class TestStoneMouse(unittest.TestCase):
     def setUp(self):
