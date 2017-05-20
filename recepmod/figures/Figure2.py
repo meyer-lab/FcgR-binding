@@ -152,7 +152,6 @@ def AverageAvidity():
     """ Produce the average of avidity of binding in the dilute case. """
 
     from ..StoneModel import StoneMod
-    import pandas as pd
     from ..StoneHelper import getMedianKx
     from itertools import product
 

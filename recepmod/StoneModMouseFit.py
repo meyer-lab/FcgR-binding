@@ -1,6 +1,5 @@
 import re
 import pandas as pd
-import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import explained_variance_score

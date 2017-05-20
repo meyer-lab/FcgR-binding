@@ -1,6 +1,4 @@
 import unittest
-import random
-import time
 import pandas
 import numpy as np
 from ..StoneModMouse import StoneModelMouse

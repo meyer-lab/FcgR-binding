@@ -72,7 +72,7 @@ def ClassAvidityPCA(ax):
     """ Plot the generated binding data for different classes and avidities in PCA space. """
     # If no axis was provided make our own
     
-    scores, expvar = StoneModelMouse().KnockdownPCA()
+    scores, _ = StoneModelMouse().KnockdownPCA()
 
     commonPlot(ax, scores, 'PC1', 'PC2')
 
