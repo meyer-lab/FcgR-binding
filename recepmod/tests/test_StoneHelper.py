@@ -19,13 +19,13 @@ class TestStoneMethods(unittest.TestCase):
 
         outt = rep([2, 3], 3)
 
-        self.assertEquals(len(outt), 6)
-        self.assertEquals(numpy.sum(outt), 15)
+        self.assertEqual(len(outt), 6)
+        self.assertEqual(numpy.sum(outt), 15)
 
         outt = rep([2, 3, 4], 4)
 
-        self.assertEquals(len(outt), 12)
-        self.assertEquals(numpy.sum(outt), 36)
+        self.assertEqual(len(outt), 12)
+        self.assertEqual(numpy.sum(outt), 36)
 
     def test_geweke(self):
         from ..StoneHelper import geweke
@@ -35,15 +35,15 @@ class TestStoneMethods(unittest.TestCase):
         input = numpy.random.normal(size=4000)
         inputTwo = numpy.random.normal(size=4000)
 
-        a, b = geweke(input)
+        _, b = geweke(input)
 
         self.assertGreater(b, 0.01)
 
-        a, b = geweke(input, inputTwo)
+        _, b = geweke(input, inputTwo)
 
         self.assertGreater(b, 0.01)
 
-        a, b = geweke(input, inputTwo + 2)
+        _, b = geweke(input, inputTwo + 2)
 
         self.assertLess(b, 0.01)
 
@@ -57,7 +57,7 @@ class TestStoneMethods(unittest.TestCase):
         data['LL'] = 1
         data['walker'] = 1
 
-        a, b = geweke_chain(data)
+        _, b = geweke_chain(data)
 
         self.assertGreater(numpy.min(b), 0.01)
         self.assertEqual(len(b), 10)
