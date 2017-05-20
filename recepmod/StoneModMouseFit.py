@@ -177,7 +177,6 @@ class regFunc(BaseEstimator):
 
         if errF(resC.x) < errF(self.res.x):
             self.res = resC
-        # TODO: Maybe return fit y?
 
     def predict(self, X=None, p=None):
         """ Output prediction from parameter set. Use internal X if none given. """

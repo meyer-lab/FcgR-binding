@@ -213,4 +213,8 @@ def maxAffinity(ax):
     ax.set_xlabel(r'K$_a$ of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
     ax.set_xlim(1.0E4, 1.0E9)
-    # TODO: Add legend.
+
+    patchA = matplotlib.patches.Patch(color=colors[0], label=r'Fc$\gamma$RI')
+    patchB = matplotlib.patches.Patch(color=colors[1], label=r'Fc$\gamma$RIII')
+    patchC = matplotlib.patches.Patch(color=colors[2], label=r'Fc$\gamma$RIV')
+    ax.legend(handles=[patchA, patchB, patchC])
