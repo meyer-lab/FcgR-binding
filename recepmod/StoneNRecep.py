@@ -161,9 +161,8 @@ def reqSolver(logR,Ka,gnu,Kx,L0):
             return np.minimum(curReq, logR)
 
         # Dig up the index to optimize. Focus on the worst receptor.
-        jj = np.argmax(error)
-
-        curReq[jj] = brentq(lambda x: rootF(curReq, jj, x)[jj], -200, logR[jj], disp=False)
+        with np.argmax(error) as jj:
+            curReq[jj] = brentq(lambda x: rootF(curReq, jj, x)[jj], -200, logR[jj], disp=False)
 
     raise RuntimeError("The reqSolver couldn't find Req in a reasonable number of iterations.")
 

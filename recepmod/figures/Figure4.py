@@ -1,7 +1,6 @@
 import seaborn as sns
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
@@ -134,10 +133,12 @@ def InVivoPredictComponents(ax):
             if fcgrs[i] == Knockdown[j]:
                 fcgrs[i] = KnockdownL[j]
     idx = list(tbN.index.copy())
-    for k in range(len(idx)):
+
+    for k, item in enumerate(idx):
         if fcgrs[k] != 'Wild-type':
-            fc = idx[k].replace(idx[k].split('-')[0], '')
-            idx[k] = idx[k].replace(fc, str('-'+fcgrs[k]))
+            fc = item.replace(item.split('-')[0], '')
+            idx[k] = item.replace(fc, str('-'+fcgrs[k]))
+
     tbN.index = idx
     
     tbN.index.name = 'condition'
@@ -187,9 +188,9 @@ def commonPlot(ax, table, xcol, ycol):
 def AIplot(ax):
     """ Plot A/I vs effectiveness. """
     from ..StoneModMouseFit import NimmerjahnPredictByAIratio
-    
+
     dperf, cperf, table, coe, inter = NimmerjahnPredictByAIratio()
-    
+
     commonPlot(ax, table, 'AtoI', 'Effectiveness')
     x = [10**(-2), 10**3]
     ax.plot(x, coe * np.log10(x) + inter, color='k', linestyle='-', linewidth=1)
@@ -222,14 +223,13 @@ def InVivoPredictVsActualAffinities(ax):
     cperf = r'$\sigma$c = '+str(round(cperf, 3))
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.8, cperf)
-    
+
     ax.legend(handles=Legend(KnockdownidxL, Igs), bbox_to_anchor=(1, 1), loc=2)
 
 
 def ClassAvidityPredict(ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
     from ..StoneModMouseFit import InVivoPredict
-    from ..StoneModMouse import StoneModelMouse
     from ..StoneHelper import getMedianKx
 
     L0 = 1.0E-12
@@ -238,7 +238,7 @@ def ClassAvidityPredict(ax):
     _, _, _, model = InVivoPredict()
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
-    data = data[data.index.str.contains("FcgR") == False]
+    data = data[data.index.str.contains("FcgR") is False]
     data.drop('Effectiveness', axis=1, inplace=True)
 
     data['v'] = 1
@@ -269,13 +269,13 @@ def ClassAvidityPredict(ax):
                       L0=L0).getActivity([1, -1, 1, 1])
 
     data['NK'] = data.apply(NKapply, axis=1)
-    data['DC'] = data.apply(CALCapply, axis=1) 
+    data['DC'] = data.apply(CALCapply, axis=1)
 
     data['predict'] = model.predict(data[['NK', 'DC', '2B-KO']].as_matrix())
     data.reset_index(level=0, inplace=True)
 
     # Plot the calculated crossvalidation performance
     sns.FacetGrid(data, hue='index').map(ax.plot, 'v', 'predict')
-    
+
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
