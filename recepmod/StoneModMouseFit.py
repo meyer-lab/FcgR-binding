@@ -8,6 +8,8 @@ from sklearn.linear_model import LinearRegression
 from .StoneModMouse import StoneModelMouse
 
 def NimmerjahnPredictByAIratio():
+    """ Predict in vivo efficacy using the AtoI ratio. """
+
     lr = LinearRegression()
     table = StoneModelMouse().NimmerjahnEffectTableAffinities()
     table = table.loc[table.FcgRIIB > 0, :]
@@ -119,7 +121,7 @@ def InVivoPredict(inn=[5, 1E-12]):
     table['2Beff'] = table['2B-KO'] * np.power(10, model.res.x[4])
 
     pd.set_option('expand_frame_repr', False)
-    
+
     table['CPredict'] = cross_val_predict(model, X, y, cv=len(y))
     table['DPredict'] = model.predict(X)
     table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
@@ -151,8 +153,13 @@ def InVivoPredictMinusComponents():
 
 
 class regFunc(BaseEstimator):
+    """ Class to handle regression with saturating effect. """
+    
     def __init__(self):
         self.logg = True
+        self.res = None
+        self.trainX = None
+        self.trainy = None
 
     def fit(self, X, y):
         """ Fit the X-y relationship. Return nothing. """
@@ -160,9 +167,6 @@ class regFunc(BaseEstimator):
 
         # Fuction for fit residual
         diffF = lambda p: self.trainy - self.predict(p=p)
-
-        # Error function for comparing fits
-        errF = lambda p: np.linalg.norm(diffF(p))
 
         self.trainX, self.trainy = X, y
 
@@ -175,7 +179,7 @@ class regFunc(BaseEstimator):
         resC = least_squares(diffF, x0=x0*2,
                              jac='3-point', bounds=(lb, -lb))
 
-        if errF(resC.x) < errF(self.res.x):
+        if resC.cost < self.res.cost:
             self.res = resC
 
     def predict(self, X=None, p=None):
