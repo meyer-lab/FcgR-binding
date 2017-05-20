@@ -238,7 +238,7 @@ def ClassAvidityPredict(ax):
     _, _, _, model = InVivoPredict()
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
-    data = data[data.index.str.contains("FcgR") is False]
+    data = data[data.index.str.contains("FcgR") == False]
     data.drop('Effectiveness', axis=1, inplace=True)
 
     data['v'] = 1

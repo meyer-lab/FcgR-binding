@@ -8,6 +8,7 @@ class TestStoneMethods(unittest.TestCase):
         self.Mold = StoneModel(False)
 
     def test_getMedianKx(self):
+        """ Test that median Kx returns a float. """
         from ..StoneHelper import getMedianKx
 
         outt = getMedianKx()
@@ -15,6 +16,7 @@ class TestStoneMethods(unittest.TestCase):
         self.assertIsInstance(outt, numpy.float64)
 
     def test_rep(self):
+        """ Test the rep method. """
         from ..StoneHelper import rep
 
         outt = rep([2, 3], 3)
@@ -28,6 +30,7 @@ class TestStoneMethods(unittest.TestCase):
         self.assertEqual(numpy.sum(outt), 36)
 
     def test_geweke(self):
+        """ Test the geweke method. """
         from ..StoneHelper import geweke
 
         numpy.random.seed(0)
@@ -48,6 +51,7 @@ class TestStoneMethods(unittest.TestCase):
         self.assertLess(b, 0.01)
 
     def test_geweke_chain(self):
+        """ Test the geweke chain method. """
         from ..StoneHelper import geweke_chain
         import pandas as pd
 
