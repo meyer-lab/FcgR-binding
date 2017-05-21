@@ -1,3 +1,7 @@
+"""
+This creates Figure 2 which fits the binding data to a model.
+"""
+
 import string
 import numpy as np
 import pandas as pd

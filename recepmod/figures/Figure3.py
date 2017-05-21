@@ -1,3 +1,7 @@
+"""
+This creates Figure 3 which plots some predictions from the binding model.
+"""
+
 import matplotlib
 matplotlib.use('AGG')
 from itertools import product

@@ -1,3 +1,7 @@
+"""
+This creates Figure 1 which summarizes Anja's data.
+"""
+
 import matplotlib
 matplotlib.use('AGG')
 import numpy as np

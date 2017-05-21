@@ -1,5 +1,7 @@
-## This function has a number of methods for combining data about predictions
-## and processing predictions from the StoneMod classes.
+"""
+This function has a number of methods for combining data about predictions
+and processing predictions from the StoneMod classes.
+"""
 
 import numpy as np
 import pandas as pd
