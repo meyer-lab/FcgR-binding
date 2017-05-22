@@ -1,7 +1,7 @@
 import numpy as np
 
 def startH5File(StoneM, filename):
-    # Dump class to a string to store with MCMC chain
+    """ Dump class to a string to store with MCMC chain. """
     import h5py
 
     try:
@@ -22,7 +22,7 @@ def startH5File(StoneM, filename):
     return (f, dset)
 
 def getUniformStart(StoneM):
-    ## Set up parameters for parallel-tempered Ensemble Sampler
+    """ Set up parameters for parallel-tempered Ensemble Sampler """
     ndims, nwalkers = StoneM.Nparams, 4*StoneM.Nparams
     p0 = np.random.uniform(low=0, high=1, size=(nwalkers, ndims))
 
@@ -32,6 +32,7 @@ def getUniformStart(StoneM):
     return (p0, ndims, nwalkers)
 
 def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
+    """ Run the sampling. """
     from emcee import EnsembleSampler
     from .StoneModel import StoneModel
 
@@ -52,7 +53,7 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
     # Setup thinning tracking
     thinTrack = 0
 
-    for p, lnprob, lnlike in sampler.sample(p0, iterations=niters, storechain=False):
+    for p, lnprob, _ in sampler.sample(p0, iterations=niters, storechain=False):
         if thinTrack < thin:
             thinTrack += 1
         else:

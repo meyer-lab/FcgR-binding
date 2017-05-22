@@ -1,6 +1,5 @@
 import unittest
 import matplotlib.pyplot as plt
-from ..StoneModel import StoneModel
 
 
 class TestFigures(unittest.TestCase):

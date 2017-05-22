@@ -1,4 +1,6 @@
-# In vivo prediction robustness and first PC's
+"""
+In vivo prediction robustness and first PC's
+"""
 
 def makeFigure():
     from .FigureCommon import subplotLabel, getSetup

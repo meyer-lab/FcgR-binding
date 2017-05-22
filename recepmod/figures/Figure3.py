@@ -1,3 +1,7 @@
+"""
+This creates Figure 3 which plots some predictions from the binding model.
+"""
+
 import matplotlib
 matplotlib.use('AGG')
 from itertools import product
@@ -152,34 +156,35 @@ def varyAffinity(ax):
     """
     Figure where affinity of the activating or inhibitory receptor varies.
     """
-
-    _, _, Ka, logR = plotRanges()
-
-    gnu = 5
+    _, avidities, Ka, logR = plotRanges()
     L0 = 1E-9
 
-    tableAct = pd.DataFrame(Ka[0] * np.logspace(start=0, stop=2, num=subsplits), columns=['affinity'])
+    skipColor(ax)
+
+    affinities = Ka[0] * np.logspace(start=0, stop=2, num=subsplits)
+
+    table = pd.DataFrame(list(product(affinities, avidities)), columns=['affinity', 'avidity'])
 
     def appFunc(x, ii):
         KaCur = Ka.copy()
         KaCur[ii] = x.affinity
 
-        x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1])
+        x['activity'] = StoneN(logR, KaCur, getMedianKx(), x.avidity, L0).getActivity([1, -1])
         x['ratio'] = KaCur[0] / KaCur[1]
 
         return x
 
-    tableAct = tableAct.apply(lambda x: appFunc(x, 0), axis=1)
+    table = table.apply(lambda x: appFunc(x, 0), axis=1)
 
-    tableAct.plot(ax=ax, x='ratio', y='activity', legend=False, loglog=True, color='black')
+    for ii in avidities[1::]:
+        table[table['avidity'] == ii].plot(ax=ax, x='ratio', y='activity', legend=False, loglog=True)
 
     ax.set_xlabel('Log K$_a$ Ratio (Activating/Inhibitory)')
     ax.set_ylabel('Activity Index')
-    # TODO: Add various avidities with correct coloring.
+
 
 def maxAffinity(ax):
     """ """
-    from itertools import product
     from ..StoneModMouse import StoneModelMouse
 
     M = StoneModelMouse()
@@ -213,4 +218,8 @@ def maxAffinity(ax):
     ax.set_xlabel(r'K$_a$ of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
     ax.set_xlim(1.0E4, 1.0E9)
-    # TODO: Add legend.
+
+    patchA = matplotlib.patches.Patch(color=colors[0], label=r'Fc$\gamma$RI')
+    patchB = matplotlib.patches.Patch(color=colors[1], label=r'Fc$\gamma$RIII')
+    patchC = matplotlib.patches.Patch(color=colors[2], label=r'Fc$\gamma$RIV')
+    ax.legend(handles=[patchA, patchB, patchC])
