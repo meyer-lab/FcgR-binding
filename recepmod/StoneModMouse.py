@@ -203,15 +203,3 @@ class StoneModelMouse:
         scores = pd.DataFrame(pca.fit_transform(X), index=X.index, columns=['PC1', 'PC2', 'PC3', 'PC4'])
 
         return (scores, pca.explained_variance_ratio_)
-
-
-def MultiAvidityPredict(M, las, scale):
-    """ Make predictions for the effect of avidity and class. """
-    # TODO: Reimplement for new modeling approach
-
-    #table['Predict'] = las.predict(scale.transform(table))
-    #table['Avidity'] = table.apply(lambda x: int(x.name.split('-')[1]), axis=1)
-    #table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
-
-    #return table
-    return None

@@ -8,6 +8,8 @@ from sklearn.linear_model import LinearRegression
 from .StoneModMouse import StoneModelMouse
 
 def NimmerjahnPredictByAIratio():
+    """ Predict in vivo efficacy using the AtoI ratio. """
+
     lr = LinearRegression()
     table = StoneModelMouse().NimmerjahnEffectTableAffinities()
     table = table.loc[table.FcgRIIB > 0, :]
@@ -119,7 +121,7 @@ def InVivoPredict(inn=[5, 1E-12]):
     table['2Beff'] = table['2B-KO'] * np.power(10, model.res.x[4])
 
     pd.set_option('expand_frame_repr', False)
-    
+
     table['CPredict'] = cross_val_predict(model, X, y, cv=len(y))
     table['DPredict'] = model.predict(X)
     table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
@@ -128,9 +130,9 @@ def InVivoPredict(inn=[5, 1E-12]):
     return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table, model)
 
 def crossValF(table):
-    yy = cross_val_predict(regFunc(), 
-                           table.drop('Effectiveness', axis=1), 
-                           table['Effectiveness'], 
+    yy = cross_val_predict(regFunc(),
+                           table.drop('Effectiveness', axis=1),
+                           table['Effectiveness'],
                            cv=table.shape[0])
 
     return explained_variance_score(yy, table['Effectiveness'])
@@ -151,11 +153,41 @@ def InVivoPredictMinusComponents():
 
 
 class regFunc(BaseEstimator):
+    """ Class to handle regression with saturating effect. """
+    
     def __init__(self):
         self.logg = True
+        self.res = None
+        self.trainX = None
+        self.trainy = None
 
-    def outF(self, p, X=None):
+    def fit(self, X, y):
+        """ Fit the X-y relationship. Return nothing. """
+        from scipy.optimize import least_squares
+
+        # Fuction for fit residual
+        diffF = lambda p: self.trainy - self.predict(p=p)
+
+        self.trainX, self.trainy = X, y
+
+        x0 = np.ones((X.shape[1] + 2, ), dtype=np.float64)
+        lb = np.full(x0.shape, -20, dtype=np.float64)
+
+        self.res = least_squares(diffF, x0=x0,
+                                 jac='3-point', bounds=(lb, -lb))
+
+        resC = least_squares(diffF, x0=x0*2,
+                             jac='3-point', bounds=(lb, -lb))
+
+        if resC.cost < self.res.cost:
+            self.res = resC
+
+    def predict(self, X=None, p=None):
+        """ Output prediction from parameter set. Use internal X if none given. """
         from scipy.stats import norm
+
+        if p is None:
+            p = self.res.x
 
         if self.logg is True:
             p = np.power(10, p)
@@ -164,34 +196,3 @@ class regFunc(BaseEstimator):
             X = self.trainX
 
         return norm.cdf(np.dot(X, p[2:]), loc=p[0], scale=p[1])
-
-    def diffF(self, p):
-        return self.trainy - self.outF(p)
-
-    def errF(self, p):
-        return np.linalg.norm(self.diffF(p))
-
-    def fit(self, X, y):
-        from scipy.optimize import least_squares
-
-        self.trainX, self.trainy = X, y
-
-        x0 = np.ones((X.shape[1] + 2, ), dtype=np.float64)
-        lb = np.full(x0.shape, -20, dtype=np.float64)
-        ub = np.full(x0.shape, 20, dtype=np.float64)
-
-        self.res = least_squares(lambda p: self.diffF(p),
-                            x0=x0,
-                            jac='3-point',
-                            bounds=(lb, ub))
-
-        self.resC = least_squares(lambda p: self.diffF(p),
-                            x0=x0*2,
-                            jac='3-point',
-                            bounds=(lb, ub))
-
-        if self.errF(self.resC.x) < self.errF(self.res.x):
-            self.res = self.resC
-
-    def predict(self, X):
-        return self.outF(self.res.x, X)

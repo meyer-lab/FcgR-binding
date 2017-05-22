@@ -1,5 +1,7 @@
-## This function has a number of methods for combining data about predictions
-## and processing predictions from the StoneMod classes.
+"""
+This function has a number of methods for combining data about predictions
+and processing predictions from the StoneMod classes.
+"""
 
 import numpy as np
 import pandas as pd
@@ -10,7 +12,7 @@ try:
 except ImportError:
     import pickle
 
-def read_chain(filename=None, filter=True):
+def read_chain(filename=None, ffilter=True):
     """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
     import os
     import h5py
@@ -37,7 +39,7 @@ def read_chain(filename=None, filter=True):
 
     # Read in dataset to Pandas frame
     # Optionally use burn in
-    if filter is True:
+    if ffilter is True:
         pdset = pd.DataFrame(dset.value[11000:,:], columns = cNames)
     else:
         pdset = pd.DataFrame(dset.value, columns = cNames)
