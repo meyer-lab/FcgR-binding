@@ -1,5 +1,4 @@
 import random
-import time
 import unittest
 import numpy as np
 from scipy.stats import norm
