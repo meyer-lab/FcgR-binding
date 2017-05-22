@@ -1,7 +1,6 @@
 import seaborn as sns
 from .FigureCommon import FcgRidx, subplotLabel, getSetup
 
-# TODO: Greek FcgRs throughout
 
 def makeFigure():
     from ..StoneHelper import read_chain, mapMCMC, getFitPrediction
