@@ -84,7 +84,7 @@ def histSubplots(dset, axes):
     axes[0].set_xlabel(r'$\log_{10}$(K$_x$)')
     axes[1].set_xlabel(r'$\log_{10}$(Conversion Factor)')
     axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
-    axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
+    axes[3].set_xlabel(r'$\log_{10}$[Deviation Parameter ($\sigma$)]')
 
     # Set all the x-limites based on which histogram is displayed
     axes[0].set_xlim(-13.0,axes[0].get_xlim()[1])
