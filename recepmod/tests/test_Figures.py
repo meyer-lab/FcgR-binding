@@ -21,7 +21,7 @@ class TestFigures(unittest.TestCase):
 
         Figure4.RequiredComponents(ax)
 
-        Figure2.AverageAvidity()
+        Figure2.AverageAvidity(ax)
 
 
 if __name__ == '__main__':
