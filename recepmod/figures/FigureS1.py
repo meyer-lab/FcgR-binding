@@ -49,7 +49,7 @@ def Rbndplot(output, axarr):
         axx.set_xlabel("")
         axx.set_ylim((0, 1))
         axx.legend_.remove()
-        axx.set_title(fcr)
+        axx.set_title(fcr.replace('FcgR', r'Fc$\gamma$R'))
 
 def Rmultiplot(output, axarr):
     output['RmultiPred'] = output.groupby(['pSetNum'])['RmultiPred'].apply(lambda x: x / x.mean())
@@ -69,4 +69,4 @@ def Rmultiplot(output, axarr):
         axx.set_xlabel("")
         axx.set_ylim((0, axx.get_ylim()[1]))
         axx.legend_.remove()
-        axx.set_title(fcr)
+        axx.set_title(fcr.replace('FcgR', r'Fc$\gamma$R'))
