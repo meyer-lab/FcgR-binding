@@ -277,5 +277,7 @@ def ClassAvidityPredict(ax):
     # Plot the calculated crossvalidation performance
     sns.FacetGrid(data, hue='index').map(ax.plot, 'v', 'predict')
 
+    ax.vlines(5.0, 0, 1)
+
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
