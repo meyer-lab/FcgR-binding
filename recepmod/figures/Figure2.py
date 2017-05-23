@@ -6,11 +6,14 @@ import string
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from ..StoneHelper import read_chain, getFitMeasMergedSummarized, geweke_chains
-from .FigureCommon import Igs, FcgRidx, subplotLabel, texRename, texRenameList, getSetup, Legend, FcgRidxL, getRquant
+import matplotlib
+from .FigureCommon import Igs, FcgRidx, texRename, texRenameList, FcgRidxL
 
 
 def makeFigure():
+    from ..StoneHelper import read_chain, getFitMeasMergedSummarized
+    from .FigureCommon import getSetup, Legend, subplotLabel
+
     # Retrieve model and fit from hdf5 file
     M, dset = read_chain()
 
@@ -21,26 +24,25 @@ def makeFigure():
 
     # Blank out for the cartoon
     ax[0].axis('off')
-    ax[1].axis('off')
-
-    ax[1].legend(handles=Legend(FcgRidxL, Igs))
+    ax[0].legend(handles=Legend(FcgRidxL, Igs))
 
     # Show predicted versus actual
-    plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[2])
+    plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[1])
 
     # Make Geweke diagnostic subplot
-    GewekeDiagPlot(M, dset, ax[3])
+    GewekeDiagPlot(M, dset, ax[2])
 
     # Make histogram subplots
-    histSubplots(dset, axes=ax[4:8])
+    histSubplots(dset, axes=[ax[3], ax[5], ax[6], ax[7]])
+
+    # Plot the average avidity of binding
+    AverageAvidity(ax[4])
 
     # Make receptor expression subplot
     violinPlot(dset, ax=ax[8])
 
-    subplotLabel(ax[0], 'A')
-
-    for ii, item in enumerate(ax[2:9]):
-        subplotLabel(item, string.ascii_uppercase[ii+1])
+    for ii, item in enumerate(ax):
+        subplotLabel(item, string.ascii_uppercase[ii])
 
     # Try and fix overlapping elements
     f.tight_layout()
@@ -49,6 +51,8 @@ def makeFigure():
 
 
 def violinPlot(dset, ax):
+    from .FigureCommon import getRquant
+
     dset = dset[['Rexp']]
     dset.columns = FcgRidxL.keys()
 
@@ -120,9 +124,10 @@ def plotFit(fitMean, ax):
     ax.set_ylim(0.01, 5)
     ax.set_xlim(0.01, 5)
 
-def GewekeDiagPlot(M,dset,ax):
-    # Get pvalues from geweke diagnostic from the dataset
+def GewekeDiagPlot(M, dset, ax):
+    """ Get pvalues from geweke diagnostic from the dataset """
     from statsmodels.sandbox.stats.multicomp import multipletests
+    from ..StoneHelper import geweke_chains
 
     _, pvalues = geweke_chains(dset)
 
@@ -146,35 +151,40 @@ def GewekeDiagPlot(M,dset,ax):
                        rotation_mode="anchor",
                        ha="right",
                        fontsize=5,
-                       position=(0,0.075))
-
-    print('YAAAAAAAAAAAAAAAS')
-    print(ax.get_xticklabels()[0].get_position())
+                       position=(0, 0.075))
 
 
-def AverageAvidity():
+def AverageAvidity(ax):
     """ Produce the average of avidity of binding in the dilute case. """
 
     from ..StoneModel import StoneMod
     from ..StoneHelper import getMedianKx
     from itertools import product
 
-    KxIn = getMedianKx()
+    logRs = np.arange(3, 7, dtype=np.float)
+    L0, gnus = 1.0E-18, 4
+    Kas = np.logspace(2, 9, 20)
 
-    logRs = np.linspace(2, 5, 4, dtype=np.float)
-    L0 = 1.0E-12
-    gnus = np.arange(1, 11)
-    Kas = np.logspace(2, 8, 4, dtype=np.float)
-
-    table = pd.DataFrame(list(product(gnus, logRs, Kas)), columns=['gnu', 'logR', 'Ka'])
+    table = pd.DataFrame(list(product(logRs, Kas)), columns=['logR', 'Ka'])
 
     def avAv(x):
-        outt = StoneMod(x.logR, x.Ka, x.gnu, KxIn*x.Ka, L0, fullOutput=True)
+        outt = StoneMod(x.logR, x.Ka, gnus, getMedianKx()*x.Ka, L0, fullOutput=True)
 
-        x['AvAv'] = outt[1] / outt[0]
+        return outt[1] / outt[0]
 
-        return x
+    table['AvAv'] = table.apply(avAv, axis=1)
 
-    table = table.apply(avAv, axis=1)
 
-    return table
+    sns.FacetGrid(hue='logR', data=table).map(ax.plot, 'Ka', 'AvAv')
+
+    ax.set_xscale('log')
+    ax.set_ylabel('Average Binding Avidity')
+    ax.set_xlabel('Ka')
+
+    # Create the legend patches
+    legend_patches = [matplotlib.patches.Patch(color=C, label=L) for
+                      C, L in zip(sns.color_palette(), map(str, logRs))]
+
+    # Plot the legend
+    ax.legend(handles=legend_patches, title=r'$\log_{10}$(Receptor)', labelspacing=0.25)
+    
