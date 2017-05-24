@@ -54,7 +54,7 @@ Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-',
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
 KnockdownL = ['Wild-type', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-']
 KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
-celltypes = ['NK effect', 'DC effect', '2B effect']
+celltypes = ['NK effect', 'DC effect', '2B-KO effect']
 celltypeidx = dict(zip(celltypes, sns.color_palette()))
 
 def PrepforLegend(table):
