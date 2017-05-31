@@ -12,46 +12,46 @@ Regression against *in vivo* efficacy of IgG treatments was performed by least-s
 
 $$ y = F (X \cdot p) $$ {#eq:lsq}
 
-where F is the normal distribuion cumulative density function, with mean and standard deviation varied during fitting.
+where {\color{red} $F$} is the normal distribuion cumulative density function, with mean and standard deviation varied during fitting.
 
 ## Model
 
 ### Base model
 
-The equilibrium binding of TNP-X-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity K~a~, and then through subsequent cross-linking events with equilibrium partitioning K~x~.
+The equilibrium binding of TNP-X-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity {\color{red} $K_A$}, and then through subsequent cross-linking events with equilibrium partitioning {\color{red} $K_X$}.
 
-Therefore, according to the model, the number of ligand bound i-valently to the cell at equilibrium, v~eq~, can be found using the relation:
+Therefore, according to the model, the number of ligand bound {\color{red} i}-valently to the cell at equilibrium, {\color{red} $v_{eq}$}, can be found using the relation:
 
 $$ v_{i,eq} = {v\choose i} (K_x)^{i-1} {L_0}{K_a} \left(R_{eq}\right)^i $$ {#eq:vieq}
 
-Here, K~x~ is a cross-linking constant with units of # per cell, L~0~ is the concentration of ligand, and R~eq~ is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is:
+Here, {\color{red} $K_X$} is a cross-linking constant with units of # per cell, {\color{red} $L_0$} is the concentration of ligand, and {\color{red} $R_{eq}$} is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is:
 
 $$ L_{bound} = \sum_{i=1}^{v} v_{i,eq} = \sum_{i=1}^{v} { v\choose i } (K_x)^{i-1} {L_0}{K_a} (R_{eq})^i $$ {#eq:lbound}
 
-where v is the effective avidity of the ligand. R~eq~ represents the quantity of unbound receptors, and is a function of v, L~0~, K~a~, K~x~, and R~tot~, the total number of receptors expressed on the cell surface. R~eq~ can be approximated numerically using the following relationship when these parameters are known:
+where {\color{red} $v$} is the effective avidity of the ligand. {\color{red} $R_{eq}$} represents the quantity of unbound receptors, and is a function of {\color{red} $v$, $L_0$, $K_A$, $K_X$, and $R_{tot}$), the total number of receptors expressed on the cell surface. {\color{red} $R_{eq}$} can be approximated numerically using the following relationship when these parameters are known:
 
 $$ R_{tot} = R_{eq} \left(1+v {L_0}{K_D} (1+K_x R_{eq})^{v-1}\right) $$ {#eq:rtot}
 
-As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium (R~multi~) can be found as follows:
+As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium ({\color{red} $R_{multi}$}) can be found as follows:
 
 $$ R_{multi} = \sum_{i=2}^{v} iv_{i,eq} $$ {#eq:rmulti}
 
 ### Parameters and Assumptions
 
-Association constants for all combinations of IgG and FcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. In each replicate of Lux's assay, cells were coincubated with 5 µg/ml TNP-X-BSA. Because the molar masses of a 2,4,6-trinitrophenyl groups and of BSA are approximately 173 Da and 66430 Da, respectively, we represented the molar concentrations of TNP-4-BSA and TNP-26-BSA as 74 nM and 70 nM [@Lux:2013iv]. We also assumed that there were two, different conversion factors between the number of ICs bound and MFI for TNP-4-BSA and TNP-26-BSA. Lastly, we assumed that, due to steric effects, the effective avidities of TNP-4-BSA and (especially) TNP-26-BSA might be different that their actual avidities. This required us, in total, to fit 11 parameters: the total expression level R~tot~ for each FcγR, K~x~, conversion factors from ligand bound to MFI for both TNP-BSAs (c~4~ and c~26~, respectively), and effective avidities for both TNP-BSAs ($f_{4}$ and $f_{26}$, respectively).
+Association constants for all combinations of IgG and FcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. In each replicate of Lux's assay, cells were coincubated with 5 µg/ml TNP-X-BSA. Because the molar masses of a 2,4,6-trinitrophenyl groups and of BSA are approximately 173 Da and 66430 Da, respectively, we represented the molar concentrations of TNP-4-BSA and TNP-26-BSA as 74 nM and 70 nM [@Lux:2013iv]. We also assumed that there were two, different conversion factors between the number of ICs bound and MFI for TNP-4-BSA and TNP-26-BSA. Lastly, we assumed that, due to steric effects, the effective avidities of TNP-4-BSA and (especially) TNP-26-BSA might be different that their actual avidities. This required us, in total, to fit 11 parameters: the total expression level {\color{red} $R_{tot}$ for each FcγR, $K_X$}, conversion factors from ligand bound to MFI for both TNP-BSAs ({\color{red} $c_4$ and $c_{26}$}, respectively), and effective avidities for both TNP-BSAs ($f_{4}$ and $f_{26}$, respectively).
 
 ### Specification for K~x~
 
-We allowed K~x~ to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While K~x~ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of K~x~ must break down under certain regimes. Specifically, a constant value for K~x~ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, K~x~ must ultimately be reduced, and K~x~ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when proportional to affinity. Therefore, we specified an effective K~x~, equal to:
+We allowed {\color{red} $K_X$} to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While {\color{red} $K_X$} was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of {\color{red} $K_X$} must break down under certain regimes. Specifically, a constant value for {\color{red} $K_X$} is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, {\color{red} $K_X$} must ultimately be reduced, and {\color{red} $K_X$} for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when proportional to affinity. Therefore, we specified an effective {\color{red} $K_X$}, equal to:
 
 $$ K_{x,eff} = K_x K_a $$ {#eq:kx}
 
-As a consequence of this construction, K~x~ becomes zero in the absence of binding and satisfies detailed balance.
+As a consequence of this construction, {\color{red} $K_X$} becomes zero in the absence of binding and satisfies detailed balance.
 
 ### Model Fitting
 
-We fit our model to binding measurements for each FcγR-IgG pair using {\color{red} an affine invariant Markov chain Monte Carlo sampler} as implemented within the emcee package [@ForemanMackey:2013ux]. We assumed that the variance in each measurement was proportional to the true value. Therefore, we additionally fit a variance parameter σ~1~. The likelihood of each measurement was calculated by comparison to a normal distribution with mean equal to the model prediction and standard deviation equal to the prediction times σ~1~. {\color{red} We assayed the convergence of our Monte Carlo simulation using the Geweke Diagnostic. Each walker's series of values for a particular parameter was treated as a single chain, upon which the diagnostic was evaluation.}
+We fit our model to binding measurements for each FcγR-IgG pair using {\color{red} an affine invariant Markov chain Monte Carlo sampler} as implemented within the emcee package [@ForemanMackey:2013ux]. We assumed that the variance in each measurement was proportional to the true value. Therefore, we additionally fit a variance parameter {\color{red} $\sigma_1$}. The likelihood of each measurement was calculated by comparison to a normal distribution with mean equal to the model prediction and standard deviation equal to the prediction times {\color{red} $\sigma_1$}. {\color{red} We assayed the convergence of the Monte chain simulation using the Geweke diagnostic, to determine whether early and late segments of the Markov chain could have been sampled from the same probability distribution. Each walker's series of values for a particular parameter was treated as a single chain, upon which the diagnostic was evaluated.}
 
 % To do: hyperref (I think that's the right term?) The following citation: Geweke, J. (1992). Evaluating the accuracy of sampling‐based approaches to the calculation of posterior moments. In Bayesian Statistics 4, Bernardo, J. M., Berger, J. O., Dawid, A. P. and Smith, A. F. M. (eds.), 169‐193. Oxford: Oxford University Press.
 
-In addition to immune complex binding, the receptor expression of each cell line was quantitatively measured. These measurements were treated similarly, with a separate variance parameter σ~2~, and likelihood calculated by comparison to a normal distribution with mean equal to the predicted receptor expression and standard deviation equal to that prediction times σ~2~. The overall likelihood of the model at each parameter set was calculated by the product of all individual likelihoods. The priors for each parameter were therefore otherwise specified to be uniform.
+In addition to immune complex binding, the receptor expression of each cell line was quantitatively measured. These measurements were treated similarly, with a separate variance parameter {\color{red} $\sigma_2$}, and likelihood calculated by comparison to a normal distribution with mean equal to the predicted receptor expression and standard deviation equal to that prediction times {\color{red} $\sigma_2$}. The overall likelihood of the model at each parameter set was calculated by the product of all individual likelihoods. The priors for each parameter were therefore otherwise specified to be uniform.
