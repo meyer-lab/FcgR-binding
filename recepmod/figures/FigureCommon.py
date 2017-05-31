@@ -3,14 +3,18 @@ from ..StoneModel import StoneModel
 
 figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'Figure5', 'FigureS1', 'FigureS2', 'FigureAA']
 
+IgList = ['IgG1','IgG2','IgG3','IgG4']
+
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
 
-FcgRidx = dict(zip(['FcgRI',
-                    'FcgRIIA-Arg',
-                    'FcgRIIA-His',
-                    'FcgRIIB',
-                    'FcgRIIIA-Phe',
-                    'FcgRIIIA-Val'], sns.color_palette()))
+FcgRlist = ['FcgRI',
+            'FcgRIIA-Arg',
+            'FcgRIIA-His',
+            'FcgRIIB',
+            'FcgRIIIA-Phe',
+            'FcgRIIIA-Val']
+
+FcgRidx = dict(zip(FcgRlist, sns.color_palette()))
 
 def texRename(name):
     name = r'$K_X$' if name=='Kx1' else name
@@ -37,12 +41,9 @@ def texRename(name):
 def texRenameList(names):
     return [texRename(name) for name in names]
 
-FcgRidxL = dict(zip([r'Fc$\gamma$RI',
-                     r'Fc$\gamma$RIIA-131R',
-                     r'Fc$\gamma$RIIA-131H',
-                     r'Fc$\gamma$RIIB',
-                     r'Fc$\gamma$RIIIA-158F',
-                     r'Fc$\gamma$RIIIA-158V'], sns.color_palette()))
+FcgRlistL = texRenameList(FcgRlist)
+
+FcgRidxL = dict(zip(FcgRlistL, sns.color_palette()))
 
 def subplotLabel(ax, letter):
     ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
@@ -64,16 +65,16 @@ def getSetup(figsize, gridd):
 
     return (ax, f)
 
-def Legend(colors, shapes):
+def Legend(fcgrs, colorsDict, iglist, shapes):
     """ Make legend. """
     import matplotlib
     
     patches = list()
 
-    for key, val in colors.items():
+    for key, val in zip(fcgrs,[colorsDict[fcgr] for fcgr in fcgrs]):
         patches.append(matplotlib.patches.Patch(color=val, label=key))
 
-    for key, val in shapes.items():
+    for key, val in zip(iglist,[shapes[ig] for ig in iglist]):
         patches.append(matplotlib.lines.Line2D([], [], color='black', marker=val, markersize=7, label=key, linestyle='None'))
     
     return patches

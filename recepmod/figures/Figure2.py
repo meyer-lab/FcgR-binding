@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib
-from .FigureCommon import Igs, FcgRidx, texRename, texRenameList, FcgRidxL
+from .FigureCommon import Igs, FcgRidx, texRename, texRenameList, FcgRidxL, FcgRlist, FcgRlistL, IgList
 
 
 def makeFigure():
@@ -24,7 +24,7 @@ def makeFigure():
 
     # Blank out for the cartoon
     ax[0].axis('off')
-    ax[0].legend(handles=Legend(FcgRidxL, Igs),loc=2,bbox_to_anchor=(4.0,1.0))
+    ax[0].legend(handles=Legend(FcgRlistL, FcgRidxL, IgList, Igs),loc=2,bbox_to_anchor=(4.0,1.0))
 
     # Show predicted versus actual
     plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[1])
