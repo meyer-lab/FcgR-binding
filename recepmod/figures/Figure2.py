@@ -24,7 +24,7 @@ def makeFigure():
 
     # Blank out for the cartoon
     ax[0].axis('off')
-    ax[0].legend(handles=Legend(FcgRidxL, Igs))
+    ax[0].legend(handles=Legend(FcgRidxL, Igs),loc=2,bbox_to_anchor=(4.0,1.0))
 
     # Show predicted versus actual
     plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[1])
@@ -143,7 +143,7 @@ def GewekeDiagPlot(M, dset, ax):
                   ax=ax,
                   data=ptable)
 
-    ax.set_ylabel('-log10(q-value)')
+    ax.set_ylabel(r'-\log_{10}(q-value)')
     ax.set_xlabel('')
 
     ax.set_xticklabels(ax.get_xticklabels(),
@@ -152,6 +152,9 @@ def GewekeDiagPlot(M, dset, ax):
                        ha="right",
                        fontsize=5,
                        position=(0, 0.075))
+
+    # Remove legend created by sns.stripplot
+    ax.get_legend().set_visible(False)
 
 
 def AverageAvidity(ax):

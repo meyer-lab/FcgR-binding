@@ -21,10 +21,10 @@ def makeFigure():
     dset['row'] = dset.index
 
     # Make a column for which step this came from within the walker
-    dset['step'] = dset.groupby('walker')['row'].rank()
+    dset['Step'] = dset.groupby('walker')['row'].rank()
 
     # Find the variables we want to run this on
-    params = dset.columns.drop(['step', 'walker', 'row', 'LL'])
+    params = dset.columns.drop(['Step', 'walker', 'row', 'LL'])
 
     # Run the autocorrelation plotting on each variable
     for ii, item in enumerate(params):
@@ -48,7 +48,7 @@ def plotAutoC(ax, dset, coll):
     import numpy as np
 
     # Pivot to separate out all the walkers
-    dd = dset.pivot(index='step', columns='walker', values=coll)
+    dd = dset.pivot(index='Step', columns='walker', values=coll)
 
     # Calculate the autocorrelation
     outt = dd.apply(lambda x: acf(x, nlags=x.size))
