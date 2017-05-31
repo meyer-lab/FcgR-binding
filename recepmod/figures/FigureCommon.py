@@ -26,6 +26,12 @@ def texRename(name):
     name = r'Fc$\gamma$RIIB' if name=='Rexp4' else name
     name = r'Fc$\gamma$RIIIA-158F' if name=='Rexp5' else name
     name = r'Fc$\gamma$RIIIA-158V' if name=='Rexp6' else name
+    name = r'Fc$\gamma$RIA' if name=='FcgRI' else name
+    name = r'Fc$\gamma$RIIA-131R' if name=='FcgRIIA-Arg' else name
+    name = r'Fc$\gamma$RIIA-131H' if name=='FcgRIIA-His' else name
+    name = r'Fc$\gamma$RIIB' if name=='FcgRIIB' else name
+    name = r'Fc$\gamma$RIIIA-158F' if name=='FcgRIIIA-Phe' else name
+    name = r'Fc$\gamma$RIIIA-158V' if name=='FcgRIIIA-Val' else name
     return name
 
 def texRenameList(names):
