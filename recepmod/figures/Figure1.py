@@ -7,7 +7,7 @@ matplotlib.use('AGG')
 import numpy as np
 import seaborn as sns
 import pandas as pd
-from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx
+from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx, FcgRlist, FcgRlistL, IgList
 
 
 def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
@@ -88,7 +88,7 @@ def plotAvidityEffectVsKA(fitMean, ax1):
     ax1.set_xlim(1E4, 1E8)
     ax1.set_xticks([1E4, 1E5, 1E6, 1E7, 1E8])
 
-    ax1.legend(handles=Legend(FcgRidxL, Igs), bbox_to_anchor=(-0.1, -0.3), loc=2)
+    ax1.legend(handles=Legend(FcgRlistL, FcgRidxL, IgList, Igs), bbox_to_anchor=(-0.1, -0.3), loc=2)
 
 
 def FcgRQuantificationFigureMaker(StoneM, ax):
@@ -96,7 +96,8 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
     df = pd.DataFrame(StoneM.Rquant).T
 
     # Assign the names of the receptors
-    df.columns = FcgRidxL.keys()
+##    df.columns = FcgRidxL.keys()
+    df.columns = FcgRlistL
 
     # Melt the dataframe
     dfm = pd.melt(df)
@@ -118,8 +119,8 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
 
 def mfiAdjMeanFigureMaker(measAll, axarr):
 
-    fcIter = zip(axarr, FcgRidx.keys())
-
+##    fcIter = zip(axarr, FcgRidx.keys())
+    fcIter = zip(axarr, FcgRlist)
     # Loop through receptors creating plot
     for axx, fcr in fcIter:
         sns.barplot(x="Ig",

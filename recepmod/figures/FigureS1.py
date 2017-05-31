@@ -1,5 +1,5 @@
 import seaborn as sns
-from .FigureCommon import FcgRidx, subplotLabel, getSetup, texRename
+from .FigureCommon import FcgRidx, subplotLabel, getSetup, texRename, FcgRlist
 
 
 def makeFigure():
@@ -34,7 +34,7 @@ def makeFigure():
 def Rbndplot(output, axarr):
     output['RbndPred'] = output.apply(lambda row: (row['RbndPred'] / (row['RbndPred'] + row['Req'])), axis=1)
 
-    fcIter = zip(axarr, FcgRidx.keys())
+    fcIter = zip(axarr, FcgRlist)
 
     # Loop through receptors creating plot
     for axx, fcr in fcIter:
@@ -55,7 +55,7 @@ def Rmultiplot(output, axarr):
     output['RmultiPred'] = output.groupby(['pSetNum'])['RmultiPred'].apply(lambda x: x / x.mean())
     output['nXlinkPred'] = output.groupby(['pSetNum'])['nXlinkPred'].apply(lambda x: x / x.mean())
 
-    fcIter = zip(axarr, FcgRidx.keys())
+    fcIter = zip(axarr, FcgRlist)
 
     # Loop through receptors creating plot
     for axx, fcr in fcIter:

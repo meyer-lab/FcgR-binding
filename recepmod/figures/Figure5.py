@@ -54,8 +54,11 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
 
     colors = dict(zip(range(5), sns.color_palette()))
     Igs = {0:'o', 1:'d', 2:'^', 3:'s'}
+    mIgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
     mIgs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s'}
+    hIgList = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
     hIgs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'^', 'IgG4':'s'}
+    quantList = ['Lbnd','activity']
     quantShape = {'Lbnd':'o', 'activity':'d'}
 
     pca = PCA(n_components=4)
@@ -95,12 +98,12 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     axes[1].set_title(species + ' Loadings')
 
     # Ok, now start on legend
-    axes[1].legend(handles=Legend(colors, quantShape), bbox_to_anchor=(1, 1), loc=2)
+    axes[1].legend(handles=Legend(loadings['cellType'].unique(), colors, quantList, quantShape), bbox_to_anchor=(1, 1), loc=2)
 
     if species == 'Human':
-        axes[0].legend(handles=Legend(avcolors, hIgs), bbox_to_anchor=(1, 1), loc=2)
+        axes[0].legend(handles=Legend(dataIn['avidity'].unique(), avcolors, hIgList, hIgs), bbox_to_anchor=(1, 1), loc=2)
     else:
-        axes[0].legend(handles=Legend(avcolors, mIgs), bbox_to_anchor=(1, 1), loc=2)
+        axes[0].legend(handles=Legend(dataIn['avidity'].unique(), avcolors, mIgList, mIgs), bbox_to_anchor=(1, 1), loc=2)
     
     # Fix axis limits
     for ii in range(2):
