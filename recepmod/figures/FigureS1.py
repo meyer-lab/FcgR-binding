@@ -49,7 +49,6 @@ def Rbndplot(output, axarr):
         axx.set_xlabel("")
         axx.set_ylim((0, 1))
         axx.legend_.remove()
-##        axx.set_title(fcr.replace('FcgR', r'Fc$\gamma$R'))
         axx.set_title(texRename(fcr))
 
 def Rmultiplot(output, axarr):
@@ -70,5 +69,4 @@ def Rmultiplot(output, axarr):
         axx.set_xlabel("")
         axx.set_ylim((0, axx.get_ylim()[1]))
         axx.legend_.remove()
-##        axx.set_title(fcr.replace('FcgR', r'Fc$\gamma$R'))
         axx.set_title(texRename(fcr))
