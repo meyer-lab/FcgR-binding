@@ -5,6 +5,9 @@
 \usepackage{ifxetex,ifluatex}
 \usepackage{microtype}
 
+% To allow Ryan to show alterations he has made to the manuscript using colored text:
+\usepackage{color}
+
 \PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
 
 \usepackage[unicode=true]{hyperref}
