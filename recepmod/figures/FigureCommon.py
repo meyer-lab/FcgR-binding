@@ -13,13 +13,19 @@ FcgRidx = dict(zip(['FcgRI',
                     'FcgRIIIA-Val'], sns.color_palette()))
 
 def texRename(name):
-    name = r'K$_x$' if name=='Kx1' else name
+    name = r'$K_X$' if name=='Kx1' else name
     name = 'TNP-4 c.f.' if name=='sigConv1' else name
     name = 'TNP-26 c.f.' if name=='sigConv2' else name
     name = r'$\sigma_1$' if name=='sigma' else name
     name = r'$\sigma_2$' if name=='sigma2' else name
     name = r'$\nu_4$' if name=='gnu1' else name
     name = r'$\nu_{26}$' if name=='gnu2' else name
+    name = r'Fc$\gamma$RIA' if name=='Rexp1' else name
+    name = r'Fc$\gamma$RIIA-131R' if name=='Rexp2' else name
+    name = r'Fc$\gamma$RIIA-131H' if name=='Rexp3' else name
+    name = r'Fc$\gamma$RIIB' if name=='Rexp4' else name
+    name = r'Fc$\gamma$RIIIA-158F' if name=='Rexp5' else name
+    name = r'Fc$\gamma$RIIIA-158V' if name=='Rexp6' else name
     return name
 
 def texRenameList(names):
