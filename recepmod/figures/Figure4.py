@@ -47,6 +47,7 @@ def makeFigure():
 
     return f
 
+IgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None']
 Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s', 'None':'.'}
 Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'} 
 Igidx = dict(zip(Ig, sns.color_palette()))
@@ -224,7 +225,7 @@ def InVivoPredictVsActualAffinities(ax):
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.8, cperf)
 
-    ax.legend(handles=Legend(KnockdownidxL, Igs), bbox_to_anchor=(1, 1), loc=2)
+    ax.legend(handles=Legend(KnockdownL, KnockdownidxL, IgList, Igs), bbox_to_anchor=(1, 1), loc=2)
 
 
 def ClassAvidityPredict(ax):

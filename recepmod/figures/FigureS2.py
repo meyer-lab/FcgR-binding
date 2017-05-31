@@ -68,7 +68,7 @@ def robustnessPlot(ax, calculate=False):
     # Plot the calculated crossvalidation performance
     sns.FacetGrid(pp, hue='gnus', palette=sns.color_palette()[1:]).map(ax.semilogx, 'Los', 'CPredict')
 
-    ax.legend(handles=Legend(avcolors, {}), bbox_to_anchor=(1, 1), loc=2)
+    ax.legend(handles=Legend(pp['gnus'].unique(), avcolors, [], {}), bbox_to_anchor=(1, 1), loc=2)
 
     ax.set_xlabel('Assumed IC Conc. (M)')
     ax.set_ylabel('LOO Prediction Explained Var.')
