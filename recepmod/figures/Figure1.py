@@ -7,7 +7,7 @@ matplotlib.use('AGG')
 import numpy as np
 import seaborn as sns
 import pandas as pd
-from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx, FcgRlist, FcgRlistL, IgList
+from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx, FcgRlist, FcgRlistL, IgList, texRename
 
 
 def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
@@ -133,7 +133,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
         axx.set_ylabel("Binding (RU)")
         axx.set_xlabel("")
         axx.legend_.remove()
-        axx.set_title(fcr)
+        axx.set_title(texRename(fcr))
 
 def makeFigure():
     from ..StoneModel import StoneModel
