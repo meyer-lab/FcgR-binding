@@ -182,7 +182,7 @@ def AverageAvidity(ax):
 
     ax.set_xscale('log')
     ax.set_ylabel('Average Binding Avidity')
-    ax.set_xlabel('Ka')
+    ax.set_xlabel(r'$K_A$')
 
     # Create the legend patches
     legend_patches = [matplotlib.patches.Patch(color=C, label=L) for

@@ -95,8 +95,8 @@ def InVivoPredictVsActual(ax):
     ax.set_xlabel('Predicted Effect')
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlim(-0.05, 1.05)
-    devar = r'$\sigma$d = '+str(round(devar, 3))
-    cevar = r'$\sigma$c = '+str(round(cevar, 3))
+    devar = r'$\sigma_d$ = '+str(round(devar, 3))
+    cevar = r'$\sigma_c$ = '+str(round(cevar, 3))
     ax.text(0.05, 0.9, devar)
     ax.text(0.05, 0.8, cevar)
 
@@ -199,8 +199,8 @@ def AIplot(ax):
     ax.set_xscale('log')
     ax.set_xlim(10**(-1.2), 10**(2.6))
     ax.set_ylim(-0.05, 1.05)
-    dperf = r'$\sigma$d = '+str(round(dperf, 3))
-    cperf = r'$\sigma$c = '+str(round(cperf, 3))
+    dperf = r'$\sigma_d$ = '+str(round(dperf, 3))
+    cperf = r'$\sigma_c$ = '+str(round(cperf, 3))
     ax.text(0.1, 0.9, dperf)
     ax.text(0.1, 0.8, cperf)
 
@@ -219,8 +219,8 @@ def InVivoPredictVsActualAffinities(ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
-    dperf = r'$\sigma$d = '+str(round(dperf, 3))
-    cperf = r'$\sigma$c = '+str(round(cperf, 3))
+    dperf = r'$\sigma_d$ = '+str(round(dperf, 3))
+    cperf = r'$\sigma_c$ = '+str(round(cperf, 3))
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.8, cperf)
 
