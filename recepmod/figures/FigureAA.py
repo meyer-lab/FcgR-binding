@@ -29,6 +29,7 @@ def makeFigure():
     # Run the autocorrelation plotting on each variable
     for ii, item in enumerate(params):
         plotAutoC(ax[ii], dset, item)
+        ax[ii].set_ylabel('Autocorrelation')
     ax[13].set_axis_off()
     ax[14].set_axis_off()
 
