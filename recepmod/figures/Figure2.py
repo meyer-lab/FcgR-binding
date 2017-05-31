@@ -143,7 +143,7 @@ def GewekeDiagPlot(M, dset, ax):
                   ax=ax,
                   data=ptable)
 
-    ax.set_ylabel(r'-\log_{10}(q-value)')
+    ax.set_ylabel(r'$-\log_{10}$(q-value)')
     ax.set_xlabel('')
 
     ax.set_xticklabels(ax.get_xticklabels(),
