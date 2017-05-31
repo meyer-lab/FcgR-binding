@@ -85,7 +85,7 @@ def histSubplots(dset, axes):
     dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
 
     # Set all the x-labels based on which histogram is displayed
-    axes[0].set_xlabel(r'$\log_{10}$(K$_x$)')
+    axes[0].set_xlabel(r'$\log_{10}$($K_X$)')
     axes[1].set_xlabel(r'$\log_{10}$(Conversion Factor)')
     axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
     axes[3].set_xlabel(r'$\log_{10}$[Deviation Parameter ($\sigma$)]')

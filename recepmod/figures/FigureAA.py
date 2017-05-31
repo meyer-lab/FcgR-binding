@@ -29,6 +29,8 @@ def makeFigure():
     # Run the autocorrelation plotting on each variable
     for ii, item in enumerate(params):
         plotAutoC(ax[ii], dset, item)
+    ax[13].set_axis_off()
+    ax[14].set_axis_off()
 
     # Tweak layout
     f.tight_layout()
@@ -37,6 +39,7 @@ def makeFigure():
 
 
 def plotAutoC(ax, dset, coll):
+    from .FigureCommon import texRename
     """
     Run the autocorrelation analysis and plot for the selected variable.
     """
@@ -52,6 +55,8 @@ def plotAutoC(ax, dset, coll):
     # Plot the values
     outt.plot(ax=ax, legend=False, linewidth=0.5)
 
+    # Rename columns for plotting
+    coll = texRename(coll)
     ax.set_title(coll)
 
     # Indicate the confidence intervals for failure
