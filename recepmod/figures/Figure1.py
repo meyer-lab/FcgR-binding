@@ -32,7 +32,7 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
                            linestyle='None')
 
         axInt.loglog()
-        axInt.set_xlabel(r'Fc$\gamma$R-IgG Ka')
+        axInt.set_xlabel(r'Fc$\gamma$R-IgG $K_A$')
         axInt.set_ylabel('Measured TNP-BSA binding')
         axInt.set_ylim(1.0E-3, 1.0E-1)
 
@@ -79,7 +79,7 @@ def plotAvidityEffectVsKA(fitMean, ax1):
     ax1.set_xscale('log', basex=10)
     ax1.set_yscale('log', basey=2)
 
-    ax1.set_xlabel(r'Fc$\gamma$R-IgG Ka')
+    ax1.set_xlabel(r'Fc$\gamma$R-IgG $K_A$')
     ax1.set_ylabel('TNP-26 / TNP-4 Binding')
 
     ax1.set_ylim(1, 20)
