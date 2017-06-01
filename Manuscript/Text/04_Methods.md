@@ -18,17 +18,17 @@ where $F$ is the normal distribuion cumulative density function, with mean and s
 
 ### Base model
 
-The equilibrium binding of TNP-X-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity $K_A$, and then through subsequent cross-linking events with equilibrium partitioning $K_X$.
+The equilibrium binding of TNP-X-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity $K_a$, and then through subsequent cross-linking events with equilibrium partitioning $K_x$.
 
 Therefore, according to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{i,eq}$, can be found using the relation:
 
 $$ v_{i,eq} = {v\choose i} (K_x)^{i-1} {L_0}{K_a} \left(R_{eq}\right)^i $$ {#eq:vieq}
 
-Here, $K_X$ is a cross-linking constant with units of # per cell, $L_0$ is the concentration of ligand, and $R_{eq}$ is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is:
+Here, $K_x$ is a cross-linking constant with units of # per cell, $L_0$ is the concentration of ligand, and $R_{eq}$ is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is:
 
 $$ L_{bound} = \sum_{i=1}^{v} v_{i,eq} = \sum_{i=1}^{v} { v\choose i } (K_x)^{i-1} {L_0}{K_a} (R_{eq})^i $$ {#eq:lbound}
 
-where $v$ is the effective avidity of the ligand. $R_{eq}$ represents the quantity of unbound receptors, and is a function of $v$, $L_0$, $K_A$, $K_X$, and $R_{tot}$, the total number of receptors expressed on the cell surface. $R_{eq}$ can be approximated numerically using the following relationship when these parameters are known:
+where $v$ is the effective avidity of the ligand. $R_{eq}$ represents the quantity of unbound receptors, and is a function of $v$, $L_0$, $K_a$, $K_x$, and $R_{tot}$, the total number of receptors expressed on the cell surface. $R_{eq}$ can be approximated numerically using the following relationship when these parameters are known:
 
 $$ R_{tot} = R_{eq} \left(1+v {L_0}{K_D} (1+K_x R_{eq})^{v-1}\right) $$ {#eq:rtot}
 
@@ -38,15 +38,15 @@ $$ R_{multi} = \sum_{i=2}^{v} iv_{i,eq} $$ {#eq:rmulti}
 
 ### Parameters and Assumptions
 
-Association constants for all combinations of IgG and FcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. In each replicate of Lux's assay, cells were coincubated with 5 µg/ml TNP-X-BSA. Because the molar masses of a 2,4,6-trinitrophenyl groups and of BSA are approximately 173 Da and 66430 Da, respectively, we represented the molar concentrations of TNP-4-BSA and TNP-26-BSA as 74 nM and 70 nM [@Lux:2013iv]. We also assumed that there were two, different conversion factors between the number of ICs bound and MFI for TNP-4-BSA and TNP-26-BSA. Lastly, we assumed that, due to steric effects, the effective avidities of TNP-4-BSA and (especially) TNP-26-BSA might be different that their actual avidities. This required us, in total, to fit 11 parameters: the total expression level $R_{tot}$ for each FcγR, $K_X$, conversion factors from ligand bound to MFI for both TNP-BSAs ($c_4$ and $c_{26}$, respectively), and effective avidities for both TNP-BSAs ($f_{4}$ and $f_{26}$, respectively).
+Association constants for all combinations of IgG and FcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. In each replicate of Lux's assay, cells were coincubated with 5 µg/ml TNP-X-BSA. Because the molar masses of a 2,4,6-trinitrophenyl groups and of BSA are approximately 173 Da and 66430 Da, respectively, we represented the molar concentrations of TNP-4-BSA and TNP-26-BSA as 74 nM and 70 nM [@Lux:2013iv]. We also assumed that there were two, different conversion factors between the number of ICs bound and MFI for TNP-4-BSA and TNP-26-BSA. Lastly, we assumed that, due to steric effects, the effective avidities of TNP-4-BSA and (especially) TNP-26-BSA might be different that their actual avidities. This required us, in total, to fit 11 parameters: the total expression level $R_{tot}$ for each FcγR, $K_x$, conversion factors from ligand bound to MFI for both TNP-BSAs ($c_4$ and $c_{26}$, respectively), and effective avidities for both TNP-BSAs ($f_{4}$ and $f_{26}$, respectively).
 
-### Specification for $K_X$
+### Specification for $K_x$
 
-We allowed $K_X$ to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While $K_X$ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of $K_X$ must break down under certain regimes. Specifically, a constant value for $K_X$ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, $K_X$ must ultimately be reduced, and $K_X$ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when proportional to affinity. Therefore, we specified an effective $K_X$, equal to:
+We allowed $K_x$ to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While $K_x$ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of $K_x$ must break down under certain regimes. Specifically, a constant value for $K_x$ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, $K_x$ must ultimately be reduced, and $K_x$ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when proportional to affinity. Therefore, we specified an effective $K_x$, equal to:
 
 $$ K_{x,eff} = K_x K_a $$ {#eq:kx}
 
-As a consequence of this construction, $K_X$ becomes zero in the absence of binding and satisfies detailed balance.
+As a consequence of this construction, $K_x$ becomes zero in the absence of binding and satisfies detailed balance.
 
 ### Model Fitting
 
