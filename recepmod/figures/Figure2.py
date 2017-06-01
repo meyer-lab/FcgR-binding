@@ -54,7 +54,7 @@ def violinPlot(dset, ax):
     from .FigureCommon import getRquant
 
     dset = dset[['Rexp']]
-    dset.columns = FcgRidxL.keys()
+    dset.columns = FcgRlistL
 
     sns.violinplot(data=dset, cut=0, ax=ax, linewidth=0)
 
@@ -85,10 +85,15 @@ def histSubplots(dset, axes):
     dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
 
     # Set all the x-labels based on which histogram is displayed
-    axes[0].set_xlabel(r'$\log_{10}$($K_X$)')
-    axes[1].set_xlabel(r'$\log_{10}$(Conversion Factor)')
+    axes[0].set_xlabel(r'$K_x$')
+    axes[1].set_xlabel(r'Conversion Factor')
     axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
-    axes[3].set_xlabel(r'$\log_{10}$[Deviation Parameter ($\sigma$)]')
+    axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
+
+    # Make x-axes appear logarithmic
+    for ii in range(len(axes)):
+        if ii != 2:
+            axes[ii].set_xticklabels([eval("r'$10^{"+str(num)+"}$'") for num in axes[ii].get_xticks()])    
 
     # Set all the x-limites based on which histogram is displayed
     axes[0].set_xlim(-13.0,axes[0].get_xlim()[1])
@@ -97,9 +102,9 @@ def histSubplots(dset, axes):
 
     axes[1].set_ylim(0, 5000)
 
-    print(np.mean(np.power(10, dset[texRename('sigConv2')] - dset[texRename('sigConv1')])))
-
-    print(np.power(10, np.std(dset[texRename('sigma2')])))
+##    print(np.mean(np.power(10, dset[texRename('sigConv2')] - dset[texRename('sigConv1')])))
+##
+##    print(np.power(10, np.std(dset[texRename('sigma2')])))
 
 
 def plotFit(fitMean, ax):
@@ -182,7 +187,7 @@ def AverageAvidity(ax):
 
     ax.set_xscale('log')
     ax.set_ylabel('Average Binding Avidity')
-    ax.set_xlabel(r'$K_A$')
+    ax.set_xlabel(r'$K_a$')
 
     # Create the legend patches
     legend_patches = [matplotlib.patches.Patch(color=C, label=L) for
