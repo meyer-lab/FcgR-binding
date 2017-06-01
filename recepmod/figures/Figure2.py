@@ -85,7 +85,7 @@ def histSubplots(dset, axes):
     dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
 
     # Set all the x-labels based on which histogram is displayed
-    axes[0].set_xlabel(r'$K_X$')
+    axes[0].set_xlabel(r'$K_x$')
     axes[1].set_xlabel(r'Conversion Factor')
     axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
     axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
@@ -187,7 +187,7 @@ def AverageAvidity(ax):
 
     ax.set_xscale('log')
     ax.set_ylabel('Average Binding Avidity')
-    ax.set_xlabel(r'$K_A$')
+    ax.set_xlabel(r'$K_a$')
 
     # Create the legend patches
     legend_patches = [matplotlib.patches.Patch(color=C, label=L) for
