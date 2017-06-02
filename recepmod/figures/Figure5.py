@@ -3,7 +3,7 @@ import pandas as pd
 
 # Compare across species
 
-def makeFigure(pcOne='PC 2', pcTwo='PC 3'):
+def makeFigure(pcOne='PC 1', pcTwo='PC 2'):
     from .FigureCommon import subplotLabel, getSetup
 
     path = os.path.dirname(os.path.abspath(__file__))
