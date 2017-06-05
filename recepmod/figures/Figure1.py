@@ -134,6 +134,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
         axx.set_xlabel("")
         axx.legend_.remove()
         axx.set_title(texRename(fcr))
+    axarr[5].legend(bbox_to_anchor=(1.6,1),loc=2)
 
 def makeFigure():
     from ..StoneModel import StoneModel
