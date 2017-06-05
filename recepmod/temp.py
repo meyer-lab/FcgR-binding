@@ -49,13 +49,16 @@ def calcActivity(condR, expressions, affinities, activities):
     from .StoneModel import StoneMod
 
     for exprN, expr in expressions.items():
+        # Murine or Human, based on IgID
+        which = int(np.floor(condR.IgID / 4.0))
+        
         # Isolate receptors expressed, and keep the index of those
-        exprV = np.array(expr[0], dtype=np.float)
+        exprV = np.array(expr[which], dtype=np.float)
         exprIDX = np.logical_not(np.isnan(exprV))
         exprV = exprV[exprIDX]
 
         # Pull out the relevant affinities from the table
-        affyH = affinities[expr[1]][exprIDX, int(condR.IgID)]+0.1
+        affyH = affinities[which][exprIDX, int(condR.IgID % 4.0)]+0.1
 
         if exprV.size > 1:
             # Setup the StoneN model
@@ -64,8 +67,8 @@ def calcActivity(condR, expressions, affinities, activities):
                        Kx=getMedianKx(),
                        gnu=np.asscalar(condR.avidity.values),
                        L0=np.asscalar(condR.ligand.values))
-
-            condR[exprN + '_activity'] = M.getActivity(activities[exprN])
+            
+            condR[exprN + '_activity'] = M.getActivity(activities[exprN][which])
             condR[exprN + '_Lbnd'] = M.getLbnd()
         else:
             output = StoneMod(np.asscalar(exprV),
