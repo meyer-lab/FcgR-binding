@@ -31,16 +31,13 @@ def recalcPCA():
     # Setup the table of conditions we'll use.
     avidity = np.logspace(0, 3, 4, base=2, dtype=np.int)
     ligand = np.logspace(start=-9, stop=-9, num=1)
-    IgID = np.arange(0, 4, dtype=np.int)
-    # Genotype: 0 for murine, 1 for human-Phe, 2 for human-Val
-    genotype = np.arange(3)
-    conditions = pd.DataFrame(list(product(avidity, ligand, IgID, species)), columns=['avidity', 'ligand', 'IgID', 'genotype'])
+    IgID = np.arange(0, 8, dtype=np.int)
+    # Genotype: 0 for human-Phe, 1 for human-Val
+    genotype = np.arange(2)
+    conditions = pd.DataFrame(list(product(avidity, ligand, IgID, genotype)), columns=['avidity', 'ligand', 'IgID', 'genotype'])
 
-    # Run the murine plots
-    PCAmurine(conditions)
-
-    # Run the human plots
-    PCAhuman(conditions)
+    # Run the plot
+    PCAall(conditions)
 
 
 def calcActivity(condR, expressions, affinities, activities):
@@ -53,12 +50,12 @@ def calcActivity(condR, expressions, affinities, activities):
 
     for exprN, expr in expressions.items():
         # Isolate receptors expressed, and keep the index of those
-        exprV = np.array(expr, dtype=np.float)
+        exprV = np.array(expr[0], dtype=np.float)
         exprIDX = np.logical_not(np.isnan(exprV))
         exprV = exprV[exprIDX]
 
         # Pull out the relevant affinities from the table
-        affyH = affinities[exprIDX, int(condR.IgID)] + 0.1
+        affyH = affinities[expr[1]][exprIDX, int(condR.IgID)]+0.1
 
         if exprV.size > 1:
             # Setup the StoneN model
@@ -83,6 +80,23 @@ def calcActivity(condR, expressions, affinities, activities):
 
     return condR
 
+def PCAall(conditions):
+    # Load dictionary of expressions and activities
+    from .data.cellExprAndAct import expressions, activities
+    
+    from .StoneModMouse import StoneModelMouse
+    affinitiesMur = StoneModelMouse().kaMouse
+    affinitiesHum = np.genfromtxt(os.path.join(path, './data/human-affinities.csv'),
+                               delimiter=',',
+                               skip_header=1,
+                               max_rows=9,
+                               invalid_raise=True,
+                               usecols=list(range(1,5)),
+                               dtype=np.float64)
+    affinities = [affinitiesMur,affinitiesHum]
+    outt = parallelize_dataframe(conditions, lambda x: calcActivity(x, expressions, affinities, activities))
+
+    outt.to_csv(os.path.join(path, './data/pca.csv'))
 
 def PCAmurine(conditions):
     """ Principle Components Analysis of murine FcgR binding predictions """
