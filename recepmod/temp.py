@@ -95,7 +95,6 @@ def PCAall(conditions):
                                invalid_raise=True,
                                usecols=list(range(1,5)),
                                dtype=np.float64)
-    print(affinitiesHum.tolist())
     affinities = [affinitiesMur, affinitiesHum, affinitiesHum]
     outt = parallelize_dataframe(conditions, lambda x: calcActivity(x, expressions, affinities, activities))
 
