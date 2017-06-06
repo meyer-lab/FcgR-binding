@@ -31,10 +31,8 @@ def recalcPCA():
     # Setup the table of conditions we'll use.
     avidity = np.logspace(0, 3, 4, base=2, dtype=np.int)
     ligand = np.logspace(start=-9, stop=-9, num=1)
-    IgID = np.arange(0, 8, dtype=np.int)
-    # Genotype: 0 for human-Phe, 1 for human-Val
-    genotype = np.arange(2)
-    conditions = pd.DataFrame(list(product(avidity, ligand, IgID, genotype)), columns=['avidity', 'ligand', 'IgID', 'genotype'])
+    IgID = np.arange(0, 12, dtype=np.int)
+    conditions = pd.DataFrame(list(product(avidity, ligand, IgID)), columns=['avidity', 'ligand', 'IgID'])
 
     # Run the plot
     PCAall(conditions)
@@ -50,16 +48,16 @@ def calcActivity(condR, expressions, affinities, activities):
 
     for exprN, expr in expressions.items():
         # Murine or Human, based on IgID
-        which = int(np.floor(condR.IgID / 4.0))
+        which = int(np.floor(condR.IgID / 4))
         
         # Isolate receptors expressed, and keep the index of those
         exprV = np.array(expr[which], dtype=np.float)
-##        exprIDX = np.logical_not(np.isnan(exprV))
-        exprIDX = (exprV != 0.0)
+        exprIDX = np.logical_not(np.isnan(exprV))
+##        exprIDX = (exprV != 0.0)
         exprV = exprV[exprIDX]
 
         # Pull out the relevant affinities from the table
-        affyH = affinities[which][exprIDX, int(condR.IgID % 4.0)]+0.1
+        affyH = affinities[which][exprIDX, int(condR.IgID % 4)]+0.1
 
         if exprV.size > 1:
             # Setup the StoneN model
@@ -97,7 +95,8 @@ def PCAall(conditions):
                                invalid_raise=True,
                                usecols=list(range(1,5)),
                                dtype=np.float64)
-    affinities = [affinitiesMur,affinitiesHum]
+    print(affinitiesHum.tolist())
+    affinities = [affinitiesMur, affinitiesHum, affinitiesHum]
     outt = parallelize_dataframe(conditions, lambda x: calcActivity(x, expressions, affinities, activities))
 
     outt.to_csv(os.path.join(path, './data/pca.csv'))
