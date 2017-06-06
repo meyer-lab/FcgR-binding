@@ -66,8 +66,8 @@ def calcActivity(condR, expressions, affinities, activities):
                        Kx=getMedianKx(),
                        gnu=np.asscalar(condR.avidity.values),
                        L0=np.asscalar(condR.ligand.values))
-            
-            condR[exprN + '_activity'] = M.getActivity((activities[exprN][which])[exprIDX])
+
+            condR[exprN + '_activity'] = M.getActivity(activities[exprN][which])
             condR[exprN + '_Lbnd'] = M.getLbnd()
         else:
             output = StoneMod(np.asscalar(exprV),
