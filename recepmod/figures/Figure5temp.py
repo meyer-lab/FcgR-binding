@@ -9,7 +9,7 @@ def makeFigure(pcOne='PC 1', pcTwo='PC 2'):
     path = os.path.dirname(os.path.abspath(__file__))
 
     # Get list of axis objects
-    ax, f = getSetup((7, 5), (2, 1))
+    ax, f = getSetup((7, 5), (2, 2))
 
 ##    # Run the murine plots
 ##    PCAplot(ax[0:2],
@@ -58,11 +58,11 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     from .FigureCommon import Legend
 
     colors = dict(zip(range(5), sns.color_palette()))
-    Igs = {0:'o', 1:'d', 2:'^', 3:'s'}
-    mIgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
-    mIgs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s'}
-    hIgList = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
-    hIgs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'^', 'IgG4':'s'}
+    Igs = {0:'o', 1:'d', 2:'^', 3:'s', 4:'v', 5:'<', 6:'>', 7:'1', 8:'2', 9:'3', 10: '4', 11:'h'}
+##    mIgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
+##    mIgs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s'}
+##    hIgList = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
+##    hIgs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'^', 'IgG4':'s'}
     quantList = ['Lbnd','activity']
     quantShape = {'Lbnd':'o', 'activity':'d'}
 
@@ -90,25 +90,25 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     loadings = pd.DataFrame(pca.components_.T, columns=['PC 1', 'PC 2', 'PC 3', 'PC 4'])
     loadings['terms'] = terms
     loadings['cells'], loadings['quantity'] = loadings['terms'].str.split('_', 1).str
-    loadings['cellType'], loadings['cellGeno'] = loadings['cells'].str.split('-', 1).str
+##    loadings['cellType'], loadings['cellGeno'] = loadings['cells'].str.split('-', 1).str
 
-    colors = dict(zip(loadings['cellType'].unique(), sns.color_palette()))
+    colors = dict(zip(loadings['terms'].unique(), sns.color_palette()))
 
     for _, row in loadings.iterrows():
         markerr=quantShape[row['quantity']]
-        colorr = colors[row['cellType']]
+        colorr = colors[row['terms']]
         axes[1].errorbar(x=row[pcOne], y=row[pcTwo], marker=markerr, mfc=colorr, ms=5)
 
     axes[0].set_title(species + ' Scores')
     axes[1].set_title(species + ' Loadings')
 
-    # Ok, now start on legend
-    axes[1].legend(handles=Legend(loadings['cellType'].unique(), colors, quantList, quantShape), bbox_to_anchor=(1, 1), loc=2)
-
-    if species == 'Human':
-        axes[0].legend(handles=Legend(dataIn['avidity'].unique(), avcolors, hIgList, hIgs), bbox_to_anchor=(1, 1), loc=2)
-    else:
-        axes[0].legend(handles=Legend(dataIn['avidity'].unique(), avcolors, mIgList, mIgs), bbox_to_anchor=(1, 1), loc=2)
+##    # Ok, now start on legend
+##    axes[1].legend(handles=Legend(loadings['cellType'].unique(), colors, quantList, quantShape), bbox_to_anchor=(1, 1), loc=2)
+##
+##    if species == 'Human':
+##        axes[0].legend(handles=Legend(dataIn['avidity'].unique(), avcolors, hIgList, hIgs), bbox_to_anchor=(1, 1), loc=2)
+##    else:
+##        axes[0].legend(handles=Legend(dataIn['avidity'].unique(), avcolors, mIgList, mIgs), bbox_to_anchor=(1, 1), loc=2)
     
     # Fix axis limits
     for ii in range(2):
