@@ -28,13 +28,13 @@ Here, $f$ is the effective avidity of the ligand, $K_x$ is a cross-linking param
 
 $$ L_{bound} = \sum_{i=1}^{f} v_{i,eq} = \sum_{i=1}^{f} { f\choose i } (K_x)^{i-1} {L_0}{K_a} (R_{eq})^i. $$ {#eq:lbound}
 
-$R_{eq}$ represents the quantity of unbound receptors, and is a function of $f$, $L_0$, $K_a$, $K_x$, and $R_{tot}$, the total number of receptors expressed on the cell surface. $R_{eq}$ can be approximated numerically using the following relationship when these parameters are known:
+$R_{eq}$ represents the quantity of unbound receptors, and is a function of $f$, $L_0$, $K_a$, $K_x$, and $R_{tot}$, the total number of receptors expressed on the cell surface. $R_{eq}$ can be solved for numerically using the relationship
 
 $$ R_{tot} = R_{eq} \left(1+f {L_0}{K_D} (1+K_x R_{eq})^{f-1}\right) $$ {#eq:rtot}
 
-As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium ($R_{multi}$) can be found as follows:
+when these parameters are known. As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium ($R_{multi}$) can be found as follows:
 
-$$ R_{multi} = \sum_{i=2}^{f} iv_{i,eq} $$ {#eq:rmulti}
+$$ R_{multi} = \sum_{i=2}^{f} iv_{i,eq}. $$ {#eq:rmulti}
 
 ### Parameters and Assumptions
 
@@ -42,9 +42,9 @@ Association constants for all combinations of IgG and FcγR were obtained from p
 
 ### Specification for $K_x$
 
-We represented $K_x$ as the product of $K_a$, the affinity between IgG species on the ligand and the FcγR species expressed, and a crosslinking coefficient, $K_x^*$ We allowed $K_x^*$ to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While $K_x$ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of $K_x$ must break down under certain regimes. Specifically, a constant value for $K_x$ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, $K_x$ must ultimately be reduced, and $K_x$ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when proportional to affinity. Therefore, we specified an effective $K_x$, equal to:
+We represented $K_x$ as the product of $K_a$, the affinity between IgG species on the ligand and the FcγR species expressed, and a crosslinking coefficient, $K_x^*$ We allowed $K_x^*$ to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While $K_x$ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of $K_x$ must break down under certain regimes. Specifically, a constant value for $K_x$ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, $K_x$ must ultimately be reduced, and $K_x$ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when proportional to affinity. Therefore, we specified an effective $K_x$, equal to
 
-$$ K_x = K_x^* K_a $$ {#eq:kx}
+$$ K_x = K_x^* K_a. $$ {#eq:kx}
 
 As a consequence of this construction, $K_x$ becomes zero in the absence of binding and satisfies detailed balance.
 
