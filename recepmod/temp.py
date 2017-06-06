@@ -54,7 +54,8 @@ def calcActivity(condR, expressions, affinities, activities):
         
         # Isolate receptors expressed, and keep the index of those
         exprV = np.array(expr[which], dtype=np.float)
-        exprIDX = np.logical_not(np.isnan(exprV))
+##        exprIDX = np.logical_not(np.isnan(exprV))
+        exprIDX = (exprV != 0.0)
         exprV = exprV[exprIDX]
 
         # Pull out the relevant affinities from the table
@@ -68,7 +69,7 @@ def calcActivity(condR, expressions, affinities, activities):
                        gnu=np.asscalar(condR.avidity.values),
                        L0=np.asscalar(condR.ligand.values))
             
-            condR[exprN + '_activity'] = M.getActivity(activities[exprN][which])
+            condR[exprN + '_activity'] = M.getActivity((activities[exprN][which])[exprIDX])
             condR[exprN + '_Lbnd'] = M.getLbnd()
         else:
             output = StoneMod(np.asscalar(exprV),
