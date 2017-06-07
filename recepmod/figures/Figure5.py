@@ -15,9 +15,6 @@ def makeFigure(pcOne='PC 1', pcTwo='PC 2'):
     PCAplot(ax[0:2],
             pd.read_csv(os.path.join(path, '../data/pca-HIV.csv'), index_col=0),
             '', pcOne, pcTwo)
-##    PCAplot(ax[2:4],
-##            pd.read_csv(os.path.join(path, '../data/pca-human-Val.csv'), index_col=0),
-##            'Human-Val', pcOne, pcTwo)
 
     subplotLabel(ax[0], 'A')
     subplotLabel(ax[2], 'B')
@@ -42,13 +39,13 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     from collections import defaultdict
 
     colors = dict(zip(range(5), sns.color_palette()))
-    Igs = {0:'o', 1:'d', 2:'^', 3:'s', 4:'o', 5:'d', 6:'^', 7:'s'}
+    Igs = {0:'o', 1:'d', 2:'^', 3:'s', 4:'v', 5:'x', 6:'*', 7:'p'}
     fillstyles = {0:'full', 1:'full', 2:'full', 3:'full', 4:'none', 5:'none', 6:'none', 7:'none'}
     quantList = ['Lbnd','activity']
     quantShape = {'Lbnd':'o', 'activity':'d'}
 
     IgList = ['mIgG1','mIgG2a','mIgG2b','mIgG3','hIgG1','hIgG2','hIgG3','hIgG4']
-    lesIgs = {'mIgG1':'o', 'mIgG2a':'d', 'mIgG2b':'^', 'mIgG3':'s', 'hIgG1':'o', 'hIgG2':'d', 'hIgG3':'^', 'hIgG4':'s'}
+    lesIgs = {'mIgG1':'o', 'mIgG2a':'d', 'mIgG2b':'^', 'mIgG3':'s', 'hIgG1':'v', 'hIgG2':'x', 'hIgG3':'*', 'hIgG4':'p'}
 
     pca = PCA(n_components=4)
 
@@ -61,13 +58,6 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     #print(pca.explained_variance_)
 
     avcolors = dict(zip(dataIn['avidity'].unique(), sns.color_palette()))
-    fill = lambda x: (False if (x[0]=='h') else True)
-##    fill = {}
-##    for ig in IgList:
-##        if ig[0] == 'h':
-##            fill[ig] = False
-##        else:
-##            fill[ig] = True
 
     # Move PCs into dataframe
     for ii in range(4):
@@ -99,7 +89,7 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     # Ok, now start on legend
     axes[1].legend(handles=Legend(loadings['cells'].unique(), colors, quantList, quantShape), bbox_to_anchor=(1, 1), loc=2)
 
-    axes[0].legend(handles=Legend(dataIn['avidity'].unique(), avcolors, IgList, lesIgs, fill), bbox_to_anchor=(1, 1), loc=2)
+    axes[0].legend(handles=Legend(dataIn['avidity'].unique(), avcolors, IgList, lesIgs), bbox_to_anchor=(1, 1), loc=2)
     
     # Fix axis limits
     for ii in range(2):
