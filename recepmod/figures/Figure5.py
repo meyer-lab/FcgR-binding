@@ -27,8 +27,7 @@ def makeFigure(pcOne='PC 1', pcTwo='PC 2'):
 
 def makeSupp(ax):
     print('COME BACK AND CHANGE makeSupp IN FIGURE 5 AT SOME POINT')
-
-    # COME BACK AND CHANGE THIS AT SOME POINT
+    # TODO: COME BACK AND CHANGE THIS AT SOME POINT
 
 def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     import numpy as np
