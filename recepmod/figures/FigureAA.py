@@ -12,7 +12,9 @@ def makeFigure():
     # Retrieve model and fit from hdf5 file
     M, dset = read_chain()
 
-    d = {'Rexp': ['Rexp1', 'Rexp2', 'Rexp3', 'Rexp4', 'Rexp5', 'Rexp6']}
+    d = {'Rexp': [r'Fc$\gamma$RIA', r'Fc$\gamma$RIIA-131R',
+                  r'Fc$\gamma$RIIA-131H', r'Fc$\gamma$RIIB',
+                  r'Fc$\gamma$RIIIA-158F', r'Fc$\gamma$RIIIA-158V']}
 
     # Rename the receptor expression columns
     dset = dset.rename(columns=lambda c: d[c].pop(0) if c in d.keys() else c)
@@ -40,7 +42,6 @@ def makeFigure():
 
 
 def plotAutoC(ax, dset, coll):
-    from .FigureCommon import texRename
     """
     Run the autocorrelation analysis and plot for the selected variable.
     """
@@ -57,7 +58,6 @@ def plotAutoC(ax, dset, coll):
     outt.plot(ax=ax, legend=False, linewidth=0.5)
 
     # Rename columns for plotting
-    coll = texRename(coll)
     ax.set_title(coll)
 
     # Indicate the confidence intervals for failure
