@@ -1,9 +1,11 @@
-from cellExprAndAct import cell, geno
+from cellExprAndAct2 import cell, geno
 
-for cline in cell:
-    print('expressions["'+cline+'"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]')
+for typ in geno:
+    for cline in cell:
+        print('expressions["'+typ+'"]["'+cline+'"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]')
 
-print('\n')
+    for cline in cell:
+        print('activities["'+typ+'"]["'+cline+'"] = [[1.0, -1.0, 1.0, 1.0],[1.0, 1.0, -1.0, 1.0, 1.0, 0.0]]')
 
-for cline in cell:
-    print('activities["'+cline+'"] = [[1.0, -1.0, 1.0, 1.0],[1.0, 1.0, -1.0, 1.0, 1.0, 0.0],[1.0, 1.0, -1.0, 1.0, 1.0, 0.0]]')
+    print('\n')
+
