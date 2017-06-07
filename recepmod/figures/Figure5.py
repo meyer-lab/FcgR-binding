@@ -32,18 +32,7 @@ def makeSupp(ax):
     x = [j for j in range(10000)]
     ax.plot(x,x)
 
-##    path = os.path.dirname(os.path.abspath(__file__))
-##
-##    # Run the murine plots
-##    PCAplot(ax[0:2],
-##            pd.read_csv(os.path.join(path, '../data/pca-murine.csv'), index_col=0),
-##            'Murine', 'PC 1', 'PC 2')
-##
-##    # Run the human plots
-##    PCAplot(ax[2:4],
-##            pd.read_csv(os.path.join(path, '../data/pca-human.csv'), index_col=0),
-##            'Human', 'PC 1', 'PC 2')
-
+    # COME BACK AND CHANGE THIS AT SOME POINT
 
 def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     import numpy as np
