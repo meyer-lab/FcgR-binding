@@ -82,12 +82,14 @@ def calcActivity(condR, expressions, affinities, activities):
     return condR
 
 def PCAall(conditions,geno):
+    from numpy import nan
     expressions = {}
     expressions["NK"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
     expressions["MO"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
     expressions["DC"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
     activities = [[1.0, -1.0, 1.0, 1.0],[1.0, 1.0, -1.0, 1.0, 1.0, 0.0]]
 
+    expressions = genoComb(expressions,geno)
     
     from .StoneModMouse import StoneModelMouse
     affinitiesMur = StoneModelMouse().kaMouse
@@ -101,7 +103,14 @@ def PCAall(conditions,geno):
     affinities = [affinitiesMur, affinitiesHum]
     outt = parallelize_dataframe(conditions, lambda x: calcActivity(x, expressions, affinities, activities))
 
-    if geno == 'human-Phe':
-        outt.to_csv(os.path.join(path, './data/pca-human-Phe.csv'))
-    else:
-        outt.to_csv(os.path.join(path, './data/pca-human-Val.csv'))
+    outt.to_csv(os.path.join(path, './data/pca-'+geno+'.csv'))
+
+def genoComb(expressions, geno):
+    for cell in expressions.keys():
+        if geno[0] == 'R':
+            expressions[cell] = expressions[cell][0:2]+list(reversed(expressions[cell][2:4]))+expressions[cell][4:9]
+        if geno[1] == 'T':
+            expressions[cell] = expressions[cell][0:4]+list(reversed(expressions[cell][4:6]))+expressions[cell][6:9]
+        if geno[2] == 'F':
+            expressions[cell] = expressions[cell][0:7]+list(reversed(expressions[cell][7:9]))
+    return expressions

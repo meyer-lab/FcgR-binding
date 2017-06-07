@@ -13,11 +13,11 @@ def makeFigure(pcOne='PC 1', pcTwo='PC 2'):
 
     # Run the plots
     PCAplot(ax[0:2],
-            pd.read_csv(os.path.join(path, '../data/pca-human-Phe.csv'), index_col=0),
-            'Human-Phe', pcOne, pcTwo)
-    PCAplot(ax[2:4],
-            pd.read_csv(os.path.join(path, '../data/pca-human-Val.csv'), index_col=0),
-            'Human-Val', pcOne, pcTwo)
+            pd.read_csv(os.path.join(path, '../data/pca-HIV.csv'), index_col=0),
+            '', pcOne, pcTwo)
+##    PCAplot(ax[2:4],
+##            pd.read_csv(os.path.join(path, '../data/pca-human-Val.csv'), index_col=0),
+##            'Human-Val', pcOne, pcTwo)
 
     subplotLabel(ax[0], 'A')
     subplotLabel(ax[2], 'B')
@@ -29,8 +29,7 @@ def makeFigure(pcOne='PC 1', pcTwo='PC 2'):
 
 
 def makeSupp(ax):
-    x = [j for j in range(10000)]
-    ax.plot(x,x)
+    print('COME BACK AND CHANGE makeSupp IN FIGURE 5 AT SOME POINT')
 
     # COME BACK AND CHANGE THIS AT SOME POINT
 
@@ -62,7 +61,13 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
     #print(pca.explained_variance_)
 
     avcolors = dict(zip(dataIn['avidity'].unique(), sns.color_palette()))
-    fill = defaultdict(lambda x: False if (x[0]=='m') else True)
+    fill = lambda x: (False if (x[0]=='h') else True)
+##    fill = {}
+##    for ig in IgList:
+##        if ig[0] == 'h':
+##            fill[ig] = False
+##        else:
+##            fill[ig] = True
 
     # Move PCs into dataframe
     for ii in range(4):
