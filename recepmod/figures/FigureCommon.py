@@ -68,7 +68,6 @@ def getSetup(figsize, gridd):
 def Legend(fcgrs, colorsDict, iglist, shapes):
     """ Make legend. """
     import matplotlib
-    from collections import defaultdict
     
     patches = list()
 
