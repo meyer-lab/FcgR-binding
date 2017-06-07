@@ -65,20 +65,17 @@ def getSetup(figsize, gridd):
 
     return (ax, f)
 
-def Legend(fcgrs, colorsDict, iglist, shapes, fill=None):
+def Legend(fcgrs, colorsDict, iglist, shapes):
     """ Make legend. """
     import matplotlib
     from collections import defaultdict
-
-    if not fill:
-        fill = lambda x: True
     
     patches = list()
 
     for key, val in zip(fcgrs,[colorsDict[fcgr] for fcgr in fcgrs]):
         patches.append(matplotlib.patches.Patch(color=val, label=key))
-    for key, val, phil in zip(iglist,[shapes[ig] for ig in iglist],[fill(ig) for ig in iglist]):
-        patches.append(matplotlib.lines.Line2D([], [], markeredgecolor='black', markeredgewidth=1.0, markerfacecolor=('none' if not phil else 'black'), marker=val, markersize=7, label=key, linestyle='None'))
+    for key, val in zip(iglist,[shapes[ig] for ig in iglist]):
+        patches.append(matplotlib.lines.Line2D([], [], markeredgecolor='black', markeredgewidth=1.0, markerfacecolor='black', marker=val, markersize=7, label=key, linestyle='None'))
     
     return patches
 
