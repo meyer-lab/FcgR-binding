@@ -42,6 +42,7 @@ def makeFigure():
 
 
 def plotAutoC(ax, dset, coll):
+    from .FigureCommon import texRename
     """
     Run the autocorrelation analysis and plot for the selected variable.
     """
@@ -58,6 +59,7 @@ def plotAutoC(ax, dset, coll):
     outt.plot(ax=ax, legend=False, linewidth=0.5)
 
     # Rename columns for plotting
+    coll = texRename(coll)
     ax.set_title(coll)
 
     # Indicate the confidence intervals for failure
