@@ -66,7 +66,7 @@ def calcActivity(condR, expressions, affinities, activities):
                        gnu=np.asscalar(condR.avidity.values),
                        L0=np.asscalar(condR.ligand.values))
 
-            condR[exprN + '_activity'] = M.getActivity(activities[exprN][which])
+            condR[exprN + '_activity'] = M.getActivity(activities[which])
             condR[exprN + '_Lbnd'] = M.getLbnd()
         else:
             output = StoneMod(np.asscalar(exprV),
@@ -82,10 +82,12 @@ def calcActivity(condR, expressions, affinities, activities):
     return condR
 
 def PCAall(conditions,geno):
-    # Load dictionary of expressions and activities
-    from .data.cellExprAndAct import expressions, activities
-    expressions = expressions[geno]
-    activities = activities[geno]
+    expressions = {}
+    expressions["NK"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
+    expressions["MO"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
+    expressions["DC"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
+    activities = [[1.0, -1.0, 1.0, 1.0],[1.0, 1.0, -1.0, 1.0, 1.0, 0.0]]
+
     
     from .StoneModMouse import StoneModelMouse
     affinitiesMur = StoneModelMouse().kaMouse
