@@ -5,11 +5,17 @@
 *.py~
 *.gitignore~
 Manuscript/Figures/
-<<<<<<< HEAD
 Manuscript/Figures/Figure*
 Manuscript/Manuscript.pdf
+temp.py
 temp2.py
 temp3.py
 temp4.py
+recepmod/temp.py
+recepmod/temp2.py
+recepmod/temp3.py
+recepmod/temp4.py
+recepmod/data/cellExprAndAct3.py
+recepmod/data/cellExprAndActGen3.py
 recepmod.sublime-workspace
 Manuscript/Text/07_ModelData.md
