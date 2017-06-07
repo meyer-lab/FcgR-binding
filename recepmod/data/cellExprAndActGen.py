@@ -1,4 +1,4 @@
-from cellExprAndAct import cell, species
+from cellExprAndAct import cell, geno
 
 for cline in cell:
     print('expressions["'+cline+'"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]')
