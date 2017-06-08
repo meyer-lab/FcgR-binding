@@ -44,7 +44,7 @@ def read_chain(filename=None, ffilter=True):
     else:
         pdset = pd.DataFrame(dset.value, columns = cNames)
 
-    print(str(pdset.shape[0]) + ' rows read.')
+    #print(str(pdset.shape[0]) + ' rows read.')
 
     f.close()
 
