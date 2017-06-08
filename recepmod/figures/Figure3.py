@@ -14,7 +14,7 @@ from ..StoneHelper import getMedianKx
 
 # Specific predictions regarding the coordinate effects of immune complex parameters.
 
-subsplits = 15
+subsplits = 20
 
 def makeFigure():
     import string
