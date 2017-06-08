@@ -126,12 +126,12 @@ def mapMCMC(dFunction, pSet, quiet=False):
     return pd.concat(retVals)
 
 
-def getFitMeasMerged(self, x):
+def getFitMeasMerged(M, x):
     """
     Return the fit and measured data merged into a single dataframe
     """
-    fit = getFitPrediction(self, x)
-    data = getMeasuredDataFrame(self)
+    fit = getFitPrediction(M, x)
+    data = getMeasuredDataFrame(M)
 
     fit = fit.drop('Expression', axis = 1)
 
