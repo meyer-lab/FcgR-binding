@@ -14,13 +14,13 @@ $$ y = F (X \cdot p) $$ {#eq:lsq}
 
 where $F$ is the normal distribuion cumulative density function, with mean and standard deviation varied during fitting.
 
-## Principle Components Analysis 
+## Principle Component Analysis 
 
-Principle components analysis was performed using Python's PCA tool in scikit-learn (`sklearn.decomposition.PCA`). 
+Principle component analysis was performed using Python's PCA tool in scikit-learn (`sklearn.decomposition.PCA`). 
 
 ### PCA of IgG-FcgR Affinities
 
-PCA is performed on affinities of 4 IgGs (IgG1, IgG2a, IgG2b,  IgG3), with or without knockout treatments, for 4 receptors (FcgRI, FcgRIIB, FcgRIII, FcgRIV). The affinity for a knocked-out or blocked FcgR is assumed to be 0. The affinities were integral normalized to the maximum affinity for each receptor. 
+PCA was performed on the affinities of 4 IgGs (IgG1, IgG2a, IgG2b,  IgG3), with or without knockout treatments, for 4 receptors (FcgRI, FcgRIIB, FcgRIII, FcgRIV). The affinity for a knocked-out or blocked FcgR is assumed to be zero. The affinities were integral normalized to the maximum affinity for each receptor. 
 
 ### PCA of Human and Murine IgG-FcgR Interactions
 
@@ -30,13 +30,13 @@ PCA is performed on affinities of 4 IgGs (IgG1, IgG2a, IgG2b,  IgG3), with or wi
 
 ### Base model
 
-The equilibrium binding of TNP-X-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity $K_a$, and then through subsequent cross-linking events with equilibrium partitioning $K_x$.
+The equilibrium binding of TNP-BSA to FcγRs was modeled using an a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity $K_a$, and then through subsequent cross-linking events with equilibrium partitioning $K_x$.
 
 Therefore, according to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{i,eq}$, can be found using the relation
 
 $$ v_{i,eq} = {f\choose i} (K_x)^{i-1} {L_0}{K_a} \left(R_{eq}\right)^i. $$ {#eq:vieq}
 
-Here, $f$ is the effective avidity of the ligand, $K_x$ is a cross-linking parameter with units of # per cell, $L_0$ is the concentration of ligand, and $R_{eq}$ is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is
+Here, $f$ is the effective avidity of the ligand, $K_x$ is a cross-linking parameter with units of # per cell, $L_0$ is the concentration of ligand (assumed to be saturating), and $R_{eq}$ is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is
 
 $$ L_{bound} = \sum_{i=1}^{f} v_{i,eq} = \sum_{i=1}^{f} { f\choose i } (K_x)^{i-1} {L_0}{K_a} (R_{eq})^i. $$ {#eq:lbound}
 
@@ -44,24 +44,24 @@ $R_{eq}$ represents the quantity of unbound receptors, and is a function of $f$,
 
 $$ R_{tot} = R_{eq} \left(1+f {L_0}{K_D} (1+K_x R_{eq})^{f-1}\right) $$ {#eq:rtot}
 
-when these parameters are known. As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium ($R_{multi}$) can be found as follows:
+when these parameters are known. As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium ($R_{multi}$) is equal to
 
 $$ R_{multi} = \sum_{i=2}^{f} iv_{i,eq}. $$ {#eq:rmulti}
 
-### Parameters and Assumptions
-
-Association constants for all combinations of IgG and FcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. In each replicate of Lux's assay, cells were coincubated with 5 µg/ml TNP-X-BSA. Because the molar masses of a 2,4,6-trinitrophenyl groups and of BSA are approximately 173 Da and 66430 Da, respectively, we represented the molar concentrations of TNP-4-BSA and TNP-26-BSA as 74 nM and 70 nM [@Lux:2013iv]. We also assumed that there were two different conversion factors between the number of ICs bound and MFI for TNP-4-BSA and TNP-26-BSA. Lastly, we assumed that, due to steric effects, the effective avidities of TNP-4-BSA and (especially) TNP-26-BSA might be different that their actual avidities. This required us, in total, to fit 11 parameters: the total expression level $R_{tot}$ for each FcγR, $K_x$, conversion factors from ligand bound to MFI for both TNP-BSAs, and effective avidities for both TNP-BSAs ($f_{4}$ and $f_{26}$, respectively).
-
 ### Specification for $K_x$
 
-We represented $K_x$ as the product of $K_a$, the affinity between IgG species on the ligand and the FcγR species expressed, and a crosslinking coefficient, $K_x^*$ We allowed $K_x^*$ to vary between $10^{-25}$ and $10^3$, in order to provide no constraint on possible values. While $K_x$ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of $K_x$ must break down under certain regimes. Specifically, a constant value for $K_x$ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, $K_x$ must ultimately be reduced, and $K_x$ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when proportional to affinity. Therefore, we specified an effective $K_x$, equal to
+We represented $K_x$ as the product of $K_a$, the affinity between the IgG subtype on the ligand and the FcγR species being bound, and a crosslinking coefficient, $K_x^*$. While $K_x$ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of $K_x$ must break down under certain regimes. Specifically, a constant value for $K_x$ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low affinity FcγR-IgG binding, $K_x$ must ultimately be reduced, and $K_x$ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when allowed to vary with affinity. Therefore, we specified an effective $K_x$ for any given crosslinking interaction, equal to
 
 $$ K_x = K_x^* K_a. $$ {#eq:kx}
 
 As a consequence of this construction, $K_x$ becomes zero in the absence of binding and satisfies detailed balance.
 
-### Model Fitting
+### Parameters and Assumptions
 
-We fit our model to binding measurements for each FcγR-IgG pair using an affine invariant Markov chain Monte Carlo sampler as implemented within the `emcee` package [@ForemanMackey:2013ux]. We assumed that the standard deviation in each receptor expression measurement was proportional to the actual expression. Therefore, we additionally fit a variance parameter $\sigma_1^*$. The likelihood of each receptor expression measurement was calculated by comparison to a normal distribution with mean equal to the model prediction and standard deviation equal to the prediction times $\sigma_1^*$. We assayed the convergence of the Markov chain using the Geweke diagnostic and chain autocorrelation [@Geweke:1991tk]. The Geweke diagnostic was used to determine whether early and late segments of the Markov chain could have been sampled from the same probability distribution. Each walker's series of values for a particular parameter was treated as a single chain, upon which the diagnostic was evaluated.
+Association constants for all combinations of IgG and FcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. In each replicate of the binding assay, cells were coincubated with 5 µg/ml TNP-4-BSA or TNP-26-BSA. Because the molar masses of a 2,4,6-trinitrophenyl groups and of BSA are approximately 173 Da and 66430 Da, respectively, we represented the molar concentrations of TNP-4-BSA and TNP-26-BSA as 74 nM and 70 nM [@Lux:2013iv]. We also assumed that there were two different conversion factors between the number of ICs bound and the mean fluorescent intensities (MFIs) measured in the assay for TNP-4-BSA and TNP-26-BSA. Lastly, we assumed that, due to steric effects, the effective avidities of TNP-4-BSA and (especially) TNP-26-BSA might be different than their actual avidities. This required us to fit the following 11 binding parameters: the total expression level $R_{tot}$ for each FcγR, $K_x^*$, conversion factors from ligand bound to MFI measured for both TNP-BSAs, and effective avidities for both TNP-BSAs ($f_{4}$ and $f_{26}$, respectively). In our simulation, receptor expression levels were allowed to vary between $10^3$ and $10^8$, $K_x^*$ between $10^{-25}$ and $10^3$ (in order to provide no constraint on possible values), the conversion factors between $10^{-10}$ and $10^5$, $f_4$ between one and 20, and $f_{26}$ between twelve and 32.
 
-In addition to immune complex binding, the receptor expression of each cell line was quantitatively measured. We git a second variance parameter, $\sigma_2^*$, such that the likelihood of each receptor measurement was calculated using a normal distribution with mean equal to the common logarithm of the predicted receptor expression and standard deviation equal to that value times $\sigma_2^*$. The overall likelihood of the model at each parameter set was calculated by the product of all individual likelihoods. The priors for each parameter were therefore otherwise specified to be uniform.
+### Model Fitting and Deviation Parameters
+
+We fit our model to binding measurements for each FcγR-IgG pair using an affine invariant Markov chain Monte Carlo sampler as implemented within the `emcee` package [@ForemanMackey:2013ux]. Therefore, we additionally fit a standard deviation parameter $\sigma_1^*$. The likelihood for each of the predicted values of $K_x^*$ the two conversion factors, $f_4$, and $f_{26}$ was calculated by comparison of our model's predicted ligand binding to a normal distribution with mean equal to the predicted binding and standard deviation equal to the predicted binding times $\sigma_1^*$, for each FcγR-IgG-TNP-BSA combination represented in the dataset. We assayed the convergence of the Markov chain using the Geweke diagnostic and chain autocorrelation [@Geweke:1991tk]. The Geweke diagnostic was used to determine whether early and late segments of the Markov chain could have been sampled from the same probability distribution. Each walker's series of values for a particular parameter was treated as a single chain, upon which the diagnostic was evaluated.
+
+In addition to immune complex binding, the receptor expression of each cell line was quantitatively measured. We assumed that the receptor expression measurements were log-normally distributed, with the standard deviation of the log-normal distribution being proportional to the common logarithm of the actual expression. We fit a second standard deviation parameter, $\sigma_2^*$, such that the likelihood of each receptor measurement was calculated using a normal distribution with mean equal to the common logarithm of the predicted receptor expression and standard deviation equal to this value times $\sigma_2^*$. The overall likelihood of the model at each parameter set was calculated as the product of all individual likelihoods. The priors for each parameter were therefore otherwise specified to be uniform within their lower and upper bounds. $\sigma_1^*$ and $\sigma_2^*$ were allowed to vary between $10^{-4}$ and ten.
