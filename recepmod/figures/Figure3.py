@@ -22,11 +22,10 @@ def makeFigure():
     from .FigureCommon import subplotLabel, getSetup
 
     # Get list of axis objects
-##    ax, f = getSetup((9, 5), (2, 4))
     ax, f = getSetup((7, 6), (3, 3))
 
     # Plot subplot B
-    PredictionVersusAvidity(ax[1:5])
+    PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
     TwoRecep(ax=ax[5:7])
@@ -45,7 +44,7 @@ def makeFigure():
                  bbox_to_anchor=(0.5, 1))
 
     # Remove first subplot for overlaid cartoon
-    ax[0].set_axis_off()
+    ax[4].set_axis_off()
 
     # Tweak layout
     f.tight_layout()
