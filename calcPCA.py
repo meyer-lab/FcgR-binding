@@ -2,5 +2,8 @@
 
 from recepmod.PCAanalysis import recalcPCA
 
+geno = ['HIV','HIF','HTV','HTF','RIV','RIF','RTV','RTF']
+
 if __name__ == '__main__':
-    recalcPCA()
+    for typ in geno:
+        recalcPCA(typ)

@@ -73,9 +73,8 @@ def Legend(fcgrs, colorsDict, iglist, shapes):
 
     for key, val in zip(fcgrs,[colorsDict[fcgr] for fcgr in fcgrs]):
         patches.append(matplotlib.patches.Patch(color=val, label=key))
-
     for key, val in zip(iglist,[shapes[ig] for ig in iglist]):
-        patches.append(matplotlib.lines.Line2D([], [], color='black', marker=val, markersize=7, label=key, linestyle='None'))
+        patches.append(matplotlib.lines.Line2D([], [], markeredgecolor='black', markeredgewidth=1.0, markerfacecolor='black', marker=val, markersize=7, label=key, linestyle='None'))
     
     return patches
 
