@@ -13,8 +13,8 @@ def makeFigure(pcOne='PC 1', pcTwo='PC 2'):
 
     # Run the plots
     PCAplot(ax[0:2],
-            pd.read_csv(os.path.join(path, '../data/pca-HIV.csv'), index_col=0),
-            '', pcOne, pcTwo)
+            pd.read_hdf(os.path.join(path, '../data/pca.h5'), 'HIV'),
+            pcOne, pcTwo)
 
     subplotLabel(ax[0], 'A')
     subplotLabel(ax[2], 'B')
@@ -29,7 +29,7 @@ def makeSupp(ax):
     print('COME BACK AND CHANGE makeSupp IN FIGURE 5 AT SOME POINT')
     # TODO: COME BACK AND CHANGE THIS AT SOME POINT
 
-def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
+def PCAplot(axes, dataIn, pcOne='PC 2', pcTwo='PC 3'):
     import numpy as np
     from sklearn.decomposition import PCA
     from sklearn.preprocessing import StandardScaler
@@ -82,8 +82,8 @@ def PCAplot(axes, dataIn, species, pcOne='PC 2', pcTwo='PC 3'):
         colorr = colors[row['cells']]
         axes[1].errorbar(x=row[pcOne], y=row[pcTwo], marker=markerr, mfc=colorr, ms=5)
 
-    axes[0].set_title(species + ' Scores')
-    axes[1].set_title(species + ' Loadings')
+    axes[0].set_title('Scores')
+    axes[1].set_title('Loadings')
 
     # Ok, now start on legend
     axes[1].legend(handles=Legend(loadings['cells'].unique(), colors, quantList, quantShape), bbox_to_anchor=(1, 1), loc=2)
