@@ -4,26 +4,15 @@ In vivo prediction robustness and first PC's
 
 def makeFigure():
     from .FigureCommon import subplotLabel, getSetup
-    from .Figure5 import makeSupp
 
     # Get list of axis objects
-    ax, f = getSetup((7, 4), (2, 3))
+    ax, f = getSetup((2, 2), (1, 1))
 
     # Make the robustness plot
     robustnessPlot(ax[0])
 
-    # Make the supplemental PCA plots
-    makeSupp([ax[1], ax[2], ax[4], ax[5]])
-
-    # Blank out empty spot
-    ax[3].axis('off')
-
-    subplotLabel(ax[0], 'A')
-    subplotLabel(ax[1], 'B')
-    subplotLabel(ax[4], 'C')
-
     # Tweak layout
-    f.tight_layout(w_pad=7)
+    f.tight_layout()
 
     return f
 
