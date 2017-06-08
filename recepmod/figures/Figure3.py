@@ -22,19 +22,19 @@ def makeFigure():
     from .FigureCommon import subplotLabel, getSetup
 
     # Get list of axis objects
-    ax, f = getSetup((9, 5), (2, 4))
+    ax, f = getSetup((7, 6), (3, 3))
 
     # Plot subplot A
     PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
-    TwoRecep(ax=ax[4:6])
+    TwoRecep(ax=ax[5:7])
 
     # Plot of activity index versus Ka ratio
-    varyAffinity(ax=ax[6])
+    varyAffinity(ax=ax[7])
 
     # Plot to show that highest affinity activating receptor is most sensitive to adjustment
-    maxAffinity(ax=ax[7])
+    maxAffinity(ax=ax[8])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -42,6 +42,9 @@ def makeFigure():
     ax[0].legend([r'$\nu='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
                  loc=1,
                  bbox_to_anchor=(0.5, 1))
+
+    # Remove center subplot for overlaid cartoon
+    ax[4].set_axis_off()
 
     # Tweak layout
     f.tight_layout()
