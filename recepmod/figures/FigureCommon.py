@@ -80,3 +80,16 @@ def Legend(fcgrs, colorsDict, iglist, shapes):
 
 def getRquant():
     return StoneModel(newData=True).Rquant
+
+def PCApercentVar(explainedVar, axes = None):
+    """ 
+    Takes in the vector of explained variance and a list of 2 ints as axis handle.
+    Outputs labels, a list of len(2) for axis labels 
+    """
+    if axes == None:
+        percentVar = [ '%.0f' % j for j in explainedVar[0:2]*100 ]
+        labels = ['PC 1 ('+percentVar[0]+'%)', 'PC 2 ('+percentVar[1]+'%)']
+    else:
+        percentVar = [ '%.0f' % j for j in [explainedVar[axes[0]-1]*100,explainedVar[axes[1]-1]*100]]
+        labels = [('PC '+str(axes[0])+'('+percentVar[0]+'%)'), ('PC '+str(axes[1])+'('+percentVar[1]+'%)')]
+    return labels 
