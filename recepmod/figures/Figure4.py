@@ -71,14 +71,16 @@ def PrepforLegend(table):
 
 def ClassAvidityPCA(ax):
     """ Plot the generated binding data for different classes and avidities in PCA space. """
+    from .FigureCommon import PCApercentVar
     # If no axis was provided make our own
     
-    scores, _ = StoneModelMouse().KnockdownPCA()
+    scores, explainedVar = StoneModelMouse().KnockdownPCA()
 
     commonPlot(ax, scores, 'PC1', 'PC2')
-
-    ax.set_ylabel('PC 2')
-    ax.set_xlabel('PC 1')
+    
+    labels = PCApercentVar(explainedVar)
+    ax.set_ylabel(labels[1])
+    ax.set_xlabel(labels[0])
 
 
 def InVivoPredictVsActual(ax):
