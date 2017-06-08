@@ -87,7 +87,7 @@ def histSubplots(dset, axes):
     # Set all the x-labels based on which histogram is displayed
     axes[0].set_xlabel(r'$K_x$')
     axes[1].set_xlabel(r'Conversion Factor')
-    axes[2].set_xlabel(r'Effective Avidity ($\nu$)')
+    axes[2].set_xlabel(r'Effective Avidity ($f$)')
     axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
 
     # Make x-axes appear logarithmic
@@ -191,8 +191,10 @@ def AverageAvidity(ax):
 
     # Create the legend patches
     legend_patches = [matplotlib.patches.Patch(color=C, label=L) for
-                      C, L in zip(sns.color_palette(), map(str, logRs))]
+                      C, L in zip(sns.color_palette(),
+                                  [r'$10^{'+str(logr)+'}$' for logr in logRs])]
+##                                  map(str, logRs))]
 
     # Plot the legend
-    ax.legend(handles=legend_patches, title=r'$\log_{10}$(Receptor)', labelspacing=0.25)
+    ax.legend(handles=legend_patches, title=r'# Receptors', labelspacing=0.25)
     
