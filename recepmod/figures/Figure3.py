@@ -24,8 +24,8 @@ def makeFigure():
     # Get list of axis objects
     ax, f = getSetup((9, 5), (2, 4))
 
-    # Plot subplot A
-    PredictionVersusAvidity(ax[0:4])
+    # Plot subplot B
+    PredictionVersusAvidity(ax[1:4])
 
     # Plot from two receptor model
     TwoRecep(ax=ax[4:6])
@@ -39,9 +39,12 @@ def makeFigure():
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
 
-    ax[0].legend([r'$\nu='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
+    ax[1].legend([r'$\nu='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
                  loc=1,
                  bbox_to_anchor=(0.5, 1))
+
+    # Remove first subplot for overlaid cartoon
+    ax[0].set_axis_off()
 
     # Tweak layout
     f.tight_layout()
@@ -76,7 +79,6 @@ def PredictionVersusAvidity(ax):
 
     skipColor(ax[1])
     skipColor(ax[2])
-    skipColor(ax[3])
 
     def calculate(x):
         a = StoneMod(logR[0],Ka[0],x['avidity'],getMedianKx()*Ka[0],x['ligand'], fullOutput=True)
@@ -98,20 +100,18 @@ def PredictionVersusAvidity(ax):
         curDat.plot(x="ligand", y="bound", ax=ax[0], logx=True, legend=False)
 
         if ii > 1:
-            curDat.plot(x="ligand", y="Rmulti", ax=ax[1], logx=True, legend=False)
-            curDat.plot(x="ligand", y="nXlink", ax=ax[2], logx=True, legend=False)
-            curDat.plot(x="bound", y="nXlink", ax=ax[3], loglog=True, legend=False)
+            curDat.plot(x="ligand", y="nXlink", ax=ax[1], logx=True, legend=False)
+            curDat.plot(x="bound", y="nXlink", ax=ax[2], loglog=True, legend=False)
+
 
     ax[0].set_xlabel('IC Concentration (M)')
     ax[1].set_xlabel('IC Concentration (M)')
-    ax[2].set_xlabel('IC Concentration (M)')
     ax[0].set_ylabel(r'Bound Fc$\gamma$RIIIA-F')
-    ax[1].set_ylabel(r'Multimerized Fc$\gamma$RIIIA-F')
+    ax[1].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
+    ax[2].set_xlabel(r'Bound Fc$\gamma$RIIIA-F')
     ax[2].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
-    ax[3].set_xlabel(r'Bound Fc$\gamma$RIIIA-F')
-    ax[3].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
-    ax[3].set_ylim(1, 1E3)
-    ax[3].set_xlim(1, 1E4)
+    ax[2].set_ylim(1, 1E3)
+    ax[2].set_xlim(1, 1E4)
 
 def TwoRecep(ax):
     """
