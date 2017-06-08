@@ -86,9 +86,9 @@ def histSubplots(dset, axes):
 
     # Set all the x-labels based on which histogram is displayed
     axes[0].set_xlabel(r'$K_x$')
-    axes[1].set_xlabel(r'Conversion Factor')
-    axes[2].set_xlabel(r'Effective Avidity ($f$)')
-    axes[3].set_xlabel(r'Deviation Parameter ($\sigma$)')
+    axes[1].set_xlabel(r'Conversion Factors')
+    axes[2].set_xlabel(r'Effective Avidities ($f$)')
+    axes[3].set_xlabel(r'Deviation Parameters ($\sigma^*$)')
 
     # Make x-axes appear logarithmic
     for ii in range(len(axes)):
@@ -123,8 +123,8 @@ def plotFit(fitMean, ax):
                     ecolor=colorr,
                     linestyle='None')
 
-    ax.set_ylabel('Fitted prediction')
-    ax.set_xlabel('Measured ligand binding')
+    ax.set_ylabel('Fitted Prediction')
+    ax.set_xlabel('Measured Ligand Binding')
     ax.loglog()
     ax.set_ylim(0.01, 5)
     ax.set_xlim(0.01, 5)
