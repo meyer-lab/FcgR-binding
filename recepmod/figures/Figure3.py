@@ -148,8 +148,8 @@ def TwoRecep(ax):
         table[table['avidity'] == ii].plot(x="RmultiOne", y="RmultiTwo", ax=ax[0], legend=False)
         table[table['avidity'] == ii].plot(x="ligand", y="activity", ax=ax[1], logx=True, legend=False)
 
-    ax[0].set_xlabel(r'Multimerized Fc$\gamma$RIIIA-F')
-    ax[0].set_ylabel(r'Multimerized Fc$\gamma$RIIB')
+    ax[0].set_xlabel(r'Multimerized hFc$\gamma$RIIIA-F')
+    ax[0].set_ylabel(r'Multimerized hFc$\gamma$RIIB')
     ax[1].set_xlabel('IC Concentration (M)')
     ax[1].set_ylabel('Activity Index')
     ax[0].set_ylim(0, 1E3)
@@ -222,7 +222,7 @@ def maxAffinity(ax):
     ax.set_ylabel('Activity Index')
     ax.set_xlim(1.0E4, 1.0E9)
 
-    patchA = matplotlib.patches.Patch(color=colors[0], label=r'Fc$\gamma$RI')
-    patchB = matplotlib.patches.Patch(color=colors[1], label=r'Fc$\gamma$RIII')
-    patchC = matplotlib.patches.Patch(color=colors[2], label=r'Fc$\gamma$RIV')
+    patchA = matplotlib.patches.Patch(color=colors[0], label=r'mFc$\gamma$RI')
+    patchB = matplotlib.patches.Patch(color=colors[1], label=r'mFc$\gamma$RIII')
+    patchC = matplotlib.patches.Patch(color=colors[2], label=r'mFc$\gamma$RIV')
     ax.legend(handles=[patchA, patchB, patchC])
