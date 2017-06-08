@@ -61,7 +61,7 @@ if __name__ == '__main__':
     template = st.fromfile(fdir + 'Figure3.svg')
     cartoon = st.fromfile('./recepmod/figures/Figure3_model_diagram.svg').getroot()
 
-    cartoon.moveto(2, 23, scale=0.16)
+    cartoon.moveto(173, 160, scale=0.16)
 
     template.append(cartoon)
     template.save(fdir + 'Figure3.svg')
