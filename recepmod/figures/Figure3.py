@@ -39,7 +39,7 @@ def makeFigure():
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
 
-    ax[0].legend([r'$\nu='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
+    ax[0].legend([r'$f='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
                  loc=1,
                  bbox_to_anchor=(0.5, 1))
 
