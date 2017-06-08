@@ -20,8 +20,8 @@ def texRename(name):
     name = r'$K_x$' if name=='Kx1' else name
     name = 'TNP-4 c.f.' if name=='sigConv1' else name
     name = 'TNP-26 c.f.' if name=='sigConv2' else name
-    name = r'$\sigma_1$' if name=='sigma' else name
-    name = r'$\sigma_2$' if name=='sigma2' else name
+    name = r'$\sigma_1^*$' if name=='sigma' else name
+    name = r'$\sigma_2^*$' if name=='sigma2' else name
     name = r'$f_4$' if name=='gnu1' else name
     name = r'$f_{26}$' if name=='gnu2' else name
     name = r'Fc$\gamma$RIA' if name=='Rexp1' else name
