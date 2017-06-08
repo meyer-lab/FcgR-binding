@@ -22,19 +22,20 @@ def makeFigure():
     from .FigureCommon import subplotLabel, getSetup
 
     # Get list of axis objects
-    ax, f = getSetup((9, 5), (2, 4))
+##    ax, f = getSetup((9, 5), (2, 4))
+    ax, f = getSetup((7, 6), (3, 3))
 
     # Plot subplot B
-    PredictionVersusAvidity(ax[1:4])
+    PredictionVersusAvidity(ax[1:5])
 
     # Plot from two receptor model
-    TwoRecep(ax=ax[4:6])
+    TwoRecep(ax=ax[5:7])
 
     # Plot of activity index versus Ka ratio
-    varyAffinity(ax=ax[6])
+    varyAffinity(ax=ax[7])
 
     # Plot to show that highest affinity activating receptor is most sensitive to adjustment
-    maxAffinity(ax=ax[7])
+    maxAffinity(ax=ax[8])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
@@ -79,6 +80,7 @@ def PredictionVersusAvidity(ax):
 
     skipColor(ax[1])
     skipColor(ax[2])
+    skipColor(ax[3])
 
     def calculate(x):
         a = StoneMod(logR[0],Ka[0],x['avidity'],getMedianKx()*Ka[0],x['ligand'], fullOutput=True)
@@ -100,18 +102,20 @@ def PredictionVersusAvidity(ax):
         curDat.plot(x="ligand", y="bound", ax=ax[0], logx=True, legend=False)
 
         if ii > 1:
-            curDat.plot(x="ligand", y="nXlink", ax=ax[1], logx=True, legend=False)
-            curDat.plot(x="bound", y="nXlink", ax=ax[2], loglog=True, legend=False)
-
+            curDat.plot(x="ligand", y="Rmulti", ax=ax[1], logx=True, legend=False)
+            curDat.plot(x="ligand", y="nXlink", ax=ax[2], logx=True, legend=False)
+            curDat.plot(x="bound", y="nXlink", ax=ax[3], loglog=True, legend=False)
 
     ax[0].set_xlabel('IC Concentration (M)')
     ax[1].set_xlabel('IC Concentration (M)')
+    ax[2].set_xlabel('IC Concentration (M)')
     ax[0].set_ylabel(r'Bound Fc$\gamma$RIIIA-F')
-    ax[1].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
-    ax[2].set_xlabel(r'Bound Fc$\gamma$RIIIA-F')
+    ax[1].set_ylabel(r'Multimerized Fc$\gamma$RIIIA-F')
     ax[2].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
-    ax[2].set_ylim(1, 1E3)
-    ax[2].set_xlim(1, 1E4)
+    ax[3].set_xlabel(r'Bound Fc$\gamma$RIIIA-F')
+    ax[3].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
+    ax[3].set_ylim(1, 1E3)
+    ax[3].set_xlim(1, 1E4)
 
 def TwoRecep(ax):
     """
