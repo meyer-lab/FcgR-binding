@@ -199,7 +199,6 @@ class StoneModelMouse:
 
         X = self.NimmerjahnEffectTableAffinities().drop('Effectiveness', axis=1)
 
-        X = (X - X.min()) / X.max()
         scores = pd.DataFrame(pca.fit_transform(X), index=X.index, columns=['PC1', 'PC2', 'PC3', 'PC4'])
 
         return (scores, pca.explained_variance_ratio_)
