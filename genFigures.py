@@ -57,6 +57,15 @@ if __name__ == '__main__':
     template.append(cartoon)
     template.save(fdir + 'Figure2.svg')
 
+    # Overlay Figure 3 cartoon
+    template = st.fromfile(fdir + 'Figure3.svg')
+    cartoon = st.fromfile('./recepmod/figures/Figure3_model_diagram.svg').getroot()
+
+    cartoon.moveto(15, 40, scale=0.30)
+
+    template.append(cartoon)
+    template.save(fdir + 'Figure3.svg')
+
     # Overlay Figure 4 cartoon
     template = st.fromfile(fdir + 'Figure4.svg')
     cartoon = st.fromfile('./recepmod/figures/Figure4_regression_approach.svg').getroot()
