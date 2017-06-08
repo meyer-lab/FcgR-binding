@@ -24,7 +24,7 @@ def makeFigure():
     # Get list of axis objects
     ax, f = getSetup((7, 6), (3, 3))
 
-    # Plot subplot B
+    # Plot subplot A
     PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
@@ -43,7 +43,7 @@ def makeFigure():
                  loc=1,
                  bbox_to_anchor=(0.5, 1))
 
-    # Remove first subplot for overlaid cartoon
+    # Remove center subplot for overlaid cartoon
     ax[4].set_axis_off()
 
     # Tweak layout
