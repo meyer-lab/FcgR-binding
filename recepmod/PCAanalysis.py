@@ -4,7 +4,6 @@ import pandas as pd
 
 # Compare across species
 path = os.path.dirname(os.path.abspath(__file__))
-na = float('nan')
 
 def parallelize_dataframe(df, func):
     """ Calculate the pandas table in parallel. """
@@ -19,23 +18,30 @@ def parallelize_dataframe(df, func):
 
     return pd.concat(list(iterpool))
 
-def recalcPCA(geno):
+
+def recalcPCA():
     """
     Run the calculations for both the human and murine case under the defined
     conditions.
     """
     from itertools import product
 
-    pd.set_option('expand_frame_repr', False)
+    # Setup all genotypes
+    geno = list(product('HR', 'IT', 'FV'))
+
+    for ii, item in enumerate(geno):
+        geno[ii] = ''.join(item)
 
     # Setup the table of conditions we'll use.
     avidity = np.logspace(0, 3, 4, base=2, dtype=np.int)
     ligand = np.logspace(start=-9, stop=-9, num=1)
     IgID = np.arange(0, 8, dtype=np.int)
-    conditions = pd.DataFrame(list(product(avidity, ligand, IgID)), columns=['avidity', 'ligand', 'IgID'])
+    conditions = pd.DataFrame(list(product(avidity, ligand, IgID)),
+                              columns=['avidity', 'ligand', 'IgID'])
 
     # Run the plot
-    PCAall(conditions,geno)
+    for genoo in geno:
+        PCAall(conditions, genoo)
 
 
 def calcActivity(condR, expressions, affinities, activities):
@@ -48,15 +54,17 @@ def calcActivity(condR, expressions, affinities, activities):
 
     for exprN, expr in expressions.items():
         # Murine or Human, based on IgID
-        which = int(np.floor(condR.IgID / 4))
+        isHuman = int(condR.IgID >= 4)
         
         # Isolate receptors expressed, and keep the index of those
-        exprV = np.array(expr[which], dtype=np.float)
+        exprV = np.array(expr[isHuman], dtype=np.float64)
+
+        # Which receptors are expressed
         exprIDX = np.logical_not(np.isnan(exprV))
         exprV = exprV[exprIDX]
 
         # Pull out the relevant affinities from the table
-        affyH = affinities[which][exprIDX, int(condR.IgID % 4)]+0.1
+        affyH = affinities[isHuman][exprIDX, int(condR.IgID) - 4*isHuman] + 0.1
 
         if exprV.size > 1:
             # Setup the StoneN model
@@ -66,7 +74,7 @@ def calcActivity(condR, expressions, affinities, activities):
                        gnu=np.asscalar(condR.avidity.values),
                        L0=np.asscalar(condR.ligand.values))
 
-            condR[exprN + '_activity'] = M.getActivity(activities[which])
+            condR[exprN + '_activity'] = M.getActivity(activities[isHuman])
             condR[exprN + '_Lbnd'] = M.getLbnd()
         else:
             output = StoneMod(np.asscalar(exprV),
@@ -82,35 +90,28 @@ def calcActivity(condR, expressions, affinities, activities):
     return condR
 
 def PCAall(conditions,geno):
-    from numpy import nan
-    expressions = {}
-    expressions["NK"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
-    expressions["MO"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
-    expressions["DC"] = [[3.0, 4.0, 3.0, 3.0],[3.0, 3.0, nan, 3.0, nan, 4.0, 3.0, nan, 3.0]]
-    activities = [[1.0, -1.0, 1.0, 1.0],[1.0, 1.0, -1.0, 1.0, 1.0, 0.0]]
-
-    expressions = genoComb(expressions,geno)
-    
     from .StoneModMouse import StoneModelMouse
+
+    expressions = {'NK': [[np.nan, np.nan, 3.0, np.nan], [np.nan, np.nan, np.nan, np.nan, 3.0, np.nan]],
+                   'M∅': [[3.0, 4.0, 3.0, 3.0],          [3.0, 3.0, 3.0, 4.0, 3.0, 3.0]],
+                   'cMO':[[4.0, 4.0, 4.0, 3.0],          [3.0, 4.0, 2.0, 4.0, 2.0, 2.0]],
+                   'pMO':[[2.0, 3.0, 3.0, 4.0],          [3.0, 4.0, 2.0, 4.0, 3.0, 3.0]],
+                   'DC': [[3.0, 4.0, 3.0, 3.0],          [3.0, 3.0, 3.0, 4.0, 3.0, 3.0]]}
+
+    activities = [[1.0, -1.0, 1.0, 1.0], [1.0, 1.0, -1.0, 1.0, 1.0, 0.0]]
+
+    # Swap expression points depending upon the genotype
+    for _, value in expressions.items():
+        value[1].insert(2 + int(geno[0] == 'R'), np.nan)
+        value[1].insert(4 + int(geno[1] == 'T'), np.nan)
+        value[1].insert(7 + int(geno[2] == 'F'), np.nan)
+    
     affinitiesMur = StoneModelMouse().kaMouse
     affinitiesHum = np.genfromtxt(os.path.join(path, './data/human-affinities.csv'),
-                               delimiter=',',
-                               skip_header=1,
-                               max_rows=9,
-                               invalid_raise=True,
-                               usecols=list(range(1,5)),
-                               dtype=np.float64)
-    affinities = [affinitiesMur, affinitiesHum]
-    outt = parallelize_dataframe(conditions, lambda x: calcActivity(x, expressions, affinities, activities))
+                               delimiter=',', skip_header=1, max_rows=9,
+                               usecols=list(range(1,5)), dtype=np.float64)
 
-    outt.to_csv(os.path.join(path, './data/pca-'+geno+'.csv'))
+    outt = parallelize_dataframe(conditions, lambda x: calcActivity(x, expressions, [affinitiesMur, affinitiesHum], activities))
 
-def genoComb(expressions, geno):
-    for cell in expressions.keys():
-        if geno[0] == 'R':
-            expressions[cell] = expressions[cell][0:2]+list(reversed(expressions[cell][2:4]))+expressions[cell][4:9]
-        if geno[1] == 'T':
-            expressions[cell] = expressions[cell][0:4]+list(reversed(expressions[cell][4:6]))+expressions[cell][6:9]
-        if geno[2] == 'F':
-            expressions[cell] = expressions[cell][0:7]+list(reversed(expressions[cell][7:9]))
-    return expressions
+    outt.to_hdf(os.path.join(path, './data/pca.h5'), geno)
+
