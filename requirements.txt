@@ -19,3 +19,4 @@ nosexcover
 nose-cprof
 gprof2dot
 statsmodels
+tables
