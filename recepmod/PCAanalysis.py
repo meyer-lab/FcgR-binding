@@ -92,20 +92,19 @@ def calcActivity(condR, expressions, affinities, activities):
 def PCAall(conditions,geno):
     from .StoneModMouse import StoneModelMouse
 
-    expressions = {'NK': [[np.nan, np.nan, 3.0, np.nan], [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 3.0, np.nan, np.nan]],
-                   'MO': [[3.0, 4.0, 3.0, 3.0],          [3.0, 3.0, np.nan, 3.0, np.nan, 4.0, 3.0, np.nan, 3.0]],
-                   'DC': [[3.0, 4.0, 3.0, 3.0],          [3.0, 3.0, np.nan, 3.0, np.nan, 4.0, 3.0, np.nan, 3.0]]}
+    expressions = {'NK': [[np.nan, np.nan, 3.0, np.nan], [np.nan, np.nan, np.nan, np.nan, 3.0, np.nan]],
+                   'M∅': [[3.0, 4.0, 3.0, 3.0],          [3.0, 3.0, 3.0, 4.0, 3.0, 3.0]],
+                   'cMO':[[4.0, 4.0, 4.0, 3.0],          [3.0, 4.0, 2.0, 4.0, 2.0, 2.0]],
+                   'pMO':[[2.0, 3.0, 3.0, 4.0],          [3.0, 4.0, 2.0, 4.0, 3.0, 3.0]],
+                   'DC': [[3.0, 4.0, 3.0, 3.0],          [3.0, 3.0, 3.0, 4.0, 3.0, 3.0]]}
 
     activities = [[1.0, -1.0, 1.0, 1.0], [1.0, 1.0, -1.0, 1.0, 1.0, 0.0]]
 
     # Swap expression points depending upon the genotype
     for _, value in expressions.items():
-        if geno[0] == 'R':
-            value[1][2], value[1][3] = value[1][3], value[1][2]
-        if geno[1] == 'T':
-            value[1][4], value[1][5] = value[1][5], value[1][4]
-        if geno[2] == 'F':
-            value[1][7], value[1][8] = value[1][8], value[1][7]
+        value[1].insert(2 + int(geno[0] == 'R'), np.nan)
+        value[1].insert(4 + int(geno[1] == 'T'), np.nan)
+        value[1].insert(7 + int(geno[2] == 'F'), np.nan)
     
     affinitiesMur = StoneModelMouse().kaMouse
     affinitiesHum = np.genfromtxt(os.path.join(path, './data/human-affinities.csv'),
@@ -114,5 +113,5 @@ def PCAall(conditions,geno):
 
     outt = parallelize_dataframe(conditions, lambda x: calcActivity(x, expressions, [affinitiesMur, affinitiesHum], activities))
 
-    outt.to_csv(os.path.join(path, './data/pca-'+geno+'.csv'))
+    outt.to_hdf(os.path.join(path, './data/pca.h5'), geno)
 
