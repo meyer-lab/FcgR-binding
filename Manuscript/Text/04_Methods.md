@@ -23,11 +23,11 @@ Principle component analysis was performed using Python's PCA tool in scikit-lea
 
 ### Base model
 
-The equilibrium binding of TNP-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity $K_a$, and then through subsequent cross-linking events with equilibrium partitioning $K_x$. Therefore, according to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{i,eq}$, can be found using the relation
+The equilibrium binding of TNP-BSA to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. This model assumes an excess of ligand. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity $K_a$, and then through subsequent cross-linking events with equilibrium partitioning $K_x$. Therefore, according to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{i,eq}$, can be found using the relation
 
 $$ v_{i,eq} = {f\choose i} (K_x)^{i-1} {L_0}{K_a} \left(R_{eq}\right)^i. $$ {#eq:vieq}
 
-Here, $f$ is the effective avidity of the ligand, $K_x$ is a cross-linking parameter with units of # per cell, $L_0$ is the concentration of ligand (assumed to be saturating), and $R_{eq}$ is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is
+Here, $f$ is the effective avidity of the ligand, $K_x$ is a cross-linking parameter with units of # per cell, $L_0$ is the concentration of ligand, and $R_{eq}$ is the number of unbound receptors at equilibrium. Consequently, the total number of ligand complexes bound at equilibrium is
 
 $$ L_{bound} = \sum_{i=1}^{f} v_{i,eq} = \sum_{i=1}^{f} { f\choose i } (K_x)^{i-1} {L_0}{K_a} (R_{eq})^i. $$ {#eq:lbound}
 
