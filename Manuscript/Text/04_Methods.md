@@ -14,6 +14,18 @@ $$ y = F (X \cdot p) $$ {#eq:lsq}
 
 where $F$ is the normal distribuion cumulative density function, with mean and standard deviation varied during fitting.
 
+## Principle Components Analysis 
+
+Principle components analysis was performed using Python's PCA tool in scikit-learn (`sklearn.decomposition.PCA`). 
+
+### PCA of IgG-FcgR Affinities
+
+PCA is performed on affinities of 4 IgGs (IgG1, IgG2a, IgG2b,  IgG3), with or without knockout treatments, for 4 receptors (FcgRI, FcgRIIB, FcgRIII, FcgRIV). The affinity for a knocked-out or blocked FcgR is assumed to be 0. The affinities were integral normalized to the maximum affinity for each receptor. 
+
+### PCA of Human and Murine IgG-FcgR Interactions
+
+(TODO:Finish)
+
 ## Model
 
 ### Base model
