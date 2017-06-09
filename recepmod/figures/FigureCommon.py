@@ -1,7 +1,7 @@
 import seaborn as sns
 from ..StoneModel import StoneModel
 
-figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'FigureS1', 'FigureS2', 'FigureAA']
+figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'FigureS2', 'FigureAA']
 
 IgList = ['IgG1','IgG2','IgG3','IgG4']
 
