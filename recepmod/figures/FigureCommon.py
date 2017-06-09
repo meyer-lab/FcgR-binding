@@ -5,7 +5,13 @@ figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'FigureS2', 'FigureAA']
 
 IgList = ['IgG1','IgG2','IgG3','IgG4']
 
+def iggRename(name):
+    return 'h'+name
+
 Igs = {'IgG1':'o', 'IgG2':'d', 'IgG3':'s', 'IgG4':'^'}
+keys = [key for key in Igs.keys()]
+for key in keys:
+    Igs[iggRename(key)] = Igs[key]
 
 FcgRlist = ['FcgRI',
             'FcgRIIA-Arg',
