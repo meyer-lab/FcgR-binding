@@ -162,7 +162,7 @@ def InVivoPredictComponents(ax):
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
     # Make legend
     patches = list()
-    for key, val in celltypeidx.items():
+    for key, val in zip(celltypes, [celltypeidx[typ] for typ in celltypes]):
         patches.append(matplotlib.patches.Patch(color=val, label=key))
     ax.legend(handles=patches, bbox_to_anchor=(0, 1), loc=2)
 
