@@ -193,7 +193,6 @@ def AverageAvidity(ax):
     legend_patches = [matplotlib.patches.Patch(color=C, label=L) for
                       C, L in zip(sns.color_palette(),
                                   [r'$10^{'+str(logr)+'}$' for logr in logRs])]
-##                                  map(str, logRs))]
 
     # Plot the legend
     ax.legend(handles=legend_patches, title=r'# Receptors', labelspacing=0.25)
