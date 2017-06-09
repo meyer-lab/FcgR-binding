@@ -16,7 +16,7 @@ where $F$ is the normal distribuion cumulative density function, with mean and s
 
 ### PCA of IgG-FcgR Affinities
 
-Principle component analysis was performed using scikit-learn (`sklearn.decomposition.PCA`) and the affinities of the four IgGs (mIgG1, mIgG2a, mIgG2b,  mIgG3), with or without knockout treatments, for four receptors (mFcgRIA, mFcgRIIB, mFcgRIII, mFcgRIV). The affinity for a knocked-out or blocked hFcgR was assumed to be zero. The affinities were not normalized before PCA transformation. 
+Principle component analysis was performed using scikit-learn (`sklearn.decomposition.PCA`) and the affinities of the four IgGs (mIgG1, mIgG2a, mIgG2b,  mIgG3), with or without knockout treatments, for four receptors (mFcgRIA, mFcgRIIB, mFcgRIII, mFcgRIV). The affinity for a knocked-out or blocked FcgR was assumed to be zero. The affinities were not normalized before PCA transformation. 
 
 ## Model
 
