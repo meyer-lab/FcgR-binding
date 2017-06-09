@@ -1,6 +1,6 @@
 # Acknowledgements
 
-This work was supported by NIH DP5-OD019815 to A.S.M. and in part by the Koch Institute Support (core) grant P30-CA14051 from the NCI. The authors wish to thank Ted Richards, Song Yi Bae and Simin Manole for helpful feedback. **Competing financial interests:** The authors declare no competing financial interests.
+This work was supported by NIH DP5-OD019815 to A.S.M. and in part by the Koch Institute Support (core) grant P30-CA14051 from the NCI. The authors wish to thank Galit Alter, Song Yi Bae, Simin Manole, and Ted Richards for helpful feedback. **Competing financial interests:** The authors declare no competing financial interests.
 
 # Author contributions statement
 
