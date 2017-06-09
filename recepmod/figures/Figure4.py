@@ -55,7 +55,7 @@ Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-',
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
 KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',r'mFc$\gamma$RI-/-',r'mFc$\gamma$RIII-/-',r'mFc$\gamma$RI,IV-/-','Fucose-']
 KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
-celltypes = ['NK effect', 'DC effect', '2B-KO effect']
+celltypes = ['NK effect', 'DC-like effect', '2B-KO effect']
 celltypeidx = dict(zip(celltypes, sns.color_palette()))
 
 def PrepforLegend(table):
@@ -234,9 +234,7 @@ def InVivoPredictVsActualAffinities(ax):
 def ClassAvidityPredict(ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
     from ..StoneModMouseFit import InVivoPredict
-    from ..StoneHelper import getMedianKx
-
-    L0 = 1.0E-12
+    from ..StoneModMouseFit import CALCapply
 
     # Run the in vivo regression model
     _, _, _, model = InVivoPredict()
@@ -256,24 +254,9 @@ def ClassAvidityPredict(ax):
         data = data.append(dataNew)
 
     data['2B-KO'] = 0
+    data['L0'] = 1.0E-12
 
-
-    def NKapply(row):
-        from ..StoneModel import StoneMod
-
-        return StoneMod(logR=4.0, Ka=row.FcgRIII, v=row.v, Kx=getMedianKx(), L0=L0, fullOutput = True)[2]
-
-    def CALCapply(row):
-        from ..StoneNRecep import StoneN
-
-        return StoneN(logR=[2.0, 3.0, 2.0, 2.0],
-                      Ka=[row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV],
-                      Kx=getMedianKx(),
-                      gnu=row.v,
-                      L0=L0).getActivity([1, -1, 1, 1])
-
-    data['NK'] = data.apply(NKapply, axis=1)
-    data['DC'] = data.apply(CALCapply, axis=1)
+    data = data.apply(lambda x: CALCapply(x), axis=1)
 
     data['predict'] = model.predict(data[['NK', 'DC', '2B-KO']].as_matrix())
     data.reset_index(level=0, inplace=True)
