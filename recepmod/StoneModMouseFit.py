@@ -63,31 +63,31 @@ def NimmerjahnPredictByAffinities():
 
     return (direct_perf, crossval_perf, data)
 
-def modelPrepAffinity(v=5, L0=1E-12):
+def CALCapply(row):
+    from .StoneModel import StoneMod
+    from .StoneNRecep import StoneN
     from .StoneHelper import getMedianKx
-
-    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
 
     DCexpr = [2.0, 3.0, 2.0, 2.0]
 
-    def CALCapply(row):
-        from .StoneModel import StoneMod
-        from .StoneNRecep import StoneN
+    KaFull = [row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
 
-        KaFull = [row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
+    row['NK'] = StoneMod(logR=4.0, Ka=row.FcgRIII, v=row.v, Kx=getMedianKx(), L0=row.L0, fullOutput = True)[2]
+    row['DC'] = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(), gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
 
-        row['NK'] = StoneMod(logR=4.0, Ka=row.FcgRIII, v=v, Kx=getMedianKx()*row.FcgRIII, L0=L0, fullOutput = True)[2]
-        row['DC'] = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(), gnu=v, L0=L0).getActivity([1, -1, 1, 1])
+    row['2B-KO'] = 1
 
-        row['2B-KO'] = 1
+    if re.search('FcgRIIB-', row.name) is None:
+        row['2B-KO'] = 0
 
-        if re.search('FcgRIIB-', row.name) is None:
-            row['2B-KO'] = 0
+    return row
 
-        row['L0'] = L0
-        row['v'] = v
 
-        return row
+def modelPrepAffinity(v=5, L0=1E-12):
+
+    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
+    data['v'] = v
+    data['L0'] = L0
 
     data = data.apply(CALCapply, axis=1)
 
