@@ -7,7 +7,7 @@ matplotlib.use('AGG')
 import numpy as np
 import seaborn as sns
 import pandas as pd
-from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx, FcgRlist, FcgRlistL, IgList, texRename
+from .FigureCommon import Igs, Legend, FcgRidxL, FcgRidx, FcgRlist, FcgRlistL, IgList, texRename, iggRename
 
 
 def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
@@ -32,7 +32,7 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
                            linestyle='None')
 
         axInt.loglog()
-        axInt.set_xlabel(r'hFc$\gamma$R-IgG $K_a$')
+        axInt.set_xlabel(r'hFc$\gamma$R-hIgG $K_a$')
         axInt.set_ylabel('Measured TNP-BSA Binding')
         axInt.set_ylim(1.0E-3, 1.0E-1)
 
@@ -64,6 +64,9 @@ def plotAvidityEffectVsKA(fitMean, ax1):
     fitMean = fitMean.reset_index()
     fitMean.columns = fitMean.columns.droplevel(1)
 
+    # Mark IgGs as human
+    fitMean['Ig'] = fitMean['Ig'].apply(iggRename)
+
     for _, row in fitMean.iterrows():
         colorr = FcgRidx[row['FcgR']]
         ax1.errorbar(x=row['Ka'],
@@ -79,7 +82,7 @@ def plotAvidityEffectVsKA(fitMean, ax1):
     ax1.set_xscale('log', basex=10)
     ax1.set_yscale('log', basey=2)
 
-    ax1.set_xlabel(r'hFc$\gamma$R-IgG $K_a$')
+    ax1.set_xlabel(r'hFc$\gamma$R-hIgG $K_a$')
     ax1.set_ylabel('TNP-26 / TNP-4 Binding')
 
     ax1.set_ylim(1, 20)
@@ -88,7 +91,9 @@ def plotAvidityEffectVsKA(fitMean, ax1):
     ax1.set_xlim(1E4, 1E8)
     ax1.set_xticks([1E4, 1E5, 1E6, 1E7, 1E8])
 
-    ax1.legend(handles=Legend(FcgRlistL, FcgRidxL, IgList, Igs), bbox_to_anchor=(-0.1, -0.5), loc=2)
+    ax1.legend(handles=Legend(FcgRlistL, FcgRidxL,
+                              [iggRename(igg) for igg in IgList], Igs),
+               bbox_to_anchor=(-0.1, -0.5), loc=2)
 
 
 def FcgRQuantificationFigureMaker(StoneM, ax):
@@ -117,6 +122,8 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
     axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
 def mfiAdjMeanFigureMaker(measAll, axarr):
+    # Mark IgGs as human
+    measAll['Ig'] = measAll['Ig'].apply(iggRename)
 
     fcIter = zip(axarr, FcgRlist)
     # Loop through receptors creating plot
@@ -132,6 +139,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
         axx.set_xlabel("")
         axx.legend_.remove()
         axx.set_title(texRename(fcr))
+        axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
     axarr[5].legend(bbox_to_anchor=(1.6,1),loc=2)
 
 def makeFigure():
