@@ -96,7 +96,6 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
     df = pd.DataFrame(StoneM.Rquant).T
 
     # Assign the names of the receptors
-##    df.columns = FcgRidxL.keys()
     df.columns = FcgRlistL
 
     # Melt the dataframe
