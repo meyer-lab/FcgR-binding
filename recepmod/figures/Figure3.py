@@ -218,7 +218,7 @@ def maxAffinity(ax):
     ax.loglog(M.kaMouse[2, 2], 512, color=colors[1], marker='o')
     ax.loglog(M.kaMouse[3, 2], 512, color=colors[2], marker='o')
 
-    ax.set_xlabel(r'$K_a$ of mFc$\gamma$R Adjusted')
+    ax.set_xlabel(r'$K_a$ of Fc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
     ax.set_xlim(1.0E4, 1.0E9)
 
