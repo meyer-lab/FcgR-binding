@@ -32,7 +32,7 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
                            linestyle='None')
 
         axInt.loglog()
-        axInt.set_xlabel(r'Fc$\gamma$R-IgG $K_a$')
+        axInt.set_xlabel(r'hFc$\gamma$R-IgG $K_a$')
         axInt.set_ylabel('Measured TNP-BSA Binding')
         axInt.set_ylim(1.0E-3, 1.0E-1)
 
@@ -79,7 +79,7 @@ def plotAvidityEffectVsKA(fitMean, ax1):
     ax1.set_xscale('log', basex=10)
     ax1.set_yscale('log', basey=2)
 
-    ax1.set_xlabel(r'Fc$\gamma$R-IgG $K_a$')
+    ax1.set_xlabel(r'hFc$\gamma$R-IgG $K_a$')
     ax1.set_ylabel('TNP-26 / TNP-4 Binding')
 
     ax1.set_ylim(1, 20)
@@ -119,7 +119,6 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
 
 def mfiAdjMeanFigureMaker(measAll, axarr):
 
-##    fcIter = zip(axarr, FcgRidx.keys())
     fcIter = zip(axarr, FcgRlist)
     # Loop through receptors creating plot
     for axx, fcr in fcIter:

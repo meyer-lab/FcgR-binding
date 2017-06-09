@@ -108,11 +108,11 @@ def PredictionVersusAvidity(ax):
     ax[0].set_xlabel('IC Concentration (M)')
     ax[1].set_xlabel('IC Concentration (M)')
     ax[2].set_xlabel('IC Concentration (M)')
-    ax[0].set_ylabel(r'Bound Fc$\gamma$RIIIA-F')
-    ax[1].set_ylabel(r'Multimerized Fc$\gamma$RIIIA-F')
-    ax[2].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
-    ax[3].set_xlabel(r'Bound Fc$\gamma$RIIIA-F')
-    ax[3].set_ylabel(r'Fc$\gamma$RIIIA-F Nxlinks')
+    ax[0].set_ylabel(r'Bound hFc$\gamma$RIIIA-F')
+    ax[1].set_ylabel(r'Multimerized hFc$\gamma$RIIIA-F')
+    ax[2].set_ylabel(r'hFc$\gamma$RIIIA-F Nxlinks')
+    ax[3].set_xlabel(r'Bound hFc$\gamma$RIIIA-F')
+    ax[3].set_ylabel(r'hFc$\gamma$RIIIA-F Nxlinks')
     ax[3].set_ylim(1, 1E3)
     ax[3].set_xlim(1, 1E4)
 
@@ -218,7 +218,7 @@ def maxAffinity(ax):
     ax.loglog(M.kaMouse[2, 2], 512, color=colors[1], marker='o')
     ax.loglog(M.kaMouse[3, 2], 512, color=colors[2], marker='o')
 
-    ax.set_xlabel(r'$K_a$ of Fc$\gamma$R Adjusted')
+    ax.set_xlabel(r'$K_a$ of mFc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
     ax.set_xlim(1.0E4, 1.0E9)
 
