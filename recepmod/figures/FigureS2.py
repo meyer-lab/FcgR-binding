@@ -52,6 +52,9 @@ def robustnessPlot(ax, calculate=False):
         # Load the data from CSV
         pp = pd.read_csv(filepath, index_col=0)
 
+    # Change avidities to strings
+    pp['gnus'] = pp['gnus'].apply(lambda gnu: r'$\nu='+str(int(gnu))+'$')
+
     avcolors = dict(zip(pp['gnus'].unique(), sns.color_palette()[1:]))
 
     # Plot the calculated crossvalidation performance

@@ -48,7 +48,12 @@ def makeFigure():
     return f
 
 IgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None']
+iggRename = lambda name: 'm'+name if name[0]=='I' else name
 Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s', 'None':'.'}
+keys = [key for key in Igs.keys()]
+for key in keys:
+    Igs[iggRename(key)] = Igs[key]
+    
 Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'} 
 Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
@@ -158,8 +163,11 @@ def InVivoPredictComponents(ax):
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
-    
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
+
+    for lab in ax.get_xticklabels():
+        lab.set_text('h'+lab.get_text() if lab.get_text()[0]=='I' else lab.get_text())
+    ax.set_xticklabels(ax.get_xticklabels(),
+                       rotation=40, rotation_mode="anchor", ha="right")
     # Make legend
     patches = list()
     for key, val in zip(celltypes, [celltypeidx[typ] for typ in celltypes]):
@@ -228,7 +236,9 @@ def InVivoPredictVsActualAffinities(ax):
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.8, cperf)
 
-    ax.legend(handles=Legend(KnockdownL, KnockdownidxL, IgList, Igs), bbox_to_anchor=(1, 1), loc=2)
+    ax.legend(handles=Legend(KnockdownL, KnockdownidxL,
+                             [iggRename(igg) for igg in IgList], Igs),
+              bbox_to_anchor=(1, 1), loc=2)
 
 
 def ClassAvidityPredict(ax):
