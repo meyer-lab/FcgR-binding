@@ -53,7 +53,7 @@ Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'}
 Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
-KnockdownL = ['Wild-type', r'Fc$\gamma$RIIB-/-',r'Fc$\gamma$RI-/-',r'Fc$\gamma$RIII-/-',r'Fc$\gamma$RI,IV-/-','Fucose-']
+KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',r'mFc$\gamma$RI-/-',r'mFc$\gamma$RIII-/-',r'mFc$\gamma$RI,IV-/-','Fucose-']
 KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
 celltypes = ['NK effect', 'DC effect', '2B-KO effect']
 celltypeidx = dict(zip(celltypes, sns.color_palette()))
@@ -158,6 +158,7 @@ def InVivoPredictComponents(ax):
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
+    
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
     # Make legend
     patches = list()
