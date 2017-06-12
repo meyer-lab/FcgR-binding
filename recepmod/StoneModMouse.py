@@ -192,21 +192,41 @@ class StoneModelMouse:
 ##
 ##        writer.close()
 
+    def tabWrite(self, filename, matrix, names):
+        tnl = '\\tabularnewline'
+
+        f = open(filename, 'w')
+        f.write('\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
+        temp = ''
+        for ii, name in enumerate(names):
+            f.write(name)
+            if ii != 5:
+                f.write(' & ')
+        f.write(tnl+'\n\\midrule\n\\endhead\n')
+        for row in matrix:
+            for ii, item in enumerate(row):
+                f.write(str(item))
+                if ii != 5:
+                    f.write(' & ')
+            f.write(tnl+'\n')
+        f.write('\\bottomrule\n\\end{longtable}\n')
+
     def writeModelData(self, filename):
-        import pytablewriter
 
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
 
-        writer = pytablewriter.MarkdownTableWriter()
-        writer.header_list = tbN.columns
-        writer.value_matrix = tbN.as_matrix()
+        def rename(name):
+            name = '$mFc$\\gamma$RI' if name=='FcgRI' else name
+            name = '$mFc$\\gamma$RIIB' if name=='FcgRIIB' else name
+            name = '$mFc$\\gamma$RIII' if name=='FcgRIII' else name
+            name = '$mFc$\\gamma$RIV' if name=='FcgRIV' else name
+            return name
 
-        with open(filename, 'w') as f:
-            writer.stream = f
-            writer.write_table()
+        def renameList(names):
+            return [rename(name) for name in names]
 
-        writer.close()
+        self.tabWrite(filename,tbN.as_matrix(),renameList(tbN.columns))
         
     def KnockdownPCA(self):
         """ Principle Components Analysis of FcgR-IgG affinities. """
