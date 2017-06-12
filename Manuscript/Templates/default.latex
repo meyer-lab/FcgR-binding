@@ -102,9 +102,9 @@ $else$
 \fi
 $endif$
 
-% set default figure placement to bp!
+% set default figure placement to htbp
 \makeatletter
-\def\fps@figure{bp!}
+\def\fps@figure{htbp}
 \makeatother
 
 $if(title)$
