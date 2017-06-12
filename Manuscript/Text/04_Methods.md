@@ -16,7 +16,7 @@ where $F$ is the normal distribuion cumulative density function, with mean and s
 
 ### PCA of hIgG-hFcgR affinities
 
-Principle component analysis was performed using `scikit-learn` (`sklearn.decomposition.PCA`) and the affinities of the four hIgGs (hIgG1, hIgG2a, hIgG2b, hIgG3), with or without knockout treatments, for each of four receptors (hFcgRIA, hFcgRIIB, hFcgRIII, hFcgRIV). The affinity for a knocked-out or blocked hFcgR was assumed to be zero. The affinities were not normalized before PCA transformation. 
+Principle component analysis was performed using `scikit-learn` (`sklearn.decomposition.PCA`) and the affinities of the four hIgGs (hIgG1, hIgG2a, hIgG2b, hIgG3), with or without knockout treatments, for each of four receptors (hFcgRI, hFcgRIIB, hFcgRIII, hFcgRIV). The affinity for a knocked-out or blocked hFcgR was assumed to be zero. The affinities were not normalized before PCA transformation. 
 
 ## Model
 
