@@ -217,10 +217,10 @@ class StoneModelMouse:
         tbN.insert(0, 'Condition', tbN.index)
 
         def rename(name):
-            name = '$mFc$\\gamma$RI' if name=='FcgRI' else name
-            name = '$mFc$\\gamma$RIIB' if name=='FcgRIIB' else name
-            name = '$mFc$\\gamma$RIII' if name=='FcgRIII' else name
-            name = '$mFc$\\gamma$RIV' if name=='FcgRIV' else name
+            name = 'mFc$\\gamma$RI' if name=='FcgRI' else name
+            name = 'mFc$\\gamma$RIIB' if name=='FcgRIIB' else name
+            name = 'mFc$\\gamma$RIII' if name=='FcgRIII' else name
+            name = 'mFc$\\gamma$RIV' if name=='FcgRIV' else name
             return name
 
         def renameList(names):
