@@ -171,27 +171,6 @@ class StoneModelMouse:
                 output[i, k, :] = stoneModOut[:4]
         return output.reshape(2,16)
 
-
-##    def writeModelData(self, filename):
-##        """ Write out model data to be included as supplementary table. """
-##        import pytablewriter
-##
-##        # Collect data
-##        tbN = self.NimmerjahnEffectTableAffinities()
-##        tbN.insert(0, 'Condition', tbN.index)
-##        tbN.columns = [('m' + name if name[0]=='F' else name) for name in tbN.columns]
-##
-##        writer = pytablewriter.MarkdownTableWriter()
-##
-##        writer.from_dataframe(tbN)
-##
-##        # change output stream to a file
-##        with open(filename, 'w') as f:
-##            writer.stream = f
-##            writer.write_table()
-##
-##        writer.close()
-
     def tabWrite(self, filename, matrix, names):
         tnl = '\\tabularnewline'
 
