@@ -72,6 +72,11 @@ def violinPlot(dset, ax):
         ax.plot([ii]*len(row), row, 'k_', mew=1.0)
 
     ax.set_ylim(5, 7)
+    # Change violin colors to match FcgR colors in legend next to 2C
+    for ii, child in enumerate(ax.get_children()[0:12]):
+        if ii % 2 == 0:
+            child.set_facecolor(FcgRidx[FcgRlist[int(ii/2)]])
+            child.set_edgecolor(FcgRidx[FcgRlist[int(ii/2)]])
 
 def histSubplots(dset, axes):
     dset.columns = texRenameList(dset.columns)
