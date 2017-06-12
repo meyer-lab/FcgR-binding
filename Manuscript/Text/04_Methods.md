@@ -14,9 +14,9 @@ $$ y = F (X \cdot p) $$ {#eq:lsq}
 
 where $F$ is the normal distribuion cumulative density function, with mean and standard deviation varied during fitting.
 
-### PCA of hIgG-hFcgR affinities
+### PCA of hIgG-hFcγR affinities
 
-Principle component analysis was performed using `scikit-learn` (`sklearn.decomposition.PCA`) and the affinities of the four hIgGs (hIgG1, hIgG2a, hIgG2b, hIgG3), with or without knockout treatments, for each of four receptors (hFcgRI, hFcgRIIB, hFcgRIII, hFcgRIV). The affinity for a knocked-out or blocked hFcgR was assumed to be zero. The affinities were not normalized before PCA transformation. 
+Principle component analysis was performed using `scikit-learn` (`sklearn.decomposition.PCA`) and the affinities of the four hIgGs (hIgG1, hIgG2a, hIgG2b, hIgG3), with or without knockout treatments, for each of four receptors (hFcγRI, hFcγRIIB, hFcγRIII, hFcγRIV). The affinity for a knocked-out or blocked hFcγR was assumed to be zero. The affinities were not normalized before PCA transformation. 
 
 ## Model
 
@@ -40,7 +40,7 @@ $$ R_{multi} = \sum_{i=2}^{f} iv_{i,eq}. $$ {#eq:rmulti}
 
 ### Specification for $K_x$
 
-We represented $K_x$ for any given crosslinking interaction as the product of $K_a$, the affinity of the epitpope being bound for the receptor species to which it binds, and a crosslinking coefficient, $K_x^*$. While $K_x$ was previously assumed to be constant [@Stone:2001fm], we noted that a constant value of $K_x$ must break down under certain regimes. Specifically, a constant value for $K_x$ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion and other factors. However, at some limit of low-affinity FcγR-IgG binding, $K_x$ must ultimately be reduced, and $K_x$ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when allowed to vary with affinity. Therefore, for any given crosslinking interaction between an epitope-receptor pair with affinity $K_a$,
+It cannot be that $K_x$ is constant across different combinations of FcγR and IgG, as a constant value of $K_x$ makes this model invalid under certain regimes. Specifically, a constant value for $K_x$ is consistent with a high local concentration of ligand, leading to receptor-ligand binding determined more so by receptor accessibility via cell surface diffusion than other factors. However, for low-affinity FcγR-IgG binding, $K_x$ must ultimately be reduced, and $K_x$ for interactions with zero affinity must equal zero. Further, detailed balance is only satisfied for cases with multiple receptors of differing affinity present when allowed to vary with affinity. Therefore, we represented $K_x$ for any given crosslinking interaction as the product of $K_a$, the affinity of the epitope being bound for the receptor species to which it binds, and a crosslinking coefficient, $K_x^*$, that is uniform for all combinations of FcγR and IgG. For any given crosslinking interaction between an epitope-receptor pair with affinity $K_a$,
 
 $$ K_x = K_x^* K_a. $$ {#eq:kx}
 
