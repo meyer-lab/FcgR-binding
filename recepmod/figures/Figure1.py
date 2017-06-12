@@ -130,6 +130,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
     measAll['Ig'] = measAll['Ig'].apply(iggRename)
 
     fcIter = zip(axarr, FcgRlist)
+    col = sns.crayon_palette(colors=['Cornflower', 'Brick Red'])
     # Loop through receptors creating plot
     for axx, fcr in fcIter:
         sns.barplot(x="Ig",
@@ -144,6 +145,15 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
         axx.legend_.remove()
         axx.set_title(texRename(fcr))
         axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
+        # Change colors to make them different that in FcgRidx
+        for ii, child in enumerate(axx.get_children()[0:8]):
+            if ii < 4:
+                child.set_facecolor(col[0])
+                child.set_edgecolor(col[0])
+            else:
+                child.set_facecolor(col[1])
+                child.set_edgecolor(col[1])
+                
     axarr[5].legend(bbox_to_anchor=(1.6,1),loc=2)
 
 def makeFigure():
