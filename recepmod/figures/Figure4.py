@@ -165,7 +165,7 @@ def InVivoPredictComponents(ax):
     ax.set_xlabel('Components')
 
     for lab in ax.get_xticklabels():
-        lab.set_text('h'+lab.get_text() if lab.get_text()[0]=='I' else lab.get_text())
+        lab.set_text('m'+lab.get_text() if lab.get_text()[0]=='I' else lab.get_text())
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40, rotation_mode="anchor", ha="right")
     # Make legend
