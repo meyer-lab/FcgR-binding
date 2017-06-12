@@ -120,6 +120,10 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
     ax.set_xlabel("")
     axx.set_xlabel("")
     axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
+    # Change rectangle colors to those in FcgRidx
+    for ii, child in enumerate(axx.get_children()[0:6]):
+        child.set_edgecolor(FcgRidx[FcgRlist[ii]])
+        child.set_facecolor(FcgRidx[FcgRlist[ii]])
 
 def mfiAdjMeanFigureMaker(measAll, axarr):
     # Mark IgGs as human
