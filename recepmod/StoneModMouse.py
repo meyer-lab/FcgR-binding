@@ -179,7 +179,7 @@ class StoneModelMouse:
         # Collect data
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
-        tbN.columns = [('h' + name if name[0]=='F' else name) for name in tbN.columns]
+        tbN.columns = [('m' + name if name[0]=='F' else name) for name in tbN.columns]
 
         writer = pytablewriter.MarkdownTableWriter()
 

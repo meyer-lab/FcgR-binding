@@ -30,19 +30,19 @@ def texRename(name):
     name = r'$\sigma_2^*$' if name=='sigma2' else name
     name = r'$f_4$' if name=='gnu1' else name
     name = r'$f_{26}$' if name=='gnu2' else name
-    name = r'hFc$\gamma$RIA' if name=='Rexp1' else name
+    name = r'hFc$\gamma$RI' if name=='Rexp1' else name
     name = r'hFc$\gamma$RIIA-131R' if name=='Rexp2' else name
     name = r'hFc$\gamma$RIIA-131H' if name=='Rexp3' else name
     name = r'hFc$\gamma$RIIB' if name=='Rexp4' else name
     name = r'hFc$\gamma$RIIIA-158F' if name=='Rexp5' else name
     name = r'hFc$\gamma$RIIIA-158V' if name=='Rexp6' else name
-    name = r'hFc$\gamma$RIA' if name=='FcgRI' else name
+    name = r'hFc$\gamma$RI' if name=='FcgRI' else name
     name = r'hFc$\gamma$RIIA-131R' if name=='FcgRIIA-Arg' else name
     name = r'hFc$\gamma$RIIA-131H' if name=='FcgRIIA-His' else name
     name = r'hFc$\gamma$RIIB' if name=='FcgRIIB' else name
     name = r'hFc$\gamma$RIIIA-158F' if name=='FcgRIIIA-Phe' else name
     name = r'hFc$\gamma$RIIIA-158V' if name=='FcgRIIIA-Val' else name
-    name = r'hFc$\gamma$RIA' if name==r'Fc$\gamma$RIA' else name
+    name = r'hFc$\gamma$RI' if name==r'Fc$\gamma$RIA' else name
     name = r'hFc$\gamma$RIIA-131R' if name==r'Fc$\gamma$RIIA-131R' else name
     name = r'hFc$\gamma$RIIA-131H' if name==r'Fc$\gamma$RIIA-131H' else name
     name = r'hFc$\gamma$RIIB' if name==r'Fc$\gamma$RIIB' else name
