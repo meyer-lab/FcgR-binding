@@ -46,7 +46,7 @@ $if(listings)$
 \usepackage{listings}
 $endif$
 
-$if(tables)$
+% $if(tables)$
 \usepackage{longtable,booktabs}
 % Fix footnotes in tables (requires footnote package)
 \IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{long table}}{}
