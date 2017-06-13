@@ -205,7 +205,20 @@ class StoneModelMouse:
         def renameList(names):
             return [rename(name) for name in names]
 
-        self.tabWrite(filename,tbN.as_matrix(),renameList(tbN.columns))
+        def matrixScientific(matrix):
+            for j in range(matrix.shape[0]):
+                for k in range(matrix.shape[1]):
+                    if not isinstance(matrix[j,k],str):
+                        if matrix[j,k] > 1:
+                            matrix[j,k] = sci(matrix[j,k])
+            return matrix
+
+        def sci(val):
+            return r'$'+str(val/(10**np.log10(val)))[0:3]+ \
+                   '^{'+str(int(np.log10(val)))+'}$'
+
+        self.tabWrite(filename,matrixScientific(tbN.as_matrix()),
+                      renameList(tbN.columns))
         
     def KnockdownPCA(self):
         """ Principle Components Analysis of FcgR-IgG affinities. """
