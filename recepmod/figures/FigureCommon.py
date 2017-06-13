@@ -104,4 +104,4 @@ def PCApercentVar(explainedVar, axes = None):
     else:
         percentVar = [ '%.0f' % j for j in [explainedVar[axes[0]-1]*100,explainedVar[axes[1]-1]*100]]
         labels = [('PC '+str(axes[0])+'('+percentVar[0]+'%)'), ('PC '+str(axes[1])+'('+percentVar[1]+'%)')]
-    return labels 
+    return labels
