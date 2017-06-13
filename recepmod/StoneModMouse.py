@@ -171,42 +171,41 @@ class StoneModelMouse:
                 output[i, k, :] = stoneModOut[:4]
         return output.reshape(2,16)
 
+    def tabWrite(self, filename, matrix, names):
+        tnl = '\\tabularnewline'
 
-##    def writeModelData(self, filename):
-##        """ Write out model data to be included as supplementary table. """
-##        import pytablewriter
-##
-##        # Collect data
-##        tbN = self.NimmerjahnEffectTableAffinities()
-##        tbN.insert(0, 'Condition', tbN.index)
-##        tbN.columns = [('m' + name if name[0]=='F' else name) for name in tbN.columns]
-##
-##        writer = pytablewriter.MarkdownTableWriter()
-##
-##        writer.from_dataframe(tbN)
-##
-##        # change output stream to a file
-##        with open(filename, 'w') as f:
-##            writer.stream = f
-##            writer.write_table()
-##
-##        writer.close()
+        f = open(filename, 'w')
+        f.write('\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
+        temp = ''
+        for ii, name in enumerate(names):
+            f.write(name)
+            if ii != 5:
+                f.write(' & ')
+        f.write(tnl+'\n\\midrule\n\\endhead\n')
+        for row in matrix:
+            for ii, item in enumerate(row):
+                f.write(str(item))
+                if ii != 5:
+                    f.write(' & ')
+            f.write(tnl+'\n')
+        f.write('\\bottomrule\n\\end{longtable}\n')
 
     def writeModelData(self, filename):
-        import pytablewriter
 
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
 
-        writer = pytablewriter.MarkdownTableWriter()
-        writer.header_list = tbN.columns
-        writer.value_matrix = tbN.as_matrix()
+        def rename(name):
+            name = 'mFc$\\gamma$RI' if name=='FcgRI' else name
+            name = 'mFc$\\gamma$RIIB' if name=='FcgRIIB' else name
+            name = 'mFc$\\gamma$RIII' if name=='FcgRIII' else name
+            name = 'mFc$\\gamma$RIV' if name=='FcgRIV' else name
+            return name
 
-        with open(filename, 'w') as f:
-            writer.stream = f
-            writer.write_table()
+        def renameList(names):
+            return [rename(name) for name in names]
 
-        writer.close()
+        self.tabWrite(filename,tbN.as_matrix(),renameList(tbN.columns))
         
     def KnockdownPCA(self):
         """ Principle Components Analysis of FcgR-IgG affinities. """

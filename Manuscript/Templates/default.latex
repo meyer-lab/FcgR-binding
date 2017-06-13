@@ -46,6 +46,7 @@ $if(listings)$
 \usepackage{listings}
 $endif$
 
+\usepackage{longtable,booktabs}
 $if(tables)$
 \usepackage{longtable,booktabs}
 % Fix footnotes in tables (requires footnote package)
