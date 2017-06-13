@@ -200,7 +200,7 @@ def maxAffinity(ax):
     table = pd.DataFrame(list(product(np.logspace(start=4, stop=9, num=subsplits), [0, 2, 3])),
                          columns=['adjust', 'ridx'])
 
-    colors = sns.color_palette()
+    colors = sns.crayon_palette(['Brick Red','Forest Green','Brown'])
 
     def appFunc(x):
         KaCur = Kas.copy()
@@ -212,7 +212,7 @@ def maxAffinity(ax):
 
     table = table.apply(appFunc, axis=1)
 
-    sns.FacetGrid(hue='ridx', data=table).map(ax.loglog, 'adjust', 'activity')
+    sns.FacetGrid(hue='ridx', data=table, palette=colors).map(ax.loglog, 'adjust', 'activity')
 
     ax.loglog(M.kaMouse[0, 2], 512, color=colors[0], marker='o')
     ax.loglog(M.kaMouse[2, 2], 512, color=colors[1], marker='o')
