@@ -187,8 +187,9 @@ def AverageAvidity(ax):
 
     table['AvAv'] = table.apply(avAv, axis=1)
 
-
-    sns.FacetGrid(hue='logR', data=table).map(ax.plot, 'Ka', 'AvAv')
+    col = sns.crayon_palette(['Tickle Me Pink','Orange','Forest Green',
+                              'Royal Purple'])
+    sns.FacetGrid(hue='logR', data=table, palette=col).map(ax.plot, 'Ka', 'AvAv')
 
     ax.set_xscale('log')
     ax.set_ylabel('Average Binding Avidity')
@@ -196,7 +197,7 @@ def AverageAvidity(ax):
 
     # Create the legend patches
     legend_patches = [matplotlib.patches.Patch(color=C, label=L) for
-                      C, L in zip(sns.color_palette(),
+                      C, L in zip(col,
                                   [r'$10^{'+str(int(logr))+'}$' for logr in logRs])]
 
     # Plot the legend
