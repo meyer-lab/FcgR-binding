@@ -14,7 +14,7 @@ from ..StoneHelper import getMedianKx
 
 # Specific predictions regarding the coordinate effects of immune complex parameters.
 
-subsplits = 20
+subsplits = 100
 
 def makeFigure():
     import string
@@ -144,10 +144,18 @@ def TwoRecep(ax):
 
     table = table.apply(appFunc, axis=1)
 
-    for ii in avidity[1::]:
-        table[table['avidity'] == ii].plot(x="RmultiOne", y="RmultiTwo", ax=ax[0], legend=False)
-        table[table['avidity'] == ii].plot(x="ligand", y="activity", ax=ax[1], logx=True, legend=False)
+    colors = dict(zip(avidity[1::],sns.color_palette()[1::]))
 
+    for ii in avidity[1::]:
+        table[table['avidity'] == ii].plot(x="ligand", y="activity", ax=ax[1], logx=True, legend=False)
+        x0 = table[table['avidity']==ii]['RmultiOne'].values
+        y0 = table[table['avidity']==ii]['RmultiTwo'].values
+        ax[0].plot(x0,y0)
+        for x, y, xx, yy in zip(x0[0:-1:10],y0[0:-1:10],
+                                (x0-np.roll(x0,1))[0:-1:10],
+                                (y0-np.roll(y0,1))[0:-1:10]):
+            ax[0].plot(x,y,marker=(3,0,np.arctan2(yy,xx)/np.pi*180-90),
+                       color=colors[ii])
     ax[0].set_xlabel(r'Multimerized hFc$\gamma$RIIIA-F')
     ax[0].set_ylabel(r'Multimerized hFc$\gamma$RIIB')
     ax[1].set_xlabel('IC Concentration (M)')
@@ -207,7 +215,10 @@ def maxAffinity(ax):
         KaCur[int(x.ridx)] = x.adjust
 
         x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
-
+        # Make ridx == 0 visible
+        if x['ridx'] == 0:
+            x['activity'] += 100
+        
         return x
 
     table = table.apply(appFunc, axis=1)

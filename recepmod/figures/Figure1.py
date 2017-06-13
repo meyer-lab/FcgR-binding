@@ -93,7 +93,7 @@ def plotAvidityEffectVsKA(fitMean, ax1):
 
     ax1.legend(handles=Legend(FcgRlistL, FcgRidxL,
                               [iggRename(igg) for igg in IgList], Igs),
-               bbox_to_anchor=(-0.1, -0.5), loc=2)
+               bbox_to_anchor=(1.6, 1.1), loc=2)
 
 
 def FcgRQuantificationFigureMaker(StoneM, ax):
@@ -130,7 +130,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
     measAll['Ig'] = measAll['Ig'].apply(iggRename)
 
     fcIter = zip(axarr, FcgRlist)
-    col = sns.crayon_palette(colors=['Cornflower', 'Brick Red'])
+    col = sns.crayon_palette(colors=['Tickle Me Pink', 'Brown'])
     # Loop through receptors creating plot
     for axx, fcr in fcIter:
         sns.barplot(x="Ig",
@@ -140,7 +140,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
                     ax = axx,
                     ci = 68)
 
-        axx.set_ylabel("Binding (RU)")
+        axx.set_ylabel("Normalized MFI")
         axx.set_xlabel("")
         axx.legend_.remove()
         axx.set_title(texRename(fcr))
@@ -154,7 +154,7 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
                 child.set_facecolor(col[1])
                 child.set_edgecolor(col[1])
                 
-    axarr[5].legend(bbox_to_anchor=(1.6,1),loc=2)
+    axarr[2].legend(bbox_to_anchor=(1.6,1),loc=2)
 
 def makeFigure():
     from ..StoneModel import StoneModel
@@ -166,27 +166,27 @@ def makeFigure():
     # Get list of axis objects
     ax, f = getSetup((7, 6), (3, 4))
     
-    FcgRQuantificationFigureMaker(StoneM, ax[0])
+    FcgRQuantificationFigureMaker(StoneM, ax[7])
 
     subplotLabel(ax[0], 'A')
 
     fitMean = getFitMeasSummarized(StoneM)
     measAll = getMeasuredDataFrame(StoneM)
 
-    plotNormalizedBindingvsKA(fitMean, ax[1], ax[2])
+    plotNormalizedBindingvsKA(fitMean, ax[8], ax[9])
 
-    subplotLabel(ax[1], 'C')
-    subplotLabel(ax[2], 'D')
+    subplotLabel(ax[8], 'C')
+    subplotLabel(ax[9], 'D')
 
-    plotAvidityEffectVsKA(fitMean, ax[3])
+    plotAvidityEffectVsKA(fitMean, ax[10])
 
-    subplotLabel(ax[3], 'E')
+    subplotLabel(ax[10], 'E')
 
-    subplotLabel(ax[4], 'B')
+    subplotLabel(ax[7], 'B')
 
-    mfiAdjMeanFigureMaker(measAll, (ax[4], ax[5], ax[6], ax[8], ax[9], ax[10]))
+    mfiAdjMeanFigureMaker(measAll, (ax[0], ax[1], ax[2], ax[4], ax[5], ax[6]))
 
-    ax[7].axis('off')
+    ax[3].axis('off')
     ax[11].axis('off')
 
     f.tight_layout()

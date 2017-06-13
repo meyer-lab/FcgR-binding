@@ -288,6 +288,3 @@ def ClassAvidityPredict(ax):
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
     ax.legend(handles=Legend(IgList,colors,[],[]), loc=2, bbox_to_anchor=(1,1))
-    for child in ax.get_children():
-        print(type(child))
-    print('\n')
