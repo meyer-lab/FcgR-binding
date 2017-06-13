@@ -172,7 +172,7 @@ class StoneModelMouse:
         return output.reshape(2,16)
 
     def tabWrite(self, filename, matrix, names):
-        tnl = '\\tabularnewline'
+        tnl = '\\section{Supplement}\\label{supplement}\n\n\\tabularnewline'
 
         f = open(filename, 'w')
         f.write('\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
