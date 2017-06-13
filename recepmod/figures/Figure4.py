@@ -61,7 +61,11 @@ Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
 KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',r'mFc$\gamma$RI-/-',r'mFc$\gamma$RIII-/-',r'mFc$\gamma$RI,IV-/-','Fucose-']
 KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
 celltypes = ['NK effect', 'DC-like effect', '2B-KO effect']
-celltypeidx = dict(zip(celltypes, sns.color_palette()))
+celltypes2 = ['NKeff','DCeff','2Beff']
+cellColors = sns.crayon_palette(['Royal Purple','Brown','Asparagus'])
+celltypeidx = dict(zip(celltypes, cellColors))
+for cell, cell2 in zip(celltypes,celltypes2):
+    celltypeidx[cell2] = celltypeidx[cell]
 
 def PrepforLegend(table):
     knockdowntype = []
@@ -159,7 +163,8 @@ def InVivoPredictComponents(ax):
                    y="value",
                    data=tbN,
                    ax=ax,
-                   kind='bar')
+                   kind='bar',
+                   palette=celltypeidx)
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('Components')
@@ -245,6 +250,7 @@ def ClassAvidityPredict(ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
     from ..StoneModMouseFit import InVivoPredict
     from ..StoneModMouseFit import CALCapply
+    from .FigureCommon import Legend
 
     # Run the in vivo regression model
     _, _, _, model = InVivoPredict()
@@ -272,9 +278,13 @@ def ClassAvidityPredict(ax):
     data.reset_index(level=0, inplace=True)
 
     # Plot the calculated crossvalidation performance
+##    col = sns.crayon_palette(['Pine Green','Goldenrod','Wild Strawberry',
+##                                 'Red Violet', 'Navy Blue'])
+##    iggCol = dict(zip(IgList,col))
     sns.FacetGrid(data, hue='index').map(ax.plot, 'v', 'predict')
 
     ax.vlines(5.0, 0, 1)
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
+##    ax.legend(Legend(IgList,iggCol,[],[]), loc=2,bbox_to_anchor=(1,1))
