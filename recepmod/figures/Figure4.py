@@ -278,13 +278,16 @@ def ClassAvidityPredict(ax):
     data.reset_index(level=0, inplace=True)
 
     # Plot the calculated crossvalidation performance
-##    col = sns.crayon_palette(['Pine Green','Goldenrod','Wild Strawberry',
-##                                 'Red Violet', 'Navy Blue'])
-##    iggCol = dict(zip(IgList,col))
-    sns.FacetGrid(data, hue='index').map(ax.plot, 'v', 'predict')
+    col = sns.crayon_palette(['Pine Green','Goldenrod','Wild Strawberry',
+                                 'Brown', 'Navy Blue'])
+    colors = dict(zip(IgList,col))
+    sns.FacetGrid(data, hue='index', palette=col).map(ax.plot, 'v', 'predict')
 
     ax.vlines(5.0, 0, 1)
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
-##    ax.legend(Legend(IgList,iggCol,[],[]), loc=2,bbox_to_anchor=(1,1))
+    ax.legend(handles=Legend(IgList,colors,[],[]), loc=2, bbox_to_anchor=(1,1))
+    for child in ax.get_children():
+        print(type(child))
+    print('\n')
