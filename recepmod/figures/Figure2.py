@@ -187,7 +187,8 @@ def AverageAvidity(ax):
 
     table['AvAv'] = table.apply(avAv, axis=1)
 
-    col = sns.crayon_palette(['Brown','Royal Purple','Orange','Cadet Blue'])
+    col = sns.crayon_palette(['Tickle Me Pink','Orange','Forest Green',
+                              'Royal Purple'])
     sns.FacetGrid(hue='logR', data=table, palette=col).map(ax.plot, 'Ka', 'AvAv')
 
     ax.set_xscale('log')
