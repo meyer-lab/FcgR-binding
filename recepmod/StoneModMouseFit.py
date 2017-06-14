@@ -116,6 +116,7 @@ def modelPrepAffinity(v=5, L0=1E-12):
 
 def InVivoPredict(inn=[5, 1E-12]):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
+    pd.set_option('expand_frame_repr', False)
 
     inn = np.squeeze(inn)
 
@@ -128,16 +129,20 @@ def InVivoPredict(inn=[5, 1E-12]):
     model = regFunc()
     model.fit(X, y)
 
-    table['NKeff'] = table.NK * np.power(10, model.res.x[2])
-    table['DCeff'] = table.DC * np.power(10, model.res.x[3])
-    table['2Beff'] = table['2B-KO'] * np.power(10, model.res.x[4])
+    XX = np.power(10, model.res.x)
 
-    pd.set_option('expand_frame_repr', False)
+    table['NKeff'] = table.NK * XX[0]
+    table['DCeff'] = table.DC * XX[1]
+    table['2Beff'] = table['2B-KO'] * XX[2]
 
     table['CPredict'] = cross_val_predict(model, X, y, cv=len(y))
     table['DPredict'] = model.predict(X)
     table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
     table['Error'] = np.square(table.CPredict - y)
+
+    print('')
+    print(explained_variance_score(table.DPredict, y))
+    print(explained_variance_score(table.CPredict, y))
 
     return (explained_variance_score(table.DPredict, y),
             explained_variance_score(table.CPredict, y),
@@ -178,30 +183,40 @@ class regFunc(BaseEstimator):
 
     def fit(self, X, y):
         """ Fit the X-y relationship. Return nothing. """
-        from scipy.optimize import least_squares
-
-        # Fuction for fit residual
-        diffF = lambda p: self.trainy - self.predict(p=p)
+        from scipy.optimize import least_squares, differential_evolution
 
         self.trainX, self.trainy = X, y
 
-        x0 = np.ones((X.shape[1] + 2, ), dtype=np.float64)
-        lb = np.full(x0.shape, -20, dtype=np.float64)
+        lb = np.full((X.shape[1], ), -10.0, dtype=np.float64)
+        ub = np.full((X.shape[1], ), 10.0, dtype=np.float64)
 
-        self.res = least_squares(diffF, x0=x0,
-                                 jac='3-point', bounds=(lb, -lb))
+        self.res = differential_evolution(self.errF, bounds=list(zip(lb, ub)),
+                                          popsize=30, polish=True)
+        self.res.cost = self.res.fun
+        x0 = self.res.x
 
-        resC = least_squares(diffF, x0=x0 * 2,
-                             jac='3-point', bounds=(lb, -lb))
+        for ii in range(5):
+            resC = least_squares(self.diffF, x0=x0,
+                                 jac='3-point', bounds=(lb, ub))
 
-        if resC.cost < self.res.cost:
-            self.res = resC
+            if resC.cost < self.res.cost:
+                print(ii)
+                self.res = resC
+
+            x0 = np.random.uniform(lb, ub)
+
+        print(self.res.x)
+
+    def diffF(self, p):
+        return self.trainy - self.predict(p=p)
+
+    def errF(self, p):
+        return np.sum(np.square(self.trainy - self.predict(p=p))) / 2.0
 
     def predict(self, X=None, p=None):
         """
         Output prediction from parameter set. Use internal X if none given.
         """
-        from scipy.stats import norm
 
         if p is None:
             p = self.res.x
@@ -212,4 +227,4 @@ class regFunc(BaseEstimator):
         if X is None:
             X = self.trainX
 
-        return norm.cdf(np.dot(X, p[2:]), loc=p[0], scale=p[1])
+        return np.tanh(np.dot(X, p))
