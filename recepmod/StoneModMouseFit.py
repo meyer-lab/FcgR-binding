@@ -4,22 +4,25 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import explained_variance_score
-from sklearn.linear_model import LinearRegression
 from .StoneModMouse import StoneModelMouse
+
 
 def NimmerjahnPredictByAIratio():
     """ Predict in vivo efficacy using the AtoI ratio. """
+    from sklearn.linear_model import LinearRegression
 
     lr = LinearRegression()
     table = StoneModelMouse().NimmerjahnEffectTableAffinities()
     table = table.loc[table.FcgRIIB > 0, :]
-    table['AtoI'] = table.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV)/x.FcgRIIB, axis=1)
+    table['AtoI'] = table.apply(lambda x: max(x.FcgRI,
+                                              x.FcgRIII,
+                                              x.FcgRIV) / x.FcgRIIB, axis=1)
     X = table[['AtoI']].apply(np.log10)
     y = table['Effectiveness']
     # Do direct regression too
     lr.fit(X, y)
     table['DirectPredict'] = lr.predict(X)
-    
+
     # Run crossvalidation predictions at the same time
     table['CrossPredict'] = cross_val_predict(lr, X, y, cv=X.shape[0])
 
@@ -33,14 +36,19 @@ def NimmerjahnPredictByAIratio():
 
 
 def NimmerjahnPredictByAffinities():
-    """ This will run ordinary linear regression using just affinities of receptors. """
+    """
+    This will run ordinary linear regression using just
+    affinities of receptors.
+    """
 
     # Run regression with our setup
     lr = regFunc()
     lr.logg = False
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
-    data['ActMax'] = data.apply(lambda x: max(x.FcgRI, x.FcgRIII, x.FcgRIV), axis=1)
+    data['ActMax'] = data.apply(lambda x: max(x.FcgRI,
+                                              x.FcgRIII,
+                                              x.FcgRIV), axis=1)
 
     X = data[['ActMax', 'FcgRIIB']]
     y = data['Effectiveness']
@@ -62,6 +70,7 @@ def NimmerjahnPredictByAffinities():
     direct_perf = explained_variance_score(y, data.DirectPredict)
 
     return (direct_perf, crossval_perf, data)
+
 
 def CALCapply(row):
     from .StoneModel import StoneMod
@@ -129,6 +138,7 @@ def InVivoPredict(inn=[5, 1E-12]):
 
     return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table, model)
 
+
 def crossValF(table):
     yy = cross_val_predict(regFunc(),
                            table.drop('Effectiveness', axis=1),
@@ -145,16 +155,16 @@ def InVivoPredictMinusComponents():
 
     table = pd.DataFrame(cperf, columns=['CrossVal'], index=['Full Model'])
 
-    table.loc['No 2B',:] = crossValF(data.drop('2B-KO', axis=1))
-    table.loc['No NK',:] = crossValF(data.drop('NK', axis=1))
-    table.loc['No DC',:] = crossValF(data.drop('DC', axis=1))
+    table.loc['No 2B', :] = crossValF(data.drop('2B-KO', axis=1))
+    table.loc['No NK', :] = crossValF(data.drop('NK', axis=1))
+    table.loc['No DC', :] = crossValF(data.drop('DC', axis=1))
 
     return table
 
 
 class regFunc(BaseEstimator):
     """ Class to handle regression with saturating effect. """
-    
+
     def __init__(self):
         self.logg = True
         self.res = None
@@ -176,14 +186,16 @@ class regFunc(BaseEstimator):
         self.res = least_squares(diffF, x0=x0,
                                  jac='3-point', bounds=(lb, -lb))
 
-        resC = least_squares(diffF, x0=x0*2,
+        resC = least_squares(diffF, x0=x0 * 2,
                              jac='3-point', bounds=(lb, -lb))
 
         if resC.cost < self.res.cost:
             self.res = resC
 
     def predict(self, X=None, p=None):
-        """ Output prediction from parameter set. Use internal X if none given. """
+        """
+        Output prediction from parameter set. Use internal X if none given.
+        """
         from scipy.stats import norm
 
         if p is None:

@@ -26,7 +26,8 @@ def normalizeData(filepath):
     """ Import Lux et al data and normalize by experiment. """
 
     # Read in the csv data for the first experiments.
-    Luxpre = np.loadtxt(filepath, delimiter=',', skiprows=2, usecols=list(range(2, 10)))
+    Luxpre = np.loadtxt(filepath, delimiter=',',
+                        skiprows=2, usecols=list(range(2, 10)))
 
     # Copy the data to a new matrix
     newLux = np.copy(Luxpre)
@@ -62,7 +63,7 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
 
     try:
-        if diffFunAnon(a)*diffFunAnon(b) > 0:
+        if diffFunAnon(a) * diffFunAnon(b) > 0:
             return np.nan
     except FloatingPointError:
         return np.nan
@@ -71,7 +72,7 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     return brentq(diffFunAnon, a, b, disp=False)
 
 
-def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
+def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     '''
     Returns the number of mutlivalent ligand bound to a cell with 10^logR
     receptors, granted each epitope of the ligand binds to the receptor
@@ -84,7 +85,7 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
     v = np.int_(v)
 
     # Vector of binomial coefficients
-    Req = 10**ReqFuncSolver(10**logR,Ka,L0,v,Kx)
+    Req = 10**ReqFuncSolver(10**logR, Ka, L0, v, Kx)
     if np.isnan(Req):
         return (np.nan, np.nan, np.nan, np.nan)
 
@@ -99,13 +100,13 @@ def StoneMod(logR,Ka,v,Kx,L0,fullOutput = False):
         return (Lbound, np.nan, np.nan, np.nan, Req)
 
     # Calculate Rmulti from equation 5
-    Rmulti = np.sum(np.multiply(vieq[1:], np.arange(2, v+1, dtype = np.float)))
+    Rmulti = np.sum(np.multiply(vieq[1:], np.arange(2, v + 1, dtype=np.float)))
 
     # Calculate Rbound
-    Rbnd = np.sum(np.multiply(vieq, np.arange(1, v+1, dtype = np.float)))
+    Rbnd = np.sum(np.multiply(vieq, np.arange(1, v + 1, dtype=np.float)))
 
     # Calculate numXlinks from equation 4
-    nXlink = np.sum(np.multiply(vieq[1:], np.arange(1, v, dtype = np.float)))
+    nXlink = np.sum(np.multiply(vieq[1:], np.arange(1, v, dtype=np.float)))
 
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
 
@@ -118,35 +119,35 @@ class StoneModel:
     # logarithms of the MFI-per-TNP-BSA ratios for TNP-4-BSA and TNP-26-BSA, respectively, the effective avidity of TNP-4-BSA, the effective avidity
     # of TNP-26-BSA, and the coefficient by which the mean MFI for a certain combination of FcgR, IgG, and avidity is multiplied to produce the
     # standard deviation of MFIs for that condition.
-    def NormalErrorCoefcalc(self, x, fullOutput = False):
-        ## Set the standard deviation coefficients
+    def NormalErrorCoefcalc(self, x, fullOutput=False):
+        # Set the standard deviation coefficients
         sigCoef = np.power(10, x[self.sigIDX])
         sigCoef2 = np.power(10, x[self.sig2IDX])
 
-        ## Keep track of cumulative error
+        # Keep track of cumulative error
         logSqrErr = 0
 
         # Fill in Req values for evalutation
-        outputReq = np.full((24,2), np.nan)
+        outputReq = np.full((24, 2), np.nan)
 
         if fullOutput:
-            outputFit = np.full((24,2), np.nan)
-            outputLL = np.full((24,2), np.nan)
-            outputRbnd = np.full((24,2), np.nan)
-            outputRmulti = np.full((24,2), np.nan)
-            outputnXlink = np.full((24,2), np.nan)
-            outputLbnd = np.full((24,2), np.nan)
+            outputFit = np.full((24, 2), np.nan)
+            outputLL = np.full((24, 2), np.nan)
+            outputRbnd = np.full((24, 2), np.nan)
+            outputRmulti = np.full((24, 2), np.nan)
+            outputnXlink = np.full((24, 2), np.nan)
+            outputLbnd = np.full((24, 2), np.nan)
 
-        ## Iterate over each kind of TNP-BSA (4 or 26)
+        # Iterate over each kind of TNP-BSA (4 or 26)
         for j in range(2):
-            ## Set the effective avidity for the kind of TNP-BSA in question
+            # Set the effective avidity for the kind of TNP-BSA in question
             v = x[self.uvIDX[j]]
-            ## Set the MFI-per-TNP-BSA conversion ratio for the kind of TNP-BSA in question
+            # Set the MFI-per-TNP-BSA conversion ratio for the kind of TNP-BSA in question
             c = 10**x[self.cIDX[j]]
-            ## Set the ligand (TNP-BSA) concentration for the kind of TNP-BSA in question
+            # Set the ligand (TNP-BSA) concentration for the kind of TNP-BSA in question
             L0 = self.tnpbsa[j]
 
-            ## Iterate over each kind of FcgR
+            # Iterate over each kind of FcgR
             for k in range(6):
                 logR = x[k]
 
@@ -154,9 +155,9 @@ class StoneModel:
                 if self.newData:
                     logSqrErr = logSqrErr+logpdf_sum(self.Rquant[k],logR,sigCoef2*logR)
 
-                ## Iterate over each kind of IgG
+                # Iterate over each kind of IgG
                 for l in range(4):
-                    ## Set the affinity for the binding of the FcgR and IgG in question
+                    # Set the affinity for the binding of the FcgR and IgG in question
                     Ka = self.kaBruhns[k][l]
                     if np.isnan(Ka):
                         continue
@@ -166,26 +167,25 @@ class StoneModel:
 
                     Kx = np.power(10, x[self.kxIDX]) * Ka
 
-                    ## Calculate the MFI which should result from this condition according to the model
-                    stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
+                    # Calculate the MFI which should result from this condition according to the model
+                    stoneModOut = StoneMod(logR,Ka,v,Kx,L0, fullOutput=fullOutput)
                     MFI = c*stoneModOut[0]
                     if np.isnan(MFI):
                         return -np.inf
 
-                    ## Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
-                    ## of the point assuming the calculated point is true.
-                    tempm = logpdf_sum(temp, MFI, sigCoef*MFI)
+                    # Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
+                    # of the point assuming the calculated point is true.
+                    tempm = logpdf_sum(temp, MFI, sigCoef * MFI)
                     if np.isnan(tempm):
                         return -np.inf
 
                     # Fill in Req values for evalutation
-                    outputReq[4*k+l,j] = stoneModOut[4]
+                    outputReq[4 * k + l, j] = stoneModOut[4]
 
                     # If the fit was requested output the model predictions
                     if fullOutput:
-                        stoneRes = StoneMod(logR,Ka,v,Kx,L0, fullOutput = True)
-                        outputFit[4*k+l,j] = MFI
-                        outputLL[4*k+l, j] = tempm
+                        outputFit[4 * k + l, j] = MFI
+                        outputLL[4 * k + l, j] = tempm
                         outputRbnd[4*k+l,j] = stoneRes[1]
                         outputRmulti[4*k+l,j] = stoneRes[2]
                         outputnXlink[4*k+l,j] = stoneRes[3]
