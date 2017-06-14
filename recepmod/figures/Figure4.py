@@ -8,16 +8,18 @@ from ..StoneModMouse import StoneModelMouse
 def makeFigure():
     import string
     from .FigureCommon import subplotLabel, getSetup
+    import matplotlib.gridspec as gridspec
+    from matplotlib.pyplot import subplot
 
-    # Get list of axis objects
-    ax, f = getSetup((7, 6), (3, 3))
+    # Get list of axis objects; by 0-index, 3 and 11 empty, 4 double
+    ax, f = getSetup((7, 6), (3, 4), mults=[5], multz={5:2}, empts=[3,11])
 
     # Blank out for the cartoon
     ax[0].axis('off')
 
     # Plot A/I vs effectiveness.
     AIplot(ax[1])
-
+    
     # Show performance of affinity prediction
     InVivoPredictVsActualAffinities(ax[2])
 
@@ -90,7 +92,8 @@ def ClassAvidityPCA(ax):
     labels = PCApercentVar(explainedVar)
     ax.set_ylabel(labels[1])
     ax.set_xlabel(labels[0])
-
+    ax.set_xticklabels([str(tick/1e8)[0:(2 if tick<0 else 1)] for tick in ax.get_xticks()])
+    ax.set_yticklabels([str(tick/1e8)[0:(4 if tick<0 else 3)] for tick in ax.get_yticks()])
 
 def InVivoPredictVsActual(ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
@@ -104,7 +107,7 @@ def InVivoPredictVsActual(ax):
     ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
 
     ax.set_ylabel('Effectiveness')
-    ax.set_xlabel('Predicted Effect')
+    ax.set_xlabel('Predicted Effectiveness')
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlim(-0.05, 1.05)
     devar = r'$\sigma_d$ = '+str(round(devar, 3))
@@ -167,17 +170,28 @@ def InVivoPredictComponents(ax):
                    palette=celltypeidx)
 
     ax.set_ylabel('Weightings')
-    ax.set_xlabel('Components')
+    ax.set_xlabel('')
 
     for lab in ax.get_xticklabels():
         lab.set_text('m'+lab.get_text() if lab.get_text()[0]=='I' else lab.get_text())
-    ax.set_xticklabels(ax.get_xticklabels(),
-                       rotation=40, rotation_mode="anchor", ha="right")
+
     # Make legend
     patches = list()
     for key, val in zip(celltypes, [celltypeidx[typ] for typ in celltypes]):
         patches.append(matplotlib.patches.Patch(color=val, label=key))
     ax.legend(handles=patches, bbox_to_anchor=(0, 1), loc=2)
+
+    # Set vertical lines to discriminate between conditions, and position
+    # xticklabels
+    from itertools import chain
+    ax.set_xticks(list(chain.from_iterable((num, num+0.5) for num in ax.get_xticks()))[0:-1])
+    ax.set_xticklabels(list(chain.from_iterable((name, '') for name in ax.get_xticklabels()))[0:-1])
+    ax.set_xticklabels(ax.get_xticklabels(),
+                   rotation=40, rotation_mode="anchor", ha="right",
+                   position=(0,0), fontsize=5)
+    ax.vlines([x for x in ax.get_xticks() if (x%1)!=0], ymin=0,
+              ymax=[4.5 if x<4 else 8 for x in ax.get_xticks() if (x%1)!=0],
+              linestyles='dashed',linewidths=0.5)
 
 def RequiredComponents(ax):
     """ Plot model components. """
@@ -191,7 +205,6 @@ def RequiredComponents(ax):
     ax.set_ylim(-1.0, 1.0)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
-
 def commonPlot(ax, table, xcol, ycol):
     table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
     table = PrepforLegend(table)
@@ -199,7 +212,8 @@ def commonPlot(ax, table, xcol, ycol):
     for _, row in table.iterrows():
         markerr=Igs[row['Ig']]
         colorr = Knockdownidx[row['Knockdown']]
-        ax.errorbar(x=row[xcol], y=row[ycol], marker=markerr, mfc = colorr, ms=3.5)
+        ax.errorbar(x=row[xcol], y=row[ycol], marker=markerr, mfc = colorr,
+                    ms=3.5)
 
 
 def AIplot(ax):
@@ -232,7 +246,7 @@ def InVivoPredictVsActualAffinities(ax):
 
     ax.plot([-1, 2], [-1, 2], color='k', linestyle='-', linewidth=1)
 
-    ax.set_xlabel('Regressed Effect')
+    ax.set_xlabel('Regressed Effectiveness')
     ax.set_ylabel('Effectiveness')
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
@@ -243,7 +257,7 @@ def InVivoPredictVsActualAffinities(ax):
 
     ax.legend(handles=Legend(KnockdownL, KnockdownidxL,
                              [iggRename(igg) for igg in IgList], Igs),
-              bbox_to_anchor=(1, 1), loc=2)
+              bbox_to_anchor=(1.5, 1), loc=2, fontsize=6)
 
 
 def ClassAvidityPredict(ax):
@@ -287,4 +301,4 @@ def ClassAvidityPredict(ax):
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
-    ax.legend(handles=Legend(IgList,colors,[],[]), loc=2, bbox_to_anchor=(1,1))
+    ax.legend(handles=Legend(IgList,colors,[],[]), loc=2, bbox_to_anchor=(1.5,1))

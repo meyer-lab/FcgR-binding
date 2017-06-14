@@ -60,9 +60,8 @@ FcgRidxL = dict(zip(FcgRlistL, sns.color_palette()))
 def subplotLabel(ax, letter):
     ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
 
-def getSetup(figsize, gridd):
-    from matplotlib import gridspec
-    import matplotlib.pyplot as plt
+def getSetup(figsize, gridd, mults=[], multz={}, empts=[]):
+    from matplotlib import gridspec, pyplot as plt
 
     sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
 
@@ -73,7 +72,10 @@ def getSetup(figsize, gridd):
     gs1 = gridspec.GridSpec(*gridd)
 
     # Get list of axis objects
-    ax = [f.add_subplot(gs1[x]) for x in range(gridd[0] * gridd[1])]
+    if not mults:
+        ax = [f.add_subplot(gs1[x]) for x in range(gridd[0] * gridd[1])]
+    else:
+        ax = [f.add_subplot(gs1[x]) if x not in mults else f.add_subplot(gs1[x:x+multz[x]]) for x in range(gridd[0] * gridd[1]) if not any([x-j in mults for j in range(1,max(multz.values()))]) and x not in empts]
 
     return (ax, f)
 
