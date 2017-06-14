@@ -1,6 +1,6 @@
 # Methods
 
-All analysis was implemented in Python, and can be found at [https://github.com/meyer-lab/FcgR-binding](https://github.com/meyer-lab/FcgR-binding), release 1.0 (TODO: Add doi number).
+All analysis was implemented in Python, and can be found at [https://github.com/meyer-lab/FcgR-binding](https://github.com/meyer-lab/FcgR-binding), release 1.0 (doi: [00.0000/arc0000000](https://doi.org/doi-url)).
 
 ## Immune complex binding measurement
 
