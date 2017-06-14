@@ -137,9 +137,11 @@ def InVivoPredict(inn=[5, 1E-12]):
     table['CPredict'] = cross_val_predict(model, X, y, cv=len(y))
     table['DPredict'] = model.predict(X)
     table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
-    table['Error'] = abs(table.CPredict - y)
+    table['Error'] = np.square(table.CPredict - y)
 
-    return (explained_variance_score(table.DPredict, y), explained_variance_score(table.CPredict, y), table, model)
+    return (explained_variance_score(table.DPredict, y),
+            explained_variance_score(table.CPredict, y),
+            table, model)
 
 
 def crossValF(table):
