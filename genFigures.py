@@ -81,7 +81,7 @@ if __name__ == '__main__':
         template = st.fromfile(fdir + 'Figure4.svg')
         cartoon = st.fromfile('./recepmod/figures/Figure4_regression_approach.svg').getroot()
 
-        cartoon.moveto(10, 20, scale=0.66)
+        cartoon.moveto(10, 30, scale=0.5)
 
         template.append(cartoon)
         template.save(fdir + 'Figure4.svg')
