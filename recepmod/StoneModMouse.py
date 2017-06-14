@@ -175,7 +175,7 @@ class StoneModelMouse:
         tnl = '\\tabularnewline'
 
         f = open(filename, 'w')
-        f.write('\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
+        f.write('\\section{Supplement}\\label{supplement}\n\n\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
         temp = ''
         for ii, name in enumerate(names):
             f.write(name)
@@ -184,11 +184,11 @@ class StoneModelMouse:
         f.write(tnl+'\n\\midrule\n\\endhead\n')
         for row in matrix:
             for ii, item in enumerate(row):
-                f.write(str(item))
+                f.write('{\centering '+str(item)+'}')
                 if ii != 5:
                     f.write(' & ')
             f.write(tnl+'\n')
-        f.write('\\bottomrule\n\\end{longtable}\n')
+        f.write('\n\\bottomrule\n\\end{longtable}\n')
 
     def writeModelData(self, filename):
 
@@ -205,7 +205,22 @@ class StoneModelMouse:
         def renameList(names):
             return [rename(name) for name in names]
 
-        self.tabWrite(filename,tbN.as_matrix(),renameList(tbN.columns))
+        def matrixScientific(matrix):
+            for j in range(matrix.shape[0]):
+                for k in range(matrix.shape[1]):
+                    if not isinstance(matrix[j,k],str):
+                        if matrix[j,k] > 1:
+                            matrix[j,k] = sci(matrix[j,k])
+                        else:
+                            matrix[j,k] = r'$'+str(matrix[j,k])+'$'
+            return matrix
+
+        def sci(val):
+            return r'$'+str(val/(10**np.floor(np.log10(val))))[0:3]+ \
+                   '\\times10^{'+str(int(np.log10(val)))+'}$'
+
+        self.tabWrite(filename,matrixScientific(tbN.as_matrix()),
+                      renameList(tbN.columns))
         
     def KnockdownPCA(self):
         """ Principle Components Analysis of FcgR-IgG affinities. """
