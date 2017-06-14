@@ -79,10 +79,13 @@ def CALCapply(row):
 
     DCexpr = [2.0, 3.0, 2.0, 2.0]
 
-    KaFull = [row.FcgRI+0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
+    KaFull = [row.FcgRI + 0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
 
-    row['NK'] = StoneMod(logR=4.0, Ka=row.FcgRIII, v=row.v, Kx=getMedianKx(), L0=row.L0, fullOutput = True)[2]
-    row['DC'] = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(), gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
+    row['NK'] = StoneMod(logR=4.0, Ka=row.FcgRIII, v=row.v,
+                         Kx=getMedianKx() * row.FcgRIII, L0=row.L0)[2]
+
+    row['DC'] = StoneN(logR=DCexpr, Ka=KaFull, Kx=getMedianKx(),
+                       gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
 
     row['2B-KO'] = 1
 
