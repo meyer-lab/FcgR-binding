@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import cross_val_predict
-from sklearn.metrics import explained_variance_score
+from sklearn.metrics import r2_score
 from .StoneModMouse import StoneModelMouse
 
 
@@ -27,10 +27,10 @@ def NimmerjahnPredictByAIratio():
     table['CrossPredict'] = cross_val_predict(lr, X, y, cv=X.shape[0])
 
     # How well did we do on crossvalidation?
-    crossval_perf = explained_variance_score(y, table.CrossPredict)
+    crossval_perf = r2_score(y, table.CrossPredict)
 
     # How well did we do on direct?
-    direct_perf = explained_variance_score(y, table.DirectPredict)
+    direct_perf = r2_score(y, table.DirectPredict)
 
     return (direct_perf, crossval_perf, table, lr.coef_, lr.intercept_)
 
@@ -64,10 +64,10 @@ def NimmerjahnPredictByAffinities():
     data['CrossPredict'] = cross_val_predict(lr, X, y, cv=X.shape[0])
 
     # How well did we do on crossvalidation?
-    crossval_perf = explained_variance_score(y, data.CrossPredict)
+    crossval_perf = r2_score(y, data.CrossPredict)
 
     # How well did we do on direct?
-    direct_perf = explained_variance_score(y, data.DirectPredict)
+    direct_perf = r2_score(y, data.DirectPredict)
 
     return (direct_perf, crossval_perf, data)
 
@@ -93,6 +93,8 @@ def CALCapply(row):
         row['2B-KO'] = 0
 
     return row
+
+# TODO: Change all regression metrics to R2
 
 
 def modelPrepAffinity(v=5, L0=1E-12):
@@ -140,12 +142,10 @@ def InVivoPredict(inn=[5, 1E-12]):
     table['NKfrac'] = table.NKeff / (table.DCeff + table.NKeff + table['2Beff'])
     table['Error'] = np.square(table.CPredict - y)
 
-    print('')
-    print(explained_variance_score(table.DPredict, y))
-    print(explained_variance_score(table.CPredict, y))
+    print(r2_score(table.CPredict, y))
 
-    return (explained_variance_score(table.DPredict, y),
-            explained_variance_score(table.CPredict, y),
+    return (r2_score(table.DPredict, y),
+            r2_score(table.CPredict, y),
             table, model)
 
 
@@ -155,7 +155,7 @@ def crossValF(table):
                            table['Effectiveness'],
                            cv=table.shape[0])
 
-    return explained_variance_score(yy, table['Effectiveness'])
+    return r2_score(yy, table['Effectiveness'])
 
 
 def InVivoPredictMinusComponents():
@@ -200,12 +200,9 @@ class regFunc(BaseEstimator):
                                  jac='3-point', bounds=(lb, ub))
 
             if resC.cost < self.res.cost:
-                print(ii)
                 self.res = resC
 
             x0 = np.random.uniform(lb, ub)
-
-        print(self.res.x)
 
     def diffF(self, p):
         return self.trainy - self.predict(p=p)
