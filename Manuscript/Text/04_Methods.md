@@ -12,11 +12,11 @@ Regression against *in vivo* efficacy of hIgG treatments was performed by least-
 
 $$ y = F (X \cdot p) $$ {#eq:lsq}
 
-where $F$ is the normal distribuion cumulative density function, with mean and standard deviation varied during fitting.
+where $F$ is the normal distribution cumulative density function, with mean and standard deviation varied during fitting.
 
 ### PCA of hIgG-hFcγR affinities
 
-Principle component analysis was performed using `scikit-learn` (`sklearn.decomposition.PCA`) and the affinities of the four hIgGs (hIgG1, hIgG2a, hIgG2b, hIgG3), with or without knockout treatments, for each of four receptors (hFcγRI, hFcγRIIB, hFcγRIII, hFcγRIV). The affinity for a knocked-out or blocked hFcγR was assumed to be zero. The affinities were not normalized before PCA transformation. 
+Principle component analysis was performed using `scikit-learn` and the affinities of the four hIgGs (hIgG1, hIgG2a, hIgG2b, hIgG3), with or without knockout treatments, for each of four receptors (hFcγRI, hFcγRIIB, hFcγRIII, hFcγRIV). The affinity for a knocked-out or blocked hFcγR was assumed to be zero. The affinities were not normalized before PCA transformation. 
 
 ## Model
 
