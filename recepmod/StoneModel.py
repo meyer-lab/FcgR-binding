@@ -186,14 +186,14 @@ class StoneModel:
                     if fullOutput:
                         outputFit[4 * k + l, j] = MFI
                         outputLL[4 * k + l, j] = tempm
-                        outputRbnd[4*k+l,j] = stoneRes[1]
-                        outputRmulti[4*k+l,j] = stoneRes[2]
-                        outputnXlink[4*k+l,j] = stoneRes[3]
-                        outputLbnd[4*k+l,j] = stoneRes[0]
+                        outputRbnd[4*k+l,j] = stoneModOut[1]
+                        outputRmulti[4*k+l,j] = stoneModOut[2]
+                        outputnXlink[4*k+l,j] = stoneModOut[3]
+                        outputLbnd[4*k+l,j] = stoneModOut[0]
 
                     ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
                     ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
-                    logSqrErr = logSqrErr+tempm
+                    logSqrErr = logSqrErr + tempm
 
         if fullOutput:
             return (logSqrErr, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq)
