@@ -169,38 +169,47 @@ class StoneModel:
 
                     # Calculate the MFI which should result from this condition according to the model
                     stoneModOut = StoneMod(logR,Ka,v,Kx,L0, fullOutput=fullOutput)
-                    MFI = c*stoneModOut[0]
+                    MFI = c * stoneModOut[0]
                     if np.isnan(MFI):
                         return -np.inf
 
-                    # Iterate over each real data point for this combination of TNP-BSA, FcgR, and IgG in question, calculating the log-likelihood
-                    # of the point assuming the calculated point is true.
+                    # Iterate over each real data point for this combination
+                    # of TNP-BSA, FcgR, and IgG in question, calculating
+                    # the log-likelihood of the point assuming the
+                    # calculated point is true.
                     tempm = logpdf_sum(temp, MFI, sigCoef * MFI)
                     if np.isnan(tempm):
                         return -np.inf
 
+                    # Where we will fill the array
+                    xIDX = 4 * k + l
+
                     # Fill in Req values for evalutation
-                    outputReq[4 * k + l, j] = stoneModOut[4]
+                    outputReq[xIDX, j] = stoneModOut[4]
 
                     # If the fit was requested output the model predictions
                     if fullOutput:
-                        outputFit[4 * k + l, j] = MFI
-                        outputLL[4 * k + l, j] = tempm
-                        outputRbnd[4*k+l,j] = stoneModOut[1]
-                        outputRmulti[4*k+l,j] = stoneModOut[2]
-                        outputnXlink[4*k+l,j] = stoneModOut[3]
-                        outputLbnd[4*k+l,j] = stoneModOut[0]
+                        outputFit[xIDX, j] = MFI
+                        outputLL[xIDX, j] = tempm
+                        outputRbnd[xIDX,j] = stoneModOut[1]
+                        outputRmulti[xIDX,j] = stoneModOut[2]
+                        outputnXlink[xIDX,j] = stoneModOut[3]
+                        outputLbnd[xIDX,j] = stoneModOut[0]
 
-                    ## For each TNP-BSA, have an array which includes the log-likelihoods of all real points in comparison to the calculated values.
-                    ## Calculate the log-likelihood of the entire set of parameters by summing all the calculated log-likelihoods.
+                    # For each TNP-BSA, have an array which includes the
+                    # log-likelihoods of all real points in comparison to
+                    # the calculated values. Calculate the log-likelihood
+                    # of the entire set of parameters by summing all the
+                    # calculated log-likelihoods.
                     logSqrErr = logSqrErr + tempm
 
         if fullOutput:
-            return (logSqrErr, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq)
+            return (logSqrErr, outputFit, outputLL, outputRbnd,
+                    outputRmulti, outputnXlink, outputLbnd, outputReq)
 
         return logSqrErr
 
-    def NormalErrorCoef(self, x, fullOutput = False):
+    def NormalErrorCoef(self, x, fullOutput=False):
         # Return -inf for parameters out of bounds
         if np.any(np.isinf(x)) or np.any(np.isnan(x)) or np.any(np.less(x, self.lb)) or np.any(np.greater(x, self.ub)):
             return -np.inf
@@ -210,7 +219,7 @@ class StoneModel:
 
         return self.NormalErrorCoefcalc(x, fullOutput)
 
-    def __init__(self, newData = True):
+    def __init__(self, newData=True):
         import os
 
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
