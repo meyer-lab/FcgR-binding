@@ -4,7 +4,7 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc -f markdown ./Manuscript/Text
 fdir = ./Manuscript/Figures
 tdir = ./Manuscript/Templates
 
-.PHONY: clean upload test profile testcover
+.PHONY: clean upload test profile testcover open
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf
 
@@ -33,6 +33,9 @@ clean:
 	rm -f $(fdir)/Figure*
 	rm -f Manuscript/Text/07_ModelData.md
 	rm -f profile.p* stats.dat .coverage nosetests.xml
+
+open: Manuscript/index.html
+	open ./Manuscript/index.html
 
 test:
 	nosetests -s --with-timer --timer-top-n 5
