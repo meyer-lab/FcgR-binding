@@ -136,7 +136,7 @@ def InVivoPredictComponents(ax):
     # Run the in vivo regression model
     _, _, tbN, _ = InVivoPredict()
     tbN = PrepforLegend(tbN)
-    fcgrs = tbN['Knockdown']
+    fcgrs = tbN['Knockdown'].tolist()
     tbN = tbN[['NKeff', 'DCeff', '2Beff']]
     
     # Set up x axis labels 
@@ -269,10 +269,9 @@ def ClassAvidityPredict(ax):
 
         data = data.append(dataNew)
 
-    data['2B-KO'] = 0
     data['L0'] = 1.0E-12
 
-    data = data.apply(lambda x: CALCapply(x), axis=1)
+    data = data.apply(CALCapply, axis=1)
 
     data['predict'] = model.predict(data[['NK', 'DC', '2B-KO']].as_matrix())
     data.reset_index(level=0, inplace=True)
