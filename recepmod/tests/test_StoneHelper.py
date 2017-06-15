@@ -1,6 +1,9 @@
 import unittest
 import numpy
 from ..StoneModel import StoneModel
+import warnings
+warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
+
 
 class TestStoneMethods(unittest.TestCase):
     def setUp(self):
