@@ -29,25 +29,22 @@ def NimmerjahnPredictByAffinities():
     affinities of receptors.
     """
 
-    # Run regression with our setup
-    lr = regFunc()
-    lr.logg = False
-
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
     data['ActMax'] = data.apply(lambda x: max(x.FcgRI,
                                               x.FcgRIII,
                                               x.FcgRIV), axis=1)
 
     X = data[['ActMax', 'FcgRIIB']]
-    y = data['Effectiveness']
+    y = data['Effectiveness'].as_matrix()
 
     # Log transform to keep ratios
-    X = X.apply(np.log10).replace(-np.inf, -3)
+    X = X.apply(np.log10).replace(-np.inf, -3).as_matrix()
 
     # Run crossvalidation predictions at the same time
-    data['DirectPredict'], dperf, data['CrossPredict'], cperf, lr = LOOpredict(lr, X, y)
+    data['DirectPredict'], dp, data['CrossPredict'], cp, _ = LOOpredict(regFunc(logg=False),
+                                                                        X, y)
 
-    return (dperf, cperf, data)
+    return (dp, cp, data)
 
 
 def CALCapply(row):
@@ -59,12 +56,12 @@ def CALCapply(row):
     KaFull = [row.FcgRI + 0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
 
     row['NK'] = StoneMod(logR=2.0, Ka=row.FcgRIII, v=row.v,
-                         Kx=getMedianKx() * row.FcgRIII, L0=row.L0)[2]
+                         Kx=getMedianKx() * row.FcgRIII, L0=row.L0)[2] * 1.0E6
 
     row['DC'] = StoneN(logR=[2, 3, 2, 2], Ka=KaFull, Kx=getMedianKx(),
                        gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
 
-    row['2B-KO'] = not re.search('FcgRIIB-', row.name) is None
+    row['2B-KO'] = float(not re.search('FcgRIIB-', row.name) is None)
 
     return row
 
@@ -95,7 +92,7 @@ def LOOpredict(lr, X, y):
     from sklearn.metrics import r2_score
 
     # Do LOO prediction
-    crossPred = cross_val_predict(lr, X, y, cv=X.shape[0])
+    crossPred = cross_val_predict(lr, X, y, cv=len(y))
 
     # How well did we do on crossvalidation?
     crossval_perf = r2_score(y, crossPred)
@@ -124,8 +121,7 @@ def InVivoPredict(inn=[5, 1E-12]):
     except RuntimeError:
         return np.nan
 
-    tbl['DPredict'], dperf, tbl[
-        'CPredict'], cperf, model = LOOpredict(regFunc(), X, y)
+    tbl['DPredict'], dperf, tbl['CPredict'], cperf, model = LOOpredict(regFunc(), X, y)
 
     XX = np.power(10, model.res.x)
 
@@ -145,7 +141,7 @@ def InVivoPredictMinusComponents():
     def crossValF(table):
         return LOOpredict(regFunc(),
                           table.drop('Effectiveness', axis=1),
-                          table['Effectiveness'])[2]
+                          table['Effectiveness'])[3]
 
     _, cperf, data, _ = InVivoPredict()
 
@@ -163,11 +159,9 @@ def InVivoPredictMinusComponents():
 class regFunc(BaseEstimator):
     """ Class to handle regression with saturating effect. """
 
-    def __init__(self):
-        self.logg = True
-        self.res = None
-        self.trainX = None
-        self.trainy = None
+    def __init__(self, logg=True):
+        self.logg = logg
+        self.res, self.trainX, self.trainy = None, None, None
 
     def fit(self, X, y):
         """ Fit the X-y relationship. Return nothing. """
@@ -175,22 +169,12 @@ class regFunc(BaseEstimator):
 
         self.trainX, self.trainy = X, y
 
-        lb = np.full((X.shape[1], ), -10.0, dtype=np.float64)
-        ub = np.full((X.shape[1], ), 10.0, dtype=np.float64)
+        ub = np.full((X.shape[1], ), 6.0)
 
-        self.res = differential_evolution(self.errF, bounds=list(zip(lb, ub)),
-                                          popsize=30, polish=True)
-        self.res.cost = self.res.fun
-        x0 = self.res.x
+        res = differential_evolution(self.errF, bounds=list(zip(-ub, ub)),
+                                     polish=True, disp=False)
 
-        for ii in range(5):
-            resC = least_squares(self.diffF, x0=x0,
-                                 jac='3-point', bounds=(lb, ub))
-
-            if resC.cost < self.res.cost:
-                self.res = resC
-
-            x0 = np.random.uniform(lb, ub)
+        self.res = least_squares(self.diffF, x0=res.x, jac='3-point', bounds=(-ub, ub))
 
     def diffF(self, p):
         return self.trainy - self.predict(p=p)
@@ -202,6 +186,7 @@ class regFunc(BaseEstimator):
         """
         Output prediction from parameter set. Use internal X if none given.
         """
+        from scipy.special import expit
 
         if p is None:
             p = self.res.x
@@ -212,4 +197,4 @@ class regFunc(BaseEstimator):
         if X is None:
             X = self.trainX
 
-        return np.tanh(np.dot(X, p))
+        return 2.0 * (expit(np.dot(X, p)) - 0.5)

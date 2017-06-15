@@ -1,5 +1,7 @@
 import unittest
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 
 
 class TestFigures(unittest.TestCase):
