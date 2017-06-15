@@ -198,10 +198,13 @@ def InVivoPredictComponents(ax):
 
     ax.set_xlim(ax.get_xlim())
     ax.set_ylim(ax.get_ylim())
+    for j, child in enumerate(ax.get_children()):
+        print(j, type(child))
     alternatingRects([ax.get_xlim()[0]]+[x for x in ax.get_xticks() if x%1!=0]+[ax.get_xlim()[-1]],
                      ylims=ax.get_ylim(),ax=ax)
-    for rect in ax.get_children()[0:37]:
+    for rect in [rect for rect in ax.get_children() if type(rect)==type(ax.get_children()[0])][0:-1]:
         ax.add_patch(rect)
+    print('INVIVO GOOD.')
     
 def RequiredComponents(ax):
     """ Plot model components. """
