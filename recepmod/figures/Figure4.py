@@ -12,7 +12,7 @@ def makeFigure():
     from matplotlib.pyplot import subplot
 
     # Get list of axis objects; by 0-index, 3 and 11 empty, 4 double
-    ax, f = getSetup((7, 6), (3, 4), mults=[5], multz={5:2}, empts=[3,11])
+    ax, f = getSetup((9, 6), (3, 4), mults=[5], multz={5:2}, empts=[3,11])
 
     # Blank out for the cartoon
     ax[0].axis('off')
@@ -42,7 +42,10 @@ def makeFigure():
     ClassAvidityPredict(ax[8])
 
     for ii, item in enumerate(ax):
-        subplotLabel(item, string.ascii_uppercase[ii])
+        if ii != 4:
+            subplotLabel(item, string.ascii_uppercase[ii])
+        else:
+            subplotLabel(item, string.ascii_uppercase[ii], hstretch=2.5)
 
     # Tweak layout
     f.tight_layout()
@@ -92,7 +95,7 @@ def ClassAvidityPCA(ax):
     labels = PCApercentVar(explainedVar)
     ax.set_ylabel(labels[1])
     ax.set_xlabel(labels[0])
-    ax.set_xticklabels([str(tick/1e8)[0:(2 if tick<0 else 1)] for tick in ax.get_xticks()])
+    ax.set_xticklabels([str(tick/1e8)[0:(4 if tick<0 else 3)] for tick in ax.get_xticks()])
     ax.set_yticklabels([str(tick/1e8)[0:(4 if tick<0 else 3)] for tick in ax.get_yticks()])
 
 def InVivoPredictVsActual(ax):
@@ -135,9 +138,12 @@ def InVivoPredictComponents(ax):
     """ Plot model components. """
     from ..StoneModMouseFit import InVivoPredict
     import matplotlib
+    from .FigureCommon import alternatingRects
 
     # Run the in vivo regression model
     _, _, tbN, _ = InVivoPredict()
+    # Remove the "None' condition
+    tbN = tbN[tbN.index != 'None']
     tbN = PrepforLegend(tbN)
     fcgrs = tbN['Knockdown']
     tbN = tbN[['NKeff', 'DCeff', '2Beff']]
@@ -181,18 +187,22 @@ def InVivoPredictComponents(ax):
         patches.append(matplotlib.patches.Patch(color=val, label=key))
     ax.legend(handles=patches, bbox_to_anchor=(0, 1), loc=2)
 
-    # Set vertical lines to discriminate between conditions, and position
-    # xticklabels
+    # Set alternating grey rectangles in the background to allow for better
+    # readability of the bar graph
     from itertools import chain
-    ax.set_xticks(list(chain.from_iterable((num, num+0.5) for num in ax.get_xticks()))[0:-1])
-    ax.set_xticklabels(list(chain.from_iterable((name, '') for name in ax.get_xticklabels()))[0:-1])
+    ax.set_xticks(list(chain.from_iterable((num, num+0.5) for num in ax.get_xticks())))
+    ax.set_xticklabels(list(chain.from_iterable((name, '') for name in ax.get_xticklabels())))
     ax.set_xticklabels(ax.get_xticklabels(),
                    rotation=40, rotation_mode="anchor", ha="right",
-                   position=(0,0), fontsize=5)
-    ax.vlines([x for x in ax.get_xticks() if (x%1)!=0], ymin=0,
-              ymax=[4.5 if x<4 else 8 for x in ax.get_xticks() if (x%1)!=0],
-              linestyles='dashed',linewidths=0.5)
+                   position=(0,0.05), fontsize=6.5)
 
+    ax.set_xlim(ax.get_xlim())
+    ax.set_ylim(ax.get_ylim())
+    alternatingRects([ax.get_xlim()[0]]+[x for x in ax.get_xticks() if x%1!=0]+[ax.get_xlim()[-1]],
+                     ylims=ax.get_ylim(),ax=ax)
+    for rect in ax.get_children()[0:37]:
+        ax.add_patch(rect)
+    
 def RequiredComponents(ax):
     """ Plot model components. """
     from ..StoneModMouseFit import InVivoPredictMinusComponents
@@ -214,7 +224,6 @@ def commonPlot(ax, table, xcol, ycol):
         colorr = Knockdownidx[row['Knockdown']]
         ax.errorbar(x=row[xcol], y=row[ycol], marker=markerr, mfc = colorr,
                     ms=3.5)
-
 
 def AIplot(ax):
     """ Plot A/I vs effectiveness. """
@@ -301,4 +310,4 @@ def ClassAvidityPredict(ax):
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
-    ax.legend(handles=Legend(IgList,colors,[],[]), loc=2, bbox_to_anchor=(1.5,1))
+    ax.legend(handles=Legend(IgList,colors,[],[]), loc=2, bbox_to_anchor=(1,1))
