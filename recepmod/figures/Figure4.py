@@ -53,7 +53,7 @@ def makeFigure():
     return f
 
 IgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None']
-iggRename = lambda name: 'm'+name if name[0]=='I' else name
+iggRename = lambda name: 'm'+name if name[0]=='I' else 'mIgG2b-Fucose-/-' if name=='None' else name
 Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s', 'None':'.'}
 keys = [key for key in Igs.keys()]
 for key in keys:
@@ -113,10 +113,10 @@ def InVivoPredictVsActual(ax):
     ax.set_xlabel('Predicted Effectiveness')
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlim(-0.05, 1.05)
-    devar = r'$\sigma_d$ = '+str(round(devar, 3))
-    cevar = r'$\sigma_c$ = '+str(round(cevar, 3))
+    devar = r'$R^2_d$ = '+str(round(devar, 3))
+    cevar = r'$R^2_c$ = '+str(round(cevar, 3))
     ax.text(0.05, 0.9, devar)
-    ax.text(0.05, 0.8, cevar)
+    ax.text(0.05, 0.75, cevar)
 
 
 def ComponentContrib(ax):
@@ -211,7 +211,7 @@ def RequiredComponents(ax):
 
     table.plot(kind='bar', y='CrossVal', ax=ax, legend=False)
 
-    ax.set_ylabel('LOO Var Explained')
+    ax.set_ylabel('LOO $R^2$ Explained')
     ax.set_ylim(-1.0, 1.0)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
@@ -239,10 +239,10 @@ def AIplot(ax):
     ax.set_xscale('log')
     ax.set_xlim(10**(-1.2), 10**(2.6))
     ax.set_ylim(-0.05, 1.05)
-    dperf = r'$\sigma_d$ = '+str(round(dperf, 3))
-    cperf = r'$\sigma_c$ = '+str(round(cperf, 3))
+    dperf = r'$R^2_d$ = '+str(round(dperf, 3))
+    cperf = r'$R^2_c$ = '+str(round(cperf, 3))
     ax.text(0.1, 0.9, dperf)
-    ax.text(0.1, 0.8, cperf)
+    ax.text(0.1, 0.75, cperf)
 
 def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
@@ -259,14 +259,14 @@ def InVivoPredictVsActualAffinities(ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
-    dperf = r'$\sigma_d$ = '+str(round(dperf, 3))
-    cperf = r'$\sigma_c$ = '+str(round(cperf, 3))
+    dperf = r'$R^2_d$ = '+str(round(dperf, 3))
+    cperf = r'$R^2_c$ = '+str(round(cperf, 3))
     ax.text(0.05, 0.9, dperf)
-    ax.text(0.05, 0.8, cperf)
+    ax.text(0.05, 0.75, cperf)
 
     ax.legend(handles=Legend(KnockdownL, KnockdownidxL,
                              [iggRename(igg) for igg in IgList], Igs),
-              bbox_to_anchor=(1.5, 1), loc=2, fontsize=6)
+              bbox_to_anchor=(1.5, 1), loc=2)
 
 
 def ClassAvidityPredict(ax):
@@ -277,7 +277,6 @@ def ClassAvidityPredict(ax):
 
     # Run the in vivo regression model
     _, _, _, model = InVivoPredict()
-
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
     data = data[data.index.str.contains("FcgR") == False]
     data.drop('Effectiveness', axis=1, inplace=True)
@@ -302,11 +301,15 @@ def ClassAvidityPredict(ax):
     # Plot the calculated crossvalidation performance
     col = sns.crayon_palette(['Pine Green','Goldenrod','Wild Strawberry',
                                  'Brown', 'Navy Blue'])
-    colors = dict(zip(IgList,col))
-    sns.FacetGrid(data, hue='index', palette=col).map(ax.plot, 'v', 'predict')
+    colors = dict(zip(iggRename(IgList),col))
+    
+    sns.FacetGrid(data, hue='index', palette=col).map(ax.plot, 'v', 'predict',
+                                                      marker='x', markersize=6,
+                                                      linestyle='None',
+                                                      markeredgewidth=1)
 
     ax.vlines(5.0, 0, 1)
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
-    ax.legend(handles=Legend(IgList,colors,[],[]), loc=2, bbox_to_anchor=(1,1))
+    ax.legend(handles=Legend(iggRename(IgList),colors,[],[]), loc=2, bbox_to_anchor=(1,1))
