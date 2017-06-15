@@ -48,7 +48,6 @@ def NimmerjahnPredictByAffinities():
 
 
 def CALCapply(row):
-    import re
     from .StoneModel import StoneMod
     from .StoneNRecep import StoneN
     from .StoneHelper import getMedianKx
@@ -60,8 +59,6 @@ def CALCapply(row):
 
     row['DC'] = StoneN(logR=[2, 3, 2, 2], Ka=KaFull, Kx=getMedianKx(),
                        gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
-
-    row['2B-KO'] = float(not re.search('FcgRIIB-', row.name) is None)
 
     return row
 
@@ -81,7 +78,7 @@ def modelPrepAffinity(v=5, L0=1E-12):
     data = data.iloc[:, 4:]
 
     # Assign independent variables and dependent variable
-    X = data[['NK', 'DC', '2B-KO']].as_matrix()
+    X = data[['NK', 'DC']].as_matrix()
     y = data['Effectiveness'].as_matrix()
 
     return (X, y, data)
@@ -127,11 +124,8 @@ def InVivoPredict(inn=[5, 1E-12]):
 
     tbl['NKeff'] = tbl.NK * XX[0]
     tbl['DCeff'] = tbl.DC * XX[1]
-    tbl['2Beff'] = tbl['2B-KO'] * XX[2]
-    tbl['NKfrac'] = tbl.NKeff / (tbl.DCeff + tbl.NKeff + tbl['2Beff'])
+    tbl['NKfrac'] = tbl.NKeff / (tbl.DCeff + tbl.NKeff)
     tbl['Error'] = np.square(tbl.CPredict - y)
-
-    print(cperf)
 
     return (dperf, cperf, tbl, model)
 
@@ -145,11 +139,10 @@ def InVivoPredictMinusComponents():
 
     _, cperf, data, _ = InVivoPredict()
 
-    data = data[['Effectiveness', 'NK', 'DC', '2B-KO']]
+    data = data[['Effectiveness', 'NK', 'DC']]
 
     table = pd.DataFrame(cperf, columns=['CrossVal'], index=['Full Model'])
 
-    table.loc['No 2B', :] = crossValF(data.drop('2B-KO', axis=1))
     table.loc['No NK', :] = crossValF(data.drop('NK', axis=1))
     table.loc['No DC', :] = crossValF(data.drop('DC', axis=1))
 

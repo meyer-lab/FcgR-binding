@@ -60,8 +60,8 @@ Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-',
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
 KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',r'mFc$\gamma$RI-/-',r'mFc$\gamma$RIII-/-',r'mFc$\gamma$RI,IV-/-','Fucose-']
 KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
-celltypes = ['NK effect', 'DC-like effect', '2B-KO effect']
-celltypes2 = ['NKeff','DCeff','2Beff']
+celltypes = ['NK effect', 'DC-like effect']
+celltypes2 = ['NKeff','DCeff']
 cellColors = sns.crayon_palette(['Royal Purple','Brown','Asparagus'])
 celltypeidx = dict(zip(celltypes, cellColors))
 for cell, cell2 in zip(celltypes,celltypes2):
@@ -137,7 +137,7 @@ def InVivoPredictComponents(ax):
     _, _, tbN, _ = InVivoPredict()
     tbN = PrepforLegend(tbN)
     fcgrs = tbN['Knockdown'].tolist()
-    tbN = tbN[['NKeff', 'DCeff', '2Beff']]
+    tbN = tbN[['NKeff', 'DCeff']]
     
     # Set up x axis labels 
     for i in range(len(fcgrs)):
@@ -273,7 +273,7 @@ def ClassAvidityPredict(ax):
 
     data = data.apply(CALCapply, axis=1)
 
-    data['predict'] = model.predict(data[['NK', 'DC', '2B-KO']].as_matrix())
+    data['predict'] = model.predict(data[['NK', 'DC']].as_matrix())
     data.reset_index(level=0, inplace=True)
 
     # Plot the calculated crossvalidation performance
