@@ -8,12 +8,12 @@ IC binding to hFcγRs was analyzed using Chinese hamster ovarian (CHO) cells sta
 
 ## *In vivo* regression
 
-Regression against *in vivo* efficacy of hIgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Each efficacy was presented as the percent reduction in the number of lung metastases quantified [@Nimmerjahn:2005hu]. To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was performed with a hyberbolic relationship, such that:
+Regression against *in vivo* effectiveness of hIgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Each effectiveness was presented as the percent reduction in the number of lung metastases quantified [@Nimmerjahn:2005hu]. To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was performed with a hyberbolic relationship, such that:
 
 $$ y = F (X \cdot p) $$ {#eq:lsq}
 
-where $F$ is the normal distribution cumulative density function, with mean and standard deviation varied during fitting.
+where $F$ is the normal distribution cumulative density function, $X$ is the predicted numbers of multimerized mFcγR for each cell line according to our model, and $p$ is the regression weights. Mean and standard deviation were varied during fitting.
 
 ### PCA of hIgG-hFcγR affinities
 
-Principle component analysis was performed using `scikit-learn` and the affinities of the four mIgGs (mIgG1, mIgG2a, mIgG2b, mIgG3), with or without knockout treatments, for each of four receptors (mFcγRI, mFcγRIIB, mFcγRIII, mFcγRIV). The affinity for a knocked-out or blocked hFcγR was assumed to be zero. The affinities were not normalized before PCA transformation. 
+Principle component analysis was performed using `scikit-learn` and the affinities of the four mIgGs (mIgG1, mIgG2a, mIgG2b, mIgG3), with or without knockout treatments, for each of four receptors (mFcγRI, mFcγRIIB, mFcγRIII, mFcγRIV). Association constants for all combinations of hIgG and hFcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. The affinity for a knocked-out or blocked hFcγR was assumed to be zero. The affinities were not normalized before PCA transformation. 

@@ -2,7 +2,7 @@
 
 ### Base model
 
-TNP-BSA equilibrium binding to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. This model assumes an excess of ligand. Within the model, binding is assumed to occur first according to a monovalent binding interaction governed by the individual binding site affinity $K_a$, and then through subsequent cross-linking events with equilibrium partitioning $K_x$. Therefore, according to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{i,eq}$, can be found using the relation
+TNP-BSA equilibrium binding to FcγRs was modeled using a two-parameter equilibrium model of multivalent ligand binding to monovalent receptors expressed uniformly on a cell surface [@Stone:2001fm; @Perelson:1980fs]. This model assumes that the cell expresses exactly one receptor species to which epirope on the lifand can bind, and it also assumes an excess of ligand, such that ligand concentration is assumed to be constant. Within the model, the initial binding of an IC to the cell is assumed to occur according to a monovalent binding interaction governed by the individual binding site association constant $K_a$. Once a ligand is bound to the cell surface by at least one receptor, all subsequent binding occurs through cross-linking events with equilibrium partitioning $K_x$, where an unbound epitope on the ligand binds to a free receptor on the cell surface. $K_x$ serves as the association constant for all crosslinking interactions. According to the model, the number of ligand bound $i$-valently to the cell at equilibrium, $v_{i,eq}$, can be found using the relation
 
 $$ v_{i,eq} = {f\choose i} (K_x)^{i-1} {L_0}{K_a} \left(R_{eq}\right)^i. $$ {#eq:vieq}
 
@@ -10,7 +10,7 @@ Here, $f$ is the effective avidity of the ligand, $K_x$ is a cross-linking param
 
 $$ L_{bound} = \sum_{i=1}^{f} v_{i,eq} = \sum_{i=1}^{f} { f\choose i } (K_x)^{i-1} {L_0}{K_a} (R_{eq})^i. $$ {#eq:lbound}
 
-$R_{eq}$ represents the quantity of unbound receptors, and is a function of $f$, $L_0$, $K_a$, $K_x$, and $R_{tot}$, the total number of receptors expressed on the cell surface. $R_{eq}$ can be solved for numerically using the relationship
+$R_{eq}$ changes as a function of $f$, $L_0$, $K_a$, $K_x$, and $R_{tot}$, the total number of receptors expressed on the cell surface. It can be solved for numerically using the relationship
 
 $$ R_{tot} = R_{eq} \left(1+f {L_0}{K_D} (1+K_x R_{eq})^{f-1}\right) $$ {#eq:rtot}
 
