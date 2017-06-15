@@ -57,8 +57,8 @@ FcgRlistL = texRenameList(FcgRlist)
 
 FcgRidxL = dict(zip(FcgRlistL, sns.color_palette()))
 
-def subplotLabel(ax, letter):
-    ax.text(-0.2, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
+def subplotLabel(ax, letter, hstretch=1):
+    ax.text(-0.2/hstretch, 1.2, letter, transform=ax.transAxes, fontsize=16, fontweight='bold', va='top')
 
 def getSetup(figsize, gridd, mults=[], multz={}, empts=[]):
     from matplotlib import gridspec, pyplot as plt
@@ -107,3 +107,16 @@ def PCApercentVar(explainedVar, axes = None):
         percentVar = [ '%.0f' % j for j in [explainedVar[axes[0]-1]*100,explainedVar[axes[1]-1]*100]]
         labels = [('PC '+str(axes[0])+'('+percentVar[0]+'%)'), ('PC '+str(axes[1])+'('+percentVar[1]+'%)')]
     return labels
+
+def alternatingRects(rectEdges, ylims, ax, color=(0.8,0.8,0.8), alpha=0):
+    from matplotlib.patches import Rectangle
+    rects = []
+    if len(rectEdges)<3:
+        return
+    for j in range(len(rectEdges)-2):
+        if j%2 == 1:
+            rects.append(Rectangle((rectEdges[j],ylims[0]),
+                                   rectEdges[j+1]-rectEdges[j],
+                                   ylims[1], color=color))
+    for patch in rects:
+        ax.add_patch(patch)
