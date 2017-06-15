@@ -200,7 +200,7 @@ def InVivoPredictComponents(ax):
     ax.set_ylim(ax.get_ylim())
     alternatingRects([ax.get_xlim()[0]]+[x for x in ax.get_xticks() if x%1!=0]+[ax.get_xlim()[-1]],
                      ylims=ax.get_ylim(),ax=ax)
-    for rect in [rect for rect in ax.get_children() if type(rect)==type(ax.get_children()[0])][0:-1]:
+    for rect in ax.get_children()[0:24]:
         ax.add_patch(rect)
     
 def RequiredComponents(ax):
