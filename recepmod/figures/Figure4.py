@@ -304,7 +304,7 @@ def ClassAvidityPredict(ax):
     colors = dict(zip(iggRename(IgList),col))
     
     sns.FacetGrid(data, hue='index', palette=col).map(ax.plot, 'v', 'predict',
-                                                      marker='o', linestyle='None')
+                                                      marker='.', linestyle='None')
 
     ax.vlines(5.0, 0, 1)
 
