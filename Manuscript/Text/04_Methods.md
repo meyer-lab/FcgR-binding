@@ -10,9 +10,9 @@ IC binding to hFcγRs was analyzed using Chinese hamster ovarian (CHO) cells sta
 
 Regression against *in vivo* effectiveness of hIgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Each effectiveness was presented as the percent reduction in the number of lung metastases quantified [@Nimmerjahn:2005hu]. To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was performed with a hyberbolic relationship, such that:
 
-$$ y = F (X \cdot p) $$ {#eq:lsq}
+$$ y = S (X \cdot p) $$ {#eq:lsq}
 
-where $F$ is the normal distribution cumulative density function, $X$ is the predicted numbers of multimerized mFcγR for each cell line according to our model, and $p$ is the regression weights. Mean and standard deviation were varied during fitting.
+where $S$ is the sigmoid function, scaled so that $S(x=0) = 0$ and $\lim_{x\to\infty} S(x) = 1$. $X$ is the predicted mFcγR activity for each cell line according to our model, and $p$ is the regression weights.
 
 ### PCA of hIgG-hFcγR affinities
 
