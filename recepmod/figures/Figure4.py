@@ -53,7 +53,7 @@ def makeFigure():
     return f
 
 IgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None']
-iggRename = lambda name: 'm'+name if name[0]=='I' else 'mIgG2b-Fucose-/-' if name=='None' else name
+iggRename = lambda name: 'm'+name if name[0]=='I' else name
 Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s', 'None':'.'}
 keys = [key for key in Igs.keys()]
 for key in keys:
@@ -301,13 +301,16 @@ def ClassAvidityPredict(ax):
     # Plot the calculated crossvalidation performance
     col = sns.crayon_palette(['Pine Green','Goldenrod','Wild Strawberry',
                                  'Brown', 'Navy Blue'])
-    colors = dict(zip(iggRename(IgList),col))
+    newIgList = IgList[0:-1]+['IgG2b-Fucose-/-']
+    colors = dict(zip([iggRename(ig) for ig in newIgList],col))
     
     sns.FacetGrid(data, hue='index', palette=col).map(ax.plot, 'v', 'predict',
-                                                      marker='.', linestyle='None')
+                                                      marker='.',
+                                                      linestyle='None')
 
     ax.vlines(5.0, 0, 1)
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
-    ax.legend(handles=Legend(iggRename(IgList),colors,[],[]), loc=2, bbox_to_anchor=(1,1))
+    ax.legend(handles=Legend([iggRename(ig) for ig in newIgList],colors,[],[]),
+              loc=2, bbox_to_anchor=(1,1))
