@@ -6,8 +6,9 @@ from pandocfilters import toJSONFilter, Image
 
 fmt_to_option = {
     "latex": ("--export-pdf", "pdf"),
-    "beamer": ("--export-pdf", "pdf")
+    "docx": ("--export-eps", "eps")
 }
+
 
 def svg_to_any(key, value, fmt, meta):
     if key == 'Image':
@@ -18,6 +19,7 @@ def svg_to_any(key, value, fmt, meta):
             base_name, _ = splitext(src)
             eps_name = base_name + "." + option[1]
             return Image(attrs, alt, [eps_name, title])
+
 
 if __name__ == "__main__":
     toJSONFilter(svg_to_any)
