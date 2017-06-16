@@ -212,7 +212,7 @@ def RequiredComponents(ax):
     table.plot(kind='bar', y='CrossVal', ax=ax, legend=False)
 
     ax.set_ylabel('LOO $R^2$ Explained')
-    ax.set_ylim(-1.0, 1.0)
+    ax.set_ylim(0.0, 1.0)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
 def commonPlot(ax, table, xcol, ycol):
