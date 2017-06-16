@@ -8,7 +8,7 @@ IC binding to hFcγRs was analyzed using Chinese hamster ovarian (CHO) cells sta
 
 ## *In vivo* regression
 
-Regression against *in vivo* effectiveness of mIgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Association constants for all combinations of mIgG and mFcγR were obtained from previous experimental measurements [@Gavin20; @Guilliams:2014cm]. Each effectiveness was presented as the percent reduction in the number of lung metastases quantified [@Nimmerjahn:2005hu]. To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was performed with a hyberbolic relationship, such that:
+Regression against *in vivo* effectiveness of mIgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Association constants for all combinations of mIgG and mFcγR were obtained from previous experimental measurements [@Gavin20; @Robinette:2015tp]. Each effectiveness was presented as the percent reduction in the number of lung metastases quantified [@Nimmerjahn:2005hu]. To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was performed with a hyberbolic relationship, such that:
 
 $$ y = S (X \cdot p) $$ {#eq:lsq}
 
