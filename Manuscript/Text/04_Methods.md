@@ -14,6 +14,6 @@ $$ y = S (X \cdot p) $$ {#eq:lsq}
 
 where $S$ is the sigmoid function, scaled so that $S(x=0) = 0$ and $\lim_{x\to\infty} S(x) = 1$. $X$ is the predicted mFcγR activity for each cell line according to our model, and $p$ is the regression weights.
 
-### PCA of hIgG-hFcγR affinities
+### PCA of mIgG-mFcγR affinities
 
-Principle component analysis was performed using `scikit-learn` and the affinities of the four mIgGs (mIgG1, mIgG2a, mIgG2b, mIgG3), with or without knockout treatments, for each of four receptors (mFcγRI, mFcγRIIB, mFcγRIII, mFcγRIV). Association constants for all combinations of hIgG and hFcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. The affinity for a knocked-out or blocked hFcγR was assumed to be zero. The affinities were not normalized before PCA transformation. 
+Principle component analysis was performed using `scikit-learn` and the affinities of the four mIgGs (mIgG1, mIgG2a, mIgG2b, mIgG3), with or without knockout treatments, for each of four receptors (mFcγRI, mFcγRIIB, mFcγRIII, mFcγRIV). Association constants for all combinations of mIgG and mFcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. The affinity for a knocked-out or blocked mFcγR was assumed to be zero. The affinities were not normalized before PCA transformation. 
