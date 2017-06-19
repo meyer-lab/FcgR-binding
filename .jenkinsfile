@@ -50,16 +50,16 @@ pipeline {
           failNoReports: true,
           failUnhealthy: true,
           failUnstable: true,
-          maxNumberOfBuilds: 0,
-          onlyStable: false,
           sourceEncoding: 'UTF_8',
           zoomCoverageChart: true])
       }
     }
-    stage('Deploy') {
-      steps {
-        sh 'make upload'
-        archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
+    if (env.BRANCH_NAME == 'master') {
+      stage('Deploy') {
+        steps {
+          sh 'make upload'
+          archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
+        }
       }
     }
   }
