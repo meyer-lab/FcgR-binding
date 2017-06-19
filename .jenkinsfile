@@ -23,9 +23,7 @@ pipeline {
       }
     }
     stage('Build') {
-      steps {
-        sh 'make'
-      }
+      steps { sh 'make' }
     }
     stage('Test'){
       steps {
@@ -55,11 +53,12 @@ pipeline {
       }
     }
     stage('Deploy') {
-      if (env.BRANCH_NAME == 'master') {
-        steps {
-          sh 'make upload'
-          archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
-        }
+      when {
+        expression { env.BRANCH_NAME == 'master' }
+      }
+      steps {
+        sh 'make upload'
+        archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
       }
     }
   }
