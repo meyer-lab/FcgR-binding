@@ -54,8 +54,14 @@ def CALCapply(row):
 
     KaFull = [row.FcgRI + 0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
 
-    row['NK'] = StoneMod(logR=2.0, Ka=row.FcgRIII, v=row.v,
-                         Kx=getMedianKx() * row.FcgRIII, L0=row.L0)[2] * 1.0E6
+    if 'exprI' in row:
+        logRtwo = [row.exprI, row.exprIIB, row.exprIII, row.exprIV]
+
+        row['NK'] = StoneN(logR=logRtwo, Ka=KaFull, Kx=getMedianKx(),
+                           gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
+    else:
+        row['NK'] = StoneMod(logR=2.0, Ka=row.FcgRIII, v=row.v,
+                             Kx=getMedianKx() * row.FcgRIII, L0=row.L0)[2] * 1.0E6
 
     row['DC'] = StoneN(logR=[2, 3, 2, 2], Ka=KaFull, Kx=getMedianKx(),
                        gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
@@ -63,17 +69,21 @@ def CALCapply(row):
     return row
 
 
-def modelPrepAffinity(v=5, L0=1E-12):
+def modelPrepAffinity(v=5, L0=1E-12, exprV=None):
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
     data['v'] = v
     data['L0'] = L0
 
+    if exprV is not None:
+        data['exprI'] = exprV[0]
+        data['exprIIB'] = exprV[1]
+        data['exprIII'] = exprV[2]
+        data['exprIV'] = exprV[3]
+
     data = data.apply(CALCapply, axis=1)
 
     data.loc['None', :] = 0.0
-
-    data = data.iloc[:, 4:]
 
     # Assign independent variables and dependent variable
     X = data[['NK', 'DC']].as_matrix()
@@ -104,7 +114,7 @@ def LOOpredict(lr, X, y):
     return (dirPred, direct_perf, crossPred, crossval_perf, lr)
 
 
-def InVivoPredict(inn=[5, 1E-12]):
+def InVivoPredict(inn=[5, 1E-12], exprV=None):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     pd.set_option('expand_frame_repr', False)
 
@@ -112,7 +122,7 @@ def InVivoPredict(inn=[5, 1E-12]):
 
     # Collect data
     try:
-        X, y, tbl = modelPrepAffinity(v=inn[0], L0=inn[1])
+        X, y, tbl = modelPrepAffinity(v=inn[0], L0=inn[1], exprV=exprV)
     except RuntimeError:
         return np.nan
 
