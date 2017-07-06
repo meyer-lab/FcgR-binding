@@ -4,7 +4,7 @@ from tqdm import trange
 from recepmod.StoneModMouseFit import InVivoPredict
 
 # Make an array of the expression levels to use
-expr = np.linspace(0, 4, num=2)
+expr = np.linspace(0, 4, num=6)
 
 # Make expression levels into a grid
 a = np.meshgrid(expr, expr, expr, expr)
