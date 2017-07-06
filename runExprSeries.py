@@ -1,9 +1,10 @@
 import numpy as np
+import pandas as pd
 from tqdm import trange
 from recepmod.StoneModMouseFit import InVivoPredict
 
 # Make an array of the expression levels to use
-expr = np.linspace(-2, 3, num=2)
+expr = np.linspace(0, 4, num=2)
 
 # Make expression levels into a grid
 a = np.meshgrid(expr, expr, expr, expr)
@@ -18,6 +19,10 @@ e = np.concatenate((np.reshape(a[0], (-1, 1)),
 outt = np.zeros((e.shape[0], 1), dtype=np.float)
 
 for ii in trange(e.shape[0]):
-    outt[ii] = InVivoPredict(exprV=e[ii, :])[0]
+    outt[ii] = InVivoPredict(exprV=e[ii, :], cPred=False)[0]
 
-print(outt)
+
+df = pd.DataFrame(e)
+df['pref'] = outt
+
+df.to_csv('output.csv')
