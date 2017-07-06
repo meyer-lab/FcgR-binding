@@ -121,10 +121,7 @@ def InVivoPredict(inn=[5, 1E-12], exprV=None):
     inn = np.squeeze(inn)
 
     # Collect data
-    try:
-        X, y, tbl = modelPrepAffinity(v=inn[0], L0=inn[1], exprV=exprV)
-    except RuntimeError:
-        return np.nan
+    X, y, tbl = modelPrepAffinity(v=inn[0], L0=inn[1], exprV=exprV)
 
     tbl['DPredict'], dperf, tbl['CPredict'], cperf, model = LOOpredict(regFunc(), X, y)
 
