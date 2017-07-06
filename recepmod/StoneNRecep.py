@@ -1,8 +1,10 @@
 import numpy as np
+from numba import jit
 from memoize import memoize
 from .StoneModel import nchoosek
 
 
+@jit(cache=True)
 def StoneVgrid(Req, Ka, gnu, Kx, L0):
     """
     This function takes in the relevant parameters and creates the v_ij grid
@@ -35,6 +37,7 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
     return vGrid
 
 
+@jit(cache=True)
 def boundMult(cur_pos):
     """ Deal with the combinatorics of different species bound. """
     upos = np.array(cur_pos, dtype=np.int)

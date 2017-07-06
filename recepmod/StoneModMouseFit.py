@@ -92,15 +92,19 @@ def modelPrepAffinity(v=5, L0=1E-12, exprV=None):
     return (X, y, data)
 
 
-def LOOpredict(lr, X, y):
+def LOOpredict(lr, X, y, cPred=True):
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import r2_score
 
-    # Do LOO prediction
-    crossPred = cross_val_predict(lr, X, y, cv=len(y))
+    if cPred is True:
+        # Do LOO prediction
+        crossPred = cross_val_predict(lr, X, y, cv=len(y))
 
-    # How well did we do on crossvalidation?
-    crossval_perf = r2_score(y, crossPred)
+        # How well did we do on crossvalidation?
+        crossval_perf = r2_score(y, crossPred)
+    else:
+        crossPred = None
+        crossval_perf = None
 
     # Do direct regression
     lr.fit(X, y)
@@ -114,7 +118,7 @@ def LOOpredict(lr, X, y):
     return (dirPred, direct_perf, crossPred, crossval_perf, lr)
 
 
-def InVivoPredict(inn=[5, 1E-12], exprV=None):
+def InVivoPredict(inn=[5, 1E-12], exprV=None, cPred=True):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     pd.set_option('expand_frame_repr', False)
 
@@ -123,7 +127,7 @@ def InVivoPredict(inn=[5, 1E-12], exprV=None):
     # Collect data
     X, y, tbl = modelPrepAffinity(v=inn[0], L0=inn[1], exprV=exprV)
 
-    tbl['DPredict'], dperf, tbl['CPredict'], cperf, model = LOOpredict(regFunc(), X, y)
+    tbl['DPredict'], dperf, tbl['CPredict'], cperf, model = LOOpredict(regFunc(), X, y, cPred)
 
     XX = np.power(10, model.res.x)
 
@@ -167,10 +171,9 @@ class regFunc(BaseEstimator):
 
         self.trainX, self.trainy = X, y
 
-        ub = np.full((X.shape[1], ), 6.0)
+        ub = np.full((X.shape[1], ), 7.0)
 
-        res = differential_evolution(self.errF, bounds=list(zip(-ub, ub)),
-                                     polish=True, disp=False)
+        res = differential_evolution(self.errF, bounds=list(zip(-ub, ub)), disp=False)
 
         self.res = least_squares(self.diffF, x0=res.x, jac='3-point', bounds=(-ub, ub))
 
