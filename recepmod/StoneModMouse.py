@@ -1,13 +1,16 @@
 import pandas as pd
 import numpy as np
 
-np.seterr(over = 'raise')
+
+np.seterr(over='raise')
+
 
 def funcAppend(indexList, nameApp):
     idx = []
     for i in indexList:
-        idx.append(i+nameApp)
+        idx.append(i + nameApp)
     return idx
+
 
 class StoneModelMouse:
     # Takes in a list of shape (9) for x: Rexp for FcgRs logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
@@ -20,18 +23,18 @@ class StoneModelMouse:
         self.Igs = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3']
         self.FcgRs = ['FcgRI', 'FcgRIIB', 'FcgRIII', 'FcgRIV']
         # Read in csv file of murine binding affinities
-        self.kaM = np.genfromtxt(os.path.join(path,'./data/murine-affinities.csv'), 
-                                     delimiter=',', 
-                                     skip_header=1, 
-                                     usecols=list(range(1,6)),
-                                     dtype=np.float64)
+        self.kaM = np.genfromtxt(os.path.join(path, './data/murine-affinities.csv'),
+                                 delimiter=',',
+                                 skip_header=1,
+                                 usecols=list(range(1, 6)),
+                                 dtype=np.float64)
 
         self.kaMouse = self.kaM[:, list(range(4))]
-        self.kaIgG2b_Fucose = self.kaM[:, 4].reshape(4,1)
+        self.kaIgG2b_Fucose = self.kaM[:, 4].reshape(4, 1)
         self.L0 = 1E-9
         self.v = 4
         self.Kx = getMedianKx()
-        self.logR = np.full((len(self.FcgRs),), np.log10(10**5), dtype = np.float64)
+        self.logR = np.full((len(self.FcgRs),), np.log10(10**5), dtype=np.float64)
 
     def StoneModMouse(self):
         '''
@@ -53,8 +56,8 @@ class StoneModelMouse:
                 Ka = self.kaMouse[k][l]
 
                 ## Calculate the MFI which should result from this condition according to the model
-                stoneModOut = StoneMod(self.logR[k],Ka,self.v,self.Kx*Ka,self.L0, fullOutput = True)
-                output[l, :, k] = np.asarray(stoneModOut, dtype = np.float)
+                stoneModOut = StoneMod(self.logR[k], Ka, self.v, self.Kx * Ka, self.L0, fullOutput=True)
+                output[l, :, k] = np.asarray(stoneModOut, dtype=np.float)
 
         return output
 
@@ -70,13 +73,13 @@ class StoneModelMouse:
         # Set labels for columns of pandas table
         labels = []
         for p in product(self.FcgRs, ['-Lbnd', '-Rbnd', '-Rmulti', '-nXlink', '-Req']):
-            labels.append(p[0]+p[1])
+            labels.append(p[0] + p[1])
 
         # Make a 3-d array of StoneModMouse output for each Ig
         stoneModMurine = self.StoneModMouse()
 
         # Reshape data for pandas table
-        output = np.reshape(stoneModMurine, (4, -1), order = 'F')
+        output = np.reshape(stoneModMurine, (4, -1), order='F')
 
         # Make pandas table of binding predictions of Ig-FcgR pairs
         return pd.DataFrame(output, index=self.Igs, columns=labels)
@@ -88,17 +91,17 @@ class StoneModelMouse:
         tb1 = pd.DataFrame()
         idx = []
         # Concatenating a pandas table for a range of avidity
-        for j in range(1, self.v+1):
+        for j in range(1, self.v + 1):
             self.v = j
             tb = self.pdOutputTable()
             tb1 = pd.concat([tb1, tb])
 
             for _, Ig in enumerate(self.Igs):
-                idx.append(Ig+'-'+str(j))
-            
+                idx.append(Ig + '-' + str(j))
+
         tb1.index = idx
         return tb1
-        
+
     def NimmerjahnEffectTable(self):
         # Makes a pandas dataframe of shape(8,31) with 2 different avidities for each 1gG
         # Initiate variables
@@ -120,7 +123,7 @@ class StoneModelMouse:
         tbN = tbN.sort_index()
 
         # Append effectiveness data on the 31 column
-        tbN.loc[:,'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
+        tbN.loc[:, 'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
 
         return tbN
 
@@ -150,7 +153,7 @@ class StoneModelMouse:
         tbK2.iloc[1, 2] = 0.0
         tbK2.iloc[2, 0] = 0.0
         tbK2.iloc[2, 3] = 0.0
-        
+
         # set up IgG2b, -Fucose
         tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index = ['IgG2b-Fucose-/-'], columns = self.FcgRs)
         tbK3.loc[:,'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
@@ -196,10 +199,10 @@ class StoneModelMouse:
         tbN.insert(0, 'Condition', tbN.index)
 
         def rename(name):
-            name = 'mFc$\\gamma$RI' if name=='FcgRI' else name
-            name = 'mFc$\\gamma$RIIB' if name=='FcgRIIB' else name
-            name = 'mFc$\\gamma$RIII' if name=='FcgRIII' else name
-            name = 'mFc$\\gamma$RIV' if name=='FcgRIV' else name
+            name = 'mFc$\\gamma$RI' if name =='FcgRI' else name
+            name = 'mFc$\\gamma$RIIB' if name =='FcgRIIB' else name
+            name = 'mFc$\\gamma$RIII' if name =='FcgRIII' else name
+            name = 'mFc$\\gamma$RIV' if name =='FcgRIV' else name
             return name
 
         def renameList(names):

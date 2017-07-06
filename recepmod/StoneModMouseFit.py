@@ -62,8 +62,6 @@ def CALCapply(row):
 
     return row
 
-# TODO: Change all regression metrics to R2
-
 
 def modelPrepAffinity(v=5, L0=1E-12):
 

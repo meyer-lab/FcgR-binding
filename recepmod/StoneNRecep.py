@@ -25,7 +25,7 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
 
         vGrid[slicing] *= term
 
-        for jj in range(2, gnu+1):
+        for jj in range(2, gnu + 1):
             slicing[ii] = jj
 
             term *= KKRK[ii]
@@ -57,7 +57,7 @@ def vGridInit(gnu, Nrep):
     """ Make the grid of all the possible multimerization states. """
 
     # Initialize the grid of possibilities
-    vGrid = np.zeros(np.full((Nrep, ), gnu+1), dtype=np.float)
+    vGrid = np.zeros(np.full((Nrep, ), gnu + 1), dtype=np.float)
 
     # Precalculate outside terms
     nk = nchoosek(gnu)
@@ -208,7 +208,7 @@ class StoneN:
     def __init__(self, logR, Ka, Kx, gnu, L0):
         self.logR = np.array(logR, dtype=np.float, copy=True)
         self.Ka = np.array(Ka, dtype=np.float, copy=True)
-        self.Kx = np.array(Kx*Ka[0], dtype=np.float, copy=True)
+        self.Kx = np.array(Kx * Ka[0], dtype=np.float, copy=True)
         self.gnu = np.array(gnu, dtype=np.int, copy=True)
         self.L0 = np.array(L0, dtype=np.float, copy=True)
 
