@@ -127,7 +127,7 @@ def reqSolver(logR, Ka, gnu, Kx, L0):
     def rootF(curr, ii=None, x=None):
         """ Mass balance calculator we want to solve. """
         # If we're overriding one axis do it here.
-        if not ii is None:
+        if ii is not None:
             curr = curr.copy()
             curr[ii] = x
 
@@ -141,7 +141,7 @@ def reqSolver(logR, Ka, gnu, Kx, L0):
         return R - curr - Rbnd
 
     # Reasonable approximation for curReq
-    curReq = np.array(logR - Ka*L0, dtype=np.float64)
+    curReq = np.array(logR - Ka * L0, dtype=np.float64)
 
     if np.max(np.multiply(rootF(np.full(logR.shape, -200, dtype=np.float)), rootF(logR))) > 0:
         raise RuntimeError("No reasonable value for Req exists.")
@@ -154,7 +154,7 @@ def reqSolver(logR, Ka, gnu, Kx, L0):
     # Set jj so linting doesn't complain
     jj = 0
 
-    # The two receptors only weakly interact, so try and find the roots separately in an iterive fashion
+    # Receptors only weakly interact, so try and find the roots separately in an iterive fashion
     for _ in range(200):
         # Square the error for each
         error = np.square(rootF(curReq))
