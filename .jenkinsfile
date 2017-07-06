@@ -59,7 +59,6 @@ pipeline {
       steps {
         sh 'make upload'
         archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
-        archiveArtifacts artifacts: 'profile.png', onlyIfSuccessful: true
       }
     }
   }
