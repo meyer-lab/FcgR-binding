@@ -50,7 +50,7 @@ test:
 
 profile:
 	nosetests -s --with-timer --timer-top-n 5 --with-cprofile
-	gprof2dot -f pstats stats.dat | dot -Tpng -o profile.png
+	gprof2dot -n 2.0 -e 2.0 -f pstats stats.dat | dot -Tpng -o profile.png
 
 testcover:
 	nosetests --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
