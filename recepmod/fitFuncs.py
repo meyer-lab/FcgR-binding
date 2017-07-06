@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def startH5File(StoneM, filename):
     """ Dump class to a string to store with MCMC chain. """
     import h5py
@@ -21,15 +22,17 @@ def startH5File(StoneM, filename):
 
     return (f, dset)
 
+
 def getUniformStart(StoneM):
     """ Set up parameters for parallel-tempered Ensemble Sampler """
-    ndims, nwalkers = StoneM.Nparams, 4*StoneM.Nparams
+    ndims, nwalkers = StoneM.Nparams, 4 * StoneM.Nparams
     p0 = np.random.uniform(low=0, high=1, size=(nwalkers, ndims))
 
     for ii in range(nwalkers):
-        p0[ii] = StoneM.lb + (StoneM.ub - StoneM.lb)*p0[ii]
+        p0[ii] = StoneM.lb + (StoneM.ub - StoneM.lb) * p0[ii]
 
     return (p0, ndims, nwalkers)
+
 
 def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
     """ Run the sampling. """
@@ -44,10 +47,10 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
     # Get uniform distribution of positions for start
     p0, ndims, nwalkers = getUniformStart(StoneM)
 
-    ## Set up sampler
-    sampler = EnsembleSampler(nwalkers,ndims,StoneM.NormalErrorCoef,2.0,[],{},None,16)
+    # Set up sampler
+    sampler = EnsembleSampler(nwalkers, ndims, StoneM.NormalErrorCoef, 2.0, [], {}, None, 16)
 
-    if not filename is None:
+    if filename is not None:
         f, dset = startH5File(StoneM, filename)
 
     # Setup thinning tracking
@@ -60,9 +63,11 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
             if np.max(lnprob) > bestLL:
                 bestLL = np.max(lnprob)
 
-            matOut = np.concatenate((lnprob.reshape(nwalkers, 1), np.arange(0, nwalkers).reshape(nwalkers, 1), p.reshape(nwalkers, ndims)), axis=1)
+            matOut = np.concatenate((lnprob.reshape(nwalkers, 1),
+                                     np.arange(0, nwalkers).reshape(nwalkers, 1),
+                                     p.reshape(nwalkers, ndims)), axis=1)
 
-            if not filename is None:
+            if filename is not None:
                 fShape = dset.shape
                 dset.resize((fShape[0] + np.shape(matOut)[0], fShape[1]))
                 dset[fShape[0]:, :] = matOut
