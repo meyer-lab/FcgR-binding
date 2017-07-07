@@ -7,12 +7,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib
-from .FigureCommon import Igs, FcgRidx, texRename, texRenameList, FcgRidxL, FcgRlist, FcgRlistL, IgList, iggRename
+from .FigureCommon import Igs, FcgRidx, texRename, texRenameList, FcgRidxL, FcgRlist, FcgRlistL
 
 
 def makeFigure():
     from ..StoneHelper import read_chain, getFitMeasMergedSummarized
-    from .FigureCommon import getSetup, Legend, subplotLabel
+    from .FigureCommon import getSetup, Legend, subplotLabel, iggRename, IgList
 
     # Retrieve model and fit from hdf5 file
     M, dset = read_chain()
@@ -24,7 +24,11 @@ def makeFigure():
 
     # Blank out for the cartoon
     ax[0].axis('off')
-    ax[0].legend(handles=Legend(FcgRlistL, FcgRidxL, [iggRename(igg) for igg in IgList], Igs),loc=2,bbox_to_anchor=(4.0,1.0))
+    ax[0].legend(handles=Legend(FcgRlistL,
+                                FcgRidxL,
+                                [iggRename(igg) for igg in IgList], Igs),
+                 loc=2,
+                 bbox_to_anchor=(4.0, 1.0))
 
     # Show predicted versus actual
     plotFit(getFitMeasMergedSummarized(M, pBest), ax=ax[1])
@@ -69,25 +73,29 @@ def violinPlot(dset, ax):
 
     # Overlay FcgR quantifications
     for ii, row in enumerate(getRquant()):
-        ax.plot([ii]*len(row), row, 'k_', mew=1.0)
+        ax.plot([ii] * len(row), row, 'k_', mew=1.0)
 
     ax.set_ylim(5, 7)
     # Change violin colors to match FcgR colors in legend next to 2C
     for ii, child in enumerate(ax.get_children()[0:12]):
         if ii % 2 == 0:
-            child.set_facecolor(FcgRidx[FcgRlist[int(ii/2)]])
-            child.set_edgecolor(FcgRidx[FcgRlist[int(ii/2)]])
+            child.set_facecolor(FcgRidx[FcgRlist[int(ii / 2)]])
+            child.set_edgecolor(FcgRidx[FcgRlist[int(ii / 2)]])
+
 
 def histSubplots(dset, axes):
     dset.columns = texRenameList(dset.columns)
 
-    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins = 20, color=sns.color_palette()[0], legend=False)
-    dset[[texRename('sigConv1'), texRename('sigConv2')]].plot.hist(ax=axes[1], bins = 20, color=sns.color_palette()[0:2])
+    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins=20,
+                                       color=[sns.color_palette()[0]], legend=False)
+    dset[[texRename('sigConv1'), texRename('sigConv2')]].plot.hist(
+        ax=axes[1], bins=20, color=sns.color_palette()[0:2])
     dset[[texRename('gnu1'), texRename('gnu2')]].plot.hist(ax=axes[2],
-                                           bins = np.arange(-0.5, 32.5, 1.0),
-                                           color=sns.color_palette()[0:2],
-                                           xlim = (-0.5, 32.5))
-    dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(ax=axes[3], bins = 40, color=sns.color_palette()[0:2])
+                                                           bins=np.arange(-0.5, 32.5, 1.0),
+                                                           color=sns.color_palette()[0:2],
+                                                           xlim=(-0.5, 32.5))
+    dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(
+        ax=axes[3], bins=40, color=sns.color_palette()[0:2])
 
     # Set all the x-labels based on which histogram is displayed
     axes[0].set_xlabel(r'$K_x$')
@@ -98,18 +106,15 @@ def histSubplots(dset, axes):
     # Make x-axes appear logarithmic
     for ii in range(len(axes)):
         if ii != 2:
-            axes[ii].set_xticklabels([eval("r'$10^{"+str(num)+"}$'") for num in axes[ii].get_xticks()])    
+            axes[ii].set_xticklabels([eval("r'$10^{" + str(num) + "}$'")
+                                      for num in axes[ii].get_xticks()])
 
     # Set all the x-limites based on which histogram is displayed
-    axes[0].set_xlim(-13.0,axes[0].get_xlim()[1])
-    axes[1].set_xlim(-6.0,axes[1].get_xlim()[1])
-    axes[3].set_xlim(-1.5,axes[3].get_xlim()[1])
+    axes[0].set_xlim(-13.0, axes[0].get_xlim()[1])
+    axes[1].set_xlim(-6.0, axes[1].get_xlim()[1])
+    axes[3].set_xlim(-1.5, axes[3].get_xlim()[1])
 
     axes[1].set_ylim(0, 5000)
-
-##    print(np.mean(np.power(10, dset[texRename('sigConv2')] - dset[texRename('sigConv1')])))
-##
-##    print(np.power(10, np.std(dset[texRename('sigma2')])))
 
 
 def plotFit(fitMean, ax):
@@ -134,6 +139,7 @@ def plotFit(fitMean, ax):
     ax.set_ylim(0.01, 5)
     ax.set_xlim(0.01, 5)
 
+
 def GewekeDiagPlot(M, dset, ax):
     """ Get pvalues from geweke diagnostic from the dataset """
     from statsmodels.sandbox.stats.multicomp import multipletests
@@ -141,7 +147,7 @@ def GewekeDiagPlot(M, dset, ax):
 
     _, pvalues = geweke_chains(dset)
 
-    ptable = pd.DataFrame(pvalues, columns=FcgRlistL+texRenameList(M.pNames[8:]))
+    ptable = pd.DataFrame(pvalues, columns=FcgRlistL + texRenameList(M.pNames[8:]))
     ptable = pd.melt(ptable, var_name="param")
 
     ptable['PassFail'], ptable['cpval'], _, _ = multipletests(ptable.value, method='bonferroni')
@@ -181,13 +187,13 @@ def AverageAvidity(ax):
     table = pd.DataFrame(list(product(logRs, Kas)), columns=['logR', 'Ka'])
 
     def avAv(x):
-        outt = StoneMod(x.logR, x.Ka, gnus, getMedianKx()*x.Ka, L0, fullOutput=True)
+        outt = StoneMod(x.logR, x.Ka, gnus, getMedianKx() * x.Ka, L0, fullOutput=True)
 
         return outt[1] / outt[0]
 
     table['AvAv'] = table.apply(avAv, axis=1)
 
-    col = sns.crayon_palette(['Tickle Me Pink','Orange','Forest Green',
+    col = sns.crayon_palette(['Tickle Me Pink', 'Orange', 'Forest Green',
                               'Royal Purple'])
     sns.FacetGrid(hue='logR', data=table, palette=col).map(ax.plot, 'Ka', 'AvAv')
 
@@ -198,8 +204,7 @@ def AverageAvidity(ax):
     # Create the legend patches
     legend_patches = [matplotlib.patches.Patch(color=C, label=L) for
                       C, L in zip(col,
-                                  [r'$10^{'+str(int(logr))+'}$' for logr in logRs])]
+                                  [r'$10^{' + str(int(logr)) + '}$' for logr in logRs])]
 
     # Plot the legend
     ax.legend(handles=legend_patches, title=r'# Receptors', labelspacing=0.25)
-    
