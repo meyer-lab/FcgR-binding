@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-from tqdm import trange
+from tqdm import tqdm
 from recepmod.StoneModMouseFit import InVivoPredict
+from concurrent.futures import ProcessPoolExecutor
 
 # Make an array of the expression levels to use
 expr = np.linspace(0, 4, num=6)
@@ -18,9 +19,21 @@ e = np.concatenate((np.reshape(a[0], (-1, 1)),
 # Create the output vector
 outt = np.zeros((e.shape[0], 1), dtype=np.float)
 
-for ii in trange(e.shape[0]):
-    outt[ii] = InVivoPredict(exprV=e[ii, :], cPred=False)[0]
+# Split into list
+elist = np.split(e, e.shape[0])
 
+
+def F(exprVV):
+    return InVivoPredict(exprV=np.squeeze(exprVV), cPred=False)[0]
+
+
+pool = ProcessPoolExecutor()
+
+ii = 0
+
+for f in tqdm(pool.map(F, elist), total=len(outt), smoothing=0):
+    outt = f
+    ii += 1
 
 df = pd.DataFrame(e)
 df['pref'] = outt
