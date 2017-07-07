@@ -5,6 +5,7 @@ from ..StoneModMouse import StoneModelMouse
 
 # Predict in vivo response
 
+
 def makeFigure():
     import string
     from .FigureCommon import subplotLabel, getSetup
@@ -19,7 +20,7 @@ def makeFigure():
 
     # Plot A/I vs effectiveness.
     AIplot(ax[1])
-    
+
     # Show performance of affinity prediction
     InVivoPredictVsActualAffinities(ax[2])
 
@@ -54,12 +55,12 @@ def makeFigure():
 
 IgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None']
 iggRename = lambda name: 'm'+name if name[0]=='I' else name
-Igs = {'IgG1':'o', 'IgG2a':'d', 'IgG2b':'^', 'IgG3':'s', 'None':'.'}
+Igs = {'IgG1': 'o', 'IgG2a': 'd', 'IgG2b': '^', 'IgG3': 's', 'None': '.'}
 keys = [key for key in Igs.keys()]
 for key in keys:
     Igs[iggRename(key)] = Igs[key]
-    
-Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'} 
+
+Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'}
 Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
@@ -72,6 +73,7 @@ celltypeidx = dict(zip(celltypes, cellColors))
 for cell, cell2 in zip(celltypes,celltypes2):
     celltypeidx[cell2] = celltypeidx[cell]
 
+
 def PrepforLegend(table):
     knockdowntype = []
     table['Knockdown'] = table.apply(lambda x: x.name.replace(x.name.split('-')[0], ''), axis = 1)
@@ -83,20 +85,22 @@ def PrepforLegend(table):
     table['Knockdown'] = knockdowntype
     return table
 
+
 def ClassAvidityPCA(ax):
     """ Plot the generated binding data for different classes and avidities in PCA space. """
     from .FigureCommon import PCApercentVar
     # If no axis was provided make our own
-    
+
     scores, explainedVar = StoneModelMouse().KnockdownPCA()
 
     commonPlot(ax, scores, 'PC1', 'PC2')
-    
+
     labels = PCApercentVar(explainedVar)
     ax.set_ylabel(labels[1])
     ax.set_xlabel(labels[0])
     ax.set_xticklabels([str(tick/1e8)[0:(4 if tick<0 else 3)] for tick in ax.get_xticks()])
     ax.set_yticklabels([str(tick/1e8)[0:(4 if tick<0 else 3)] for tick in ax.get_yticks()])
+
 
 def InVivoPredictVsActual(ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
@@ -147,7 +151,7 @@ def InVivoPredictComponents(ax):
     tbN = PrepforLegend(tbN)
     fcgrs = tbN['Knockdown'].tolist()
     tbN = tbN[['NKeff', 'DCeff']]
-    
+
     # Set up x axis labels 
     for i in range(len(fcgrs)):
         for j in range(len(Knockdown)):
@@ -161,7 +165,7 @@ def InVivoPredictComponents(ax):
             idx[k] = item.replace(fc, str('-'+fcgrs[k]))
 
     tbN.index = idx
-    
+
     tbN.index.name = 'condition'
     tbN.reset_index(inplace=True)
 
@@ -179,7 +183,7 @@ def InVivoPredictComponents(ax):
     ax.set_xlabel('')
 
     for lab in ax.get_xticklabels():
-        lab.set_text('m'+lab.get_text() if lab.get_text()[0]=='I' else lab.get_text())
+        lab.set_text('m' + lab.get_text() if lab.get_text()[0]=='I' else lab.get_text())
 
     # Make legend
     patches = list()
@@ -193,8 +197,8 @@ def InVivoPredictComponents(ax):
     ax.set_xticks(list(chain.from_iterable((num, num+0.5) for num in ax.get_xticks())))
     ax.set_xticklabels(list(chain.from_iterable((name, '') for name in ax.get_xticklabels())))
     ax.set_xticklabels(ax.get_xticklabels(),
-                   rotation=40, rotation_mode="anchor", ha="right",
-                   position=(0,0.05), fontsize=6.5)
+                       rotation=40, rotation_mode="anchor", ha="right",
+                       position=(0, 0.05), fontsize=6.5)
 
     ax.set_xlim(ax.get_xlim())
     ax.set_ylim(ax.get_ylim())
@@ -202,7 +206,8 @@ def InVivoPredictComponents(ax):
                      ylims=ax.get_ylim(),ax=ax)
     for rect in ax.get_children()[0:24]:
         ax.add_patch(rect)
-    
+
+
 def RequiredComponents(ax):
     """ Plot model components. """
     from ..StoneModMouseFit import InVivoPredictMinusComponents
@@ -215,15 +220,17 @@ def RequiredComponents(ax):
     ax.set_ylim(0.0, 1.0)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
 
+
 def commonPlot(ax, table, xcol, ycol):
     table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
     table = PrepforLegend(table)
 
     for _, row in table.iterrows():
-        markerr=Igs[row['Ig']]
+        markerr = Igs[row['Ig']]
         colorr = Knockdownidx[row['Knockdown']]
-        ax.errorbar(x=row[xcol], y=row[ycol], marker=markerr, mfc = colorr,
+        ax.errorbar(x=row[xcol], y=row[ycol], marker=markerr, mfc=colorr,
                     ms=3.5)
+
 
 def AIplot(ax):
     """ Plot A/I vs effectiveness. """
