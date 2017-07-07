@@ -13,7 +13,8 @@ def funcAppend(indexList, nameApp):
 
 
 class StoneModelMouse:
-    # Takes in a list of shape (9) for x: Rexp for FcgRs logR, the kind of Ig, avidity Kx, valency uv, Immune Complex Concentration L0
+    # Takes in a list of shape (9) for x: Rexp for FcgRs logR, the kind of Ig,
+    # avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):
         import os
         from .StoneHelper import getMedianKx
@@ -56,7 +57,8 @@ class StoneModelMouse:
                 Ka = self.kaMouse[k][l]
 
                 # Calculate the MFI which should result from this condition according to the model
-                stoneModOut = StoneMod(self.logR[k], Ka, self.v, self.Kx * Ka, self.L0, fullOutput=True)
+                stoneModOut = StoneMod(self.logR[k], Ka, self.v,
+                                       self.Kx * Ka, self.L0, fullOutput=True)
                 output[l, :, k] = np.asarray(stoneModOut, dtype=np.float)
 
         return output
@@ -155,7 +157,8 @@ class StoneModelMouse:
         tbK2.iloc[2, 3] = 0.0
 
         # set up IgG2b, -Fucose
-        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index=['IgG2b-Fucose-/-'], columns=self.FcgRs)
+        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index=[
+                            'IgG2b-Fucose-/-'], columns=self.FcgRs)
         tbK3.loc[:, 'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
 
         # Join tbK, tbK1, tbK2 into one table
@@ -169,7 +172,8 @@ class StoneModelMouse:
         for k in range(len(self.FcgRs)):
             for i in range(2):
                 Ka = self.kaIgG2b_Fucose[k]
-                stoneModOut = np.asarray(StoneMod(self.logR[k],Ka,v[i],self.Kx*Ka,self.L0, fullOutput=True), dtype=np.float)
+                stoneModOut = np.asarray(
+                    StoneMod(self.logR[k], Ka, v[i], self.Kx * Ka, self.L0, fullOutput=True))
                 output[i, k, :] = stoneModOut[:4]
         return output.reshape(2, 16)
 
@@ -177,8 +181,8 @@ class StoneModelMouse:
         tnl = '\\tabularnewline'
 
         f = open(filename, 'w')
-        f.write('\\section{Supplement}\\label{supplement}\n\n\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
-        temp = ''
+        f.write(
+            '\\section{Supplement}\\label{supplement}\n\n\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
         for ii, name in enumerate(names):
             f.write(name)
             if ii != 5:
@@ -198,10 +202,10 @@ class StoneModelMouse:
         tbN.insert(0, 'Condition', tbN.index)
 
         def rename(name):
-            name = 'mFc$\\gamma$RI' if name =='FcgRI' else name
-            name = 'mFc$\\gamma$RIIB' if name =='FcgRIIB' else name
-            name = 'mFc$\\gamma$RIII' if name =='FcgRIII' else name
-            name = 'mFc$\\gamma$RIV' if name =='FcgRIV' else name
+            name = 'mFc$\\gamma$RI' if name == 'FcgRI' else name
+            name = 'mFc$\\gamma$RIIB' if name == 'FcgRIIB' else name
+            name = 'mFc$\\gamma$RIII' if name == 'FcgRIII' else name
+            name = 'mFc$\\gamma$RIV' if name == 'FcgRIV' else name
             return name
 
         def renameList(names):
@@ -210,7 +214,7 @@ class StoneModelMouse:
         def matrixScientific(matrix):
             for j in range(matrix.shape[0]):
                 for k in range(matrix.shape[1]):
-                    if not isinstance(matrix[j,k],str):
+                    if not isinstance(matrix[j, k], str):
                         if matrix[j, k] > 1:
                             matrix[j, k] = sci(matrix[j, k])
                         else:
@@ -218,12 +222,12 @@ class StoneModelMouse:
             return matrix
 
         def sci(val):
-            return r'$'+str(val/(10**np.floor(np.log10(val))))[0:3]+ \
-                   '\\times10^{'+str(int(np.log10(val)))+'}$'
+            return r'$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
+                   '\\times10^{' + str(int(np.log10(val))) + '}$'
 
-        self.tabWrite(filename,matrixScientific(tbN.as_matrix()),
+        self.tabWrite(filename, matrixScientific(tbN.as_matrix()),
                       renameList(tbN.columns))
-        
+
     def KnockdownPCA(self):
         """ Principle Components Analysis of FcgR-IgG affinities. """
         from sklearn.decomposition import PCA
@@ -232,6 +236,7 @@ class StoneModelMouse:
 
         X = self.NimmerjahnEffectTableAffinities().drop('Effectiveness', axis=1)
 
-        scores = pd.DataFrame(pca.fit_transform(X), index=X.index, columns=['PC1', 'PC2', 'PC3', 'PC4'])
+        scores = pd.DataFrame(pca.fit_transform(X), index=X.index,
+                              columns=['PC1', 'PC2', 'PC3', 'PC4'])
 
         return (scores, pca.explained_variance_ratio_)
