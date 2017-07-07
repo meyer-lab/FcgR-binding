@@ -9,11 +9,9 @@ from ..StoneModMouse import StoneModelMouse
 def makeFigure():
     import string
     from .FigureCommon import subplotLabel, getSetup
-    import matplotlib.gridspec as gridspec
-    from matplotlib.pyplot import subplot
 
     # Get list of axis objects; by 0-index, 3 and 11 empty, 4 double
-    ax, f = getSetup((9, 6), (3, 4), mults=[5], multz={5:2}, empts=[3,11])
+    ax, f = getSetup((9, 6), (3, 4), mults=[5], multz={5: 2}, empts=[3, 11])
 
     # Blank out for the cartoon
     ax[0].axis('off')
@@ -53,8 +51,9 @@ def makeFigure():
 
     return f
 
+
 IgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None']
-iggRename = lambda name: 'm'+name if name[0]=='I' else name
+iggRename = lambda name: 'm' + name if name[0] == 'I' else name
 Igs = {'IgG1': 'o', 'IgG2a': 'd', 'IgG2b': '^', 'IgG3': 's', 'None': '.'}
 keys = [key for key in Igs.keys()]
 for key in keys:
@@ -64,19 +63,22 @@ Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'}
 Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
-KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',r'mFc$\gamma$RI-/-',r'mFc$\gamma$RIII-/-',r'mFc$\gamma$RI,IV-/-','Fucose-']
+KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',
+              r'mFc$\gamma$RI-/-', r'mFc$\gamma$RIII-/-',
+              r'mFc$\gamma$RI,IV-/-', 'Fucose-']
+
 KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
 celltypes = ['NK effect', 'DC-like effect']
-celltypes2 = ['NKeff','DCeff']
-cellColors = sns.crayon_palette(['Royal Purple','Brown','Asparagus'])
+celltypes2 = ['NKeff', 'DCeff']
+cellColors = sns.crayon_palette(['Royal Purple', 'Brown', 'Asparagus'])
 celltypeidx = dict(zip(celltypes, cellColors))
-for cell, cell2 in zip(celltypes,celltypes2):
+for cell, cell2 in zip(celltypes, celltypes2):
     celltypeidx[cell2] = celltypeidx[cell]
 
 
 def PrepforLegend(table):
     knockdowntype = []
-    table['Knockdown'] = table.apply(lambda x: x.name.replace(x.name.split('-')[0], ''), axis = 1)
+    table['Knockdown'] = table.apply(lambda x: x.name.replace(x.name.split('-')[0], ''), axis=1)
     for i in table['Knockdown']:
         if i == '':
             knockdowntype.append('Wild-type')
@@ -98,8 +100,8 @@ def ClassAvidityPCA(ax):
     labels = PCApercentVar(explainedVar)
     ax.set_ylabel(labels[1])
     ax.set_xlabel(labels[0])
-    ax.set_xticklabels([str(tick/1e8)[0:(4 if tick<0 else 3)] for tick in ax.get_xticks()])
-    ax.set_yticklabels([str(tick/1e8)[0:(4 if tick<0 else 3)] for tick in ax.get_yticks()])
+    ax.set_xticklabels([str(tick / 1e8)[0:(4 if tick < 0 else 3)] for tick in ax.get_xticks()])
+    ax.set_yticklabels([str(tick / 1e8)[0:(4 if tick < 0 else 3)] for tick in ax.get_yticks()])
 
 
 def InVivoPredictVsActual(ax):
@@ -117,8 +119,8 @@ def InVivoPredictVsActual(ax):
     ax.set_xlabel('Predicted Effectiveness')
     ax.set_ylim(-0.05, 1.05)
     ax.set_xlim(-0.05, 1.05)
-    devar = r'$R^2_d$ = '+str(round(devar, 3))
-    cevar = r'$R^2_c$ = '+str(round(cevar, 3))
+    devar = r'$R^2_d$ = ' + str(round(devar, 3))
+    cevar = r'$R^2_c$ = ' + str(round(cevar, 3))
     ax.text(0.05, 0.9, devar)
     ax.text(0.05, 0.75, cevar)
 
@@ -152,7 +154,7 @@ def InVivoPredictComponents(ax):
     fcgrs = tbN['Knockdown'].tolist()
     tbN = tbN[['NKeff', 'DCeff']]
 
-    # Set up x axis labels 
+    # Set up x axis labels
     for i in range(len(fcgrs)):
         for j in range(len(Knockdown)):
             if fcgrs[i] == Knockdown[j]:
@@ -162,7 +164,7 @@ def InVivoPredictComponents(ax):
     for k, item in enumerate(idx):
         if fcgrs[k] != 'Wild-type':
             fc = item.replace(item.split('-')[0], '')
-            idx[k] = item.replace(fc, str('-'+fcgrs[k]))
+            idx[k] = item.replace(fc, str('-' + fcgrs[k]))
 
     tbN.index = idx
 
@@ -183,7 +185,7 @@ def InVivoPredictComponents(ax):
     ax.set_xlabel('')
 
     for lab in ax.get_xticklabels():
-        lab.set_text('m' + lab.get_text() if lab.get_text()[0]=='I' else lab.get_text())
+        lab.set_text('m' + lab.get_text() if lab.get_text()[0] == 'I' else lab.get_text())
 
     # Make legend
     patches = list()
@@ -194,7 +196,7 @@ def InVivoPredictComponents(ax):
     # Set alternating grey rectangles in the background to allow for better
     # readability of the bar graph
     from itertools import chain
-    ax.set_xticks(list(chain.from_iterable((num, num+0.5) for num in ax.get_xticks())))
+    ax.set_xticks(list(chain.from_iterable((num, num + 0.5) for num in ax.get_xticks())))
     ax.set_xticklabels(list(chain.from_iterable((name, '') for name in ax.get_xticklabels())))
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40, rotation_mode="anchor", ha="right",
@@ -202,8 +204,8 @@ def InVivoPredictComponents(ax):
 
     ax.set_xlim(ax.get_xlim())
     ax.set_ylim(ax.get_ylim())
-    alternatingRects([ax.get_xlim()[0]]+[x for x in ax.get_xticks() if x%1!=0]+[ax.get_xlim()[-1]],
-                     ylims=ax.get_ylim(),ax=ax)
+    alternatingRects([ax.get_xlim()[0]] + [x for x in ax.get_xticks() if x % 1 != 0] + [ax.get_xlim()[-1]],
+                     ylims=ax.get_ylim(), ax=ax)
     for rect in ax.get_children()[0:24]:
         ax.add_patch(rect)
 
