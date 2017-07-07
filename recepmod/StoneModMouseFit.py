@@ -118,16 +118,16 @@ def LOOpredict(lr, X, y, cPred=True):
     return (dirPred, direct_perf, crossPred, crossval_perf, lr)
 
 
-def InVivoPredict(inn=[5, 1E-12], exprV=None, cPred=True):
+def InVivoPredict(inn=[5, 1E-9]):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     pd.set_option('expand_frame_repr', False)
 
     inn = np.squeeze(inn)
 
     # Collect data
-    X, y, tbl = modelPrepAffinity(v=inn[0], L0=inn[1], exprV=exprV)
+    X, y, tbl = modelPrepAffinity(v=inn[0], L0=inn[1])
 
-    tbl['DPredict'], dperf, tbl['CPredict'], cperf, model = LOOpredict(regFunc(), X, y, cPred)
+    tbl['DPredict'], dperf, tbl['CPredict'], cperf, model = LOOpredict(regFunc(), X, y)
 
     XX = np.power(10, model.res.x)
 

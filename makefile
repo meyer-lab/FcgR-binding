@@ -4,7 +4,7 @@ fdir = ./Manuscript/Figures
 tdir = ./Manuscript/Templates
 pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filter.py -f markdown ./Manuscript/Text/*.md
 
-.PHONY: clean upload test profile testcover open profExpr
+.PHONY: clean upload test profile testcover open
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx
 
@@ -50,10 +50,6 @@ test:
 
 profile:
 	nosetests -s --with-timer --timer-top-n 5 --with-cprofile
-	gprof2dot -n 2.0 -e 2.0 -f pstats stats.dat | dot -Tpng -o profile.png
-
-profExpr:
-	python3 -m cProfile -o stats.dat runExprSeries.py
 	gprof2dot -n 2.0 -e 2.0 -f pstats stats.dat | dot -Tpng -o profile.png
 
 testcover:
