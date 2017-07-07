@@ -52,10 +52,10 @@ class StoneModelMouse:
         # Iterate over each FcgR
         for l in range(len(self.Igs)):
             for k in range(len(self.FcgRs)):
-                ## Set the affinity for the binding of the FcgR and IgG in question
+                # Set the affinity for the binding of the FcgR and IgG in question
                 Ka = self.kaMouse[k][l]
 
-                ## Calculate the MFI which should result from this condition according to the model
+                # Calculate the MFI which should result from this condition according to the model
                 stoneModOut = StoneMod(self.logR[k], Ka, self.v, self.Kx * Ka, self.L0, fullOutput=True)
                 output[l, :, k] = np.asarray(stoneModOut, dtype=np.float)
 
@@ -116,33 +116,33 @@ class StoneModelMouse:
         # Redo the row indeces
         idx = list(tbN.index)
         for i in range(len(self.Igs)):
-            idx[i] = idx[i]+'-'+str(self.v)
-            idx[i+len(self.Igs)] = idx[i+len(self.Igs)]+'-1'
+            idx[i] = idx[i] + '-' + str(self.v)
+            idx[i + len(self.Igs)] = idx[i + len(self.Igs)] + '-1'
         tbN.index = idx
 
         tbN = tbN.sort_index()
 
         # Append effectiveness data on the 31 column
-        tbN.loc[:, 'Effectiveness'] = pd.Series([0,0,0,0.95,0,0.20,0,0], index=tbN.index)
+        tbN.loc[:, 'Effectiveness'] = pd.Series([0, 0, 0, 0.95, 0, 0.20, 0, 0], index=tbN.index)
 
         return tbN
 
     def NimmerjahnEffectTableAffinities(self):
         # Setup initial table
         tbK = pd.DataFrame(np.transpose(self.kaMouse),
-                           index = self.Igs,
-                           columns = self.FcgRs)
-        tbK.loc[:,'Effectiveness'] = pd.Series([0, 0.95, 0.20, 0], index=tbK.index)
+                           index=self.Igs,
+                           columns=self.FcgRs)
+        tbK.loc[:, 'Effectiveness'] = pd.Series([0, 0.95, 0.20, 0], index=tbK.index)
 
         # Set up tbK1 for FcgRIIB knockdown, see Figure 3B
         tbK1 = tbK.copy()
         tbK1.index = funcAppend(tbK1.index, '-FcgRIIB-/-')
-        tbK1.loc[:,'Effectiveness'] = pd.Series([0.7, 1, 0.75, 0],
-                                                index=tbK1.index)
+        tbK1.loc[:, 'Effectiveness'] = pd.Series([0.7, 1, 0.75, 0],
+                                                 index=tbK1.index)
         tbK1.iloc[:, 1] = 0.0
 
         # set up tbK2 for FcgRI, FcgRIII, FcgRI/IV knockdown, IgG2a treatment
-        tbK2 = tbK.iloc[(1, 1, 1), :].copy()
+        tbK2 = tbK.iloc[[1, 1, 1], :].copy()
         idx = list(tbK2.index)
         idx[0] = idx[0] + '-FcgRI-/-'
         idx[1] = idx[1] + '-FcgRIII-/-'
@@ -155,12 +155,11 @@ class StoneModelMouse:
         tbK2.iloc[2, 3] = 0.0
 
         # set up IgG2b, -Fucose
-        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index = ['IgG2b-Fucose-/-'], columns = self.FcgRs)
-        tbK3.loc[:,'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
+        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index=['IgG2b-Fucose-/-'], columns=self.FcgRs)
+        tbK3.loc[:, 'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
 
         # Join tbK, tbK1, tbK2 into one table
         return tbK.append([tbK1, tbK2, tbK3])
-
 
     def IgG2b_Fucose(self):
         from .StoneModel import StoneMod
@@ -170,9 +169,9 @@ class StoneModelMouse:
         for k in range(len(self.FcgRs)):
             for i in range(2):
                 Ka = self.kaIgG2b_Fucose[k]
-                stoneModOut = np.asarray(StoneMod(self.logR[k],Ka,v[i],self.Kx*Ka,self.L0, fullOutput = True), dtype = np.float)
+                stoneModOut = np.asarray(StoneMod(self.logR[k],Ka,v[i],self.Kx*Ka,self.L0, fullOutput=True), dtype=np.float)
                 output[i, k, :] = stoneModOut[:4]
-        return output.reshape(2,16)
+        return output.reshape(2, 16)
 
     def tabWrite(self, filename, matrix, names):
         tnl = '\\tabularnewline'
@@ -184,13 +183,13 @@ class StoneModelMouse:
             f.write(name)
             if ii != 5:
                 f.write(' & ')
-        f.write(tnl+'\n\\midrule\n\\endhead\n')
+        f.write(tnl + '\n\\midrule\n\\endhead\n')
         for row in matrix:
             for ii, item in enumerate(row):
-                f.write('{\centering '+str(item)+'}')
+                f.write('{\centering ' + str(item) + '}')
                 if ii != 5:
                     f.write(' & ')
-            f.write(tnl+'\n')
+            f.write(tnl + '\n')
         f.write('\n\\bottomrule\n\\end{longtable}\n')
 
     def writeModelData(self, filename):
@@ -212,10 +211,10 @@ class StoneModelMouse:
             for j in range(matrix.shape[0]):
                 for k in range(matrix.shape[1]):
                     if not isinstance(matrix[j,k],str):
-                        if matrix[j,k] > 1:
-                            matrix[j,k] = sci(matrix[j,k])
+                        if matrix[j, k] > 1:
+                            matrix[j, k] = sci(matrix[j, k])
                         else:
-                            matrix[j,k] = r'$'+str(matrix[j,k])+'$'
+                            matrix[j, k] = r'$' + str(matrix[j, k]) + '$'
             return matrix
 
         def sci(val):
