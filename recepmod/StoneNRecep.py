@@ -81,11 +81,9 @@ def sumNonDims(vGridIn, dimm):
 
     vGridIn = vGridIn.copy()
 
-    for ii in range(len(vGridIn.shape)):
+    for ii in reversed(range(len(vGridIn.shape))):
         if ii != dimm:
-            vGridIn = np.sum(vGridIn, axis=ii, keepdims=True)
-
-    vGridIn = np.squeeze(vGridIn)
+            vGridIn = np.sum(vGridIn, axis=ii)
 
     return vGridIn
 
