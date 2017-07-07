@@ -246,10 +246,11 @@ def AIplot(ax):
     ax.set_xscale('log')
     ax.set_xlim(10**(-1.2), 10**(2.6))
     ax.set_ylim(-0.05, 1.05)
-    dperf = r'$R^2_d$ = '+str(round(dperf, 3))
-    cperf = r'$R^2_c$ = '+str(round(cperf, 3))
+    dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
+    cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
     ax.text(0.1, 0.9, dperf)
     ax.text(0.1, 0.75, cperf)
+
 
 def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
@@ -266,8 +267,8 @@ def InVivoPredictVsActualAffinities(ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
-    dperf = r'$R^2_d$ = '+str(round(dperf, 3))
-    cperf = r'$R^2_c$ = '+str(round(cperf, 3))
+    dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
+    cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.75, cperf)
 
@@ -278,14 +279,13 @@ def InVivoPredictVsActualAffinities(ax):
 
 def ClassAvidityPredict(ax):
     """ Plot prediction of in vivo model with varying avidity and class. """
-    from ..StoneModMouseFit import InVivoPredict
-    from ..StoneModMouseFit import CALCapply
+    from ..StoneModMouseFit import InVivoPredict, cellpops, CALCapply
     from .FigureCommon import Legend
 
     # Run the in vivo regression model
     _, _, _, model = InVivoPredict()
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
-    data = data[data.index.str.contains("FcgR") == False]
+    data = data[data.index.str.contains("FcgR") is False]
     data.drop('Effectiveness', axis=1, inplace=True)
 
     data['v'] = 1
@@ -302,15 +302,15 @@ def ClassAvidityPredict(ax):
 
     data = data.apply(CALCapply, axis=1)
 
-    data['predict'] = model.predict(data[['NK', 'DC']].as_matrix())
+    data['predict'] = model.predict(data[cellpops].as_matrix())
     data.reset_index(level=0, inplace=True)
 
     # Plot the calculated crossvalidation performance
-    col = sns.crayon_palette(['Pine Green','Goldenrod','Wild Strawberry',
-                                 'Brown', 'Navy Blue'])
-    newIgList = IgList[0:-1]+['IgG2b-Fucose-/-']
-    colors = dict(zip([iggRename(ig) for ig in newIgList],col))
-    
+    col = sns.crayon_palette(['Pine Green', 'Goldenrod', 'Wild Strawberry',
+                              'Brown', 'Navy Blue'])
+    newIgList = IgList[0:-1] + ['IgG2b-Fucose-/-']
+    colors = dict(zip([iggRename(ig) for ig in newIgList], col))
+
     sns.FacetGrid(data, hue='index', palette=col).map(ax.plot, 'v', 'predict',
                                                       marker='.',
                                                       linestyle='None')
@@ -319,5 +319,5 @@ def ClassAvidityPredict(ax):
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Avidity')
-    ax.legend(handles=Legend([iggRename(ig) for ig in newIgList],colors,[],[]),
-              loc=2, bbox_to_anchor=(1,1))
+    ax.legend(handles=Legend([iggRename(ig) for ig in newIgList], colors, [], []),
+              loc=2, bbox_to_anchor=(1, 1))
