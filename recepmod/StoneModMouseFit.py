@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from memoize import memoize
 from sklearn.base import BaseEstimator
 from .StoneModMouse import StoneModelMouse
 
@@ -47,46 +48,43 @@ def NimmerjahnPredictByAffinities():
     return (dp, cp, data)
 
 
-def CALCapply(row):
-    from .StoneModel import StoneMod
+@memoize
+def caller(**kwargs):
     from .StoneNRecep import StoneN
+    return StoneN(**kwargs).getActivity([1, -1, 1, 1])
+
+
+def CALCapply(row):
     from .StoneHelper import getMedianKx
 
-    KaFull = [row.FcgRI + 0.00001, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
+    KaFull = [row.FcgRI + 1.0E-6, row.FcgRIIB, row.FcgRIII, row.FcgRIV]
 
-    if 'exprI' in row:
-        logRtwo = [row.exprI, row.exprIIB, row.exprIII, row.exprIV]
+    kwarg = {'Ka': KaFull, 'Kx': getMedianKx(), 'gnu': row.v, 'L0': row.L0}
 
-        row['NK'] = StoneN(logR=logRtwo, Ka=KaFull, Kx=getMedianKx(),
-                           gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
-    else:
-        row['NK'] = StoneMod(logR=2.0, Ka=row.FcgRIII, v=row.v,
-                             Kx=getMedianKx() * row.FcgRIII, L0=row.L0)[2] * 1.0E6
-
-    row['DC'] = StoneN(logR=[2, 3, 2, 2], Ka=KaFull, Kx=getMedianKx(),
-                       gnu=row.v, L0=row.L0).getActivity([1, -1, 1, 1])
+    row['ncMO'] = caller(logR=[3.28, 4.17, 3.81, 4.84], **kwarg)  # non-classic MO
+    row['NE'] = caller(logR=[1.96, 3.08, 3.88, 4.07], **kwarg)  # neutrophils
+    row['cMO'] = caller(logR=[3.49, 4.13, 4.18, 3.46], **kwarg)  # classic MO
+    # row['NKs'] = caller(logR=[1.54, 3.21, 3.23, 2.23], **kwarg)  # NK
+    row['EO'] = caller(logR=[1.96, 4.32, 4.22, 2.60], **kwarg)  # Eosino
 
     return row
 
 
-def modelPrepAffinity(v=5, L0=1E-12, exprV=None):
+cellpops = ['cMO', 'EO', 'NE', 'ncMO']
+
+
+def modelPrepAffinity(v=5, L0=1E-12):
 
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
     data['v'] = v
     data['L0'] = L0
-
-    if exprV is not None:
-        data['exprI'] = exprV[0]
-        data['exprIIB'] = exprV[1]
-        data['exprIII'] = exprV[2]
-        data['exprIV'] = exprV[3]
 
     data = data.apply(CALCapply, axis=1)
 
     data.loc['None', :] = 0.0
 
     # Assign independent variables and dependent variable
-    X = data[['NK', 'DC']].as_matrix()
+    X = data[cellpops].as_matrix()
     y = data['Effectiveness'].as_matrix()
 
     return (X, y, data)
@@ -96,15 +94,11 @@ def LOOpredict(lr, X, y, cPred=True):
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import r2_score
 
-    if cPred is True:
-        # Do LOO prediction
-        crossPred = cross_val_predict(lr, X, y, cv=len(y))
+    # Do LOO prediction
+    crossPred = cross_val_predict(lr, X, y, cv=len(y))
 
-        # How well did we do on crossvalidation?
-        crossval_perf = r2_score(y, crossPred)
-    else:
-        crossPred = None
-        crossval_perf = None
+    # How well did we do on crossvalidation?
+    crossval_perf = r2_score(y, crossPred)
 
     # Do direct regression
     lr.fit(X, y)
@@ -131,10 +125,16 @@ def InVivoPredict(inn=[5, 1E-9]):
 
     XX = np.power(10, model.res.x)
 
-    tbl['NKeff'] = tbl.NK * XX[0]
-    tbl['DCeff'] = tbl.DC * XX[1]
-    tbl['NKfrac'] = tbl.NKeff / (tbl.DCeff + tbl.NKeff)
+    for ii in range(len(cellpops)):
+        tbl[cellpops[ii] + 'eff'] = tbl[cellpops[ii]] * XX[ii]
+
     tbl['Error'] = np.square(tbl.CPredict - y)
+
+    print('')
+    print(tbl)
+    print('')
+    print(dperf)
+    print(cperf)
 
     return (dperf, cperf, tbl, model)
 
@@ -148,12 +148,12 @@ def InVivoPredictMinusComponents():
 
     _, cperf, data, _ = InVivoPredict()
 
-    data = data[['Effectiveness', 'NK', 'DC']]
+    data = data[['Effectiveness'] + cellpops]
 
     table = pd.DataFrame(cperf, columns=['CrossVal'], index=['Full Model'])
 
-    table.loc['No NK', :] = crossValF(data.drop('NK', axis=1))
-    table.loc['No DC', :] = crossValF(data.drop('DC', axis=1))
+    for ii in range(len(cellpops)):
+        table.loc['No ' + cellpops[ii], :] = crossValF(data.drop(cellpops[ii], axis=1))
 
     return table
 
@@ -171,7 +171,7 @@ class regFunc(BaseEstimator):
 
         self.trainX, self.trainy = X, y
 
-        ub = np.full((X.shape[1], ), 7.0)
+        ub = np.full((X.shape[1], ), 12.0)
 
         res = differential_evolution(self.errF, bounds=list(zip(-ub, ub)), disp=False)
 
