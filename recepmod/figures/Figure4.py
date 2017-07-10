@@ -277,7 +277,7 @@ def InVivoPredictVsActualAffinities(ax):
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
     cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
     
-    logging.info('AI with KO crossvalidation r2: ' + str(round(cperf, 3)))
+    logging.info('AI with KO crossval: ' + cperf)
     
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.75, cperf)
