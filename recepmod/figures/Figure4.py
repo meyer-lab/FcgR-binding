@@ -26,7 +26,7 @@ def makeFigure():
     ClassAvidityPCA(ax[3])
 
     # Show model components
-    InVivoPredictComponents(ax[4])
+    # InVivoPredictComponents(ax[4])
 
     # Show performance of in vivo regression model
     InVivoPredictVsActual(ax[5])
