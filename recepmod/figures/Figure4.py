@@ -35,7 +35,8 @@ def makeFigure():
     RequiredComponents(ax[6])
 
     # Predicted contribution plot
-    ComponentContrib(ax[7])
+    # ComponentContrib(ax[7])
+    # TODO Add component contribution back in
 
     # Predict class/avidity effect
     ClassAvidityPredict(ax[8])
