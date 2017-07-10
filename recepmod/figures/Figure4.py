@@ -253,7 +253,7 @@ def AIplot(ax):
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
     cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
     
-    logging.info('AI crossvalidation r2: ' + str(round(cperf, 3)))
+    logging.info('AI crossval: ' + cperf)
     
     ax.text(0.1, 0.9, dperf)
     ax.text(0.1, 0.75, cperf)
