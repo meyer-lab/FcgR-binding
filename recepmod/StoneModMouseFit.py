@@ -131,7 +131,7 @@ def InVivoPredict(inn=[5, 1E-9]):
     tbl['Error'] = np.square(tbl.CPredict - y)
 
     print('')
-    print(tbl)
+    # print(tbl)
     print('')
     print(dperf)
     print(cperf)
