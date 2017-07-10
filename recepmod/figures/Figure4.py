@@ -39,7 +39,7 @@ def makeFigure():
     # TODO: Removed comp contribution plot temp
 
     # Predict class/avidity effect
-    ClassAvidityPredict(ax[8])
+    # ClassAvidityPredict(ax[8])
 
     for ii, item in enumerate(ax):
         if ii != 4:
