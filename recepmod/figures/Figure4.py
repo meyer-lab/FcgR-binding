@@ -1,3 +1,4 @@
+import logging
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -251,6 +252,9 @@ def AIplot(ax):
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
     cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
+    
+    logging.info('AI crossvalidation r2: ' + str(round(cperf, 3)))
+    
     ax.text(0.1, 0.9, dperf)
     ax.text(0.1, 0.75, cperf)
 
@@ -272,6 +276,9 @@ def InVivoPredictVsActualAffinities(ax):
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
     cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
+    
+    logging.info('AI with KO crossvalidation r2: ' + str(round(cperf, 3)))
+    
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.75, cperf)
 

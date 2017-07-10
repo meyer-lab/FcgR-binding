@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 from memoize import memoize
@@ -130,11 +131,8 @@ def InVivoPredict(inn=[5, 1E-9]):
 
     tbl['Error'] = np.square(tbl.CPredict - y)
 
-    print('')
-    # print(tbl)
-    print('')
-    print(dperf)
-    print(cperf)
+    logging.info('InVivoPredict direct r2: ' + str(round(dperf, 3)))
+    logging.info('InVivoPredict crossval r2: ' + str(round(cperf, 3)))
 
     return (dperf, cperf, tbl, model)
 
