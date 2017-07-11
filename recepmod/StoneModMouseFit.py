@@ -65,7 +65,7 @@ def CALCapply(row):
     row['ncMO'] = caller(logR=[3.28, 4.17, 3.81, 4.84], **kwarg)  # non-classic MO
     row['NE'] = caller(logR=[1.96, 3.08, 3.88, 4.07], **kwarg)  # neutrophils
     row['cMO'] = caller(logR=[3.49, 4.13, 4.18, 3.46], **kwarg)  # classic MO
-    # row['NKs'] = caller(logR=[1.54, 3.21, 3.23, 2.23], **kwarg)  # NK
+    row['NKs'] = caller(logR=[1.54, 3.21, 3.23, 2.23], **kwarg)  # NK
     row['EO'] = caller(logR=[1.96, 4.32, 4.22, 2.60], **kwarg)  # Eosino
 
     return row
@@ -113,6 +113,7 @@ def LOOpredict(lr, X, y, cPred=True):
     return (dirPred, direct_perf, crossPred, crossval_perf, lr)
 
 
+@memoize
 def InVivoPredict(inn=[5, 1E-9]):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     pd.set_option('expand_frame_repr', False)
@@ -131,8 +132,8 @@ def InVivoPredict(inn=[5, 1E-9]):
 
     tbl['Error'] = np.square(tbl.CPredict - y)
 
-    logging.info('InVivoPredict direct r2: ' + str(round(dperf, 3)))
-    logging.info('InVivoPredict crossval r2: ' + str(round(cperf, 3)))
+    print('InVivoPredict direct r2: ' + str(round(dperf, 3)))
+    print('InVivoPredict crossval r2: ' + str(round(cperf, 3)))
 
     return (dperf, cperf, tbl, model)
 
