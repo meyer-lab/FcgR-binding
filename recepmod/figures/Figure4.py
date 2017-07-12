@@ -138,7 +138,7 @@ def ComponentContrib(ax):
     tbN = tbN.drop('None')
 
     # TODO: Put fraction we care about
-    tbN['frac'] = tbN['ncMOeff'] / tbN[[s + 'eff' for s in cellpops]].sum()
+    tbN['frac'] = tbN['ncMOeff'] / tbN[[s + 'eff' for s in cellpops]].sum(axis=1)
 
     commonPlot(ax, tbN, 'frac', 'Effectiveness')
 
