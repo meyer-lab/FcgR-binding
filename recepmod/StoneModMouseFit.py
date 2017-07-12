@@ -74,8 +74,8 @@ def CALCapply(row):
 cellpops = ['cMO', 'EO', 'NE', 'ncMO']
 
 
-def modelPrepAffinity(v=5, L0=1E-12):
-
+def modelPrepAffinity(v, L0):
+    """ Setup data for model. """
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
     data['v'] = v
     data['L0'] = L0
