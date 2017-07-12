@@ -66,6 +66,7 @@ def CALCapply(row):
     row['cMO'] = caller(logR=[3.49, 4.13, 4.18, 3.46], **kwarg)  # classic MO
     row['NKs'] = caller(logR=[1.54, 3.21, 3.23, 2.23], **kwarg)  # NK
     row['EO'] = caller(logR=[1.96, 4.32, 4.22, 2.60], **kwarg)  # Eosino
+    # TODO: Add this expression data to the paper.
 
     return row
 
