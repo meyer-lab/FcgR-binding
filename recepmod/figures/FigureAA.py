@@ -10,7 +10,7 @@ def makeFigure():
     ax, f = getSetup((7, 6), (3, 5))
 
     # Retrieve model and fit from hdf5 file
-    M, dset = read_chain()
+    _, dset = read_chain()
 
     d = {'Rexp': [r'Fc$\gamma$RIA', r'Fc$\gamma$RIIA-131R',
                   r'Fc$\gamma$RIIA-131H', r'Fc$\gamma$RIIB',
