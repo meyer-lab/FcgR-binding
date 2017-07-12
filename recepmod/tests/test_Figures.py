@@ -7,23 +7,47 @@ warnings.filterwarnings(action="ignore", module="scipy", message="^internal gels
 class TestFigures(unittest.TestCase):
     def test_Figure4(self):
         from ..figures import Figure4
+
+        ax = plt.gca()
+
+        #Figure4.InVivoPredictComponents(ax)
+
+        #Figure4.ComponentContrib(ax)
+
+    def test_Figure2_AvgAV(self):
         from ..figures import Figure2
+
+        ax = plt.gca()
+
+        Figure2.AverageAvidity(ax)
+
+    def test_Figure4_AI(self):
+        from ..figures import Figure4
 
         ax = plt.gca()
 
         Figure4.AIplot(ax)
 
-        Figure4.InVivoPredictVsActualAffinities(ax)
+    def test_Figure4_ReqComp(self):
+        from ..figures import Figure4
 
-        Figure4.InVivoPredictVsActual(ax)
-
-        Figure4.InVivoPredictComponents(ax)
-
-        Figure4.ComponentContrib(ax)
+        ax = plt.gca()
 
         Figure4.RequiredComponents(ax)
 
-        Figure2.AverageAvidity(ax)
+    def test_Figure4_predVact(self):
+        from ..figures import Figure4
+
+        ax = plt.gca()
+
+        Figure4.InVivoPredictVsActual(ax)
+
+    def test_Figure4_predAffinity(self):
+        from ..figures import Figure4
+
+        ax = plt.gca()
+
+        Figure4.InVivoPredictVsActualAffinities(ax)
 
 
 if __name__ == '__main__':

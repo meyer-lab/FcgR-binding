@@ -1,3 +1,4 @@
+import logging
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -26,7 +27,8 @@ def makeFigure():
     ClassAvidityPCA(ax[3])
 
     # Show model components
-    InVivoPredictComponents(ax[4])
+    # InVivoPredictComponents(ax[4])
+    # TODO: Get InVivoPredictComponents working
 
     # Show performance of in vivo regression model
     InVivoPredictVsActual(ax[5])
@@ -39,7 +41,8 @@ def makeFigure():
     # TODO Add component contribution back in
 
     # Predict class/avidity effect
-    ClassAvidityPredict(ax[8])
+    # ClassAvidityPredict(ax[8])
+    # TODO: Get ClassAvidityPredict working
 
     for ii, item in enumerate(ax):
         if ii != 4:
@@ -251,6 +254,9 @@ def AIplot(ax):
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
     cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
+
+    logging.info('AI crossval: ' + cperf)
+
     ax.text(0.1, 0.9, dperf)
     ax.text(0.1, 0.75, cperf)
 
@@ -272,6 +278,9 @@ def InVivoPredictVsActualAffinities(ax):
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
     cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
+
+    logging.info('AI with KO crossval: ' + cperf)
+
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.75, cperf)
 
