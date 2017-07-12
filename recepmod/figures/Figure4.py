@@ -37,8 +37,7 @@ def makeFigure():
     RequiredComponents(ax[6])
 
     # Predicted contribution plot
-    # ComponentContrib(ax[7])
-    # TODO Add component contribution back in
+    ComponentContrib(ax[7])
 
     # Predict class/avidity effect
     # ClassAvidityPredict(ax[8])
@@ -131,17 +130,20 @@ def InVivoPredictVsActual(ax):
 
 def ComponentContrib(ax):
     """ Plot the predicted contribution of NK cells. """
-    from ..StoneModMouseFit import InVivoPredict
+    from ..StoneModMouseFit import InVivoPredict, cellpops
 
     # Run the in vivo regression model
     _, _, tbN, _ = InVivoPredict()
 
     tbN = tbN.drop('None')
 
-    commonPlot(ax, tbN, 'NKfrac', 'Effectiveness')
+    # TODO: Put fraction we care about
+    tbN['frac'] = tbN['ncMOeff'] / tbN[[s + 'eff' for s in cellpops]].sum()
+
+    commonPlot(ax, tbN, 'frac', 'Effectiveness')
 
     ax.set_ylabel('Effectiveness')
-    ax.set_xlabel('Predicted NK Contribution')
+    ax.set_xlabel('Predicted ncMO Contribution')
 
 
 def InVivoPredictComponents(ax):
@@ -295,9 +297,8 @@ def ClassAvidityPredict(ax):
     from .FigureCommon import Legend
 
     # Run the in vivo regression model
-    _, _, _, model = InVivoPredict()
+    _, _, tblOne, model = InVivoPredict()
     data = StoneModelMouse().NimmerjahnEffectTableAffinities()
-    data = data[data.index.str.contains("FcgR") is False]
     data.drop('Effectiveness', axis=1, inplace=True)
 
     data['v'] = 1
@@ -310,7 +311,7 @@ def ClassAvidityPredict(ax):
 
         data = data.append(dataNew)
 
-    data['L0'] = 1.0E-12
+    data['L0'] = tblOne['L0'][0]
 
     data = data.apply(CALCapply, axis=1)
 
