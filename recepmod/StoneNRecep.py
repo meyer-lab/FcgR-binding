@@ -187,21 +187,8 @@ class StoneN:
 
     def getActivity(self, actV):
         """ Return the activity index. """
-        vGrid = np.copy(self.vgridOut)
-        actV = np.array(actV, dtype=np.float)
-
-        if actV.size != vGrid.ndim:
-            raise ValueError('The activity vector must be equal to the number of receptors.')
-
-        for cur_pos in np.ndindex(vGrid.shape):
-            if np.dot(cur_pos, actV) < 0:
-                vGrid[cur_pos] = 0.0
-            elif np.sum(cur_pos) < 2:
-                vGrid[cur_pos] = 0.0
-            else:
-                vGrid[cur_pos] *= np.dot(cur_pos, actV)
-
-        return np.sum(vGrid)
+        # TODO: Justify and change wording for this.
+        return np.exp(np.dot(self.getRmultiAll(), actV) / 1E4)
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
         self.logR = np.array(logR, dtype=np.float, copy=True)

@@ -46,14 +46,14 @@ open: Manuscript/index.html
 	open ./Manuscript/index.html
 
 test:
-	nosetests -s --with-timer --timer-top-n 5
+	nosetests-3.4 -s --with-timer --timer-top-n 5
 
 profile:
-	nosetests -s --with-timer --timer-top-n 5 --with-cprofile
+	nosetests-3.4 -s --with-timer --timer-top-n 5 --with-cprofile
 	gprof2dot -n 2.0 -e 2.0 -f pstats stats.dat | dot -Tpng -o profile.png
 
 testcover:
-	nosetests --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
+	nosetests-3.4 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
 
 upload:
 	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --verbose"
