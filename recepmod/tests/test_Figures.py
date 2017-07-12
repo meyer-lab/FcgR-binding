@@ -12,7 +12,9 @@ class TestFigures(unittest.TestCase):
 
         #Figure4.InVivoPredictComponents(ax)
 
-        #Figure4.ComponentContrib(ax)
+        Figure4.ComponentContrib(ax)
+
+        Figure4.ClassAvidityPredict(ax)
 
     def test_Figure2_AvgAV(self):
         from ..figures import Figure2
