@@ -38,7 +38,7 @@ def makeFigure():
 
     # Predicted contribution plot
     # ComponentContrib(ax[7])
-    # TODO: Removed comp contribution plot temp
+    # TODO Add component contribution back in
 
     # Predict class/avidity effect
     # ClassAvidityPredict(ax[8])
