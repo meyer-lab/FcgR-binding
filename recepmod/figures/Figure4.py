@@ -54,22 +54,18 @@ def makeFigure():
     return f
 
 
+def iggRename(x):
+    """ Make names refer to murine form. """
+    return x.replace('IgG', 'mIgG')
+
+
 IgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None']
-iggRename = lambda name: 'm' + name if name[0] == 'I' else name
 Igs = {'IgG1': 'o', 'IgG2a': 'd', 'IgG2b': '^', 'IgG3': 's', 'None': '.'}
 keys = [key for key in Igs.keys()]
 for key in keys:
     Igs[iggRename(key)] = Igs[key]
 
-Ig = {'IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None'}
-Igidx = dict(zip(Ig, sns.color_palette()))
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
-Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
-KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',
-              r'mFc$\gamma$RI-/-', r'mFc$\gamma$RIII-/-',
-              r'mFc$\gamma$RI,IV-/-', 'Fucose-']
-
-KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
 
 
 def PrepforLegend(table):
@@ -183,8 +179,7 @@ def InVivoPredictComponents(ax):
                        rotation=40, rotation_mode="anchor", ha="right",
                        position=(0, 0.05), fontsize=6.5)
 
-    alternatingRects([ax.get_xlim()[0]] + [x for x in ax.get_xticks() if x % 1 != 0] + [ax.get_xlim()[-1]],
-                     ylims=ax.get_ylim(), ax=ax)
+    alternatingRects([ax.get_xlim()[0]] + [ax.get_xlim()[-1]], ylims=ax.get_ylim(), ax=ax)
     for rect in ax.get_children()[0:24]:
         ax.add_patch(rect)
 
@@ -203,6 +198,8 @@ def RequiredComponents(ax):
 
 
 def commonPlot(ax, table, xcol, ycol):
+    Knockdownidx = dict(zip(Knockdown, sns.color_palette()))
+
     table['Ig'] = table.apply(lambda x: x.name.split('-')[0], axis=1)
     table = PrepforLegend(table)
 
@@ -259,7 +256,11 @@ def InVivoPredictVsActualAffinities(ax):
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.75, cperf)
 
-    ax.legend(handles=Legend(KnockdownL, KnockdownidxL,
+    KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',
+                  r'mFc$\gamma$RI-/-', r'mFc$\gamma$RIII-/-',
+                  r'mFc$\gamma$RI,IV-/-', 'Fucose-']
+
+    ax.legend(handles=Legend(KnockdownL, dict(zip(KnockdownL, sns.color_palette())),
                              [iggRename(igg) for igg in IgList], Igs),
               bbox_to_anchor=(1.5, 1), loc=2)
 
