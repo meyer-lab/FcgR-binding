@@ -12,6 +12,7 @@ try:
 except ImportError:
     import pickle
 
+
 def read_chain(filename=None, ffilter=True):
     """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
     import os
@@ -40,9 +41,9 @@ def read_chain(filename=None, ffilter=True):
     # Read in dataset to Pandas frame
     # Optionally use burn in
     if ffilter is True:
-        pdset = pd.DataFrame(dset.value[11000:,:], columns = cNames)
+        pdset = pd.DataFrame(dset.value[11000:, :], columns=cNames)
     else:
-        pdset = pd.DataFrame(dset.value, columns = cNames)
+        pdset = pd.DataFrame(dset.value, columns=cNames)
 
     #print(str(pdset.shape[0]) + ' rows read.')
 
@@ -70,15 +71,15 @@ def getMeasuredDataFrame(self):
     Return a dataframe with the measured data labeled with the condition variables
     """
     normData = pd.DataFrame(self.mfiAdjMean)
-    normData = pd.melt(normData, value_name = "Meas")
+    normData = pd.melt(normData, value_name="Meas")
 
-    normData = (normData.assign(TNP=rep(self.TNPs, 24*4))
+    normData = (normData.assign(TNP=rep(self.TNPs, 24 * 4))
                 .assign(Ig=self.Igs * 12 * 4)
-                .drop('variable', axis = 1)
-                .assign(FcgR=rep(self.FcgRs, 4)*8)
-                .assign(Expression=rep(self.Rquant, 4)*8)
-                .assign(Ka=np.tile(np.reshape(self.kaBruhns, (-1,1)), (8, 1)))
-               )
+                .drop('variable', axis=1)
+                .assign(FcgR=rep(self.FcgRs, 4) * 8)
+                .assign(Expression=rep(self.Rquant, 4) * 8)
+                .assign(Ka=np.tile(np.reshape(self.kaBruhns, (-1, 1)), (8, 1)))
+                )
 
     return normData
 
@@ -87,7 +88,8 @@ def getFitPrediction(self, x):
     """
     Return a dataframe with the fit data labeled with the condition variables
     """
-    _, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = self.NormalErrorCoef(x, fullOutput = True)
+    _, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = self.NormalErrorCoef(
+        x, fullOutput=True)
 
     outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
 
@@ -103,9 +105,10 @@ def getFitPrediction(self, x):
           .assign(nXlinkPred=np.reshape(np.transpose(outputnXlink), (-1, 1)))
           .assign(LbndPred=np.reshape(np.transpose(outputLbnd), (-1, 1)))
           .assign(Req=np.reshape(np.transpose(outputReq), (-1, 1)))
-         )
+          )
 
     return dd
+
 
 def mapMCMC(dFunction, pSet, quiet=False):
     """
@@ -117,7 +120,7 @@ def mapMCMC(dFunction, pSet, quiet=False):
     from tqdm import trange
 
     # Set the function to pass back results
-    funFunc = lambda ii: dFunction(pSet.iloc[ii,:]).assign(pSetNum = ii)
+    funFunc = lambda ii: dFunction(pSet.iloc[ii, :]).assign(pSetNum=ii)
 
     # Iterate over each parameter set, output to a list
     retVals = map(funFunc, trange(pSet.shape[0], disable=quiet))
@@ -133,11 +136,12 @@ def getFitMeasMerged(M, x):
     fit = getFitPrediction(M, x)
     data = getMeasuredDataFrame(M)
 
-    fit = fit.drop('Expression', axis = 1)
+    fit = fit.drop('Expression', axis=1)
 
     allFrame = fit.merge(data, 'outer', on=('FcgR', 'TNP', 'Ig', 'Ka'))
 
     return allFrame
+
 
 def getFitMeasMergedSummarized(M, x):
     fitFrame = getFitMeasMerged(M, x)
@@ -152,11 +156,12 @@ def getFitMeasMergedSummarized(M, x):
               .reset_index())
 
     # Reunite the mean and sem summarized values
-    fitMean = fitMean.merge(fitSTD, how = 'outer',
-                            on = ['Ig', 'TNP', 'FcgR'],
-                            suffixes = ['_mean', '_std'])
+    fitMean = fitMean.merge(fitSTD, how='outer',
+                            on=['Ig', 'TNP', 'FcgR'],
+                            suffixes=['_mean', '_std'])
 
     return fitMean
+
 
 def getFitMeasSummarized(M):
     fitFrame = getMeasuredDataFrame(M)
@@ -165,29 +170,31 @@ def getFitMeasSummarized(M):
 
     # Massage data frame into mean and sem of measured values
     fitMean = fitFrame.groupby(['Ig', 'TNP', 'FcgR']).mean().reset_index()
-    fitSTD = (fitFrame[['Ig', 'TNP', 'FcgR', 'Meas']].groupby(['Ig', 'TNP', 'FcgR']).sem().reset_index())
+    fitSTD = (fitFrame[['Ig', 'TNP', 'FcgR', 'Meas']].groupby(
+        ['Ig', 'TNP', 'FcgR']).sem().reset_index())
 
     # Reunite the mean and sem summarized values
-    fitMean = fitMean.merge(fitSTD, how = 'outer',
-                            on = ['Ig', 'TNP', 'FcgR'],
-                            suffixes = ['_mean', '_std'])
+    fitMean = fitMean.merge(fitSTD, how='outer',
+                            on=['Ig', 'TNP', 'FcgR'],
+                            suffixes=['_mean', '_std'])
 
     return fitMean
 
 
 def geweke(chain1, chain2=None):
     """
-    Perform the Geweke Diagnostic between two univariate chains. If two chains are input 
+    Perform the Geweke Diagnostic between two univariate chains. If two chains are input
     instead of one, Student's t-test is performed instead.
     """
     from scipy.stats import ttest_ind
 
     len0 = chain1.shape[0]
     if chain2 is None:
-        chain2 = chain1[int(np.ceil(len0/2)):len0]
-        chain1 = chain1[0:int(np.ceil(len0*0.1))]
-    statistic, pvalue = ttest_ind(chain1,chain2)
+        chain2 = chain1[int(np.ceil(len0 / 2)):len0]
+        chain1 = chain1[0:int(np.ceil(len0 * 0.1))]
+    statistic, pvalue = ttest_ind(chain1, chain2)
     return statistic, pvalue
+
 
 def geweke_chain(dset, cut=0):
     """
@@ -195,17 +202,18 @@ def geweke_chain(dset, cut=0):
     """
     statistics = []
     pvalues = []
-    dsett = dset.drop(['LL','walker'],1).as_matrix()
+    dsett = dset.drop(['LL', 'walker'], 1).as_matrix()
     for j in range(dsett.shape[1]):
-        statistic, pvalue = geweke(dsett[cut:-1,j])
+        statistic, pvalue = geweke(dsett[cut:-1, j])
         statistics.append(statistic)
         pvalues.append(pvalue)
     return statistics, pvalues
 
+
 def geweke_chains(DSET, cut=0):
     # Perform the Geweke Diagnostic on multiple chains (on along two axes)
     # of data contained in a Pandas Dataframe "dset" output by read_chain.
-    nwalkers = int(np.max(DSET['walker']))+1
+    nwalkers = int(np.max(DSET['walker'])) + 1
     Statistics = []
     Pvalues = []
     DSETT = DSET.T
