@@ -27,8 +27,7 @@ def makeFigure():
     ClassAvidityPCA(ax[3])
 
     # Show model components
-    # InVivoPredictComponents(ax[4])
-    # TODO: Get InVivoPredictComponents working
+    InVivoPredictComponents(ax[4])
 
     # Show performance of in vivo regression model
     InVivoPredictVsActual(ax[5])
@@ -71,12 +70,6 @@ KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',
               r'mFc$\gamma$RI,IV-/-', 'Fucose-']
 
 KnockdownidxL = dict(zip(KnockdownL, sns.color_palette()))
-celltypes = ['NK effect', 'DC-like effect']
-celltypes2 = ['NKeff', 'DCeff']
-cellColors = sns.crayon_palette(['Royal Purple', 'Brown', 'Asparagus'])
-celltypeidx = dict(zip(celltypes, cellColors))
-for cell, cell2 in zip(celltypes, celltypes2):
-    celltypeidx[cell2] = celltypeidx[cell]
 
 
 def PrepforLegend(table):
@@ -149,35 +142,28 @@ def ComponentContrib(ax):
 def InVivoPredictComponents(ax):
     """ Plot model components. """
     from ..StoneModMouseFit import InVivoPredict
-    import matplotlib
+    import re
     from .FigureCommon import alternatingRects
 
     # Run the in vivo regression model
     _, _, tbN, _ = InVivoPredict()
-    # Remove the "None' condition
-    tbN = tbN[tbN.index != 'None']
-    tbN = PrepforLegend(tbN)
-    fcgrs = tbN['Knockdown'].tolist()
-    tbN = tbN[['NKeff', 'DCeff']]
 
-    # Set up x axis labels
-    for i in range(len(fcgrs)):
-        for j in range(len(Knockdown)):
-            if fcgrs[i] == Knockdown[j]:
-                fcgrs[i] = KnockdownL[j]
-    idx = list(tbN.index.copy())
+    # Only keep the effect columns
+    tbN = tbN.select(lambda x: re.search('eff', x), axis=1)
 
-    for k, item in enumerate(idx):
-        if fcgrs[k] != 'Wild-type':
-            fc = item.replace(item.split('-')[0], '')
-            idx[k] = item.replace(fc, str('-' + fcgrs[k]))
-
-    tbN.index = idx
+    tbN.index = map(lambda x: x.replace('Fcg', r'mFc$\gamma$'), tbN.index)
+    tbN.index = map(lambda x: x.replace('ose-/-', 'ose-'), tbN.index)
+    tbN.index = map(lambda x: x.replace('IgG', 'mIgG'), tbN.index)
 
     tbN.index.name = 'condition'
     tbN.reset_index(inplace=True)
 
     tbN = pd.melt(tbN, id_vars=['condition'])
+
+    # Remove eff from cell line labels
+    tbN['variable'] = list(map(lambda x: x.replace('eff', ''), tbN.variable))
+
+    # TODO: Temporarily set color palette to something else
 
     sns.factorplot(x="condition",
                    hue="variable",
@@ -185,31 +171,18 @@ def InVivoPredictComponents(ax):
                    data=tbN,
                    ax=ax,
                    kind='bar',
-                   palette=celltypeidx)
+                   legend=False)
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('')
-
-    for lab in ax.get_xticklabels():
-        lab.set_text('m' + lab.get_text() if lab.get_text()[0] == 'I' else lab.get_text())
-
-    # Make legend
-    patches = list()
-    for key, val in zip(celltypes, [celltypeidx[typ] for typ in celltypes]):
-        patches.append(matplotlib.patches.Patch(color=val, label=key))
-    ax.legend(handles=patches, bbox_to_anchor=(0, 1), loc=2)
+    ax.legend(loc='best')
 
     # Set alternating grey rectangles in the background to allow for better
     # readability of the bar graph
-    from itertools import chain
-    ax.set_xticks(list(chain.from_iterable((num, num + 0.5) for num in ax.get_xticks())))
-    ax.set_xticklabels(list(chain.from_iterable((name, '') for name in ax.get_xticklabels())))
     ax.set_xticklabels(ax.get_xticklabels(),
                        rotation=40, rotation_mode="anchor", ha="right",
                        position=(0, 0.05), fontsize=6.5)
 
-    ax.set_xlim(ax.get_xlim())
-    ax.set_ylim(ax.get_ylim())
     alternatingRects([ax.get_xlim()[0]] + [x for x in ax.get_xticks() if x % 1 != 0] + [ax.get_xlim()[-1]],
                      ylims=ax.get_ylim(), ax=ax)
     for rect in ax.get_children()[0:24]:
