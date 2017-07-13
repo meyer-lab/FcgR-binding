@@ -10,7 +10,7 @@ class TestFigures(unittest.TestCase):
 
         ax = plt.gca()
 
-        #Figure4.InVivoPredictComponents(ax)
+        Figure4.InVivoPredictComponents(ax)
 
         Figure4.ComponentContrib(ax)
 
