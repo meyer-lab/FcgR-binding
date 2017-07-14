@@ -1,14 +1,1 @@
-*.asv
 **/__pycache__/
-*mcmc_chain.h5
-.Rproj.user
-*.py~
-*.gitignore~
-Manuscript/Figures/
-Manuscript/Figures/Figure*
-Manuscript/Manuscript.pdf
-recepmod.sublime-workspace
-Manuscript/Text/07_ModelData.md
-*.csv#
-quikcred.sh
-getMan.sh
