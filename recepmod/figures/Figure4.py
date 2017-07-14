@@ -30,7 +30,8 @@ def makeFigure():
     InVivoPredictComponents(ax[4])
 
     # Show performance of in vivo regression model
-    InVivoPredictVsActual(ax[5])
+    with sns.set_palette("Paired"):
+        InVivoPredictVsActual(ax[5])
 
     # Leave components out plot
     RequiredComponents(ax[6])
@@ -125,7 +126,6 @@ def ComponentContrib(ax):
 
     tbN = tbN.drop('None')
 
-    # TODO: Put fraction we care about
     tbN['frac'] = tbN['ncMOeff'] / tbN[[s + 'eff' for s in cellpops]].sum(axis=1)
 
     commonPlot(ax, tbN, 'frac', 'Effectiveness')
@@ -157,8 +157,6 @@ def InVivoPredictComponents(ax):
 
     # Remove eff from cell line labels
     tbN['variable'] = list(map(lambda x: x.replace('eff', ''), tbN.variable))
-
-    # TODO: Temporarily set color palette to something else
 
     sns.factorplot(x="condition",
                    hue="variable",
