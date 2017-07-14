@@ -3,12 +3,11 @@
 import sys
 import traceback
 import multiprocessing
-from recepmod.figures.FigureCommon import figList
+import svgutils.transform as st
 from recepmod.StoneModMouse import StoneModelMouse
 import matplotlib
 matplotlib.use('AGG')
-
-import svgutils.transform as st
+from recepmod.figures.FigureCommon import figList
 
 
 parallel = True
@@ -29,7 +28,6 @@ def runFunc(nameOut):
         print(nameOut + ' is done.')
         return None
     except Exception as e:
-        traceback.print_exc()
         return e
 
 
@@ -62,6 +60,7 @@ if __name__ == '__main__':
 
             for i in result.get():
                 if isinstance(i, Exception):
+                    traceback.print_exc()
                     raise i
 
         # Overlay Figure 2 cartoon
