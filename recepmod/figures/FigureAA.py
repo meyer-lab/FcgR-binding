@@ -2,6 +2,7 @@
 Make a supplemental figure with the autocorrelation analysis.
 """
 
+
 def makeFigure():
     from ..StoneHelper import read_chain
     from .FigureCommon import getSetup
@@ -70,4 +71,3 @@ def plotAutoC(ax, dset, coll):
     ax.axhline(y=0.0, color='black', linewidth=0.5)
     ax.axhline(y=-z95, color='grey', linewidth=0.5)
     ax.axhline(y=-z99, linestyle='--', color='grey', linewidth=0.5)
-
