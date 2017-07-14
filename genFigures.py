@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 
 import sys
-import matplotlib
-matplotlib.use('AGG')
-import svgutils.transform as st
+import traceback
 import multiprocessing
 from recepmod.figures.FigureCommon import figList
 from recepmod.StoneModMouse import StoneModelMouse
+import matplotlib
+matplotlib.use('AGG')
+
+import svgutils.transform as st
+
 
 parallel = True
 
@@ -26,6 +29,7 @@ def runFunc(nameOut):
         print(nameOut + ' is done.')
         return None
     except Exception as e:
+        traceback.print_exc()
         return e
 
 
@@ -37,6 +41,7 @@ if __name__ == '__main__':
         a = runFunc(nameOut)
 
         if isinstance(a, Exception):
+            traceback.print_exc()
             raise a
 
     else:
