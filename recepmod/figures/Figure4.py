@@ -39,8 +39,7 @@ def makeFigure():
     ComponentContrib(ax[7])
 
     # Predict class/avidity effect
-    # ClassAvidityPredict(ax[8])
-    # TODO: Get ClassAvidityPredict working
+    ClassAvidityPredict(ax[8])
 
     for ii, item in enumerate(ax):
         if ii != 4:
