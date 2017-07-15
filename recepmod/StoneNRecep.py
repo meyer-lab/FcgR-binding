@@ -187,7 +187,6 @@ class StoneN:
 
     def getActivity(self, actV):
         """ Return the activity index. """
-        # TODO: Justify and change wording for this.
         return np.exp(np.dot(self.getRmultiAll(), actV) / 1E4)
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
