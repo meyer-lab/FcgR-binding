@@ -40,8 +40,6 @@ We fit our model to binding measurements for each hFcγR-hIgG pair using an affi
 
 ### Generalized Multi-Receptor Model
 
-TODO: Double check this before submission.
-
 To account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of multiple receptors. At each crosslinking step, $K_x$ must be proportional to the $K_a$ of the corresponding monovalent epitope-receptor interaction to satisfy detailed balance. Under the same assumptions as before, the relative proportion of receptor complexes with $N$ receptors respectively bound $i$, $j$, $k$,...-valently is specified as:
 
 $$ \varPhi = \frac{K_x \left( K_a \odot R_{eq} \right)}{K_{a, i}} $$ {#eq:KKRK}
