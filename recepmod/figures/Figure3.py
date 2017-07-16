@@ -188,8 +188,9 @@ def varyAffinity(ax):
     table = table.apply(lambda x: appFunc(x, 0), axis=1)
 
     for ii in avidities[1::]:
-        table[table['avidity'] == ii].plot(ax=ax, x='ratio', y='activity', legend=False, loglog=True)
+        table[table['avidity'] == ii].plot(ax=ax, x='ratio', y='activity', legend=False)
 
+    ax.set_xscale('log')
     ax.set_xlabel('$K_a$ Ratio (Activating/Inhibitory)')
     ax.set_ylabel('Activity Index')
 
