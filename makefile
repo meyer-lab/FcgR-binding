@@ -4,7 +4,7 @@ fdir = ./Manuscript/Figures
 tdir = ./Manuscript/Templates
 pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filter.py -f markdown ./Manuscript/Text/*.md
 
-.PHONY: clean upload test profile testcover open
+.PHONY: clean upload test profile testcover open rebuild
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx
 
@@ -57,3 +57,6 @@ testcover:
 
 upload:
 	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --verbose"
+
+rebuild:
+	(echo "from recepmod.figures.FigureS2 import robustnessCalc" ; echo "robustnessCalc()") | python3
