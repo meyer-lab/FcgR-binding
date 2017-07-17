@@ -17,21 +17,18 @@ class regFunc(BaseEstimator):
 
         ub = np.full((X.shape[1], ), 12.0)
 
-        res = differential_evolution(self.errF, bounds=list(zip(-ub, ub)), disp=False)
+        res = differential_evolution(lambda p: np.sum(np.square(self.trainy - self.predict(p=p))),
+                                     bounds=list(zip(-ub, ub)), disp=False)
 
-        self.res = least_squares(self.diffF, x0=res.x, jac='3-point', bounds=(-ub, ub))
+        self.res = least_squares(self.diffF, x0=res.x, jac='cs', bounds=(-ub, ub))
 
     def diffF(self, p):
         return self.trainy - self.predict(p=p)
-
-    def errF(self, p):
-        return np.sum(np.square(self.trainy - self.predict(p=p))) / 2.0
 
     def predict(self, X=None, p=None):
         """
         Output prediction from parameter set. Use internal X if none given.
         """
-        from scipy.special import expit
 
         if p is None:
             p = self.res.x
@@ -42,4 +39,4 @@ class regFunc(BaseEstimator):
         if X is None:
             X = self.trainX
 
-        return 2.0 * (expit(np.dot(X, p)) - 0.5)
+        return np.tanh(np.dot(X, p))
