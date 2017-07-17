@@ -140,7 +140,7 @@ def InVivoPredictComponents(ax):
     from .FigureCommon import alternatingRects
 
     # Run the in vivo regression model
-    _, _, tbN, _ = InVivoPredict()
+    tbN = InVivoPredict()[2]
 
     # Only keep the effect columns
     tbN = tbN.select(lambda x: re.search('eff', x), axis=1)

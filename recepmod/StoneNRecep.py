@@ -194,7 +194,7 @@ class StoneN:
         elif summ < -30:
             return 0.0
         else:
-            return summ / (1.0 + np.exp(-summ))
+            return np.abs(summ) / (1.0 + np.exp(-summ))
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
         self.logR = np.array(logR, dtype=np.float, copy=True)

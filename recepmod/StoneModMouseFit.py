@@ -124,15 +124,13 @@ def InVivoPredict(inn=[5, 1E-9]):
 
     tbl['DPredict'], dperf, tbl['CPredict'], cperf, model = LOOpredict(regFunc(), X, y)
 
-    XX = np.power(10, model.res.x)
-
-    for ii in range(len(cellpops)):
-        tbl[cellpops[ii] + 'eff'] = tbl[cellpops[ii]] * XX[ii]
-
     tbl['Error'] = np.square(tbl.CPredict - y)
 
     print('InVivoPredict direct r2: ' + str(round(dperf, 3)))
     print('InVivoPredict crossval r2: ' + str(round(cperf, 3)))
+
+    for ii, item in enumerate(cellpops):
+        tbl[item + 'eff'] = tbl[item] * np.power(10, model.res.x[ii])
 
     return (dperf, cperf, tbl, model)
 
