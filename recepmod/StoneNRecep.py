@@ -187,7 +187,14 @@ class StoneN:
 
     def getActivity(self, actV):
         """ Return the activity index. """
-        return np.exp(np.dot(self.getRmultiAll(), actV) / 1E4)
+        summ = np.dot(self.getRmultiAll(), actV)
+
+        if summ > 30:
+            return summ
+        elif summ < -30:
+            return 0.0
+        else:
+            return summ / (1.0 + np.exp(-summ))
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
         self.logR = np.array(logR, dtype=np.float, copy=True)

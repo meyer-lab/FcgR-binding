@@ -16,6 +16,7 @@ from ..StoneHelper import getMedianKx
 
 subsplits = 100
 
+
 def makeFigure():
     import string
 
@@ -39,7 +40,7 @@ def makeFigure():
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
 
-    ax[0].legend([r'$f='+str(x)+r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
+    ax[0].legend([r'$f=' + str(x) + r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
                  loc=1,
                  bbox_to_anchor=(0.5, 1))
 
@@ -55,7 +56,7 @@ def makeFigure():
 def plotRanges():
     avidity = np.logspace(0, 5, 6, base=2, dtype=np.int)
     ligand = np.logspace(start=-12, stop=-5, num=subsplits)
-    Ka = [1.2E6, 1.2E5] # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
+    Ka = [1.2E6, 1.2E5]  # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
     logR = [4.0, 4.5]
 
     return (ligand, avidity, Ka, logR)
@@ -82,18 +83,19 @@ def PredictionVersusAvidity(ax):
     skipColor(ax[3])
 
     def calculate(x):
-        a = StoneMod(logR[0],Ka[0],x['avidity'],getMedianKx()*Ka[0],x['ligand'], fullOutput=True)
+        a = StoneMod(logR[0], Ka[0], x['avidity'],
+                     getMedianKx() * Ka[0], x['ligand'], fullOutput=True)
 
-        return pd.Series(dict(bound = a[0],
-                              avidity = x['avidity'],
-                              ligand = x['ligand'],
-                              ligandEff = x['ligand'] * x['avidity'],
-                              Rmulti = a[2],
-                              nXlink = a[3]))
+        return pd.Series(dict(bound=a[0],
+                              avidity=x['avidity'],
+                              ligand=x['ligand'],
+                              ligandEff=x['ligand'] * x['avidity'],
+                              Rmulti=a[2],
+                              nXlink=a[3]))
 
     inputs = pd.DataFrame(list(product(avidity, ligand)), columns=['avidity', 'ligand'])
 
-    outputs = inputs.apply(calculate, axis = 1)
+    outputs = inputs.apply(calculate, axis=1)
 
     for ii in avidity:
         curDat = outputs[outputs['avidity'] == ii]
@@ -115,6 +117,7 @@ def PredictionVersusAvidity(ax):
     ax[3].set_ylabel(r'hFc$\gamma$RIIIA-F Nxlinks')
     ax[3].set_ylim(1, 1E3)
     ax[3].set_xlim(1, 1E4)
+
 
 def TwoRecep(ax):
     """
@@ -144,17 +147,18 @@ def TwoRecep(ax):
 
     table = table.apply(appFunc, axis=1)
 
-    colors = dict(zip(avidity[1::],sns.color_palette()[1::]))
+    colors = dict(zip(avidity[1::], sns.color_palette()[1::]))
 
     for ii in avidity[1::]:
-        table[table['avidity'] == ii].plot(x="ligand", y="activity", ax=ax[1], logx=True, legend=False)
-        x0 = table[table['avidity']==ii]['RmultiOne'].values
-        y0 = table[table['avidity']==ii]['RmultiTwo'].values
-        ax[0].plot(x0,y0)
-        for x, y, xx, yy in zip(x0[0:-1:10],y0[0:-1:10],
-                                (x0-np.roll(x0,1))[0:-1:10],
-                                (y0-np.roll(y0,1))[0:-1:10]):
-            ax[0].plot(x,y,marker=(3,0,np.arctan2(yy,xx)/np.pi*180-90),
+        table[table['avidity'] == ii].plot(x="ligand", y="activity", ax=ax[
+                                           1], logx=True, legend=False)
+        x0 = table[table['avidity'] == ii]['RmultiOne'].values
+        y0 = table[table['avidity'] == ii]['RmultiTwo'].values
+        ax[0].plot(x0, y0)
+        for x, y, xx, yy in zip(x0[0:-1:10], y0[0:-1:10],
+                                (x0 - np.roll(x0, 1))[0:-1:10],
+                                (y0 - np.roll(y0, 1))[0:-1:10]):
+            ax[0].plot(x, y, marker=(3, 0, np.arctan2(yy, xx) / np.pi * 180 - 90),
                        color=colors[ii])
     ax[0].set_xlabel(r'Multimerized hFc$\gamma$RIIIA-F')
     ax[0].set_ylabel(r'Multimerized hFc$\gamma$RIIB')
@@ -162,6 +166,7 @@ def TwoRecep(ax):
     ax[1].set_ylabel('Activity Index')
     ax[0].set_ylim(0, 1E3)
     ax[0].set_xlim(0, 1E3)
+
 
 def varyAffinity(ax):
     """
@@ -188,9 +193,9 @@ def varyAffinity(ax):
     table = table.apply(lambda x: appFunc(x, 0), axis=1)
 
     for ii in avidities[1::]:
-        table[table['avidity'] == ii].plot(ax=ax, x='ratio', y='activity', legend=False)
+        table[table['avidity'] == ii].plot(ax=ax, x='ratio', y='activity',
+                                           legend=False, loglog=True)
 
-    ax.set_xscale('log')
     ax.set_xlabel('$K_a$ Ratio (Activating/Inhibitory)')
     ax.set_ylabel('Activity Index')
 
@@ -199,9 +204,7 @@ def maxAffinity(ax):
     """ """
     from ..StoneModMouse import StoneModelMouse
 
-    M = StoneModelMouse()
-
-    Kas = np.squeeze(M.kaMouse[:, 2])
+    Kas = np.squeeze(StoneModelMouse().kaMouse[:, 2])
 
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
@@ -209,7 +212,7 @@ def maxAffinity(ax):
     table = pd.DataFrame(list(product(np.logspace(start=4, stop=9, num=subsplits), [0, 2, 3])),
                          columns=['adjust', 'ridx'])
 
-    colors = sns.crayon_palette(['Brick Red','Forest Green','Brown'])
+    colors = sns.crayon_palette(['Brick Red', 'Forest Green', 'Brown'])
 
     def appFunc(x):
         KaCur = Kas.copy()
@@ -218,17 +221,17 @@ def maxAffinity(ax):
         x['activity'] = StoneN(logR, KaCur, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
         # Make ridx == 0 visible
         if x['ridx'] == 0:
-            x['activity'] += 100
-        
+            x['activity'] += 50
+
         return x
 
     table = table.apply(appFunc, axis=1)
 
     sns.FacetGrid(hue='ridx', data=table, palette=colors).map(ax.loglog, 'adjust', 'activity')
 
-    ax.loglog(M.kaMouse[0, 2], 512, color=colors[0], marker='o')
-    ax.loglog(M.kaMouse[2, 2], 512, color=colors[1], marker='o')
-    ax.loglog(M.kaMouse[3, 2], 512, color=colors[2], marker='o')
+    ax.loglog(Kas[0], 512, color=colors[0], marker='o')
+    ax.loglog(Kas[2], 512, color=colors[1], marker='o')
+    ax.loglog(Kas[3], 512, color=colors[2], marker='o')
 
     ax.set_xlabel(r'$K_a$ of mFc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
