@@ -125,6 +125,7 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
         child.set_edgecolor(FcgRidx[FcgRlist[ii]])
         child.set_facecolor(FcgRidx[FcgRlist[ii]])
 
+
 def mfiAdjMeanFigureMaker(measAll, axarr):
     # Mark IgGs as human
     measAll['Ig'] = measAll['Ig'].apply(iggRename)
@@ -134,11 +135,11 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
     # Loop through receptors creating plot
     for axx, fcr in fcIter:
         sns.barplot(x="Ig",
-                    y = "Meas",
+                    y="Meas",
                     hue="TNP",
-                    data=measAll.loc[measAll['FcgR'] == fcr,:],
-                    ax = axx,
-                    ci = 68)
+                    data=measAll.loc[measAll['FcgR'] == fcr, :],
+                    ax=axx,
+                    ci=68)
 
         axx.set_ylabel("Normalized MFI")
         axx.set_xlabel("")
@@ -153,8 +154,9 @@ def mfiAdjMeanFigureMaker(measAll, axarr):
             else:
                 child.set_facecolor(col[1])
                 child.set_edgecolor(col[1])
-                
-    axarr[2].legend(bbox_to_anchor=(1.6,1),loc=2)
+
+    axarr[2].legend(bbox_to_anchor=(1.6, 1), loc=2)
+
 
 def makeFigure():
     from ..StoneModel import StoneModel
@@ -165,7 +167,7 @@ def makeFigure():
 
     # Get list of axis objects
     ax, f = getSetup((7, 6), (3, 4))
-    
+
     FcgRQuantificationFigureMaker(StoneM, ax[7])
 
     subplotLabel(ax[0], 'A')
