@@ -163,7 +163,6 @@ class TestStoneNRecpMethods(unittest.TestCase):
         logR = np.array([5, 5], dtype=np.float64)
         Ka = np.array([1E5, 1E4], dtype=np.float64)
 
-
         output, _, _ = self.retReqDebug(logR, Ka)
         self.assertGreater(output[1], output[0])
 
@@ -190,11 +189,11 @@ class TestStoneNRecpMethods(unittest.TestCase):
         gnu = 4
         L0 = 1E-9
 
-        aa = StoneN(logR, Ka, Kx, gnu, L0)
+        StoneN(logR, Ka, Kx, gnu, L0)
 
         Ka = np.array([1E5, 1E6, 1E5, 1E5], dtype=np.float64)
 
-        bb = StoneN(logR, Ka, Kx, gnu, L0)
+        StoneN(logR, Ka, Kx, gnu, L0)
 
         Ka = np.array([1E5, 1E5, 1E5, 1E5], dtype=np.float64)
 
@@ -206,7 +205,6 @@ class TestStoneNRecpMethods(unittest.TestCase):
         for ii in range(4):
             self.assertTrue(np.isclose(rmulti[0], rmulti[ii]))
             self.assertTrue(np.isclose(rbnd[0], rbnd[ii]))
-
 
 
 if __name__ == '__main__':
