@@ -70,7 +70,7 @@ def CALCapply(row):
     return row
 
 
-cellpops = ['cMO', 'EO', 'NE', 'ncMO']
+cellpops = ['cMO', 'NE', 'ncMO', 'NKs', 'EO']
 
 
 def modelPrepAffinity(v, L0):
@@ -95,7 +95,7 @@ def LOOpredict(lr, X, y, cPred=True):
     from sklearn.metrics import r2_score
 
     # Do LOO prediction
-    crossPred = cross_val_predict(lr, X, y, cv=len(y))
+    crossPred = cross_val_predict(lr, X, y, cv=len(y), n_jobs=-1)
 
     # How well did we do on crossvalidation?
     crossval_perf = r2_score(y, crossPred)
