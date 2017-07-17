@@ -1,8 +1,6 @@
 import seaborn as sns
 from ..StoneModel import StoneModel
 
-figList = ['Figure1', 'Figure2', 'Figure3', 'Figure4', 'FigureS2', 'FigureAA']
-
 IgList = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
 
 
@@ -137,3 +135,17 @@ def alternatingRects(rectEdges, ylims, ax, color=(0.8, 0.8, 0.8), alpha=0):
                                    ylims[1], color=color))
     for patch in rects:
         ax.add_patch(patch)
+
+
+def overlayCartoon(figFile, cartoonFile, x, y, scalee=1):
+    """ Add cartoon to a figure file. """
+    import svgutils.transform as st
+
+    # Overlay Figure 4 cartoon
+    template = st.fromfile(figFile)
+    cartoon = st.fromfile(cartoonFile).getroot()
+
+    cartoon.moveto(x, y, scale=scalee)
+
+    template.append(cartoon)
+    template.save(figFile)

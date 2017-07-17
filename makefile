@@ -8,9 +8,9 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filte
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx
 
-$(fdir)/Figure1%svg $(fdir)/Figure2%svg $(fdir)/Figure3%svg $(fdir)/Figure4%svg $(fdir)/FigureS2%svg $(fdir)/FigureAA%svg: genFigures.py
+$(fdir)/Figure%.svg: genFigures.py
 	mkdir -p ./Manuscript/Figures
-	python3 genFigures.py
+	python3 genFigures.py $*
 
 $(fdir)/Figure%pdf: $(fdir)/Figure%svg
 	rsvg-convert -f pdf $< -o $@
