@@ -194,8 +194,9 @@ def varyAffinity(ax):
 
     for ii in avidities[1::]:
         table[table['avidity'] == ii].plot(ax=ax, x='ratio', y='activity',
-                                           legend=False, loglog=True)
+                                           legend=False)
 
+    ax.set_xscale('log')
     ax.set_xlabel('$K_a$ Ratio (Activating/Inhibitory)')
     ax.set_ylabel('Activity Index')
 
@@ -208,6 +209,8 @@ def maxAffinity(ax):
 
     logR = [4.0, 4.5, 4.0, 4.0]
     L0, gnu = 1.0E-9, 5
+
+    baselineAct = StoneN(logR, Kas, getMedianKx(), gnu, L0).getActivity([1, -1, 1, 1])
 
     table = pd.DataFrame(list(product(np.logspace(start=4, stop=9, num=subsplits), [0, 2, 3])),
                          columns=['adjust', 'ridx'])
@@ -227,14 +230,16 @@ def maxAffinity(ax):
 
     table = table.apply(appFunc, axis=1)
 
-    sns.FacetGrid(hue='ridx', data=table, palette=colors).map(ax.loglog, 'adjust', 'activity')
+    ax.plot(Kas[0], baselineAct + 50, color=colors[0], marker='o')
 
-    ax.loglog(Kas[0], 512, color=colors[0], marker='o')
-    ax.loglog(Kas[2], 512, color=colors[1], marker='o')
-    ax.loglog(Kas[3], 512, color=colors[2], marker='o')
+    sns.FacetGrid(hue='ridx', data=table, palette=colors).map(ax.plot, 'adjust', 'activity')
+
+    ax.plot(Kas[2], baselineAct, color=colors[1], marker='o')
+    ax.plot(Kas[3], baselineAct, color=colors[2], marker='o')
 
     ax.set_xlabel(r'$K_a$ of mFc$\gamma$R Adjusted')
     ax.set_ylabel('Activity Index')
+    ax.set_xscale('log')
     ax.set_xlim(1.0E4, 1.0E9)
 
     patchA = matplotlib.patches.Patch(color=colors[0], label=r'mFc$\gamma$RI')
