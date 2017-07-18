@@ -23,7 +23,7 @@ pipeline {
       }
     }
     stage('Build') {
-      steps { sh 'make' }
+      steps { sh 'make -j 8' }
     }
     stage('Test'){
       steps {
