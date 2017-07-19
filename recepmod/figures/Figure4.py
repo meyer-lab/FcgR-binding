@@ -279,6 +279,8 @@ def ClassAvidityPredict(ax):
 
     data['L0'] = tblOne['L0'][0]
 
+    data = data[data.index.str.contains("FcgR") is False]
+
     data = data.apply(CALCapply, axis=1)
 
     data['predict'] = model.predict(data[cellpops].as_matrix())
