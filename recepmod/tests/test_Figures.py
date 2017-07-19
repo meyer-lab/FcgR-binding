@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 
+# pylint: disable=R0201
+
 
 class TestFigures(unittest.TestCase):
     def test_Figure4(self):
