@@ -2,8 +2,6 @@
 This creates Figure 1 which summarizes Anja's data.
 """
 
-import matplotlib
-matplotlib.use('AGG')
 import numpy as np
 import seaborn as sns
 import pandas as pd
@@ -15,8 +13,8 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std', 'Expression_mean']]
 
     # Normalize the binding data to expression
-    fitMean = fitMean.assign(Meas_mean = fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
-    fitMean = fitMean.assign(Meas_std = fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
+    fitMean = fitMean.assign(Meas_mean=fitMean['Meas_mean'] / fitMean['Expression_mean'] * 1.0E4)
+    fitMean = fitMean.assign(Meas_std=fitMean['Meas_std'] / fitMean['Expression_mean'] * 1.0E4)
 
     def plotF(axInt, data):
         for _, row in data.iterrows():
@@ -36,8 +34,8 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
         axInt.set_ylabel('Measured TNP-BSA Binding')
         axInt.set_ylim(1.0E-3, 1.0E-1)
 
-    plotF(ax1, fitMean.loc[fitMean['TNP'] == "TNP-4",:])
-    plotF(ax2, fitMean.loc[fitMean['TNP'] == "TNP-26",:])
+    plotF(ax1, fitMean.loc[fitMean['TNP'] == "TNP-4", :])
+    plotF(ax2, fitMean.loc[fitMean['TNP'] == "TNP-26", :])
 
     ax1.set_title('TNP-4-BSA')
     ax2.set_title('TNP-26-BSA')
@@ -46,19 +44,21 @@ def plotNormalizedBindingvsKA(fitMean, ax1, ax2):
     ax2.set_xlim(1E4, 1E8)
     ax2.set_xticks([1E4, 1E5, 1E6, 1E7, 1E8])
 
+
 def plotAvidityEffectVsKA(fitMean, ax1):
 
     # Select the subset of data we want
     fitMean = fitMean[['Ig', 'TNP', 'FcgR', 'Ka', 'Meas_mean', 'Meas_std']]
 
     # Reorder dataframe for processing
-    fitMean = pd.pivot_table(fitMean, index = ['Ig', 'FcgR', 'Ka'], columns = ['TNP'])
+    fitMean = pd.pivot_table(fitMean, index=['Ig', 'FcgR', 'Ka'], columns=['TNP'])
 
     # Calculate the ratio of binding and error
     rratio = fitMean[('Meas_mean', 'TNP-26')] / fitMean[('Meas_mean', 'TNP-4')]
-    sstd = rratio * np.sqrt(np.power(fitMean[('Meas_std', 'TNP-26')]/fitMean[('Meas_mean', 'TNP-26')], 2) + np.power(fitMean[('Meas_std', 'TNP-4')]/fitMean[('Meas_mean', 'TNP-4')], 2))
+    sstd = rratio * np.sqrt(np.power(fitMean[('Meas_std', 'TNP-26')] / fitMean[('Meas_mean', 'TNP-26')], 2) + np.power(
+        fitMean[('Meas_std', 'TNP-4')] / fitMean[('Meas_mean', 'TNP-4')], 2))
 
-    fitMean = fitMean.assign(Ratio = rratio, STD = sstd)
+    fitMean = fitMean.assign(Ratio=rratio, STD=sstd)
 
     # Reset index
     fitMean = fitMean.reset_index()
@@ -108,12 +108,12 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
 
     # Remove nan values and transform to absolute scale
     dfm = dfm[np.isfinite(dfm['value'])]
-    dfm['value'] = dfm['value'].apply(lambda x: np.power(10,x))
+    dfm['value'] = dfm['value'].apply(lambda x: np.power(10, x))
 
     # Plot everything
-    axx = sns.barplot(x = "variable", y = "value", data = dfm, ax = ax)
+    axx = sns.barplot(x="variable", y="value", data=dfm, ax=ax)
 
-    ## Set up axes
+    # Set up axes
     axx.set_yscale('log')
     axx.set_ylim(1.0E5, 1.0E7)
     axx.set_ylabel("Receptors/Cell")
