@@ -69,7 +69,7 @@ class TestStoneMouse(unittest.TestCase):
         self.assertTrue(tbN.shape == (12, 5))
 
     def test_PCA(self):
-        scores, expVar = self.Mod.KnockdownPCA()
+        scores, _ = self.Mod.KnockdownPCA()
 
         # Make sure we were given a Pandas dataframe
         self.assertIsInstance(scores, pandas.core.frame.DataFrame)

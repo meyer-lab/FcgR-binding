@@ -38,18 +38,18 @@ class TestStoneMethods(unittest.TestCase):
 
         numpy.random.seed(0)
 
-        input = numpy.random.normal(size=4000)
+        inputt = numpy.random.normal(size=4000)
         inputTwo = numpy.random.normal(size=4000)
 
-        _, b = geweke(input)
+        _, b = geweke(inputt)
 
         self.assertGreater(b, 0.01)
 
-        _, b = geweke(input, inputTwo)
+        _, b = geweke(inputt, inputTwo)
 
         self.assertGreater(b, 0.01)
 
-        _, b = geweke(input, inputTwo + 2)
+        _, b = geweke(inputt, inputTwo + 2)
 
         self.assertLess(b, 0.01)
 

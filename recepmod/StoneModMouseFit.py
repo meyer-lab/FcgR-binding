@@ -90,7 +90,7 @@ def modelPrepAffinity(v, L0):
     return (X, y, data)
 
 
-def LOOpredict(lr, X, y, cPred=True):
+def LOOpredict(lr, X, y):
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import r2_score
 
