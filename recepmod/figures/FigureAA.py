@@ -43,12 +43,10 @@ def makeFigure():
 
 
 def plotAutoC(ax, dset, coll):
-    from .FigureCommon import texRename
-    """
-    Run the autocorrelation analysis and plot for the selected variable.
-    """
+    """ Run the autocorrelation analysis and plot for the selected variable. """
     from statsmodels.tsa.stattools import acf
     import numpy as np
+    from .FigureCommon import texRename
 
     # Pivot to separate out all the walkers
     dd = dset.pivot(index='Step', columns='walker', values=coll)

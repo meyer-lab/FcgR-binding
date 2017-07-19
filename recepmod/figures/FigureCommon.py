@@ -123,7 +123,7 @@ def PCApercentVar(explainedVar, axes=None):
     return labels
 
 
-def alternatingRects(rectEdges, ylims, ax, color=(0.8, 0.8, 0.8), alpha=0):
+def alternatingRects(rectEdges, ylims, ax, color=(0.8, 0.8, 0.8)):
     from matplotlib.patches import Rectangle
     rects = []
     if len(rectEdges) < 3:
