@@ -2,8 +2,6 @@
 This creates Figure 3 which plots some predictions from the binding model.
 """
 
-import matplotlib
-matplotlib.use('AGG')
 from itertools import product
 import numpy as np
 import pandas as pd
@@ -19,7 +17,6 @@ subsplits = 100
 
 def makeFigure():
     import string
-
     from .FigureCommon import subplotLabel, getSetup
 
     # Get list of axis objects
@@ -40,7 +37,8 @@ def makeFigure():
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
 
-    ax[0].legend([r'$f=' + str(x) + r'$' for x in np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()],
+    avidities = np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()
+    ax[0].legend([r'$f=' + str(x) + r'$' for x in avidities],
                  loc=1,
                  bbox_to_anchor=(0.5, 1))
 
@@ -202,7 +200,8 @@ def varyAffinity(ax):
 
 
 def maxAffinity(ax):
-    """ """
+    """ Show that the A/I ratio is consistent with activity quantity. """
+    import matplotlib
     from ..StoneModMouse import StoneModelMouse
 
     Kas = np.squeeze(StoneModelMouse().kaMouse[:, 2])
