@@ -197,15 +197,17 @@ class StoneModelMouse:
         f.write('\n\\bottomrule\n\\end{longtable}\n')
 
     def writeModelData(self, filename):
+        import pytablewriter as ptw
+        from contextlib import redirect_stdout
 
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
 
         def rename(name):
-            name = 'mFc$\\gamma$RI' if name == 'FcgRI' else name
-            name = 'mFc$\\gamma$RIIB' if name == 'FcgRIIB' else name
-            name = 'mFc$\\gamma$RIII' if name == 'FcgRIII' else name
-            name = 'mFc$\\gamma$RIV' if name == 'FcgRIV' else name
+            name = 'mFcγRI' if name == 'FcgRI' else name
+            name = 'mFcγRIIB' if name == 'FcgRIIB' else name
+            name = 'mFcγRIII' if name == 'FcgRIII' else name
+            name = 'mFcγRIV' if name == 'FcgRIV' else name
             return name
 
         def renameList(names):
@@ -221,12 +223,33 @@ class StoneModelMouse:
                             matrix[j, k] = r'$' + str(matrix[j, k]) + '$'
             return matrix
 
-        def sci(val):
-            return r'$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
-                   '\\times10^{' + str(int(np.log10(val))) + '}$'
+        def sciSeries(series):
+            return [sci(val) for val in series]
 
-        self.tabWrite(filename, matrixScientific(tbN.as_matrix()),
-                      renameList(tbN.columns))
+        def sci(val):
+            if isinstance(val, str):
+                return val
+            else:
+                try:
+                    return r'$$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
+                           '\*10^' + str(int(np.log10(val))) + '$$'
+                except OverflowError:
+                    return r'$$0$$'
+
+##        self.tabWrite(filename, matrixScientific(tbN.as_matrix()),
+##                      renameList(tbN.columns))
+        tbN.columns = renameList(tbN.columns)
+        tbN = tbN.apply(sciSeries)
+
+        writer = ptw.MarkdownTableWriter()
+        writer.from_dataframe(tbN)
+
+        with open(filename, 'w') as f:
+            with redirect_stdout(f):
+                writer.write_table()
+
+##        f = open(filename, 'w')
+##        f.write(writer.write_table())
 
     def KnockdownPCA(self):
         """ Principle Components Analysis of FcgR-IgG affinities. """
