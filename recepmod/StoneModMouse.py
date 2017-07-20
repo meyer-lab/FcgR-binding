@@ -228,6 +228,8 @@ class StoneModelMouse:
         def sci(val):
             if isinstance(val, str):
                 return val
+            elif val == 0:
+                return r'$$0$$'
             else:
                 try:
                     return r'$$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
