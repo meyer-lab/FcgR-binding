@@ -124,7 +124,7 @@ def PCApercentVar(explainedVar, axes=None):
     return labels
 
 
-def alternatingRects(xlims, ylims, numRects, numVars, ax, color=(0.8, 0.8, 0.8)):
+def alternatingRects(xlims, ylims, numRects, ax, color=(0.8, 0.8, 0.8)):
     from matplotlib.patches import Rectangle
 
     scale = (xlims[1]-xlims[0])/numRects
@@ -134,7 +134,6 @@ def alternatingRects(xlims, ylims, numRects, numVars, ax, color=(0.8, 0.8, 0.8))
     for child in ax.get_children():
         if str(child)[0] == 'R':
             prerects.append(child)
-    prenum = len(prerects)
 
     rects = []
     for j in range(len(rectEdges) - 2):
@@ -145,13 +144,15 @@ def alternatingRects(xlims, ylims, numRects, numVars, ax, color=(0.8, 0.8, 0.8))
     for patch in rects:
         ax.add_patch(patch)
 
-    rerects = []
     for child in ax.get_children():
-        if str(child)[0] == 'R':
-            rerects.append(child)
+        if str(child)[0:6] == 'Line2D':
+            print(child)
+            ax.add_line(child)
+    
+    for patch in prerects:
+        if str(patch) != 'Rectangle(0,0;1x1)':
+            ax.add_patch(patch)
 
-    for patch in rerects[6::]:
-        ax.add_patch(patch)    
 
 
 def overlayCartoon(figFile, cartoonFile, x, y, scalee=1):
