@@ -200,13 +200,18 @@ class StoneModelMouse:
             if isinstance(val, str):
                 return renameIgg(val)
             elif val == 0:
-                return r'$$0$$'
+                return r'$$0.0$$'
             else:
                 try:
-                    return r'$$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
-                           '*10^' + str(int(np.log10(val))) + '$$'
+                    logval = np.log10(val)
+                    if int(logval) == '0':
+                        return r'$$' + strstr(val / (10**np.floor(logval)))[0:3] + \
+                               '$$'
+                    else:
+                        return r'$$' + str(val / (10**np.floor(logval)))[0:3] + \
+                           '*10^' + str(int(logval)) + '$$'
                 except OverflowError:
-                    return r'$$0$$'
+                    return r'$$0.0$$'
 
         def renameIgg(name):
             name = 'm'+name
@@ -218,6 +223,7 @@ class StoneModelMouse:
             name = 'mIgG2a-FcγRIII-/-' if name == 'mIgG2a-FcgRIII-/-' else name
             name = 'mIgG2a-FcγRI,IV-/-' if name == 'mIgG2a-FcgRI,IV-/-' else name
             name = 'mIgG2b-Fucose-/-' if name == 'mIgG2b-Fucose-/-' else name
+            return name
             
 
         def sciSeries(series):
