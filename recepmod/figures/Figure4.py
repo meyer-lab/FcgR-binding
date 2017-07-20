@@ -172,10 +172,9 @@ def InVivoPredictComponents(ax):
                        position=(0, 0.05), fontsize=6.5)
 
     numRects = len(tbN['condition'].unique())
-    numVars = len(tbN['variable'].unique())
 
     alternatingRects(xlims=ax.get_xlim(), ylims=ax.get_ylim(),
-                     numRects=numRects, numVars=numVars, ax=ax)
+                     numRects=numRects, ax=ax)
 
 
 def RequiredComponents(ax):
