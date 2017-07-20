@@ -234,7 +234,7 @@ class StoneModelMouse:
                 try:
                     logval = np.log10(val)
                     if int(logval) == '0':
-                        return r'$$' + strstr(val / (10**np.floor(logval)))[0:3] + \
+                        return r'$$' + str(val / (10**np.floor(logval)))[0:3] + \
                                '$$'
                     else:
                         return r'$$' + str(val / (10**np.floor(logval)))[0:3] + \
@@ -242,7 +242,6 @@ class StoneModelMouse:
                 except OverflowError:
                     return r'$$0.0$$'
 
-<<<<<<< HEAD
         def renameIgg(name):
             name = 'm'+name
             name = 'mIgG1-FcγRIIB-/-' if name == 'mIgG1-FcgRIIB-/-' else name
@@ -259,25 +258,19 @@ class StoneModelMouse:
         def sciSeries(series):
             return [sci(val) for val in series]
 
-        ## Rename columns of dataframe 
-=======
-##        self.tabWrite(filename, matrixScientific(tbN.as_matrix()),
-##                      renameList(tbN.columns))
->>>>>>> parent of e3f2892... Markdown table hopefully cleaned up
+        ## Rename columns of DataFrame 
         tbN.columns = renameList(tbN.columns)
         tbN = tbN.apply(sciSeries)
 
         writer = ptw.MarkdownTableWriter()
         writer.from_dataframe(tbN)
 
+        ## Change writer stream to filename
         with open(filename, 'w') as f:
             writer.stream = f
             writer.write_table()
 
         writer.close()
-
-##        f = open(filename, 'w')
-##        f.write(writer.write_table())
 
     def KnockdownPCA(self):
         """ Principle Components Analysis of FcgR-IgG affinities. """
