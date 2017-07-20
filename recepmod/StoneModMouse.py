@@ -177,25 +177,6 @@ class StoneModelMouse:
                 output[i, k, :] = stoneModOut[:4]
         return output.reshape(2, 16)
 
-    def tabWrite(self, filename, matrix, names):
-        tnl = '\\tabularnewline'
-
-        f = open(filename, 'w')
-        f.write(
-            '\\section{Supplement}\\label{supplement}\n\n\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
-        for ii, name in enumerate(names):
-            f.write(name)
-            if ii != 5:
-                f.write(' & ')
-        f.write(tnl + '\n\\midrule\n\\endhead\n')
-        for row in matrix:
-            for ii, item in enumerate(row):
-                f.write('{\centering ' + str(item) + '}')
-                if ii != 5:
-                    f.write(' & ')
-            f.write(tnl + '\n')
-        f.write('\n\\bottomrule\n\\end{longtable}\n')
-
     def writeModelData(self, filename):
         import pytablewriter as ptw
 
@@ -212,19 +193,8 @@ class StoneModelMouse:
         def renameList(names):
             return [rename(name) for name in names]
 
-        def matrixScientific(matrix):
-            for j in range(matrix.shape[0]):
-                for k in range(matrix.shape[1]):
-                    if not isinstance(matrix[j, k], str):
-                        if matrix[j, k] > 1:
-                            matrix[j, k] = sci(matrix[j, k])
-                        else:
-                            matrix[j, k] = r'$' + str(matrix[j, k]) + '$'
-            return matrix
-
-        def sciSeries(series):
-            return [sci(val) for val in series]
-
+        ## Convert numbers representing affinities into strings in
+        ## scientific notation, using Markdown formatting
         def sci(val):
             if isinstance(val, str):
                 return val
@@ -232,15 +202,13 @@ class StoneModelMouse:
                 return r'$$0.0$$'
             else:
                 try:
-                    logval = np.log10(val)
-                    if int(np.floor(logval)) == 0:
-                        return r'$$' + str(val / (10**np.floor(logval)))[0:3] + \
-                               '$$'
-                    else:
-                        return r'$$' + str(val / (10**np.floor(logval)))[0:3] + \
-                           '*10^' + str(int(np.floor(logval))) + '$$'
+                    return r'$$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
+                           '*10^' + str(int(np.floor(np.log10(val)))) + '$$'
                 except OverflowError:
                     return r'$$0.0$$'
+
+        def sciSeries(series):
+            return [sci(val) for val in series]
 
         def renameIgg(name):
             name = 'm'+name
@@ -253,14 +221,18 @@ class StoneModelMouse:
             name = 'mIgG2a-FcγRI,IV-/-' if name == 'mIgG2a-FcgRI,IV-/-' else name
             name = 'mIgG2b-Fucose-/-' if name == 'mIgG2b-Fucose-/-' else name
             return name
-            
+        
+        ## Convert percents into strings depicting percents
+        def percent(val):
+            return r'$$'+str(val*100.0)[::4]+'\%$$'
 
-        def sciSeries(series):
-            return [sci(val) for val in series]
+        def percentSeries(series):
+            return [percent(val) for val in series]
 
         ## Rename columns of DataFrame 
         tbN.columns = renameList(tbN.columns)
-        tbN = tbN.apply(sciSeries)
+        tbN[[col for col in tbN.columns if col != 'Effectiveness']] = tbN[[col for col in tbN.columns if col != 'Effectiveness']].apply(sciSeries)
+        tbN['Effectiveness'] = tbN['Effectiveness'].apply(percent)
 
         writer = ptw.MarkdownTableWriter()
         writer.from_dataframe(tbN)
