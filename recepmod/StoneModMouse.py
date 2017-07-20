@@ -198,7 +198,6 @@ class StoneModelMouse:
 
     def writeModelData(self, filename):
         import pytablewriter as ptw
-        from contextlib import redirect_stdout
 
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
@@ -245,8 +244,10 @@ class StoneModelMouse:
         writer.from_dataframe(tbN)
 
         with open(filename, 'w') as f:
-            with redirect_stdout(f):
-                writer.write_table()
+            writer.stream = f
+            writer.write_table()
+
+        writer.close()
 
 ##        f = open(filename, 'w')
 ##        f.write(writer.write_table())
