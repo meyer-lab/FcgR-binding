@@ -146,7 +146,6 @@ def alternatingRects(xlims, ylims, numRects, ax, color=(0.8, 0.8, 0.8)):
 
     for child in ax.get_children():
         if str(child)[0:6] == 'Line2D':
-            print(child)
             ax.add_line(child)
     
     for patch in prerects:
