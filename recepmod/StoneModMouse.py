@@ -177,25 +177,6 @@ class StoneModelMouse:
                 output[i, k, :] = stoneModOut[:4]
         return output.reshape(2, 16)
 
-    def tabWrite(self, filename, matrix, names):
-        tnl = '\\tabularnewline'
-
-        f = open(filename, 'w')
-        f.write(
-            '\\section{Supplement}\\label{supplement}\n\n\\begin{longtable}[]{@{}rrrrrr@{}}\n\\toprule\n')
-        for ii, name in enumerate(names):
-            f.write(name)
-            if ii != 5:
-                f.write(' & ')
-        f.write(tnl + '\n\\midrule\n\\endhead\n')
-        for row in matrix:
-            for ii, item in enumerate(row):
-                f.write('{\centering ' + str(item) + '}')
-                if ii != 5:
-                    f.write(' & ')
-            f.write(tnl + '\n')
-        f.write('\n\\bottomrule\n\\end{longtable}\n')
-
     def writeModelData(self, filename):
         import pytablewriter as ptw
 
@@ -212,22 +193,12 @@ class StoneModelMouse:
         def renameList(names):
             return [rename(name) for name in names]
 
-        def matrixScientific(matrix):
-            for j in range(matrix.shape[0]):
-                for k in range(matrix.shape[1]):
-                    if not isinstance(matrix[j, k], str):
-                        if matrix[j, k] > 1:
-                            matrix[j, k] = sci(matrix[j, k])
-                        else:
-                            matrix[j, k] = r'$' + str(matrix[j, k]) + '$'
-            return matrix
-
-        def sciSeries(series):
-            return [sci(val) for val in series]
-
+        ## Write the numbers in the tbN DataFrame to scientific notation,
+        ## using Markdown formatting. If an mIgG "condition", reformat
+        ## string to indicate species and proper formatting.
         def sci(val):
             if isinstance(val, str):
-                return val
+                return renameIgg(val)
             elif val == 0:
                 return r'$$0$$'
             else:
@@ -237,22 +208,34 @@ class StoneModelMouse:
                 except OverflowError:
                     return r'$$0$$'
 
-##        self.tabWrite(filename, matrixScientific(tbN.as_matrix()),
-##                      renameList(tbN.columns))
+        def renameIgg(name):
+            name = 'm'+name
+            name = 'mIgG1-FcγRIIB-/-' if name == 'mIgG1-FcgRIIB-/-' else name
+            name = 'mIgG2a-FcγRIIB-/-' if name == 'mIgG2a-FcgRIIB-/-' else name
+            name = 'mIgG2b-FcγRIIB-/-' if name == 'mIgG2b-FcgRIIB-/-' else name
+            name = 'mIgG3-FcγRIIB-/-' if name == 'mIgG3-FcgRIIB-/-' else name
+            name = 'mIgG2a-FcγRI-/-' if name == 'mIgG2a-FcgRI-/-' else name
+            name = 'mIgG2a-FcγRIII-/-' if name == 'mIgG2a-FcgRIII-/-' else name
+            name = 'mIgG2a-FcγRI,IV-/-' if name == 'mIgG2a-FcgRI,IV-/-' else name
+            name = 'mIgG2b-Fucose-/-' if name == 'mIgG2b-Fucose-/-' else name
+            
+
+        def sciSeries(series):
+            return [sci(val) for val in series]
+
+        ## Rename columns of dataframe 
         tbN.columns = renameList(tbN.columns)
         tbN = tbN.apply(sciSeries)
 
         writer = ptw.MarkdownTableWriter()
         writer.from_dataframe(tbN)
 
+        ## Have stream output to filename
         with open(filename, 'w') as f:
             writer.stream = f
             writer.write_table()
 
         writer.close()
-
-##        f = open(filename, 'w')
-##        f.write(writer.write_table())
 
     def KnockdownPCA(self):
         """ Principle Components Analysis of FcgR-IgG affinities. """
