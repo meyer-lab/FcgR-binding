@@ -233,7 +233,7 @@ class StoneModelMouse:
             else:
                 try:
                     return r'$$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
-                           '\*10^' + str(int(np.log10(val))) + '$$'
+                           '*10^' + str(int(np.log10(val))) + '$$'
                 except OverflowError:
                     return r'$$0$$'
 
