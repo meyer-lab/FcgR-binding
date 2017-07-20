@@ -24,7 +24,7 @@ FcgRidx = dict(zip(FcgRlist, sns.color_palette()))
 
 
 def texRename(name):
-    name = r'$K_x$' if name == 'Kx1' else name
+    name = r'$K_x^*$' if name == 'Kx1' else name
     name = 'TNP-4 c.f.' if name == 'sigConv1' else name
     name = 'TNP-26 c.f.' if name == 'sigConv2' else name
     name = r'$\sigma_1^*$' if name == 'sigma' else name

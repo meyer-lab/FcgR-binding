@@ -98,7 +98,7 @@ def histSubplots(dset, axes):
         ax=axes[3], bins=40, color=sns.color_palette()[0:2])
 
     # Set all the x-labels based on which histogram is displayed
-    axes[0].set_xlabel(r'$K_x$')
+    axes[0].set_xlabel(r'$K_x^*$')
     axes[1].set_xlabel(r'Conversion Factors')
     axes[2].set_xlabel(r'Effective Avidities ($f$)')
     axes[3].set_xlabel(r'Deviation Parameters ($\sigma^*$)')
