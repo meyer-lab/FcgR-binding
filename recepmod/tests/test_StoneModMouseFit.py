@@ -1,8 +1,8 @@
 import unittest
 import pandas
 from ..StoneModMouseFit import InVivoPredictMinusComponents, NimmerjahnPredictByAIratio
-import warnings
-warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
+
+# pylint: disable=R0201
 
 
 class TestFit(unittest.TestCase):
