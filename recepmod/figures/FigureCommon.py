@@ -128,25 +128,30 @@ def alternatingRects(xlims, ylims, numRects, numVars, ax, color=(0.8, 0.8, 0.8))
     from matplotlib.patches import Rectangle
 
     scale = (xlims[1]-xlims[0])/numRects
-    rectEdges = np.arange(xlim[0], xlim[1]+scale, scale)
+    rectEdges = np.arange(xlims[0], xlims[1]+scale, scale)
+
+    prerects = []
+    for child in ax.get_children():
+        if str(child)[0] == 'R':
+            prerects.append(child)
+    prenum = len(prerects)
+
+    rects = []
     for j in range(len(rectEdges) - 2):
         if j % 2 == 1:
             rects.append(Rectangle((rectEdges[j], ylims[0]),
                                    rectEdges[j + 1] - rectEdges[j],
                                    ylims[1], color=color))
-    rects = []
     for patch in rects:
         ax.add_patch(patch)
 
     rerects = []
     for child in ax.get_children():
         if str(child)[0] == 'R':
-            rerects.append(child):
-    for patch in rerects[::numRects*numVars]:
-        ax.add_patch(patch)
+            rerects.append(child)
 
-
-    
+    for patch in rerects[6::]:
+        ax.add_patch(patch)    
 
 
 def overlayCartoon(figFile, cartoonFile, x, y, scalee=1):
