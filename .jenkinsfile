@@ -50,6 +50,15 @@ pipeline {
           failUnstable: true,
           sourceEncoding: 'UTF_8',
           zoomCoverageChart: true])
+
+        publishHTML([
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: false,
+          reportDir: 'Manuscript',
+          reportFiles: 'index.html',
+          reportName: 'Manuscript',
+          reportTitles: ''])
       }
     }
     stage('Deploy') {
