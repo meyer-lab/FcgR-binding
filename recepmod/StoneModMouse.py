@@ -221,21 +221,15 @@ class StoneModelMouse:
             name = 'mIgG2a-FcγRI,IV-/-' if name == 'mIgG2a-FcgRI,IV-/-' else name
             name = 'mIgG2b-Fucose-/-' if name == 'mIgG2b-Fucose-/-' else name
             return name
-            
-        def renameIggSeries(series):
-            return [renameIgg(name) for name in series]
         
         ## Convert percents into strings depicting percents
         def percent(val):
             return r'$$'+str(val*1000.0)[::4]+'\%$$'
 
-        def percentSeries(series):
-            return [percent(val) for val in series]
-
         ## Rename columns of DataFrame 
         tbN.columns = renameList(tbN.columns)
         tbN[[col for col in tbN.columns if col != 'Effectiveness']] = tbN[[col for col in tbN.columns if col != 'Effectiveness']].apply(sciSeries)
-        tbN['Condition'] = tbN['Condition'].apply(renameIggSeries)
+        tbN['Condition'] = tbN['Condition'].apply(renameIgg)
         tbN['Effectiveness'] = tbN['Effectiveness'].apply(percent)
 
         writer = ptw.MarkdownTableWriter()
