@@ -192,7 +192,7 @@ class StoneModelMouse:
 
         def renameList(names):
             return [rename(name) for name in names]
-
+          
         ## Convert numbers representing affinities into strings in
         ## scientific notation, using Markdown formatting
         def sci(val):
