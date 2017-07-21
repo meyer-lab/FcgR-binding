@@ -1,7 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{libertine}
-\usepackage{amssymb,amsmath}
+\usepackage{amssymb,amsmath,mathtools}
 \usepackage{ifxetex,ifluatex}
 \usepackage{microtype}
 
