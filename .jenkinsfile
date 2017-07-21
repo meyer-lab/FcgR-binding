@@ -6,21 +6,7 @@ pipeline {
   }
   stages {
     stage('Clean') {
-      steps {
-        sh 'make clean'
-
-        step([
-          $class: 'TasksPublisher',
-          canComputeNew: false,
-          defaultEncoding: '', 
-          excludePattern: '',
-          healthy: '',
-          high: 'TODO,FIXME,XXX',
-          low: '',
-          normal: 'CITE',
-          pattern: '**/*.py, **/*.md',
-          unHealthy: ''])
-      }
+      steps { sh 'make clean' }
     }
     stage('Build') {
       steps { sh 'make -j 8' }
@@ -29,6 +15,20 @@ pipeline {
       steps {
         sh 'make testcover'
         sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
+      }
+    }
+    stage('Report') {
+      steps {
+        archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
+
+        publishHTML([
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: false,
+          reportDir: 'Manuscript',
+          reportFiles: 'index.html',
+          reportName: 'Manuscript',
+          reportTitles: ''])
 
         step([
           $class                     : 'WarningsPublisher',
@@ -50,15 +50,18 @@ pipeline {
           failUnstable: true,
           sourceEncoding: 'UTF_8',
           zoomCoverageChart: true])
-      }
-    }
-    stage('Deploy') {
-      when {
-        expression { env.BRANCH_NAME == 'master' }
-      }
-      steps {
-        sh 'make upload'
-        archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
+
+        step([
+          $class: 'TasksPublisher',
+          canComputeNew: false,
+          defaultEncoding: '', 
+          excludePattern: '',
+          healthy: '',
+          high: 'TODO,FIXME,XXX',
+          low: '',
+          normal: 'CITE',
+          pattern: '**/*.py, **/*.md',
+          unHealthy: ''])
       }
     }
   }

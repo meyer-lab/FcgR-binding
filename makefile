@@ -55,8 +55,5 @@ profile:
 testcover:
 	nosetests-3.4 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
 
-upload:
-	lftp -c "set ftp:list-options -a; open athena; cd ./www/fcgr-paper/; lcd ./Manuscript/; mirror --reverse --delete --verbose"
-
 rebuild:
 	(echo "from recepmod.figures.FigureS2 import robustnessCalc" ; echo "robustnessCalc()") | python3
