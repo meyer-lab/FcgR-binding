@@ -50,6 +50,11 @@ pipeline {
           failUnstable: true,
           sourceEncoding: 'UTF_8',
           zoomCoverageChart: true])
+      }
+    }
+    stage('Report') {
+      steps {
+        archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
 
         publishHTML([
           allowMissing: false,
@@ -59,15 +64,6 @@ pipeline {
           reportFiles: 'index.html',
           reportName: 'Manuscript',
           reportTitles: ''])
-      }
-    }
-    stage('Deploy') {
-      when {
-        expression { env.BRANCH_NAME == 'master' }
-      }
-      steps {
-        sh 'make upload'
-        archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
       }
     }
   }
