@@ -12,7 +12,7 @@ $$ L_{bound} = \sum_{i=1}^{f} v_{i,eq} = \sum_{i=1}^{f} { f\choose i } (K_x)^{i-
 
 $R_{eq}$ changes as a function of $f$, $L_0$, $K_a$, $K_x$, and $R_{tot}$, the total number of receptors expressed on the cell surface. It can be solved for numerically using the relationship
 
-$$ R_{tot} = R_{eq} \left(1+f {L_0}{K_a} (1+K_x R_{eq})^{f-1}\right) $$ {#eq:rtot}
+$$ R_{tot} = R_{eq} \left(1+f {L_0}{K_D} (1+K_x R_{eq})^{f-1}\right) $$ {#eq:rtot}
 
 when these parameters are known. As a consequence of [@eq:vieq], the number of receptors that are clustered with at least one other receptor at equilibrium ($R_{multi}$) is equal to
 
