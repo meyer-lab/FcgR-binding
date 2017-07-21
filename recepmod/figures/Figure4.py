@@ -171,9 +171,10 @@ def InVivoPredictComponents(ax):
                        rotation=40, rotation_mode="anchor", ha="right",
                        position=(0, 0.05), fontsize=6.5)
 
-    alternatingRects([ax.get_xlim()[0]] + [ax.get_xlim()[-1]], ylims=ax.get_ylim(), ax=ax)
-    for rect in ax.get_children()[0:24]:
-        ax.add_patch(rect)
+    numRects = len(tbN['condition'].unique())
+
+    alternatingRects(xlims=ax.get_xlim(), ylims=ax.get_ylim(),
+                     numRects=numRects, ax=ax)
 
 
 def RequiredComponents(ax):
