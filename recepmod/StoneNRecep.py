@@ -1,7 +1,14 @@
 import numpy as np
 from memoize import memoize
-from .StoneModel import nchoosek
+from scipy.misc import factorial
 
+@memoize
+def multinomial(n,kk):
+    mult = factorial(n)
+    for k in kk:
+        mult = mult/factorial(k)
+    return mult
+    
 
 def StoneVgrid(Req, Ka, gnu, Kx, L0):
     """
@@ -34,24 +41,6 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
 
     return vGrid
 
-
-def boundMult(cur_pos):
-    """ Deal with the combinatorics of different species bound. """
-    upos = np.array(cur_pos, dtype=np.int)
-    upos = np.sort(upos[upos > 0])
-
-    if len(upos) == 1:
-        return 1
-
-    outt = 1
-
-    while len(upos) > 1:
-        outt *= nchoosek(sum(upos))[upos[0]]
-        upos = np.delete(upos, 0)
-
-    return outt
-
-
 @memoize
 def vGridInit(gnu, Nrep):
     """ Make the grid of all the possible multimerization states. """
@@ -59,14 +48,11 @@ def vGridInit(gnu, Nrep):
     # Initialize the grid of possibilities
     vGrid = np.zeros(np.full((Nrep, ), gnu + 1), dtype=np.float)
 
-    # Precalculate outside terms
-    nk = nchoosek(gnu)
-
     for cur_pos in np.ndindex(vGrid.shape):
         scur = sum(cur_pos)
 
         if scur <= gnu and scur > 0:
-            vGrid[cur_pos] = nk[scur] * boundMult(cur_pos)
+            vGrid[cur_pos] = multinomial(scur,cur_pos)
 
     return vGrid
 
