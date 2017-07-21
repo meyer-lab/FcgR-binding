@@ -13,4 +13,5 @@ Contributions
 - `Ryan Robinett <https://github.com/robbobbinett>`
 - `Alexa Guan <https://github.com/nguan>`
 - `Anja Lux`
+- `Markus Biburger`
 - `Falk Nimmerjahn`

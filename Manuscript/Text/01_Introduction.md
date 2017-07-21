@@ -7,6 +7,8 @@ author:
   affiliation: Co-first author; Koch Institute for Integrative Cancer Research, Massachusetts Institute of Technology, Cambridge, MA
 - name: Anja Lux
   affiliation: Friedrich-Alexander-University of Erlangen-Nürnberg
+- name: Markus Biburger
+  affiliation: Friedrich-Alexander-University of Erlangen-Nürnberg
 - name: Falk Nimmerjahn
   affiliation: Friedrich-Alexander-University of Erlangen-Nürnberg
 - name: Aaron S. Meyer
