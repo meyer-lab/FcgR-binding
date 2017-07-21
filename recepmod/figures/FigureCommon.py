@@ -1,5 +1,6 @@
 import seaborn as sns
 from ..StoneModel import StoneModel
+import numpy as np
 
 IgList = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
 
@@ -24,7 +25,7 @@ FcgRidx = dict(zip(FcgRlist, sns.color_palette()))
 
 
 def texRename(name):
-    name = r'$K_x$' if name == 'Kx1' else name
+    name = r'$K_x^*$' if name == 'Kx1' else name
     name = 'TNP-4 c.f.' if name == 'sigConv1' else name
     name = 'TNP-26 c.f.' if name == 'sigConv2' else name
     name = r'$\sigma_1^*$' if name == 'sigma' else name
@@ -123,11 +124,18 @@ def PCApercentVar(explainedVar, axes=None):
     return labels
 
 
-def alternatingRects(rectEdges, ylims, ax, color=(0.8, 0.8, 0.8)):
+def alternatingRects(xlims, ylims, numRects, ax, color=(0.8, 0.8, 0.8)):
     from matplotlib.patches import Rectangle
+
+    scale = (xlims[1]-xlims[0])/numRects
+    rectEdges = np.arange(xlims[0], xlims[1]+scale, scale)
+
+    prerects = []
+    for child in ax.get_children():
+        if str(child)[0] == 'R':
+            prerects.append(child)
+
     rects = []
-    if len(rectEdges) < 3:
-        return
     for j in range(len(rectEdges) - 2):
         if j % 2 == 1:
             rects.append(Rectangle((rectEdges[j], ylims[0]),
@@ -135,6 +143,15 @@ def alternatingRects(rectEdges, ylims, ax, color=(0.8, 0.8, 0.8)):
                                    ylims[1], color=color))
     for patch in rects:
         ax.add_patch(patch)
+
+    for child in ax.get_children():
+        if str(child)[0:6] == 'Line2D':
+            ax.add_line(child)
+    
+    for patch in prerects:
+        if str(patch) != 'Rectangle(0,0;1x1)':
+            ax.add_patch(patch)
+
 
 
 def overlayCartoon(figFile, cartoonFile, x, y, scalee=1):
