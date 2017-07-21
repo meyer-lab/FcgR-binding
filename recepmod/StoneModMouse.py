@@ -182,7 +182,6 @@ class StoneModelMouse:
 
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
-        print(tbN['Effectiveness'])
 
         def rename(name):
             name = 'mFcγRI' if name == 'FcgRI' else name
@@ -225,7 +224,8 @@ class StoneModelMouse:
         
         ## Convert percents into strings depicting percents
         def percent(val):
-            return r'$$'+str(val*100.0)+'\%$$'
+            strval = str(val)
+            return r'$$'+strval[::len(strval)-1]+'\%$$'
 
         ## Rename columns of DataFrame 
         tbN.columns = renameList(tbN.columns)
