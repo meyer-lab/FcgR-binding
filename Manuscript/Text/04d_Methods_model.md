@@ -40,13 +40,32 @@ We fit our model to binding measurements for each hFcγR-hIgG pair using an affi
 
 ### Generalized Multi-Receptor Model
 
-To account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of multiple receptors. At each crosslinking step, $K_x$ must be proportional to the $K_a$ of the corresponding monovalent epitope-receptor interaction to satisfy detailed balance. Under the same assumptions as before, the relative proportion of receptor complexes with $N$ receptors respectively bound $i$, $j$, $k$,...-valently is specified as:
+To account for cells expressing multiple FcγRs, we extended the model to account for binding in the presence of multiple receptors. At each crosslinking step, $K_x$ must be proportional to the $K_a$ of the corresponding monovalent epitope-receptor interaction to satisfy detailed balance. For any cell expressing $N$ distinct receptor species that all bind the same epitope, let $R_{tot,i}$ be the total number of receptor $i$ expressed on the cell surface, and let $K_{a,i}$ be the affinity of receptor $i$ for the epitope. Let IC, ligand, and $K_x$ be as previously described (see Base Model). For all $i$ in $\{1,2,\ldots,N\}$, let
 
-$$ \varPhi = \frac{K_x \left( K_a \odot R_{eq} \right)}{K_{a, i}} $$ {#eq:KKRK}
+$$\phi_i = K_x^*K_{a,i}R_{eq,i},$$
 
-$$ v_{i,j,eq} = {v \choose i} \frac{L_0 K_{a, i}}{K_x} \prod_{q \in (i, j, ...)} \varPhi_q^{v_{q}} $$ {#eq:vieqTwo}
+where $R_{eq,i}$ is the number of receptors $i$ unbound at equilibrium. The individual IC-receptor interactions of an IC bound to $q_i$ receptors $i$, $q_j$ receptors $j$, etc. can be represented by the vector $\mathbf{q}=(q_1,q_2,\ldots,q_N)$. For any such vector describing the binding state of an IC-receptor complex, the number of ICs bound in such a way is equal to
 
-where $K_{a,z}$ and $R_{eq,z}$ are the association constant and unbound abundance for receptor $z$, respectively. As a consequence, $0 \leq i + j + ... < v$. As the amount of each receptor binding only weakly interacted, this was solved by iteratively root-finding for mass balance of each receptor independently, using the Brent routine (`scipy.optimize.brenth`). The amount of bound ligand or bound receptor was calculated by summing over each multimerization state, weighted by its probability.
+$$v_{\mathbf{q}} = {f\choose\abs{\mathbf{q}}}{f\choose\mathbf{q}}\frac{L_0}{K_x^*}\prod_{i=1}^N(\phi_i)^{q_i},\label{vq}$$
+
+where ${f\choose\abs{\mathbf{q}}}$ represents the binomial coefficient ${f\choose q_1+q_2+\ldots+q_N}$ and ${f\choose\mathbf{q}}$ represents the multinomial coefficient ${f\choose q_1,q_2,\ldots,q_N}$. Therefore, for all receptors $i$, $R_{eq,i}$ satisfies the relation
+
+$$R_{tot,i} = R_{eq,i}+\sum_{\mathbf{q}\in\mathbf{Q}_{f,N}}{f\choose\abs{\mathbf{q}}}{f\choose\mathbf{q}}\frac{L_0}{K_x^*}(\phi_i)^{q_i},$$
+
+where
+
+$$\mathbf{Q}_{f,N} \equiv \{(q_1,q_2,\ldots,q_N)\in\mathbb{N}^N\mid\sum_{i=1}^Nq_i\leq f\}.$$
+
+$R_{eq_i}$ was solved for for all $i$ by iterative root-finding using this relation, utilizing the Brent routine (`scipy.optimize.brenth`). Consequent of \ref{vq}, the total number of ligand bound at equilibrium is
+
+$$L_{bound} = \sum_{\mathbf{q}\in\mathbf{Q}_{f,N}}v_\mathbf{q}.$$
+
+The number of receptor $i$ that are multimerized can be calculated using the relation
+
+$$R_{multi}=\sum_{\mathbf{q}\in\mathbf{Q}_{f,N}^*}\abs{\mathbf{q}}v_\mathbf{q}\label{donkey},$$
+where $\abs{\mathbf{q}}=\sum_{i=1}^Nq_i$ and
+
+$$\mathbf{Q}_{f,N}^*\equiv\{(q_1,q_2,\ldots,q_N)\in\mathbb{N}^N\mid2\leq\sum_{i=1}^Nq_i\leq f\}.$$
 
 ### Activity Index
 
