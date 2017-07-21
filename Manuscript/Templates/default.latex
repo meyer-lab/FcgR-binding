@@ -107,6 +107,9 @@ $endif$
 \def\fps@figure{htbp}
 \makeatother
 
+% Defines absolute value paired delimiter "\abs{}"
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+
 $if(title)$
 \title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
 $endif$
