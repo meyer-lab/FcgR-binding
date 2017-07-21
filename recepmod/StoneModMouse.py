@@ -224,14 +224,12 @@ class StoneModelMouse:
         
         ## Convert percents into strings depicting percents
         def percent(val):
-            return r'$$'+str(val*100.0)[::4]+'\%$$'
-
-        def percentSeries(series):
-            return [percent(val) for val in series]
+            return str(val)
 
         ## Rename columns of DataFrame 
         tbN.columns = renameList(tbN.columns)
         tbN[[col for col in tbN.columns if col != 'Effectiveness']] = tbN[[col for col in tbN.columns if col != 'Effectiveness']].apply(sciSeries)
+        tbN['Condition'] = tbN['Condition'].apply(renameIgg)
         tbN['Effectiveness'] = tbN['Effectiveness'].apply(percent)
 
         writer = ptw.MarkdownTableWriter()
