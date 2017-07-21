@@ -224,8 +224,7 @@ class StoneModelMouse:
         
         ## Convert percents into strings depicting percents
         def percent(val):
-            strval = str(val*100.0)
-            return r'$$'+strval[::len(strval)-1]+'\%$$'
+            return str(val)
 
         ## Rename columns of DataFrame 
         tbN.columns = renameList(tbN.columns)
