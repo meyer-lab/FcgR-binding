@@ -1,16 +1,21 @@
 """
 In vivo prediction robustness and first PC's
 """
+import os
+import pandas as pd
+import seaborn as sns
+from .FigureCommon import getSetup, Legend
 
 
 def makeFigure():
-    from .FigureCommon import getSetup
-
     # Get list of axis objects
-    ax, f = getSetup((2, 2), (1, 1))
+    ax, f = getSetup((4, 2), (2, 1))
+
+    # Make FcgR expression plot
+    FcgRexpression(ax[0])
 
     # Make the robustness plot
-    robustnessPlot(ax[0])
+    robustnessPlot(ax[1])
 
     # Tweak layout
     f.tight_layout()
@@ -18,11 +23,24 @@ def makeFigure():
     return f
 
 
+def FcgRexpression(ax):
+    """ Calculate robustness or load it. """
+    filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "../data/murine-FcgR-abundance.csv")
+
+    data = pd.read_csv(filepath)
+
+    data = pd.melt(data, id_vars=['Cells'])
+
+    data['Receptor'] = data.variable.str.extract('(R[1234])', expand=False)
+
+    data = data.groupby(['Cells', 'Receptor']).agg(['mean', 'sem'])
+
+    print(data)
+
+
 def robustnessCalc(calculate=True):
     """ Calculate robustness or load it. """
-    import os
-    import pandas as pd
-
     filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             "../data/figS2-robustness.csv")
 
@@ -51,9 +69,6 @@ def robustnessCalc(calculate=True):
 
 def robustnessPlot(ax, calculate=False):
     """ Vary IC concentration and avidity and show the prediction still stands. """
-    import seaborn as sns
-    from .FigureCommon import Legend
-
     pp = robustnessCalc(calculate)
 
     # Change avidities to strings
