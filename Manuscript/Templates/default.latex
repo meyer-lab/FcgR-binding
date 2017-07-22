@@ -1,7 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{libertine}
-\usepackage{amssymb,amsmath}
+\usepackage{amssymb,amsmath,mathtools}
 \usepackage{ifxetex,ifluatex}
 \usepackage{microtype}
 
@@ -106,6 +106,9 @@ $endif$
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
+
+% Defines absolute value paired delimiter "\abs{}"
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
 
 $if(title)$
 \title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
