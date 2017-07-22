@@ -9,7 +9,7 @@ from .FigureCommon import getSetup, Legend
 
 def makeFigure():
     # Get list of axis objects
-    ax, f = getSetup((4, 2), (2, 1))
+    ax, f = getSetup((6, 3), (1, 2))
 
     # Make FcgR expression plot
     FcgRexpression(ax[0])
@@ -28,15 +28,16 @@ def FcgRexpression(ax):
     filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             "../data/murine-FcgR-abundance.csv")
 
-    data = pd.read_csv(filepath)
-
-    data = pd.melt(data, id_vars=['Cells'])
+    data = pd.melt(pd.read_csv(filepath), id_vars=['Cells'])
 
     data['Receptor'] = data.variable.str.extract('(R[1234])', expand=False)
 
-    data = data.groupby(['Cells', 'Receptor']).agg(['mean', 'sem'])
+    sns.factorplot(x="Cells", y="value", hue="Receptor",
+                   data=data, kind="bar", ax=ax, ci=63)
 
-    print(data)
+    ax.set_ylabel(r'Fc$\gamma$R Expression')
+    # TODO: Finish beautifying
+    # TODO: Fix references to supplemental figures here
 
 
 def robustnessCalc(calculate=True):
