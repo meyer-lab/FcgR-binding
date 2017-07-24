@@ -45,8 +45,6 @@ def read_chain(filename=None, ffilter=True):
     else:
         pdset = pd.DataFrame(dset.value, columns=cNames)
 
-    #print(str(pdset.shape[0]) + ' rows read.')
-
     f.close()
 
     pdset['gnu1'] = np.floor(pdset['gnu1'])
@@ -119,11 +117,9 @@ def mapMCMC(dFunction, pSet, quiet=False):
     """
     from tqdm import trange
 
-    # Set the function to pass back results
-    funFunc = lambda ii: dFunction(pSet.iloc[ii, :]).assign(pSetNum=ii)
-
     # Iterate over each parameter set, output to a list
-    retVals = map(funFunc, trange(pSet.shape[0], disable=quiet))
+    retVals = map(lambda ii: dFunction(pSet.iloc[ii, :]).assign(pSetNum=ii),
+                  trange(pSet.shape[0], disable=quiet))
 
     # Concatenate all the dataframes vertically and return
     return pd.concat(retVals)
