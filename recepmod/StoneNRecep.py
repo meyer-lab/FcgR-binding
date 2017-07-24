@@ -33,7 +33,7 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
             vGrid[slicing] *= term
 
     return vGrid
-    
+
 
 def boundMult(cur_pos):
     """ Deal with the combinatorics of different species bound. """
@@ -52,14 +52,13 @@ def boundMult(cur_pos):
     return outt
 
 
-
 @memoize
 def vGridInit(gnu, Nrep):
     """ Make the grid of all the possible multimerization states. """
 
     # Initialize the grid of possibilities
     vGrid = np.zeros(np.full((Nrep, ), gnu + 1), dtype=np.float)
-    
+
     # Precalculate outside terms
     nk = nchoosek(gnu)
 
@@ -194,8 +193,8 @@ class StoneN:
             return summ
         elif summ < -30:
             return 0.0
-        else:
-            return np.abs(summ) / (1.0 + np.exp(-summ))
+
+        return np.abs(summ) / (1.0 + np.exp(-summ))
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
         self.logR = np.array(logR, dtype=np.float, copy=True)
