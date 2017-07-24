@@ -1,6 +1,7 @@
 import seaborn as sns
-from ..StoneModel import StoneModel
 import numpy as np
+from ..StoneModel import StoneModel
+
 
 IgList = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
 
@@ -127,8 +128,8 @@ def PCApercentVar(explainedVar, axes=None):
 def alternatingRects(xlims, ylims, numRects, ax, color=(0.8, 0.8, 0.8)):
     from matplotlib.patches import Rectangle
 
-    scale = (xlims[1]-xlims[0])/numRects
-    rectEdges = np.arange(xlims[0], xlims[1]+scale, scale)
+    scale = (xlims[1] - xlims[0]) / numRects
+    rectEdges = np.arange(xlims[0], xlims[1] + scale, scale)
 
     prerects = []
     for child in ax.get_children():
@@ -147,11 +148,10 @@ def alternatingRects(xlims, ylims, numRects, ax, color=(0.8, 0.8, 0.8)):
     for child in ax.get_children():
         if str(child)[0:6] == 'Line2D':
             ax.add_line(child)
-    
+
     for patch in prerects:
         if str(patch) != 'Rectangle(0,0;1x1)':
             ax.add_patch(patch)
-
 
 
 def overlayCartoon(figFile, cartoonFile, x, y, scalee=1):
