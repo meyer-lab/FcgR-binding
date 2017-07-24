@@ -77,7 +77,7 @@ def getMeasuredDataFrame(self):
                 .assign(FcgR=rep(self.FcgRs, 4) * 8)
                 .assign(Expression=rep(self.Rquant, 4) * 8)
                 .assign(Ka=np.tile(np.reshape(self.kaBruhns, (-1, 1)), (8, 1)))
-                )
+               )
 
     return normData
 
@@ -86,24 +86,24 @@ def getFitPrediction(self, x):
     """
     Return a dataframe with the fit data labeled with the condition variables
     """
-    _, outputFit, outputLL, outputRbnd, outputRmulti, outputnXlink, outputLbnd, outputReq = self.NormalErrorCoef(
+    _, outputFit, oLL, oRbnd, oRmulti, onXlink, oLbnd, oReq = self.NormalErrorCoef(
         x, fullOutput=True)
 
     outputFit = np.reshape(np.transpose(outputFit), (-1, 1))
 
     dd = (pd.DataFrame(data=outputFit, columns=['Fit'])
-          .assign(LL=np.reshape(np.transpose(outputLL), (-1, 1)))
+          .assign(LL=np.reshape(np.transpose(oLL), (-1, 1)))
           .assign(Ig=self.Igs * 12)
           .assign(FcgR=rep(self.FcgRs, 4) * 2)
           .assign(TNP=rep(self.TNPs, 24))
           .assign(Expression=rep(self.Rquant, 4) * 2)
           .assign(Ka=np.tile(np.reshape(self.kaBruhns, (-1, 1)), (2, 1)))
-          .assign(RbndPred=np.reshape(np.transpose(outputRbnd), (-1, 1)))
-          .assign(RmultiPred=np.reshape(np.transpose(outputRmulti), (-1, 1)))
-          .assign(nXlinkPred=np.reshape(np.transpose(outputnXlink), (-1, 1)))
-          .assign(LbndPred=np.reshape(np.transpose(outputLbnd), (-1, 1)))
-          .assign(Req=np.reshape(np.transpose(outputReq), (-1, 1)))
-          )
+          .assign(RbndPred=np.reshape(np.transpose(oRbnd), (-1, 1)))
+          .assign(RmultiPred=np.reshape(np.transpose(oRmulti), (-1, 1)))
+          .assign(nXlinkPred=np.reshape(np.transpose(onXlink), (-1, 1)))
+          .assign(LbndPred=np.reshape(np.transpose(oLbnd), (-1, 1)))
+          .assign(Req=np.reshape(np.transpose(oReq), (-1, 1)))
+         )
 
     return dd
 

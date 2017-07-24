@@ -157,8 +157,8 @@ class StoneModelMouse:
         tbK2.iloc[2, 3] = 0.0
 
         # set up IgG2b, -Fucose
-        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose), index=[
-                            'IgG2b-Fucose-/-'], columns=self.FcgRs)
+        tbK3 = pd.DataFrame(np.transpose(self.kaIgG2b_Fucose),
+                            index=['IgG2b-Fucose-/-'], columns=self.FcgRs)
         tbK3.loc[:, 'Effectiveness'] = pd.Series([0.70], index=tbK3.index)
 
         # Join tbK, tbK1, tbK2 into one table
@@ -192,9 +192,9 @@ class StoneModelMouse:
 
         def renameList(names):
             return [rename(name) for name in names]
-          
-        ## Convert numbers representing affinities into strings in
-        ## scientific notation, using Markdown formatting
+
+        # Convert numbers representing affinities into strings in
+        # scientific notation, using Markdown formatting
         def sci(val):
             if isinstance(val, str):
                 return val
@@ -211,7 +211,7 @@ class StoneModelMouse:
             return [sci(val) for val in series]
 
         def renameIgg(name):
-            name = 'm'+name
+            name = 'm' + name
             name = 'mIgG1-FcγRIIB-/-' if name == 'mIgG1-FcgRIIB-/-' else name
             name = 'mIgG2a-FcγRIIB-/-' if name == 'mIgG2a-FcgRIIB-/-' else name
             name = 'mIgG2b-FcγRIIB-/-' if name == 'mIgG2b-FcgRIIB-/-' else name
@@ -221,12 +221,12 @@ class StoneModelMouse:
             name = 'mIgG2a-FcγRI,IV-/-' if name == 'mIgG2a-FcgRI,IV-/-' else name
             name = 'mIgG2b-Fucose-/-' if name == 'mIgG2b-Fucose-/-' else name
             return name
-        
-        ## Convert percents into strings depicting percents
+
+        # Convert percents into strings depicting percents
         def percent(val):
             return str(val)
 
-        ## Rename columns of DataFrame 
+        # Rename columns of DataFrame
         tbN.columns = renameList(tbN.columns)
         tbN[[col for col in tbN.columns if col != 'Effectiveness']] = tbN[[col for col in tbN.columns if col != 'Effectiveness']].apply(sciSeries)
         tbN['Condition'] = tbN['Condition'].apply(renameIgg)
@@ -235,7 +235,7 @@ class StoneModelMouse:
         writer = ptw.MarkdownTableWriter()
         writer.from_dataframe(tbN)
 
-        ## Change writer stream to filename
+        # Change writer stream to filename
         with open(filename, 'w') as f:
             writer.stream = f
             writer.write_table()
