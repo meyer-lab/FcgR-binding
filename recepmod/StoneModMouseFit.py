@@ -148,7 +148,7 @@ def InVivoPredictMinusComponents():
 
     table = pd.DataFrame(cperf, columns=['CrossVal'], index=['Full Model'])
 
-    for ii in range(len(cellpops)):
-        table.loc['No ' + cellpops[ii], :] = crossValF(data.drop(cellpops[ii], axis=1))
+    for _, item in enumerate(cellpops):
+        table.loc['No ' + item, :] = crossValF(data.drop(item, axis=1))
 
     return table
