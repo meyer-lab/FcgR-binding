@@ -31,12 +31,24 @@ def FcgRexpression(ax):
     data = pd.melt(pd.read_csv(filepath), id_vars=['Cells'])
 
     data['Receptor'] = data.variable.str.extract('(R[1234])', expand=False)
+    data.drop('variable', inplace=True, axis=1)
+
+    # Setup replacement dict
+    FcsIDX = {'R1': r'mFc$\gamma$RI',
+              'R2': r'mFc$\gamma$RIIB',
+              'R3': r'mFc$\gamma$RIII',
+              'R4': r'mFc$\gamma$RIV'}
+
+    # Do replacement for receptors
+    data.replace({"Receptor": FcsIDX}, inplace=True)
 
     sns.factorplot(x="Cells", y="value", hue="Receptor",
                    data=data, kind="bar", ax=ax, ci=63)
 
     ax.set_ylabel(r'Fc$\gamma$R Expression')
-    # TODO: Finish beautifying
+    ax.set_xlabel('')
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
     # TODO: Fix references to supplemental figures here
 
 
