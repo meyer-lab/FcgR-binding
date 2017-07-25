@@ -21,19 +21,16 @@ bibliography: ./Manuscript/References.bib
 abstract: Many immune receptors transduce activation across the plasma membrane through their clustering. With Fcγ receptors, this clustering is driven by binding to antibodies of differing affinity that are in turn bound to multivalent antigen. As a consequence of this activation mechanism, accounting for and rationally manipulating IgG effector function is complicated by, among other factors, differing affinities between FcγR species and changes in the valency of antigen binding. In this study, we show that a model of multivalent receptor-ligand binding can effectively account for the contribution of IgG-FcγR affinity and immune complex valency. This model in turn enables us to make specific predictions about the effect of immune complexes of defined composition. In total, these results enable both rational immune complex design for a desired IgG effector function and the deconvolution of effector function by immune complexes.
 link-citations: true
 csl: ./Manuscript/Templates/nature.csl
-chapters: True
-chaptersDepth: 1
-chapDelim: ""
 ---
 
-# Summary points {-}
+# Summary points
 
 - Avidity most prominently modulates low-affinity FcγR-immune complex binding
 - A multivalent binding model can quantitatively predict FcγR-immune complex binding
 - Immune complex avidity has an outsized contribution to FcγR multimerization as compared to binding
 - A binding model deconvoles and predicts the influence of interventions modulating *in vivo* FcγR-driven effector function
 
-# Introduction {-}
+# Introduction
 
 Antibodies are critical and central regulators of the immune response. Antibodies of the IgG isotype interact with FcγR receptors expressed widely on innate immune effector cells, and effector cell function regulation is a critical component of the IgG therapy's use in cancer and autoimmune diseases. IgGs transduce effector function through multiple cell types—including macrophages, monocytes, neutrophils, and NK cells—and through multiple processes including promoting antibody-dependent cell-mediated cytotoxicity (ADCC), antigen presentation, and cytokine response. In addition to their effect in isolation, IgG therapies can show a synergistic effect in cancers in combination with checkpoint and cytokine-mediated immunotherapies [@Moynihan:2016jb; @Zhu:2015gy]. These immunotherapeutic effects in combination with antibodies' ability to operate directly through antigen binding and opsonization make IgG biologic agents particularly versatile therapeutic agents.
 

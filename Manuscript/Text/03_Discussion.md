@@ -1,4 +1,4 @@
-# Discussion {-}
+# Discussion
 
 A unified model for the coordinate contributions of IC avidity and affinity provides a framework for reasoning about the effects of changing antibody-antigen binding or constant region composition ([@Fig:Fit]). Glycosylation forms and engineered mutants, in addition to variation in antigen binding, exponentially expand the repertoire of antibody variants possible. The quantitative model presented here provides a robust framework for reasoning about the contributions each of these variables. Since it would not be feasible to experimentally explore all combinations of these variables, such a model is necessary for knowing which combinations would result in the most effective immunotherapeutic intervention. Further, a unified model for IC engagement may make it possible to consider the effects of antibody combinations in a rational manner.
 

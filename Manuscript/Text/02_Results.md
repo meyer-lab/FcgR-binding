@@ -1,4 +1,4 @@
-# Results {-}
+# Results
 
 ## IgG-FcγR binding varies with affinity and avidity
 
