@@ -14,9 +14,9 @@ In this study, we employed a model of multivalent immune complex binding to Fcγ
 
 We wish to include supplementary figures with this paper, to be posted online.  As submitted, the manuscript is in accordance with the guidelines for a research article. Some suggested reviewers include the following:
 
-Effector signaling: Jeffrey V. Ravetch, Rockefeller University; Yang-Xin Fu, UT Southwestern Medical Center; Falk Nimmerjahn, University of Erlangen-Nuremberg; Lai-Xi Wang, University of Maryland, College Park
+Effector signaling: Jeffrey V. Ravetch, Rockefeller University; Yang-Xin Fu, UT Southwestern Medical Center; Lai-Xi Wang, University of Maryland, College Park
 
-Computational modeling: Alan S. Perelson, Los Alamos National Laboratory; 
+Computational modeling: Alan S. Perelson, Los Alamos National Laboratory; Phil Bradley, Fred Hutchinson Cancer Research Center; Frederick Matsen, Fred Hutchinson Cancer Research Center
 
 My coauthors and I are grateful for your time in considering our submission.
 
