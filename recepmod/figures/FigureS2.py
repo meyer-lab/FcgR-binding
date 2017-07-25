@@ -2,9 +2,12 @@
 In vivo prediction robustness and first PC's
 """
 import os
+import string
 import pandas as pd
 import seaborn as sns
-from .FigureCommon import getSetup, Legend
+from .FigureCommon import getSetup, Legend, subplotLabel
+
+# TODO: Fix legend for this figure
 
 
 def makeFigure():
@@ -16,6 +19,10 @@ def makeFigure():
 
     # Make the robustness plot
     robustnessPlot(ax[1])
+
+    # Add subplot labels
+    for ii, item in enumerate(ax):
+        subplotLabel(item, string.ascii_uppercase[ii])
 
     # Tweak layout
     f.tight_layout()
