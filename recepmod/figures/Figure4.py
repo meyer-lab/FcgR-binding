@@ -303,3 +303,16 @@ def ClassAvidityPredict(ax):
     ax.set_xlabel('Avidity')
     ax.legend(handles=Legend([iggRename(ig) for ig in newIgList], colors, [], []),
               loc=2, bbox_to_anchor=(1, 1))
+
+
+def AffinityPredict(ax):
+    """ X """
+    from ..StoneModMouseFit import InVivoPredict
+
+    # Run the in vivo regression model
+    _, _, tblOne, model = InVivoPredict()
+    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
+    data.drop('Effectiveness', axis=1, inplace=True)
+
+    ax.set_ylabel('Predicted Effectiveness')
+    ax.set_xlabel('Avidity')
