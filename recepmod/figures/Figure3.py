@@ -148,8 +148,11 @@ def TwoRecep(ax):
     colors = dict(zip(avidity[1::], sns.color_palette()[1::]))
 
     for ii in avidity[1::]:
-        table[table['avidity'] == ii].plot(x="ligand", y="activity", ax=ax[
-                                           1], logx=True, legend=False)
+        table[table['avidity'] == ii].plot(x="ligand",
+                                           y="activity",
+                                           ax=ax[1],
+                                           logx=True,
+                                           legend=False)
         x0 = table[table['avidity'] == ii]['RmultiOne'].values
         y0 = table[table['avidity'] == ii]['RmultiTwo'].values
         ax[0].plot(x0, y0)
