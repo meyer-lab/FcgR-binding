@@ -206,21 +206,25 @@ class TestStoneNRecpMethods(unittest.TestCase):
             self.assertTrue(np.isclose(rbnd[0], rbnd[ii]))
             
     def test_simplify_to_monovalent(self):
+        """ Check that the generalized multi-receptor model simplifies to
+        Stone's model in the case of single-receptor expression """
         from ..StoneModel import StoneMod
-        logR = np.array([4.0], dtype=np.float64)
-        Ka = np.array([1e8], dtype=np.float64)
         Kx = np.power(10, -12.5)
         gnu = 4
         L0 = 1e-9
-        
-        cc = StoneN(logR, Ka, Kx, gnu, L0)
-        multi = (cc.getLbnd(), cc.getRbnd(), cc.getRmultiAll())
-        mono = StoneMod(logR[0], Ka[0], gnu, Kx, L0, fullOutput=True)
-        for j in range(3):
-            if j == 0:
-                self.assertTrue(np.isclose(multi[j], mono[j]))
-            else:
-                self.assertTrue(np.isclose(multi[j][0], mono[j]))
+
+        for Kaa in [np.float(j) for j in range(3,10)]:
+            logR = np.array([3.0], dtype=np.float64)
+            Ka = np.array([Kaa], dtype=np.float64)
+                        
+            cc = StoneN(logR, Ka, Kx, gnu, L0)
+            multi = (cc.getLbnd(), cc.getRbnd(), cc.getRmultiAll())
+            mono = StoneMod(logR[0], Ka[0], gnu, Ka[0]*Kx, L0, fullOutput=True)
+            for j in range(3):
+                if j == 0:
+                    self.assertTrue(np.isclose(multi[j], mono[j]))
+                else:
+                    self.assertTrue(np.isclose(multi[j][0], mono[j]))
 
 if __name__ == '__main__':
     unittest.main()
