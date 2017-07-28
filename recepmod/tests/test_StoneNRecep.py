@@ -207,8 +207,8 @@ class TestStoneNRecpMethods(unittest.TestCase):
             
     def test_simplify_to_monovalent(self):
         from ..StoneModel import StoneMod
-        logR = np.array([5.0], dtype=np.float64)
-        Ka = np.array([1e5], dtype=np.float64)
+        logR = np.array([4.0], dtype=np.float64)
+        Ka = np.array([1e8], dtype=np.float64)
         Kx = np.power(10, -12.5)
         gnu = 4
         L0 = 1e-9
