@@ -204,7 +204,23 @@ class TestStoneNRecpMethods(unittest.TestCase):
         for ii in range(4):
             self.assertTrue(np.isclose(rmulti[0], rmulti[ii]))
             self.assertTrue(np.isclose(rbnd[0], rbnd[ii]))
-
+            
+    def test_simplify_to_monovalent(self):
+        from ..StoneModel import StoneMod
+        logR = np.array([5.0], dtype=np.float64)
+        Ka = np.array([1e5], dtype=np.float64)
+        Kx = np.power(10, -12.5)
+        gnu = 4
+        L0 = 1e-9
+        
+        cc = StoneN(logR, Ka, Kx, gnu, L0)
+        multi = (cc.getLbnd(), cc.getRbnd(), cc.getRmultiAll())
+        mono = StoneMod(logR[0], Ka[0], gnu, Kx, L0, fullOutput=True)
+        for j in range(3):
+            if j == 0:
+                self.assertTrue(np.isclose(multi[j], mono[j]))
+            else:
+                self.assertTrue(np.isclose(multi[j][0], mono[j]))
 
 if __name__ == '__main__':
     unittest.main()
