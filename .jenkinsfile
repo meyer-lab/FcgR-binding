@@ -1,9 +1,5 @@
 pipeline {
   agent any
-  environment {
-    PATH = "/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/texlive/2017/bin/x86_64-darwin/"
-    LC_CTYPE = "en_US.UTF-8"
-  }
   stages {
     stage('Clean') {
       steps { sh 'make clean' }
