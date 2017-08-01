@@ -2,7 +2,10 @@ import logging
 import seaborn as sns
 import pandas as pd
 import numpy as np
+from itertools import product
+from .FigureCommon import Legend
 from ..StoneModMouse import StoneModelMouse
+from ..StoneModMouseFit import InVivoPredict, cellpops, CALCapply
 
 # Predict in vivo response
 
@@ -39,7 +42,7 @@ def makeFigure():
     ComponentContrib(ax[7])
 
     # Predict class/avidity effect
-    ClassAvidityPredict(ax[8])
+    AffinityPredict(ax[8])
 
     for ii, item in enumerate(ax):
         if ii != 4:
@@ -229,7 +232,6 @@ def AIplot(ax):
 def InVivoPredictVsActualAffinities(ax):
     """ Plot predicted vs actual for regression of conditions in vivo using affinity. """
     from ..StoneModMouseFit import NimmerjahnPredictByAffinities
-    from .FigureCommon import Legend
 
     dperf, cperf, data = NimmerjahnPredictByAffinities()
 
@@ -258,61 +260,39 @@ def InVivoPredictVsActualAffinities(ax):
               bbox_to_anchor=(1.5, 1), loc=2)
 
 
-def ClassAvidityPredict(ax):
-    """ Plot prediction of in vivo model with varying avidity and class. """
-    from ..StoneModMouseFit import InVivoPredict, cellpops, CALCapply
-    from .FigureCommon import Legend
-
-    # Run the in vivo regression model
-    _, _, tblOne, model = InVivoPredict()
-    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
-    data.drop('Effectiveness', axis=1, inplace=True)
-
-    data['v'] = 1
-    dataOne = data.copy()
-
-    for vv in range(2, 11):
-        dataNew = dataOne.copy()
-
-        dataNew['v'] = vv
-
-        data = data.append(dataNew)
-
-    data['L0'] = tblOne['L0'][0]
-
-    data = data[data.index.str.contains("FcgR") == False]
-
-    data = data.apply(CALCapply, axis=1)
-
-    data['predict'] = model.predict(data[cellpops].as_matrix())
-    data.reset_index(level=0, inplace=True)
-
-    # Plot the calculated crossvalidation performance
-    col = sns.crayon_palette(['Pine Green', 'Goldenrod', 'Wild Strawberry',
-                              'Brown', 'Navy Blue'])
-    newIgList = IgList[0:-1] + ['IgG2b-Fucose-/-']
-    colors = dict(zip([iggRename(ig) for ig in newIgList], col))
-
-    sns.FacetGrid(data, hue='index', palette=col).map(ax.plot, 'v', 'predict',
-                                                      marker='.',
-                                                      linestyle='None')
-
-    ax.vlines(5.0, 0, 1)
-
-    ax.set_ylabel('Predicted Effectiveness')
-    ax.set_xlabel('Avidity')
-    ax.legend(handles=Legend([iggRename(ig) for ig in newIgList], colors, [], []),
-              loc=2, bbox_to_anchor=(1, 1))
-
-
 def AffinityPredict(ax):
-    """ X """
-    from ..StoneModMouseFit import InVivoPredict
-
+    """ Make a prediction for varying affinity. """
     # Run the in vivo regression model
     _, _, tblOne, model = InVivoPredict()
-    data = StoneModelMouse().NimmerjahnEffectTableAffinities()
-    data.drop('Effectiveness', axis=1, inplace=True)
+    data = StoneModelMouse().NimmerjahnEffectTableAffinities().loc['IgG2b', ]
+
+    edits = pd.DataFrame(list(product(range(4), np.logspace(-1, 1, num=20))),
+                         columns=['recep', 'edit'])
+
+    edits['FcgRI'] = data.FcgRI
+    edits['FcgRIIB'] = data.FcgRIIB
+    edits['FcgRIII'] = data.FcgRIII
+    edits['FcgRIV'] = data.FcgRIV
+
+    for ii in range(edits.shape[0]):
+        edits.iloc[ii, 2 + edits.recep[ii]] *= edits.edit[ii]
+
+    edits['L0'] = tblOne['L0'][0]
+    edits['v'] = tblOne['v'][0]
+
+    # Calculate activity for each cell population
+    edits = edits.apply(CALCapply, axis=1)
+
+    # Run through regression model to get predictions
+    edits['predict'] = model.predict(edits[cellpops].as_matrix())
+
+    with sns.color_palette("Paired"):
+        # Plot each line
+        sns.FacetGrid(edits, hue='recep').map(ax.plot, 'edit', 'predict')
+
+    # TODO: Add FcgR legend
+    # TODO: Change the figure caption
 
     ax.set_ylabel('Predicted Effectiveness')
-    ax.set_xlabel('Avidity')
+    ax.set_xlabel('Fold Change in Affinity')
+    ax.set_xscale('log')
