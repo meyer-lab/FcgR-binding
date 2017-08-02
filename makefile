@@ -46,14 +46,14 @@ open: Manuscript/index.html
 	open ./Manuscript/index.html
 
 test:
-	nosetests-3.4 -s --with-timer --timer-top-n 5
+	nosetests3 -s --with-timer --timer-top-n 5
 
 profile:
-	nosetests-3.4 -s --with-timer --timer-top-n 5 --with-cprofile
+	nosetests3 -s --with-timer --timer-top-n 5 --with-cprofile
 	gprof2dot -n 2.0 -e 2.0 -f pstats stats.dat | dot -Tpng -o profile.png
 
 testcover:
-	nosetests-3.4 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
+	nosetests3 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
 
 rebuild:
 	(echo "from recepmod.figures.FigureS2 import robustnessCalc" ; echo "robustnessCalc()") | python3
