@@ -1,4 +1,4 @@
-#! env python3
+#! /usr/bin/env python3
 
 from mimetypes import guess_type
 from os.path import splitext
