@@ -287,15 +287,21 @@ def AffinityPredict(ax):
     # Run through regression model to get predictions
     edits['predict'] = model.predict(edits[cellpops].as_matrix())
 
+    # FcgR labels
+    FcgRlabels = [r'mFc$\gamma$RI',
+                  r'mFc$\gamma$RIIB',
+                  r'mFc$\gamma$RIII',
+                  r'mFc$\gamma$RIV']
+
     colors = sns.color_palette("Paired")
     with colors:
         # Plot each line
         sns.FacetGrid(edits, hue='recep').map(ax.plot, 'edit', 'predict')
 
-    # TODO: Change the figure caption
+        # Add legend
+        patches = [Patch(color=colors[j], label=FcgRlabels[j]) for j in range(4)]
+        ax.legend(handles=patches)
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Fold Change in Affinity')
     ax.set_xscale('log')
-    patches = [Patch(color=colors[j], label=r'$f='+str(j)+'$') for j in range(1,4)]
-    ax.legend(handles=patches)
