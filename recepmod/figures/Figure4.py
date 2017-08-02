@@ -300,7 +300,7 @@ def AffinityPredict(ax):
 
         # Add legend
         patches = [Patch(color=colors[j], label=FcgRlabels[j]) for j in range(4)]
-        ax.legend(handles=patches)
+        ax.legend(handles=patches, bbox_to_anchor=(1, 1), loc=2)
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Fold Change in Affinity')
