@@ -6,6 +6,7 @@ from itertools import product
 from .FigureCommon import Legend
 from ..StoneModMouse import StoneModelMouse
 from ..StoneModMouseFit import InVivoPredict, cellpops, CALCapply
+from matplotlib.patches import Patch
 
 # Predict in vivo response
 
@@ -286,13 +287,15 @@ def AffinityPredict(ax):
     # Run through regression model to get predictions
     edits['predict'] = model.predict(edits[cellpops].as_matrix())
 
-    with sns.color_palette("Paired"):
+    colors = sns.color_palette("Paired")
+    with colors:
         # Plot each line
         sns.FacetGrid(edits, hue='recep').map(ax.plot, 'edit', 'predict')
 
-    # TODO: Add FcgR legend
     # TODO: Change the figure caption
 
     ax.set_ylabel('Predicted Effectiveness')
     ax.set_xlabel('Fold Change in Affinity')
     ax.set_xscale('log')
+    patches = [Patch(color=colors[j], label=r'$f='+str(j)+'$') for j in range(1,4)]
+    ax.legend(handles=patches)
