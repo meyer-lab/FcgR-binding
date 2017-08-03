@@ -2,7 +2,10 @@ pipeline {
   agent any
   stages {
     stage('Clean') {
-      steps { sh 'make clean' }
+      steps {
+        sh 'git clean -ffdx'
+        sh 'make clean'
+      }
     }
     stage('Build') {
       steps { sh 'make -j 8' }
