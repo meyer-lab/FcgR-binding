@@ -11,24 +11,14 @@
 	.st5{fill:none;stroke:#231F20;stroke-miterlimit:10;}
 </style>
 <title>Untitled-1</title>
-<text transform="matrix(1 0 0 1 121.2371 10.0439)" class="st0 st1 st2">“</text>
-<text transform="matrix(1 0 0 1 124.6692 10.0439)" class="st0 st1 st2">A/</text>
-<text transform="matrix(1 0 0 1 136.1287 10.0439)" class="st0 st1 st2">I</text>
-<text transform="matrix(1 0 0 1 138.9368 10.0439)" class="st0 st1 st2">”</text>
-<text transform="matrix(1 0 0 1 142.1526 10.0439)" class="st0 st1 st2"> </text>
-<text transform="matrix(1 0 0 1 144.6966 10.0439)" class="st0 st1 st2">r</text>
-<text transform="matrix(1 0 0 1 148.5608 10.0439)" class="st0 st1 st2">a</text>
-<text transform="matrix(1 0 0 1 154.2967 10.0439)" class="st0 st1 st2">tio</text>
+<text transform="matrix(1 0 0 1 121.2371 10.0439)" class="st0 st1 st2">“A/I” ratio</text>
 <text transform="matrix(1 0 0 1 151.82 57.8662)" class="st3"><tspan x="0" y="0" class="st0 st4 st2">In Vivo</tspan><tspan x="32.3" y="0" class="st0 st1 st2"> Effect</tspan></text>
 <text transform="matrix(1 0 0 1 120.0307 77.5045)" class="st0 st1 st2">Cell</text>
 <text transform="matrix(1 0 0 1 101.6307 91.9045)" class="st0 st1 st2">population</text>
 <text transform="matrix(1 0 0 1 106.6307 106.3045)" class="st0 st1 st2">response</text>
 <text transform="matrix(1 0 0 1 39.8404 10.0439)" class="st0 st4 st2">Affinities</text>
 <text transform="matrix(1 0 0 1 17.1737 86.7106)" class="st0 st4 st2">Affinities</text>
-<text transform="matrix(1 0 0 1 -1.983643e-04 106.7106)" class="st0 st4 st2">C</text>
-<text transform="matrix(1 0 0 1 6.576 106.7106)" class="st0 st4 st2">ell exp</text>
-<text transform="matrix(1 0 0 1 36.9232 106.7106)" class="st0 st4 st2">r</text>
-<text transform="matrix(1 0 0 1 40.6668 106.7106)" class="st0 st4 st2">ession</text>
+<text transform="matrix(1 0 0 1 -1.983643e-04 106.7106)" class="st0 st4 st2">Cell Expression</text>
 <line class="st5" x1="84.6" y1="5.7" x2="110.2" y2="5.7"/>
 <path class="st0" d="M116.2,5.7c-3.1,1.1-6,2.7-8.5,4.8l1.7-4.8L107.7,1C110.3,3,113.1,4.6,116.2,5.7z"/>
 <line class="st5" x1="168.5" y1="12.8" x2="186.7" y2="31"/>
