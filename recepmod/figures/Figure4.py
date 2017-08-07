@@ -169,6 +169,9 @@ def InVivoPredictComponents(ax):
     ax.set_xlabel('')
     ax.set_ylim(0.0, 2.0)
     ax.legend(loc='best')
+    
+    goober = tbN[tbN['value'] > 2.0]
+    ax.plot(goober.index, [1.8]*len(goober.index), marker='x', mew=2.0)
 
     # Set alternating grey rectangles in the background to allow for better
     # readability of the bar graph
