@@ -287,6 +287,10 @@ def AffinityPredict(ax):
 
     # Run through regression model to get predictions
     edits['predict'] = model.predict(edits[cellpops].as_matrix())
+    
+    # Make FcgRI visible
+    if edits['recep'] == 'FcgRI':
+        edits['predict'] += 0.02
 
     # FcgR labels
     FcgRlabels = [r'mFc$\gamma$RI',
