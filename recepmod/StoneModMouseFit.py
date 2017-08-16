@@ -54,6 +54,13 @@ def caller(**kwargs):
     return StoneN(**kwargs).getActivity([1, -1, 1, 1])
 
 
+exprDict = {'ncMO': [3.28, 4.17, 3.81, 4.84],
+            'NE': [1.96, 3.08, 3.88, 4.07],
+            'cMO': [3.49, 4.13, 4.18, 3.46],
+            'NKs': [1.54, 3.21, 3.23, 2.23],
+            'EO': [1.96, 4.32, 4.22, 2.60]}
+
+
 def CALCapply(row):
     from .StoneHelper import getMedianKx
 
@@ -61,16 +68,17 @@ def CALCapply(row):
 
     kwarg = {'Ka': KaFull, 'Kx': getMedianKx(), 'gnu': row.v, 'L0': row.L0}
 
-    row['ncMO'] = caller(logR=[3.28, 4.17, 3.81, 4.84], **kwarg)  # non-classic MO
-    row['NE'] = caller(logR=[1.96, 3.08, 3.88, 4.07], **kwarg)  # neutrophils
-    row['cMO'] = caller(logR=[3.49, 4.13, 4.18, 3.46], **kwarg)  # classic MO
-    row['NKs'] = caller(logR=[1.54, 3.21, 3.23, 2.23], **kwarg)  # NK
-    row['EO'] = caller(logR=[1.96, 4.32, 4.22, 2.60], **kwarg)  # Eosino
+    for key, item in exprDict.items():
+        internalExpr = np.asarray(item)
+
+        internalExpr[internalExpr < 2] = -8
+
+        row[key] = caller(logR=item, **kwarg)  # get predictions
 
     return row
 
 
-cellpops = ['cMO', 'NE', 'ncMO', 'NKs', 'EO']
+cellpops = list(exprDict.keys())
 
 
 def modelPrepAffinity(v, L0):
