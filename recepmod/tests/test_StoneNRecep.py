@@ -1,4 +1,5 @@
 import unittest
+import itertools
 import numpy as np
 from ..StoneNRecep import StoneVgrid, reqSolver, StoneRbnd, StoneN
 
@@ -204,7 +205,31 @@ class TestStoneNRecpMethods(unittest.TestCase):
         for ii in range(4):
             self.assertTrue(np.isclose(rmulti[0], rmulti[ii]))
             self.assertTrue(np.isclose(rbnd[0], rbnd[ii]))
-            
+
+    def test_activity(self):
+        """
+        This test reduces the affinity of a low abundance receptor and makes sure there aren't changes.
+        It sets all combinations of one and two receptors to low expression, then changes those receptor
+        affinities.
+        """
+
+        Kx = np.power(10, -12.5)
+        gnu = 4
+        L0 = 1E-9
+        activity = [1, -1, 1, 1]
+
+        for ii in list(itertools.combinations(range(4), 2)) + list(range(4)):
+            logR = np.full((4,), 3, dtype=np.float64)
+            logR[np.array(ii)] = -6
+            Ka = np.array([1E5, 1E4, 1E5, 1E5], dtype=np.float64)
+
+            one = StoneN(logR, Ka, Kx, gnu, L0).getActivity(activity)
+
+            Ka[np.array(ii)] = 1E-6
+
+            self.assertTrue(np.isclose(one,
+                                       StoneN(logR, Ka, Kx, gnu, L0).getActivity(activity)))
+
     def test_simplify_to_monovalent(self):
         """ Check that the generalized multi-receptor model simplifies to
         Stone's model in the case of single-receptor expression """
@@ -213,18 +238,19 @@ class TestStoneNRecpMethods(unittest.TestCase):
         gnu = 4
         L0 = 1e-9
 
-        for Kaa in [np.float(j) for j in range(3,10)]:
+        for Kaa in [np.float(j) for j in range(3, 10)]:
             logR = np.array([3.0], dtype=np.float64)
             Ka = np.array([Kaa], dtype=np.float64)
-                        
+
             cc = StoneN(logR, Ka, Kx, gnu, L0)
             multi = (cc.getLbnd(), cc.getRbnd(), cc.getRmultiAll())
-            mono = StoneMod(logR[0], Ka[0], gnu, Ka[0]*Kx, L0, fullOutput=True)
+            mono = StoneMod(logR[0], Ka[0], gnu, Ka[0] * Kx, L0, fullOutput=True)
             for j in range(3):
                 if j == 0:
                     self.assertTrue(np.isclose(multi[j], mono[j]))
                 else:
                     self.assertTrue(np.isclose(multi[j][0], mono[j]))
+
 
 if __name__ == '__main__':
     unittest.main()
