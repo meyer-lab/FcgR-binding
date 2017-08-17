@@ -3,7 +3,7 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 from itertools import product
-from .FigureCommon import Legend
+from .FigureCommon import Legend, rectDots
 from ..StoneModMouse import StoneModelMouse
 from ..StoneModMouseFit import InVivoPredict, cellpops, CALCapply
 from matplotlib.patches import Patch
@@ -160,6 +160,11 @@ def InVivoPredictComponents(ax):
 
     # Remove eff from cell line labels
     tbN['variable'] = list(map(lambda x: x.replace('eff', ''), tbN.variable))
+    
+    # Make dictionaries mapping each values to the position of the
+    # value in the index for both indices
+    cond_map = dict(zip(tbN['condition'].unique(), range(len(tbN['condition'].unique()))))
+    var_map = dict(zip(tbN['variable'].unique(), range(len(tbN['variable'].unique()))))
 
     with sns.color_palette("Paired"):
         sns.factorplot(x="condition", hue="variable", y="value", data=tbN,
@@ -169,9 +174,6 @@ def InVivoPredictComponents(ax):
     ax.set_xlabel('')
     ax.set_ylim(0.0, 2.0)
     ax.legend(loc='best')
-    
-    goober = tbN[tbN['value'] > 2.0]
-    ax.plot(goober.index, [1.8]*len(goober.index), marker='x', mew=2.0)
 
     # Set alternating grey rectangles in the background to allow for better
     # readability of the bar graph
@@ -183,7 +185,11 @@ def InVivoPredictComponents(ax):
 
     alternatingRects(xlims=ax.get_xlim(), ylims=ax.get_ylim(),
                      numRects=numRects, ax=ax)
-
+    
+    # Get DataFrame corresponding to rectangles exceeding ylim
+    extremes = tbN[tbN['value'] > 2.0]
+    # Mark these rectangles with black dots
+    rectDots(extremes, ax, cond_map, var_map)
 
 def RequiredComponents(ax):
     """ Plot model components. """
