@@ -72,6 +72,7 @@ def CALCapply(row):
         internalExpr = np.asarray(item)
 
         internalExpr[internalExpr < 3] = -8
+        item = list(internalExpr)
 
         row[key] = caller(logR=item, **kwarg)  # get predictions
 
