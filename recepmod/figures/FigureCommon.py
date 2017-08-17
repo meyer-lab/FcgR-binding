@@ -1,6 +1,7 @@
 import seaborn as sns
 import numpy as np
 from ..StoneModel import StoneModel
+from matplotlib.patches import Ellipse
 
 
 IgList = ['IgG1', 'IgG2', 'IgG3', 'IgG4']
@@ -152,7 +153,12 @@ def alternatingRects(xlims, ylims, numRects, ax, color=(0.8, 0.8, 0.8)):
     for patch in prerects:
         if str(patch) != 'Rectangle(0,0;1x1)':
             ax.add_patch(patch)
-
+            
+def rectDots(extremes, ax, cond_map, var_map, color='black', locy=1.0, width=0.15, height=0.075):
+    locframe = extremes.apply(lambda row: cond_map[row['condition']]+(var_map[row['variable']]+1.0)/6.0-0.5, axis=1)
+    dots = [Ellipse((locx, locy), width=width, height=height, edgecolor=color, facecolor=color) for locx in locframe]
+    for dot in dots:
+        ax.add_patch(dot)
 
 def overlayCartoon(figFile, cartoonFile, x, y, scalee=1):
     """ Add cartoon to a figure file. """
