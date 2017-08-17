@@ -73,7 +73,7 @@ def CALCapply(row):
 
         internalExpr[internalExpr < 3] = -8
 
-        row[key] = caller(logR=item, **kwarg)  # get predictions
+        row[key] = caller(logR=internalExpr, **kwarg)  # get predictions
 
     return row
 
