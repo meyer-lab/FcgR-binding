@@ -129,12 +129,12 @@ def ComponentContrib(ax):
 
     tbN = tbN.drop('None')
 
-    tbN['frac'] = tbN['EOeff'] / tbN[[s + 'eff' for s in cellpops]].sum(axis=1)
+    tbN['frac'] = tbN['cMOeff'] / tbN[[s + 'eff' for s in cellpops]].sum(axis=1)
 
     commonPlot(ax, tbN, 'frac', 'Effectiveness')
 
     ax.set_ylabel('Effectiveness')
-    ax.set_xlabel('Predicted EO Contribution')
+    ax.set_xlabel('Predicted cMO Contribution')
 
 
 def InVivoPredictComponents(ax):
