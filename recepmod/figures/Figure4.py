@@ -122,19 +122,17 @@ def InVivoPredictVsActual(ax):
 
 def ComponentContrib(ax):
     """ Plot the predicted contribution of NK cells. """
-    from ..StoneModMouseFit import InVivoPredict, cellpops
+    from ..StoneModMouseFit import InVivoPredict
 
     # Run the in vivo regression model
     _, _, tbN, _ = InVivoPredict()
 
     tbN = tbN.drop('None')
 
-    tbN['frac'] = tbN['EOeff'] / tbN[[s + 'eff' for s in cellpops]].sum(axis=1)
-
-    commonPlot(ax, tbN, 'frac', 'Effectiveness')
+    commonPlot(ax, tbN, 'cMOeff', 'Effectiveness')
 
     ax.set_ylabel('Effectiveness')
-    ax.set_xlabel('Predicted EO Contribution')
+    ax.set_xlabel('Predicted cMO Effect')
 
 
 def InVivoPredictComponents(ax):
@@ -167,7 +165,7 @@ def InVivoPredictComponents(ax):
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('')
-    ax.set_ylim(0.0, 2.0)
+    ax.set_ylim(0.0, 1.75)
     ax.legend(loc='best')
 
     # Set alternating grey rectangles in the background to allow for better
