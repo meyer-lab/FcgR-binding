@@ -9,8 +9,6 @@ import numpy as np
 from .FigureCommon import getSetup, Legend, subplotLabel
 from ..StoneModMouseFit import InVivoPredict
 
-# TODO: Fix legend for this figure
-
 
 def makeFigure():
     # Get list of axis objects
@@ -58,7 +56,6 @@ def FcgRexpression(ax):
     ax.set_xlabel('')
 
     ax.set_xticklabels(ax.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
-    # TODO: Fix references to supplemental figures here
 
 
 def robustnessPlot(ax):
