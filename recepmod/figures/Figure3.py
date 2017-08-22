@@ -239,7 +239,7 @@ def maxAffinity(ax):
     ax.plot(Kas[2], baselineAct, color=colors[1], marker='o')
     ax.plot(Kas[3], baselineAct, color=colors[2], marker='o')
 
-    ax.set_xlabel(r'$K_a$ of mFc$\gamma$R Adjusted')
+    ax.set_xlabel(r'$K_a$ of Adjusted mFc$\gamma$R')
     ax.set_ylabel('Activity Index')
     ax.set_xscale('log')
     ax.set_xlim(1.0E4, 1.0E9)
