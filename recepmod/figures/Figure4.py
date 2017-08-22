@@ -165,7 +165,7 @@ def InVivoPredictComponents(ax):
 
     ax.set_ylabel('Weightings')
     ax.set_xlabel('')
-    ax.set_ylim(0.0, 2.0)
+    ax.set_ylim(0.0, 1.75)
     ax.legend(loc='best')
 
     # Set alternating grey rectangles in the background to allow for better
