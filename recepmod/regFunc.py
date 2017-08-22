@@ -15,7 +15,7 @@ class regFunc(BaseEstimator):
 
         self.trainX, self.trainy = X, y
 
-        ub = np.full((X.shape[1], ), 12.0)
+        ub = np.full((X.shape[1], ), 15.0)
 
         res = differential_evolution(lambda p: np.sum(np.square(self.trainy - self.predict(p=p))),
                                      bounds=list(zip(-ub, ub)), disp=False)
