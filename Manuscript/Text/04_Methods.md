@@ -10,6 +10,7 @@ IC binding to hFcγRs was analyzed using Chinese hamster ovarian (CHO) cells sta
 
 TODO: Have Markus look this over and edit.
 TODO: Needs to include how immune populations were purified and defined, sources for antibodies and spheres.
+TODO: Describe thresholding
 
 FcγR abundance was measured from peripheral blood leukocytes of C57Bl/6J mice under steady state conditions.
 
