@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.base import BaseEstimator
+from scipy.optimize import least_squares, differential_evolution
 
 
 class regFunc(BaseEstimator):
@@ -11,8 +12,6 @@ class regFunc(BaseEstimator):
 
     def fit(self, X, y):
         """ Fit the X-y relationship. Return nothing. """
-        from scipy.optimize import least_squares, differential_evolution
-
         self.trainX, self.trainy = X, y
 
         ub = np.full((X.shape[1], ), 12.0)
