@@ -266,7 +266,7 @@ def AffinityPredict(ax):
     _, _, tblOne, model = InVivoPredict()
     data = StoneModelMouse().NimmerjahnEffectTableAffinities().loc['IgG2b', ]
 
-    edits = pd.DataFrame(list(product(range(4), np.logspace(-1, 1, num=20))),
+    edits = pd.DataFrame(list(product(range(4), np.logspace(-1, 1, num=30))),
                          columns=['recep', 'edit'])
 
     edits['FcgRI'] = data.FcgRI
