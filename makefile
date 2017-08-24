@@ -36,8 +36,11 @@ Manuscript/Manuscript.tex: Manuscript/Text/*.md Manuscript/index.html
 Manuscript/CoverLetter.docx: Manuscript/CoverLetter.md
 	pandoc -f markdown $< -o $@
 
+Manuscript/CoverLetter.pdf: Manuscript/CoverLetter.md
+	pandoc --latex-engine=xelatex --template=/Users/asm/.pandoc/letter-templ.tex $< -o $@
+
 clean:
-	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/Figures/ModelData.md Manuscript/CoverLetter.docx
+	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/Figures/ModelData.md Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
 	rm -f $(fdir)/Figure*
 	rm -f Manuscript/Text/07_ModelData.md
 	rm -f profile.p* stats.dat .coverage nosetests.xml
