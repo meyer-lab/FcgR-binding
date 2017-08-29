@@ -8,31 +8,15 @@ IC binding to hFcγRs was analyzed using Chinese hamster ovarian (CHO) cells sta
 
 ## FcγR abundance measurement for primary cells
 
-TODO: Needs to include how immune populations were purified and defined, sources for antibodies and spheres. Describe thresholding.
-
-FcγR abundance was measured from peripheral blood leukocytes of C57Bl/6J mice under steady state conditions.
-
-Surface receptor was quantitated by measuring antibody binding capacity (ABC). Calculation of ABC on cells is based on a reference curve for the correlation between fluorescence intensity (caused by the respective anti-FcγR antibody) and the number of antibody binding sites. This reference curve is generated using a group of micropheres with known ABC values, reflecting their ability to bind a known amount of antibody. In each experiment these microspheres are stained with the respective anti-FcγR antibody in the same concentration as it is used for staining of the cells.
-
-From Markus:
-
 FcγR abundance was measured by flow cytometry from peripheral blood leukocytes of female C57Bl/6J mice under steady state conditions. 
 
-After erythrocyte lysis of anti-coagulated blood, cells were stained with antibodies to enable identification of cell types and for quantification of Fcγ receptors as listed in the Supplementary Information. Prior to addition of the staining antibodies cells were blocked with anti-FcγR antibodies to avoid unspecific binding to Fc receptors. Samples for quantification of FcγR4 were blocked with anti-FcγR2b/3 antibody clone 2.4G2. Samples for quantification of mFcγRI, mFcγRIIb or mFcγRIII were blocked with anti-FcγRIV antibody clone 9E9, since FcγRIV receptor has been shown to be a potential cause for unspecific binding of certain antibody isotypes in flow cytometry [here we could add a citation of one of our recent publications showing this, or just omit everything after “since..”]. TODO: Add citation.
+After erythrocyte lysis of anti-coagulated blood, cells were stained with antibodies to enable identification of cell types and for quantification of Fcγ receptors as listed in the Supplementary Information. Prior to addition of the staining antibodies cells were blocked with anti-FcγR antibodies to avoid unspecific binding to Fc receptors. Samples for quantification of FcγR4 were blocked with anti-FcγR2b/3 antibody clone 2.4G2. Samples for quantification of mFcγRI, mFcγRIIb or mFcγRIII were blocked with anti-FcγRIV antibody clone 9E9, since FcγRIV receptor has been shown to be a potential cause for unspecific binding of certain antibody isotypes in flow cytometry [@Biburger:2015].
 
 A typical cell identification strategy was as follows: Cell aggregates were excluded by their forward light scatter (FSC) characteristics (area vs. height) and dead cells based on their capability for DAPI uptake. Leukocytes were identified by expression of common leukocyte marker CD45. Among those lymphocytes and myeloid cells were gated based on low side scatter (SSC) characteristics and absence of the Ly6G marker of neutrophilic granulocytes. NK cells were identified by low to intermediate CD11b expression together with expression of NK marker NK1.1. Among the highly CD11b-positive but NK1.1-negative cells, CD11b~high~ CD62L~high~ Gr-1~high~ classical and CD11b~high~ CD62L~low~ Gr-1~low~ non-classical monocytes were distinguished based on their differential expression of Gr-1 and in most experiments additionally also of CD62L. Among the granulocytes with high SSC and CD11b expression, eosinophils were identified by their very high SSC, low FSC and absence of Ly6G, whereas neutrophils were characterized by intermediately high side and forward scatter and presence of the neutrophil marker Ly6G.
 
 Surface receptor was quantitated by measuring antibody binding capacity (ABC) for antibodies specific for the respective Fcγ receptor. Calculation of ABC on cells is based on a reference curve for the correlation between fluorescence intensity (caused by the respective anti-FcγR antibody) and the number of antibody binding sites using a group of beads with known ABC values, reflecting their ability to bind a known amount of antibody. These curves were established in each experiment for all tested anti-FcγR antibodies, using Quantum Simply Cellular (QSC) anti-mouse or anti-rat beads (Bangs Laboratories Ltd.)—depending on the host species of the respective anti-FcγR antibody—according to manufacturer’s instructions. Anti-FcγR4 antibody 9E9 is derived from Armenian hamster, but was found to be efficiently bound by the anti-mouse QSC beads. Yet, in most experiments these beads were pre-coated with mouse anti-hamster moieties prior to staining with 9E9.	
 
-All anti-FcγR antibodies used for Fc quantification were used as conjugates with R-PE. They were either purchased pre-labelled or were conjugated in-house.
-
-In each experiment QSC microspheres are stained with the respective anti-FcγR antibody in the same concentration as it was used for cell staining.	
-
-To allow subtraction of ABC-background accounting for background fluorescence of the cells, FMO ("fluorescence-minus-one") controls were used in each experiment, where cells were stained with all antibodies for cell type identification but without anti-FcγR antibody.
-
-Flow cytometric analysis was done on a FACS Canto II (BD Biosciences, Heidelberg) and data were analyzed with FACSDiva Software (BD). For ABC calculation we used the QuickCal software provided by Bangs Laboratories.
-
-TODO: Cleanup
+All anti-FcγR antibodies used for Fc quantification were used as conjugates with R-PE. They were either purchased pre-labelled or were conjugated in-house. In each experiment QSC microspheres are stained with the respective anti-FcγR antibody in the same concentration as it was used for cell staining.	 To allow subtraction of ABC-background accounting for background fluorescence of the cells, FMO ("fluorescence-minus-one") controls were used in each experiment, where cells were stained with all antibodies for cell type identification but without anti-FcγR antibody. Flow cytometric analysis was done on a FACS Canto II (BD Biosciences, Heidelberg) and data were analyzed with FACSDiva Software (BD). For ABC calculation we used the QuickCal software provided by Bangs Laboratories. FcγRs with average abundances less than $10^3$ per cell were considered absent; in every case this determination was consistent with measurements in samples from knockout animals.
 
 ## *In vivo* regression
 
