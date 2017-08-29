@@ -77,7 +77,7 @@ def getMeasuredDataFrame(self):
                 .assign(FcgR=rep(self.FcgRs, 4) * 8)
                 .assign(Expression=rep(self.Rquant, 4) * 8)
                 .assign(Ka=np.tile(np.reshape(self.kaBruhns, (-1, 1)), (8, 1)))
-               )
+                )
 
     return normData
 
@@ -103,7 +103,7 @@ def getFitPrediction(self, x):
           .assign(nXlinkPred=np.reshape(np.transpose(onXlink), (-1, 1)))
           .assign(LbndPred=np.reshape(np.transpose(oLbnd), (-1, 1)))
           .assign(Req=np.reshape(np.transpose(oReq), (-1, 1)))
-         )
+          )
 
     return dd
 
