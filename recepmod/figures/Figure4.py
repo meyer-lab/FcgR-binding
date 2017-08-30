@@ -159,7 +159,9 @@ def InVivoPredictComponents(ax):
     # Remove eff from cell line labels
     tbN['variable'] = list(map(lambda x: x.replace('eff', ''), tbN.variable))
 
-    with sns.color_palette("Paired"):
+    colors = sns.crayon_palette(["Shamrock", 'Navy Blue', 'Beaver',
+                                 'Goldenrod', 'Radical Red'])
+    with colors:
         sns.factorplot(x="condition", hue="variable", y="value", data=tbN,
                        ax=ax, kind='bar', legend=False)
 
