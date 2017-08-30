@@ -53,12 +53,13 @@ def caller(**kwargs):
     from .StoneNRecep import StoneN
     return StoneN(**kwargs).getActivity([1, -1, 1, 1])
 
-
-exprDict = {'ncMO': [3.28, 4.17, 3.81, 4.84],
-            'NE': [1.96, 3.08, 3.88, 4.07],
-            'cMO': [3.49, 4.13, 4.18, 3.46],
-            'NKs': [1.54, 3.21, 3.23, 2.23],
-            'EO': [1.96, 4.32, 4.22, 2.60]}
+from collections import OrderedDict
+exprDict = OrderedDict(zip(['ncMO', 'NE', 'cMO', 'NKs', 'EO'],
+                           [[3.28, 4.17, 3.81, 4.84],
+                            [1.96, 3.08, 3.88, 4.07],
+                            [3.49, 4.13, 4.18, 3.46],
+                            [1.54, 3.21, 3.23, 2.23],
+                            [1.96, 4.32, 4.22, 2.60]]))
 
 
 def CALCapply(row):
