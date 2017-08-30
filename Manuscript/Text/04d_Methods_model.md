@@ -69,8 +69,4 @@ $$\mathbf{Q}_{f,N}^*\equiv\{(q_1,q_2,\ldots,q_N,f-\sum_{i=1}^Nq_i)\in\mathbb{N}^
 
 ### Activity Index
 
-To account for the combined effects of activating, inhibitory, and decoy receptors, we defined an activity index. To do so, we defined the activity index as being the dot product of the vector $v$, or number of multimerized receptors of each receptor species, and $w$, the activity of each receptor species. Activating receptors were given an activity of 1, decoy receptors 0, and inhibitory receptors -1. Multimerization states that resulted in activities of less than 0 were set to 0. This definition satisfied our expectations that activity increases with a greater number of activating receptors, decreases with more inhibitory receptors, and does not change with variation in the number of decoy receptors. The activity index was further transformed by:
-
-$$ A = \frac{\lvert a \rvert}{1 + e^{-a}} $$ {#eq:actTrans}
-
-so that very negative activites were trimmed to 0.
+To account for the combined effects of activating, inhibitory, and decoy receptors, we defined an activity index. To do so, we defined the activity index as being the dot product of the vector $v$, or number of multimerized receptors of each receptor species, and $w$, the activity of each receptor species. Activating receptors were given an activity of 1, decoy receptors 0, and inhibitory receptors -1. Multimerization states that resulted in activities of less than 0 were set to 0. This definition satisfied our expectations that activity increases with a greater number of activating receptors, decreases with more inhibitory receptors, and does not change with variation in the number of decoy receptors.
