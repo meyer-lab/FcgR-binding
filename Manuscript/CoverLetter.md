@@ -7,15 +7,11 @@ cc:
 
 \today
 
-| Cell Press
-| 50 Hampshire Street, 5th Floor
-| Cambridge, MA 02139  
-
 \vspace{0.3in}
 
 Dear Editors,
 
-We are pleased to submit an original manuscript entitled "Dissecting FcγR Regulation Through a Multivalent Binding Model," for consideration as a theory article in *Cell*. 
+We are pleased to submit an original manuscript entitled "Dissecting FcγR Regulation Through a Multivalent Binding Model," for consideration as an article in *Nature*. 
 
 Antibodies are critical and central regulators of the immune response. Antibodies of the IgG isotype interact with FcγR receptors expressed widely on innate immune effector cells. Regulation of effector cell function is a critical component of the IgG therapy's use in cancer and autoimmune diseases. Effector function operates through multiple cell types—including macrophages, monocytes, neutrophils, and NK cells—and through multiple processes including promoting antibody-dependent cell-mediated cytotoxicity (ADCC), antigen presentation, and cytokine response. Many efforts have sought to improve our understanding of IgG-mediated effector function. These include efforts to carefully quantify the individual, monovalent FcγR-IgG affinities. In addition, previous studies have characterized the effects of IgG glycosylation (which serves to modulate FcγR affinity) and immune complex avidity on the binding of IgG-antigen complexes. Genetic models have made it possible to remove certain FcγRs and examine the consequent effect on IgG treatment in various cancer models. Finally, comparison of antibodies with matched variable regions but differing Fc domains has allowed the effects to be compared, through with necessarily pleiotropic effects on binding to each FcγR class.
 
@@ -23,7 +19,7 @@ Models of multivalent ligand binding to monovalent receptors have been successfu
 
 In this study, we employed a model of multivalent immune complex binding to FcγR receptors and show that it captures the influence of avidity on immune complex binding. Applying this model, we show it can quantitatively predict effector response in response to diverse interventions in a forward manner and can deconvolve the causal factors of response in a reverse fashion. More broadly, these results demonstrate the power of a unified binding model tied to computational inference techniques to link theory and experimental observation.
 
-We wish to include supplementary figures with this paper, to be posted online.  As submitted, the manuscript is in accordance with the guidelines for a research article. Some suggested reviewers are the following:
+We wish to include supplementary figures with this paper, to be posted online. Some suggested reviewers are the following:
 
 Effector signaling:
 
