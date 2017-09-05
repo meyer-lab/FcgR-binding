@@ -3,10 +3,8 @@ title: Dissecting FcγR Regulation Through a Multivalent Binding Model
 author:
 - name: Ryan A. Robinett
   affilnum: a,d
-  affiliation: Co-first author
 - name: Ning Guan
   affilnum: a,d
-  affiliation: Co-first author
 - name: Anja Lux
   affilnum: b
 - name: Markus Biburger

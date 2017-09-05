@@ -7,6 +7,7 @@
 
 % To allow Ryan to show alterations he has made to the manuscript using colored text:
 \usepackage{color}
+\usepackage[affil-it]{authblk}
 
 \PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
 
@@ -112,12 +113,13 @@ $endif$
 
 \title{$title$}
 
-$if(author)$
-\author{$for(author)$ $author.name$ $sep$ \and $endfor$}
-$endif$
+$for(author)$
+\author[$author.affilnum$]{$author.name$}
+$endfor$
 
-\providecommand{\institute}[1]{}
-\institute{$for(affiliation)$$affiliation.name$$sep$ \and $endfor$}
+$for(affiliation)$
+\affil[$affiliation.key$]{$affiliation.name$}
+$endfor$
 
 \date{$date$}
 
