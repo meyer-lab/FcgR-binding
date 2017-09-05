@@ -110,16 +110,15 @@ $endif$
 % Defines absolute value paired delimiter "\abs{}"
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}
 
-$if(title)$
-\title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
-$endif$
+\title{$title$}
+
 $if(author)$
 \author{$for(author)$ $author.name$ $sep$ \and $endfor$}
 $endif$
-$if(institute)$
+
 \providecommand{\institute}[1]{}
-\institute{$for(institute)$$institute$$sep$ \and $endfor$}
-$endif$
+\institute{$for(affiliation)$$affiliation.name$$sep$ \and $endfor$}
+
 \date{$date$}
 
 \newcommand{\beginsupplement}{\cleardoublepage%
