@@ -17,7 +17,7 @@ keywords: [FcγR receptors, immunology, antibodies, effector function]
 affiliation:
 - name: Koch Institute for Integrative Cancer Research, Massachusetts Institute of Technology, Cambridge, MA
   key: a
-- Friedrich-Alexander-University of Erlangen-Nürnberg
+- name: Friedrich-Alexander-University of Erlangen-Nürnberg
   key: b
 - name: Department of Bioengineering, University of California, Los Angeles
   key: c
