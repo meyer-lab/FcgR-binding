@@ -19,7 +19,7 @@ affiliation:
   key: a
 - name: Friedrich-Alexander-University of Erlangen-Nürnberg
   key: b
-- name: Department of Bioengineering, University of California, Los Angeles
+- name: Department of Bioengineering, Jonsson Comprehensive Cancer Center, Eli and Edythe Broad Center of Regenerative Medicine and Stem Cell Research; University of California, Los Angeles
   key: c
 - name: Co-first author
   key: d
