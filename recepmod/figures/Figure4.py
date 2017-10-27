@@ -220,6 +220,7 @@ def AIplot(ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('A/I Ratio')
     ax.set_xscale('log')
+    ax.set_title('No IIB KO')
     ax.set_xlim(10**(-1.2), 10**(2.6))
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
@@ -243,6 +244,7 @@ def InVivoPredictVsActualAffinities(ax):
 
     ax.set_xlabel('Regressed Effectiveness')
     ax.set_ylabel('Effectiveness')
+    ax.set_title('All Conditions')
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
