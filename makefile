@@ -57,6 +57,3 @@ profile:
 
 testcover:
 	nosetests3 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
-
-rebuild:
-	(echo "from recepmod.figures.FigureS2 import robustnessCalc" ; echo "robustnessCalc()") | python3

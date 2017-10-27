@@ -2,19 +2,27 @@
 title: Dissecting FcγR Regulation Through a Multivalent Binding Model
 author:
 - name: Ryan A. Robinett
-  affiliation: Co-first author; Koch Institute for Integrative Cancer Research, Massachusetts Institute of Technology, Cambridge, MA
+  affilnum: a,d
 - name: Ning Guan
-  affiliation: Co-first author; Koch Institute for Integrative Cancer Research, Massachusetts Institute of Technology, Cambridge, MA
+  affilnum: a,d
 - name: Anja Lux
-  affiliation: Friedrich-Alexander-University of Erlangen-Nürnberg
+  affilnum: b
 - name: Markus Biburger
-  affiliation: Friedrich-Alexander-University of Erlangen-Nürnberg
+  affilnum: b
 - name: Falk Nimmerjahn
-  affiliation: Friedrich-Alexander-University of Erlangen-Nürnberg
+  affilnum: b
 - name: Aaron S. Meyer
-  affiliation: Department of Bioengineering, University of California, Los Angeles
+  affilnum: c
 keywords: [FcγR receptors, immunology, antibodies, effector function]
-institute: A
+affiliation:
+- name: Koch Institute for Integrative Cancer Research, Massachusetts Institute of Technology, Cambridge, MA
+  key: a
+- name: Friedrich-Alexander-University of Erlangen-Nürnberg
+  key: b
+- name: Department of Bioengineering, Jonsson Comprehensive Cancer Center, Eli and Edythe Broad Center of Regenerative Medicine and Stem Cell Research; University of California, Los Angeles
+  key: c
+- name: Co-first author
+  key: d
 bibliography: ./Manuscript/References.bib
 abstract: Many immune receptors transduce activation across the plasma membrane through their clustering. With Fcγ receptors, this clustering is driven by binding to antibodies of differing affinity that are in turn bound to multivalent antigen. As a consequence of this activation mechanism, accounting for and rationally manipulating IgG effector function is complicated by, among other factors, differing affinities between FcγR species and changes in the valency of antigen binding. In this study, we show that a model of multivalent receptor-ligand binding can effectively account for the contribution of IgG-FcγR affinity and immune complex valency. This model in turn enables us to make specific predictions about the effect of immune complexes of defined composition. In total, these results enable both rational immune complex design for a desired IgG effector function and the deconvolution of effector function by immune complexes.
 link-citations: true
