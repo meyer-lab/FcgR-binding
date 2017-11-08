@@ -135,8 +135,8 @@ def InVivoPredict(inn=[5, 1E-9]):
 
     tbl['Error'] = np.square(tbl.CPredict - y)
 
-    print('InVivoPredict direct r2: ' + str(round(dperf, 3)))
-    print('InVivoPredict crossval r2: ' + str(round(cperf, 3)))
+    # print('InVivoPredict direct r2: ' + str(round(dperf, 3)))
+    # print('InVivoPredict crossval r2: ' + str(round(cperf, 3)))
 
     for ii, item in enumerate(cellpops):
         tbl[item + 'eff'] = tbl[item] * np.power(10, model.res.x[ii])
