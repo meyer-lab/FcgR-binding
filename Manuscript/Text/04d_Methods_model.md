@@ -62,8 +62,8 @@ $$L_{bound} = \sum_{\mathbf{q}\in\mathbf{Q}_{f,N}}v_{\mathbf{q},eq}.$$
 
 The number of receptor $i$ that are multimerized at equilibrium can be calculated as
 
-$$R_{multi,i}=\sum_{\mathbf{q}\in\mathbf{Q}_{f,N}^*}\abs{\mathbf{q}}v_{\mathbf{q},eq}\label{donkey},$$
-where $\abs{\mathbf{q}}=\sum_{i=1}^Nq_i$ and
+$$R_{multi,i}=\sum_{\mathbf{q}\in\mathbf{Q}_{f,N}^*}\lvert \mathbf{q} \rvert v_{\mathbf{q},eq}\label{donkey},$$
+where $\lvert \mathbf{q} \rvert=\sum_{i=1}^Nq_i$ and
 
 $$\mathbf{Q}_{f,N}^*\equiv\{(q_1,q_2,\ldots,q_N,f-\sum_{i=1}^Nq_i)\in\mathbb{N}^{N+1}\mid2\leq\sum_{i=1}^Nq_i\leq f\}.$$
 
