@@ -8,7 +8,7 @@ pipeline {
       }
     }
     stage('Build') {
-      steps { sh 'make -j 8' }
+      steps { sh 'make -j 16' }
     }
     stage('Test'){
       steps {
