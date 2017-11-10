@@ -150,7 +150,7 @@ def alternatingRects(xlims, ylims, numRects, ax, color=(0.8, 0.8, 0.8)):
             ax.add_line(child)
 
     for patch in prerects:
-        if str(patch) != 'Rectangle(0,0;1x1)':
+        if str(patch) != 'Rectangle(xy=(0, 0), width=1, height=1, angle=0)':
             ax.add_patch(patch)
 
 
