@@ -108,15 +108,13 @@ def FcgRQuantificationFigureMaker(StoneM, ax):
 
     # Remove nan values and transform to absolute scale
     dfm = dfm[np.isfinite(dfm['value'])]
-    dfm['value'] = dfm['value'].apply(lambda x: np.power(10, x))
 
     # Plot everything
     axx = sns.barplot(x="variable", y="value", data=dfm, ax=ax)
 
     # Set up axes
-    axx.set_yscale('log')
-    axx.set_ylim(1.0E5, 1.0E7)
-    axx.set_ylabel("Receptors/Cell")
+    axx.set_ylim(5, 7)
+    axx.set_ylabel("Log10(Receptors/Cell)")
     ax.set_xlabel("")
     axx.set_xlabel("")
     axx.set_xticklabels(axx.get_xticklabels(), rotation=40, rotation_mode="anchor", ha="right")
