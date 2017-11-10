@@ -108,9 +108,6 @@ $endif$
 \def\fps@figure{htbp}
 \makeatother
 
-% Defines absolute value paired delimiter "\abs{}"
-\DeclarePairedDelimiter\abs{\lvert}{\rvert}
-
 \title{$title$}
 
 $for(author)$
