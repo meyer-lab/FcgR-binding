@@ -188,7 +188,7 @@ def RequiredComponents(ax):
 
     table = InVivoPredictMinusComponents()
 
-    table.plot(kind='bar', y='CrossVal', ax=ax, legend=False)
+    table.plot(kind='bar', y='CrossVal', ax=ax, legend=False, color=sns.color_palette()[0])
 
     ax.set_ylabel('LOO $R^2$ Explained')
     ax.set_ylim(0.0, 1.0)
