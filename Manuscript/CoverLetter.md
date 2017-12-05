@@ -15,7 +15,7 @@ cc:
 
 Dear Editors,
 
-We are pleased to submit an original manuscript entitled "Dissecting FcγR Regulation Through a Multivalent Binding Model," for consideration as an article in *Molecular Cell*. 
+We are pleased to submit an original manuscript entitled "Dissecting FcγR Regulation Through a Multivalent Binding Model," for consideration as an article in *Cell Systems*. 
 
 Antibodies are critical and central regulators of the immune response. Antibodies of the IgG isotype interact with FcγR receptors expressed widely on immune effector cells. Regulation of effector cell function is a critical component of the IgG therapy's use in cancer and autoimmune diseases. In this study, we employ a model of multivalent immune complex binding to FcγR receptors and show that it captures the influence of avidity on immune complex binding. This model enables us to quantitatively predict effector response to diverse interventions in a forward manner and can deconvolve the causal factors of response in a reverse fashion. More broadly, these results demonstrate the power of a unified binding model tied to computational inference techniques to learn about the mechanism of targeted immune interventions.
 
