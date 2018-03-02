@@ -4,7 +4,7 @@ fdir = ./Manuscript/Figures
 tdir = ./Manuscript/Templates
 pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filter.py -f markdown ./Manuscript/Text/*.md
 
-.PHONY: clean upload test profile testcover open rebuild
+.PHONY: clean upload test profile testcover open rebuild sample sampleprofile
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx
 
@@ -57,3 +57,10 @@ profile:
 
 testcover:
 	nosetests3 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
+
+sample:
+	python3 -c "from recepmod.fitFuncs import runSampler; runSampler()"
+
+sampleprofile:
+	python3 -c "from recepmod.fitFuncs import runSampler; import cProfile; cProfile.run('runSampler(niters=200, npar=1)', 'stats.dat')"
+	snakeviz stats.dat

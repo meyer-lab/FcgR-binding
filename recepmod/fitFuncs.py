@@ -34,7 +34,7 @@ def getUniformStart(StoneM):
     return (p0, ndims, nwalkers)
 
 
-def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
+def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5", npar=16):
     """ Run the sampling. """
     from emcee import EnsembleSampler
     from .StoneModel import StoneModel
@@ -42,13 +42,13 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5"):
     bestLL = -np.inf
 
     # Load model
-    StoneM = StoneModel.StoneModel(newData)
+    StoneM = StoneModel(newData)
 
     # Get uniform distribution of positions for start
     p0, ndims, nwalkers = getUniformStart(StoneM)
 
     # Set up sampler
-    sampler = EnsembleSampler(nwalkers, ndims, StoneM.NormalErrorCoef, 2.0, [], {}, None, 16)
+    sampler = EnsembleSampler(nwalkers, ndims, StoneM.NormalErrorCoef, 2.0, [], {}, None, npar)
 
     if filename is not None:
         f, dset = startH5File(StoneM, filename)

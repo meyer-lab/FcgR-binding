@@ -1,10 +1,13 @@
 from memoize import memoize
 from scipy.special import binom
+from scipy.stats import poisson
 import numpy as np
+from numba import jit
 
 np.seterr(over='raise')
 
 
+@jit(nopython=True, nogil=True)
 def logpdf_sum(x, loc, scale):
     """
     Normal distribution function. Sums over the likelihoods of points in x
@@ -46,6 +49,12 @@ def normalizeData(filepath):
     return newLux
 
 
+@jit(nopython=True, nogil=True)
+def diffFunAnon(x, R, viLika, kx, vi):
+    """ Mass balance for receptor species, to identify the amount of free receptor. """
+    return R-x*(1+viLika*(1+kx*x)**(vi-1))
+
+
 def ReqFuncSolver(R, ka, Li, vi, kx):
     """
     The purpose of this function is to calculate the value of Req (from Eq 1
@@ -55,23 +64,20 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     """
     from scipy.optimize import brentq
 
-    # a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
-    # is necessarily lower than log10(R).
-    a, b = -40, np.log10(R)
-
-    # Mass balance for receptor species, to identify the amount of free receptor
-    diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
+    # 0 and R are the bounds for bisection, because Req < R
+    viLika = vi*Li*ka
 
     try:
-        if diffFunAnon(a) * diffFunAnon(b) > 0:
+        if diffFunAnon(0, R, viLika, kx, vi) * diffFunAnon(R, R, viLika, kx, vi) > 0:
             return np.nan
     except FloatingPointError:
         return np.nan
 
     # Implement the bisection algorithm using SciPy's brentq.
-    return brentq(diffFunAnon, a, b, disp=False)
+    return brentq(diffFunAnon, 0, R, disp=False, args=(R, viLika, kx, vi))
 
 
+@jit
 def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     '''
     Returns the number of mutlivalent ligand bound to a cell with 10^logR
@@ -85,7 +91,7 @@ def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     v = np.int_(v)
 
     # Vector of binomial coefficients
-    Req = 10**ReqFuncSolver(10**logR, Ka, L0, v, Kx)
+    Req = ReqFuncSolver(10**logR, Ka, L0, v, Kx)
     if np.isnan(Req):
         return (np.nan, np.nan, np.nan, np.nan)
 
@@ -109,6 +115,7 @@ def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     nXlink = np.sum(np.multiply(vieq[1:], np.arange(1, v, dtype=np.float)))
 
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
+
 
 class StoneModel:
     # This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
@@ -141,11 +148,16 @@ class StoneModel:
         # Iterate over each kind of TNP-BSA (4 or 26)
         for j in range(2):
             # Set the effective avidity for the kind of TNP-BSA in question
-            v = x[self.uvIDX[j]]
+            v = np.int_(x[self.uvIDX[j]])
             # Set the MFI-per-TNP-BSA conversion ratio for the kind of TNP-BSA in question
             c = 10**x[self.cIDX[j]]
             # Set the ligand (TNP-BSA) concentration for the kind of TNP-BSA in question
             L0 = self.tnpbsa[j]
+
+            # Prior distribution on the ligand valency
+            # TODO: Add text to reflect this change
+            # TODO: Check whether this matches up as log10 vs log_e
+            logSqrErr = logSqrErr + poisson.logpmf(v, mu=(4 + j*22))
 
             # Iterate over each kind of FcgR
             for k in range(6):
@@ -262,7 +274,7 @@ class StoneModel:
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         ## Lower and upper bounds for avidity are specified here
         self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
-        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 12, 32,ubsigma], dtype = np.float64)
+        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 12, 64,ubsigma], dtype = np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted

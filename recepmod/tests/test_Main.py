@@ -32,7 +32,7 @@ class TestStoneMethods(unittest.TestCase):
 
         output = ReqFuncSolver(R, kai, Li, vi, kx)
 
-        self.assertTrue(abs(diffFunAnon(output)) < 1E-8)
+        self.assertTrue(abs(diffFunAnon(np.log10(output))) < 1E-8)
 
         self.assertTrue(np.isnan(ReqFuncSolver(R, kai, Li, -10, kx)))
 
@@ -41,7 +41,7 @@ class TestStoneMethods(unittest.TestCase):
         kai, kx, vi, R, Li = get_random_vars()
 
         StoneRet = StoneMod(np.log10(R),kai,vi,kx,Li,fullOutput = True)
-        Req = 10**ReqFuncSolver(R,kai,Li,vi,kx)
+        Req = ReqFuncSolver(R,kai,Li,vi,kx)
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
 
