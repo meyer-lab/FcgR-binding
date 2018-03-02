@@ -7,7 +7,10 @@ Reviewer #1: This is a very well written and interesting paper. I have a few con
 
 #### 3) In the definition of the A/I ratio it was unclear if this is the ratio of the highest affinity activating receptor to the highest affinity inhibitory receptor as the wording is unclear.
 
+
+
 #### 4) For Fig. 3A add a definition of the symbol f to the caption.
+
 
 
 #### 5) An analysis of the base model appears in Perelson (1981) and an explicit formula is given for what the authors call R_multi. Generalizations of the base model where all the crosslinking constants are different also appear in this paper, which should be cited here.
@@ -27,8 +30,20 @@ Reviewer #1: This is a very well written and interesting paper. I have a few con
 Reviewer #2: Effector function of antibodies depends on FcγR class, IgG-FcγR affinity and immune complex valency. The description and prediction of effectiveness of natural or engineered IgG are complicated, due to lack of experimental and mathematics models. In this study, Dr. Meyer and colleagues showed a unique model of multivalent receptor-immune complex. Moreover, this model could make specific predictions about the responses of immune complex with defined FcγRs. Though it is not surprising that this model could be applied in accounting for the immune complex-FcγR binding, it is worthy and interesting to explore the more complicated IgG-effector function by further improving this method. This study will be helpful for developing new concept of therapeutic antibodies/regimens for cancer and autoimmune diseases and for understanding the mechanism of immune-complex induced immune responses.
 
 Concerns:
-1. There is no description for Fig.3E in the text.
-2. The definition of effectiveness in Fig.4C is not clear.
-3. The IgG effector function is complicated. ADCC or ADCP is not the only pathway for tumor regression in some instance. Is this model limited to accounting for IgG mediated ADCC or ADCP effect in this manuscript？
-4. The author should provide more information about how to calculate the predicted effectiveness of mIgG in Fig.4C and the predicted effectiveness quantified by activity index in Fig.4F.
-5. Some of the reagents or methods are not described clearly in detail, such as the construction of TRP1(TA99) antibodies with different mIgG constant region and the method of melanoma lung metastasis model.
+
+#### 1. There is no description for Fig.3E in the text.
+
+We have added this to the relevant point in the text.
+
+#### 2. The definition of effectiveness in Fig.4C is not clear.
+
+
+
+#### 3. The IgG effector function is complicated. ADCC or ADCP is not the only pathway for tumor regression in some instance. Is this model limited to accounting for IgG mediated ADCC or ADCP effect in this manuscript？
+
+Indeed, effector function is a complex mix of processes, including ADCC, ADCP, and CDC. Our model only uses the affinity of each antibody species to determine the efficacy of a treatment. Therefore, we are assuming that other contributory factors, such as binding to C1q, have a constant or relatively lesser contribution. This assumption is supported by XXX for the *in vivo* model used here.
+
+#### 4. The author should provide more information about how to calculate the predicted effectiveness of mIgG in Fig.4C and the predicted effectiveness quantified by activity index in Fig.4F.
+
+
+#### 5. Some of the reagents or methods are not described clearly in detail, such as the construction of TRP1(TA99) antibodies with different mIgG constant region and the method of melanoma lung metastasis model.
