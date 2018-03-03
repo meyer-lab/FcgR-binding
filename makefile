@@ -53,7 +53,7 @@ test:
 
 profile:
 	nosetests3 -s --with-timer --timer-top-n 5 --with-cprofile
-	gprof2dot -n 2.0 -e 2.0 -f pstats stats.dat | dot -Tpng -o profile.png
+	snakeviz stats.dat
 
 testcover:
 	nosetests3 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
