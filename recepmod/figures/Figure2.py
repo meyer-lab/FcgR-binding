@@ -91,9 +91,9 @@ def histSubplots(dset, axes):
     dset[[texRename('sigConv1'), texRename('sigConv2')]].plot.hist(
         ax=axes[1], bins=20, color=sns.color_palette()[0:2])
     dset[[texRename('gnu1'), texRename('gnu2')]].plot.hist(ax=axes[2],
-                                                           bins=np.arange(-0.5, 32.5, 1.0),
+                                                           bins=np.arange(-0.5, 40.5, 1.0),
                                                            color=sns.color_palette()[0:2],
-                                                           xlim=(-0.5, 32.5))
+                                                           xlim=(-0.5, 40.5))
     dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(
         ax=axes[3], bins=40, color=sns.color_palette()[0:2])
 
