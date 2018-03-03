@@ -36,7 +36,7 @@ def getUniformStart(StoneM):
     return (p0, ndims, nwalkers)
 
 
-def runSampler(niters=100000, thin=200, newData=True, filename="./recepmod/data/test_chain.h5", npar=32):
+def runSampler(niters=400000, thin=400, newData=True, filename="./recepmod/data/test_chain.h5", npar=36):
     """ Run the sampling. """
     from emcee import EnsembleSampler
     from .StoneModel import StoneModel
@@ -55,7 +55,7 @@ def runSampler(niters=100000, thin=200, newData=True, filename="./recepmod/data/
         f, dset = startH5File(StoneM, filename)
 
     # Setup thinning tracking
-    thinTrack = 0
+    thinTrack = -thin
 
     for p, lnprob, _ in tqdm(sampler.sample(p0, iterations=niters, storechain=False), total=niters):
         if thinTrack < thin:
