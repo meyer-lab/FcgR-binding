@@ -38,6 +38,7 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5", 
     """ Run the sampling. """
     from emcee import EnsembleSampler
     from .StoneModel import StoneModel
+    from tqdm import tqdm
 
     bestLL = -np.inf
 
@@ -56,7 +57,7 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5", 
     # Setup thinning tracking
     thinTrack = 0
 
-    for p, lnprob, _ in sampler.sample(p0, iterations=niters, storechain=False):
+    for p, lnprob, _ in tqdm(sampler.sample(p0, iterations=niters, storechain=False), total=niters):
         if thinTrack < thin:
             thinTrack += 1
         else:
