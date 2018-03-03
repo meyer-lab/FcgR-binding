@@ -16,9 +16,11 @@ def startH5File(StoneM, filename):
     dset = f.create_dataset("data",
                             chunks=True,
                             maxshape=(None, StoneM.Nparams + 2),
-                            data=np.ndarray((0, StoneM.Nparams + 2)))
+                            data=np.ndarray((0, StoneM.Nparams + 2)),
+                            dtype=np.float32,
+                            compression="gzip",
+                            compression_opts=9)
     dset.attrs["class"] = np.void(StoneMs)
-    f.swmr_mode = True
 
     return (f, dset)
 
@@ -34,7 +36,7 @@ def getUniformStart(StoneM):
     return (p0, ndims, nwalkers)
 
 
-def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5", npar=16):
+def runSampler(niters=100000, thin=200, newData=True, filename="./recepmod/data/test_chain.h5", npar=32):
     """ Run the sampling. """
     from emcee import EnsembleSampler
     from .StoneModel import StoneModel
