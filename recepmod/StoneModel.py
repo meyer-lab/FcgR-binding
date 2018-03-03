@@ -156,7 +156,6 @@ class StoneModel:
 
             # Prior distribution on the ligand valency
             # TODO: Add text to reflect this change
-            # TODO: Check whether this matches up as log10 vs log_e
             logSqrErr = logSqrErr + poisson.logpmf(v, mu=(4 + j*22))
 
             # Iterate over each kind of FcgR

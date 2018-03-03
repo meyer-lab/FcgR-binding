@@ -86,10 +86,10 @@ def violinPlot(dset, ax):
 def histSubplots(dset, axes):
     dset.columns = texRenameList(dset.columns)
 
-    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins=20,
+    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins=30,
                                        color=[sns.color_palette()[0]], legend=False)
     dset[[texRename('sigConv1'), texRename('sigConv2')]].plot.hist(
-        ax=axes[1], bins=20, color=sns.color_palette()[0:2])
+        ax=axes[1], bins=30, color=sns.color_palette()[0:2])
     dset[[texRename('gnu1'), texRename('gnu2')]].plot.hist(ax=axes[2],
                                                            bins=np.arange(-0.5, 48.5, 1.0),
                                                            color=sns.color_palette()[0:2],
