@@ -40,8 +40,6 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5", 
     from .StoneModel import StoneModel
     from tqdm import tqdm
 
-    bestLL = -np.inf
-
     # Load model
     StoneM = StoneModel(newData)
 
@@ -49,7 +47,7 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5", 
     p0, ndims, nwalkers = getUniformStart(StoneM)
 
     # Set up sampler
-    sampler = EnsembleSampler(nwalkers, ndims, StoneM.NormalErrorCoef, 2.0, [], {}, None, npar)
+    sampler = EnsembleSampler(nwalkers, ndims, StoneM.NormalErrorCoef, threads=npar)
 
     if filename is not None:
         f, dset = startH5File(StoneM, filename)
@@ -61,9 +59,6 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5", 
         if thinTrack < thin:
             thinTrack += 1
         else:
-            if np.max(lnprob) > bestLL:
-                bestLL = np.max(lnprob)
-
             matOut = np.concatenate((lnprob.reshape(nwalkers, 1),
                                      np.arange(0, nwalkers).reshape(nwalkers, 1),
                                      p.reshape(nwalkers, ndims)), axis=1)
@@ -74,5 +69,4 @@ def runSampler(niters=100000, thin=200, newData=True, filename="mcmc_chain.h5", 
                 dset[fShape[0]:, :] = matOut
                 f.flush()
 
-            print((dset.shape, bestLL))
             thinTrack = 1
