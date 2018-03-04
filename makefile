@@ -8,7 +8,7 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filte
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx
 
-$(fdir)/Figure%.svg: genFigures.py
+$(fdir)/Figure%.svg: genFigures.py recepmod/recepmod.so
 	mkdir -p ./Manuscript/Figures
 	python3 genFigures.py $*
 
@@ -17,6 +17,9 @@ $(fdir)/Figure%pdf: $(fdir)/Figure%svg
 
 $(fdir)/Figure%eps: $(fdir)/Figure%svg
 	rsvg-convert -f eps $< -o $@
+
+recepmod/recepmod.so: recepmod/solverC.cpp
+	g++ -std=c++11 -mavx -march=native $< -O3 --shared -fPIC -lm -o $@
 
 Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
@@ -41,26 +44,24 @@ Manuscript/CoverLetter.pdf: Manuscript/CoverLetter.md
 
 clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/Figures/ModelData.md Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
-	rm -f $(fdir)/Figure*
-	rm -f Manuscript/Text/07_ModelData.md
-	rm -f profile.p* stats.dat .coverage nosetests.xml
+	rm -f $(fdir)/Figure* recepmod/recepmod.so Manuscript/Text/07_ModelData.md profile.p* stats.dat .coverage nosetests.xml
 
 open: Manuscript/index.html
 	open ./Manuscript/index.html
 
-test:
+test: recepmod/recepmod.so
 	nosetests3 -s --with-timer --timer-top-n 5
 
-profile:
+profile: recepmod/recepmod.so
 	nosetests3 -s --with-timer --timer-top-n 5 --with-cprofile
 	snakeviz stats.dat
 
-testcover:
+testcover: recepmod/recepmod.so
 	nosetests3 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
 
-sample:
+sample: recepmod/recepmod.so
 	python3 -c "from recepmod.fitFuncs import runSampler; runSampler()"
 
-sampleprofile:
+sampleprofile: recepmod/recepmod.so
 	python3 -c "from recepmod.fitFuncs import runSampler; import cProfile; cProfile.run('runSampler(niters=200, npar=1)', 'stats.dat')"
 	snakeviz stats.dat

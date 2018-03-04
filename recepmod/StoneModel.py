@@ -1,10 +1,17 @@
+import os
 from memoize import memoize
 from scipy.special import binom
 from scipy.stats import poisson
 import numpy as np
+import ctypes as ct
 from numba import jit
 
 np.seterr(over='raise')
+
+filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./recepmod.so")
+libb = ct.cdll.LoadLibrary(filename)
+libb.ReqFuncSolver.argtypes = (ct.c_double, ct.c_double, ct.c_double, ct.c_int, ct.c_double)
+libb.ReqFuncSolver.restype = ct.c_double
 
 
 @jit(nopython=True, nogil=True)
@@ -49,12 +56,6 @@ def normalizeData(filepath):
     return newLux
 
 
-@jit(nopython=True, nogil=True)
-def diffFunAnon(x, R, viLika, kx, vi):
-    """ Mass balance for receptor species, to identify the amount of free receptor. """
-    return R-x*(1+viLika*(1+kx*x)**(vi-1))
-
-
 def ReqFuncSolver(R, ka, Li, vi, kx):
     """
     The purpose of this function is to calculate the value of Req (from Eq 1
@@ -62,19 +63,9 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     by performing the bisction algorithm on Eq 2 from Stone. The bisection
     algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
     """
-    from scipy.optimize import brentq
+    global libb
 
-    # 0 and R are the bounds for bisection, because Req < R
-    viLika = vi*Li*ka
-
-    try:
-        if diffFunAnon(0, R, viLika, kx, vi) * diffFunAnon(R, R, viLika, kx, vi) > 0:
-            return np.nan
-    except FloatingPointError:
-        return np.nan
-
-    # Implement the bisection algorithm using SciPy's brentq.
-    return brentq(diffFunAnon, 0, R, disp=False, args=(R, viLika, kx, vi))
+    return libb.ReqFuncSolver(R, ka, Li, vi, kx)
 
 
 @jit
@@ -267,7 +258,7 @@ class StoneModel:
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         ## Lower and upper bounds for avidity are specified here
-        self.start = np.array([6., 6., 6., 6., 6., 6., -10., -5.6, -5.6, 4, 26, -0.4], dtype=np.float64)
+        self.start = np.array([6., 6., 6., 6., 6., 6., -12.2, -5.6, -5.6, 4, 26, -0.4], dtype=np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
