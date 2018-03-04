@@ -17,7 +17,7 @@ def makeFigure():
     # Retrieve model and fit from hdf5 file
     M, dset = read_chain()
 
-    pBest = dset.iloc[np.argmax(dset['LL']), :][2:].as_matrix()
+    pBest = dset.iloc[dset['LL'].idxmax, :][2:].as_matrix()
 
     # Get list of axis objects
     ax, f = getSetup((7, 6), (3, 3))
