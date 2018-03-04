@@ -138,14 +138,13 @@ def ComponentContrib(ax):
 def InVivoPredictComponents(ax):
     """ Plot model components. """
     from ..StoneModMouseFit import InVivoPredict
-    import re
     from .FigureCommon import alternatingRects
 
     # Run the in vivo regression model
     tbN = InVivoPredict()[2]
 
     # Only keep the effect columns
-    tbN = tbN.select(lambda x: re.search('eff', x), axis=1)
+    tbN = tbN.filter(like='eff', axis=1)
 
     tbN.index = map(lambda x: x.replace('Fcg', r'mFc$\gamma$'), tbN.index)
     tbN.index = map(lambda x: x.replace('ose-/-', 'ose-'), tbN.index)
