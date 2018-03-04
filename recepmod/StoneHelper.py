@@ -51,7 +51,7 @@ def read_chain(filename=None, ffilter=True):
 
 def rep(x, N):
     """ Returns a range with repeated elements. """
-    return [item for item in x for i in range(N)]
+    return [item for item in x for _ in range(N)]
 
 
 @memoize
