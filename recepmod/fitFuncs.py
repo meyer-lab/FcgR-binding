@@ -23,11 +23,16 @@ def startH5File(StoneM, filename):
 
 def getUniformStart(StoneM):
     """ Set up parameters for parallel-tempered Ensemble Sampler """
+    from scipy.optimize import minimize
+
     ndims, nwalkers = StoneM.Nparams, 4 * StoneM.Nparams
     p0 = np.random.normal(scale=0.1, size=(nwalkers, ndims))
 
+    start = minimize(lambda x: -StoneM.NormalErrorCoef(x),
+                     StoneM.start, method='nelder-mead')
+
     for ii in range(nwalkers):
-        p0[ii] += StoneM.start
+        p0[ii] += start.x
 
     return (p0, ndims, nwalkers)
 
