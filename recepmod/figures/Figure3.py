@@ -38,7 +38,7 @@ def makeFigure():
         subplotLabel(item, string.ascii_uppercase[ii])
 
     avidities = np.logspace(0, 5, 6, base=2, dtype=np.int).tolist()
-    ax[0].legend([r'$f=' + str(x) + r'$' for x in avidities],
+    ax[0].legend([r'$' + str(x) + r'$' for x in avidities],
                  loc=1,
                  bbox_to_anchor=(0.5, 1))
 

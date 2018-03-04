@@ -11,12 +11,16 @@ Reviewer #1: This is a very well written and interesting paper. I have a few con
 
 #### 4) For Fig. 3A add a definition of the symbol f to the caption.
 
-
+We have clarified this in the figure.
 
 #### 5) An analysis of the base model appears in Perelson (1981) and an explicit formula is given for what the authors call R_multi. Generalizations of the base model where all the crosslinking constants are different also appear in this paper, which should be cited here.
 
+We have added this reference, as this is indeed very relevant.
 
 #### 6) In the discussion of the base model the authors when they mention before Eq. (3) the number of unbound receptors or the total number of ligands (NOT LIGAND) bound at equilibrium they mean number per cell and they should be clearer about this. The same applies when the generalized multireceptor model is introduced. Also, the authors should note that Perelson and C.A. Macken wrote a monograph entitled "Branching Processes applied to Cell Surface Aggregation Phenomena". Lecture Notes in Biomathematics, vol 58, Springer 1985 that shows how one can use branching processes to solve these more complex models.
+
+
+TODO: Fix all ligand/ligands
 
 
 #### 7) In defining the activity index the authors assume all activating (inhibitory) receptors have the same activity and that activities are additive. Is there any biological support for these assumptions?
