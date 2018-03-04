@@ -146,7 +146,6 @@ class StoneModel:
             L0 = self.tnpbsa[j]
 
             # Prior distribution on the ligand valency
-            # TODO: Add text to reflect this change
             logSqrErr = logSqrErr + poisson.logpmf(v, mu=(4 + j*22))
 
             # Iterate over each kind of FcgR
@@ -218,8 +217,6 @@ class StoneModel:
 
         # Set avidities to integers
         x[self.uvIDX] = np.floor(x[self.uvIDX])
-
-        # TODO: Check that this is handled the same way in later analysis
 
         return self.NormalErrorCoefcalc(x, fullOutput)
 

@@ -16,10 +16,10 @@ class regFunc(BaseEstimator):
 
         ub = np.full((X.shape[1], ), 12.0)
 
-        res = differential_evolution(lambda p: np.sum(np.square(self.trainy - self.predict(p=p))),
-                                     bounds=list(zip(-ub, ub)), disp=False)
+        #res = differential_evolution(lambda p: np.sum(np.square(self.trainy - self.predict(p=p))),
+        #                             bounds=list(zip(-ub, ub)), disp=False)
 
-        self.res = least_squares(self.diffF, x0=res.x, jac='cs', bounds=(-ub, ub))
+        self.res = least_squares(self.diffF, x0=ub - ub, jac='cs', bounds=(-ub, ub)) # res.x
 
     def diffF(self, p):
         return self.trainy - self.predict(p=p)

@@ -94,6 +94,7 @@ def histSubplots(dset, axes):
                                                            bins=np.arange(-0.5, 48.5, 1.0),
                                                            color=sns.color_palette()[0:2],
                                                            xlim=(-0.1, 48.1))
+    # Add line to represent valency prior distribution
     dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(
         ax=axes[3], bins=40, color=sns.color_palette()[0:2])
 
