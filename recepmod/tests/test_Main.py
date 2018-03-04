@@ -67,15 +67,15 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(len(self.M.Rquant) == 6)
 
     def test_Stone_names(self):
-        self.assertEqual(len(self.M.pNames), self.M.lb.shape[0])
-        self.assertEqual(len(self.Mold.pNames), self.Mold.lb.shape[0])
+        self.assertEqual(len(self.M.pNames), self.M.start.shape[0])
+        self.assertEqual(len(self.Mold.pNames), self.Mold.start.shape[0])
 
     def test_dataImport_mfiAdjMean(self):
         self.assertTrue(self.M.mfiAdjMean.shape == (24, 8))
         self.assertTrue(self.Mold.mfiAdjMean.shape == (24, 8))
 
     def test_NormalErrorCoef(self):
-        retVal = self.M.NormalErrorCoef(self.M.lb)
+        retVal = self.M.NormalErrorCoef(self.M.start)
 
         self.assertFalse(np.isnan(retVal))
         self.assertFalse(np.isinf(retVal))

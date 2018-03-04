@@ -24,10 +24,10 @@ def startH5File(StoneM, filename):
 def getUniformStart(StoneM):
     """ Set up parameters for parallel-tempered Ensemble Sampler """
     ndims, nwalkers = StoneM.Nparams, 4 * StoneM.Nparams
-    p0 = np.random.uniform(low=0, high=1, size=(nwalkers, ndims))
+    p0 = np.random.normal(scale=0.1, size=(nwalkers, ndims))
 
     for ii in range(nwalkers):
-        p0[ii] = StoneM.lb + (StoneM.ub - StoneM.lb) * p0[ii]
+        p0[ii] += StoneM.start
 
     return (p0, ndims, nwalkers)
 

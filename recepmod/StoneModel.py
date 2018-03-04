@@ -91,7 +91,7 @@ def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     v = np.int_(v)
 
     # Vector of binomial coefficients
-    Req = ReqFuncSolver(10**logR, Ka, L0, v, Kx)
+    Req = ReqFuncSolver(10.**logR, Ka, L0, v, Kx)
     if np.isnan(Req):
         return (np.nan, np.nan, np.nan, np.nan)
 
@@ -222,11 +222,13 @@ class StoneModel:
 
     def NormalErrorCoef(self, x, fullOutput=False):
         # Return -inf for parameters out of bounds
-        if np.any(np.isinf(x)) or np.any(np.isnan(x)) or np.any(np.less(x, self.lb)) or np.any(np.greater(x, self.ub)):
+        if not np.all(np.isfinite(x)):
             return -np.inf
 
         # Set avidities to integers
         x[self.uvIDX] = np.floor(x[self.uvIDX])
+
+        # TODO: Check that this is handled the same way in later analysis
 
         return self.NormalErrorCoefcalc(x, fullOutput)
 
@@ -262,18 +264,10 @@ class StoneModel:
         ## These are put into the numpy array "tnpbsa"
         self.tnpbsa = np.array([1/67122,1/70928])*1e-3*5
 
-        # Set upper and lower bounds
-        ## Upper and lower bounds of the 12 parameters
-        lbR, ubR = 3, 8
-        lbKx, ubKx = -25, 3
-        lbc, ubc = -10, 5
-        lbsigma, ubsigma = -4, 1
-
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         ## Lower and upper bounds for avidity are specified here
-        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
-        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 12, 64,ubsigma], dtype = np.float64)
+        self.start = np.array([6., 6., 6., 6., 6., 6., -10., -5.6, -5.6, 4, 26, -0.4], dtype=np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
@@ -304,11 +298,10 @@ class StoneModel:
 
             # We only include a second sigma if new data
             self.sig2IDX = 12
-            self.lb = np.insert(self.lb, self.sig2IDX, lbsigma)
-            self.ub = np.insert(self.ub, self.sig2IDX, ubsigma)
+            self.start = np.insert(self.start, self.sig2IDX, -1.2)
             self.pNames.insert(self.sig2IDX, 'sigma2')
         else:
             # Load and normalize dataset one
             self.mfiAdjMean = normalizeData(os.path.join(path,'./data/lux/Luxetal2013-Fig2B.csv'))
 
-        self.Nparams = len(self.lb)
+        self.Nparams = len(self.start)
