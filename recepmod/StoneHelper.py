@@ -7,16 +7,12 @@ import numpy as np
 import pandas as pd
 from memoize import memoize
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 
 def read_chain(filename=None, ffilter=True):
     """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
     import os
     import h5py
+    import pickle
 
     if filename is None:
         filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5")
@@ -41,7 +37,7 @@ def read_chain(filename=None, ffilter=True):
     # Read in dataset to Pandas frame
     # Optionally use burn in
     if ffilter is True:
-        pdset = pd.DataFrame(dset.value[11000:, :], columns=cNames)
+        pdset = pd.DataFrame(dset.value[13000:, :], columns=cNames)
     else:
         pdset = pd.DataFrame(dset.value, columns=cNames)
 

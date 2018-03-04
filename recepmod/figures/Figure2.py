@@ -84,19 +84,27 @@ def violinPlot(dset, ax):
 
 
 def histSubplots(dset, axes):
+    from scipy.stats import poisson
+
     dset.columns = texRenameList(dset.columns)
 
-    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins=30,
+    dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins=100,
                                        color=[sns.color_palette()[0]], legend=False)
     dset[[texRename('sigConv1'), texRename('sigConv2')]].plot.hist(
-        ax=axes[1], bins=30, color=sns.color_palette()[0:2])
+        ax=axes[1], bins=100, color=sns.color_palette()[0:2])
     dset[[texRename('gnu1'), texRename('gnu2')]].plot.hist(ax=axes[2],
                                                            bins=np.arange(-0.5, 48.5, 1.0),
                                                            color=sns.color_palette()[0:2],
                                                            xlim=(-0.1, 48.1))
-    # Add line to represent valency prior distribution
+
+    # Plot valency prior
+    xx = np.arange(1, 48)
+
+    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=4), color=sns.color_palette()[0], alpha=0.4)
+    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=26), color=sns.color_palette()[1], alpha=0.4)
+
     dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(
-        ax=axes[3], bins=40, color=sns.color_palette()[0:2])
+        ax=axes[3], bins=100, color=sns.color_palette()[2:4])
 
     # Set all the x-labels based on which histogram is displayed
     axes[0].set_xlabel(r'$K_x^*$')
@@ -110,12 +118,7 @@ def histSubplots(dset, axes):
             axes[ii].set_xticklabels([eval("r'$10^{" + str(num) + "}$'")
                                       for num in axes[ii].get_xticks()])
 
-    # Set all the x-limites based on which histogram is displayed
-    axes[0].set_xlim(-13.0, axes[0].get_xlim()[1])
-    axes[1].set_xlim(-6.0, axes[1].get_xlim()[1])
-    axes[3].set_xlim(-1.5, axes[3].get_xlim()[1])
-
-    axes[1].set_ylim(0, 5000)
+    axes[1].set_ylim(0, 3000)
 
 
 def plotFit(fitMean, ax):
