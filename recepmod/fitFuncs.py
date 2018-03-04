@@ -4,13 +4,9 @@ import numpy as np
 def startH5File(StoneM, filename):
     """ Dump class to a string to store with MCMC chain. """
     import h5py
+    from pickle import dumps, HIGHEST_PROTOCOL
 
-    try:
-        import cPickle as pickle
-    except ImportError:
-        import pickle
-
-    StoneMs = pickle.dumps(StoneM, pickle.HIGHEST_PROTOCOL)
+    StoneMs = dumps(StoneM, HIGHEST_PROTOCOL)
 
     f = h5py.File(filename, 'w', libver='latest')
     dset = f.create_dataset("data",
