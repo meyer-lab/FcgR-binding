@@ -1,13 +1,17 @@
 Reviewers' comments:
-Reviewer #1: This is a very well written and interesting paper. I have a few concerns that the authors need to address:
+## Reviewer #1
 
-#### 1) Throughout the paper the authors misuse the term avidity. Avidity is the overall binding strength of a multivalent molecule and is distinguished from affinity, which is the strength of binding for a single site. Generally, avidity has the same units as affinity. Old papers by Fred Karush made the distinction between affinity and avidity very clear and simply Googling avidity will make this all clear
+*This is a very well written and interesting paper. I have a few concerns that the authors need to address:*
+
+#### 1) Throughout the paper the authors misuse the term avidity. Avidity is the overall binding strength of a multivalent molecule and is distinguished from affinity, which is the strength of binding for a single site. Generally, avidity has the same units as affinity. Old papers by Fred Karush made the distinction between affinity and avidity very clear and simply Googling avidity will make this all clear.
+
+
 
 #### 2) In most places in the text where the authors say avidity the correct term would be valence, average valence or effective valence. TNP-4-BSA does not have an avidity of 4, rather it has a valence (or average valence) of 4. This is somewhat more complex in the current study where the distribution of valences are measured. Also, I am somewhat concerned about the effective valences that were measured and shown in Fig. 2G. The term effective valence was introduced in Perelson Math Biosci 53: 1-39 (1981) in which binding of multivalent ligands to cell surface receptors was modeled. This paper should be cited by the authors, but argues that if one has a molecule say with n TNPs then after the first one binds to a cell surface some of the remaining n-1 TNPs may not have access to cell surface receptors - see Fig 1 in the cited paper. The effective valence f was then defined as the number of function groups, TNPs, that could simultaneously bind cell surface receptors, with f less than or equal to n. Here the authors find f >n, which make me believe their original molecules, TNP-4-BSA and TNP-26-BSA have on average more than 4 and 26 TNPs per molecule and should be renamed. Also, when they estimated the effective valence of TNP-26-BSA they assumed an upper bound of 32 TNPs, but as Fig 2G shows this upper bound needs to be increased and the calculations redone.
 
 #### 3) In the definition of the A/I ratio it was unclear if this is the ratio of the highest affinity activating receptor to the highest affinity inhibitory receptor as the wording is unclear.
 
-
+We have adjusted the wording for this in the text to hopefully clarify this definition.
 
 #### 4) For Fig. 3A add a definition of the symbol f to the caption.
 
@@ -31,7 +35,9 @@ TODO: Fix all ligand/ligands
 
 
 
-Reviewer #2: Effector function of antibodies depends on FcγR class, IgG-FcγR affinity and immune complex valency. The description and prediction of effectiveness of natural or engineered IgG are complicated, due to lack of experimental and mathematics models. In this study, Dr. Meyer and colleagues showed a unique model of multivalent receptor-immune complex. Moreover, this model could make specific predictions about the responses of immune complex with defined FcγRs. Though it is not surprising that this model could be applied in accounting for the immune complex-FcγR binding, it is worthy and interesting to explore the more complicated IgG-effector function by further improving this method. This study will be helpful for developing new concept of therapeutic antibodies/regimens for cancer and autoimmune diseases and for understanding the mechanism of immune-complex induced immune responses.
+## Reviewer #2
+
+*Effector function of antibodies depends on FcγR class, IgG-FcγR affinity and immune complex valency. The description and prediction of effectiveness of natural or engineered IgG are complicated, due to lack of experimental and mathematics models. In this study, Dr. Meyer and colleagues showed a unique model of multivalent receptor-immune complex. Moreover, this model could make specific predictions about the responses of immune complex with defined FcγRs. Though it is not surprising that this model could be applied in accounting for the immune complex-FcγR binding, it is worthy and interesting to explore the more complicated IgG-effector function by further improving this method. This study will be helpful for developing new concept of therapeutic antibodies/regimens for cancer and autoimmune diseases and for understanding the mechanism of immune-complex induced immune responses.*
 
 Concerns:
 
