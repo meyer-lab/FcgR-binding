@@ -12,7 +12,7 @@ def funcAppend(indexList, nameApp):
     return idx
 
 
-class StoneModelMouse:
+class StoneModelMouse(object):
     # Takes in a list of shape (9) for x: Rexp for FcgRs logR, the kind of Ig,
     # avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):

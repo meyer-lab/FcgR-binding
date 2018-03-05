@@ -1,6 +1,7 @@
 import unittest
-import matplotlib.pyplot as plt
 import warnings
+import matplotlib.pyplot as plt
+
 warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 
 # pylint: disable=R0201

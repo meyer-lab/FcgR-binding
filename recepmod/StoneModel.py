@@ -1,9 +1,9 @@
 import os
+import ctypes as ct
 from memoize import memoize
 from scipy.special import binom
 from scipy.stats import poisson
 import numpy as np
-import ctypes as ct
 from numba import jit
 
 np.seterr(over='raise')
@@ -108,7 +108,7 @@ def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
 
 
-class StoneModel:
+class StoneModel(object):
     # This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
     # This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
     # tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
@@ -221,8 +221,6 @@ class StoneModel:
         return self.NormalErrorCoefcalc(x, fullOutput)
 
     def __init__(self, newData=True):
-        import os
-
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
         path = os.path.dirname(os.path.abspath(__file__))
         self.TNPs = ['TNP-4', 'TNP-26']
