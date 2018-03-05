@@ -5,9 +5,15 @@ Reviewers' comments:
 
 #### 1) Throughout the paper the authors misuse the term avidity. Avidity is the overall binding strength of a multivalent molecule and is distinguished from affinity, which is the strength of binding for a single site. Generally, avidity has the same units as affinity. Old papers by Fred Karush made the distinction between affinity and avidity very clear and simply Googling avidity will make this all clear.
 
-
+Thank you for pointing out this oversight. We have corrected the text throughout.
+TODO: Finish looking through for this.
 
 #### 2) In most places in the text where the authors say avidity the correct term would be valence, average valence or effective valence. TNP-4-BSA does not have an avidity of 4, rather it has a valence (or average valence) of 4. This is somewhat more complex in the current study where the distribution of valences are measured. Also, I am somewhat concerned about the effective valences that were measured and shown in Fig. 2G. The term effective valence was introduced in Perelson Math Biosci 53: 1-39 (1981) in which binding of multivalent ligands to cell surface receptors was modeled. This paper should be cited by the authors, but argues that if one has a molecule say with n TNPs then after the first one binds to a cell surface some of the remaining n-1 TNPs may not have access to cell surface receptors - see Fig 1 in the cited paper. The effective valence f was then defined as the number of function groups, TNPs, that could simultaneously bind cell surface receptors, with f less than or equal to n. Here the authors find f >n, which make me believe their original molecules, TNP-4-BSA and TNP-26-BSA have on average more than 4 and 26 TNPs per molecule and should be renamed. Also, when they estimated the effective valence of TNP-26-BSA they assumed an upper bound of 32 TNPs, but as Fig 2G shows this upper bound needs to be increased and the calculations redone.
+
+We have remove bounds on the effective valence of each TNP-BSA ligand, and corrected the terminology throughout.
+
+Indeed, we observe an effective valence for each molecule higher than the 
+TODO: Finish.
 
 #### 3) In the definition of the A/I ratio it was unclear if this is the ratio of the highest affinity activating receptor to the highest affinity inhibitory receptor as the wording is unclear.
 
@@ -29,10 +35,9 @@ TODO: Fix all ligand/ligands
 
 #### 7) In defining the activity index the authors assume all activating (inhibitory) receptors have the same activity and that activities are additive. Is there any biological support for these assumptions?
 
+We do make this assumption. Notably, we show this assumption largely recapitulates features of the A/I ratio successfully used before, and is better able to predict *in vivo* response in particular cases where the two metrics diverge. There is not detailed evidence for the relative role of individual FcgRs when activated in combination, and we believe this to be an exciting area of inuiry outside the scope of the current study. 
 
-
-
-
+FcgR effector function is signaled through the ITIM and ITAM domains of the receptors. These domains are quite similar between receptors, suggesting that the receptors may be considered interchangable in their intracellular signaling. Additionally, in the absence of evidence to the contrary, we maintain that this assumption of additivity is most parsimonious.
 
 
 ## Reviewer #2
@@ -56,4 +61,7 @@ Indeed, effector function is a complex mix of processes, including ADCC, ADCP, a
 #### 4. The author should provide more information about how to calculate the predicted effectiveness of mIgG in Fig.4C and the predicted effectiveness quantified by activity index in Fig.4F.
 
 
+
 #### 5. Some of the reagents or methods are not described clearly in detail, such as the construction of TRP1(TA99) antibodies with different mIgG constant region and the method of melanoma lung metastasis model.
+
+TODO: Add
