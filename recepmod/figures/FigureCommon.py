@@ -68,7 +68,7 @@ def subplotLabel(ax, letter, hstretch=1):
             fontsize=16, fontweight='bold', va='top')
 
 
-def getSetup(figsize, gridd, mults=[], multz={}, empts=[]):
+def getSetup(figsize, gridd, mults=None, multz=None, empts=None):
     from matplotlib import gridspec, pyplot as plt
 
     sns.set(style="whitegrid",
@@ -85,7 +85,7 @@ def getSetup(figsize, gridd, mults=[], multz={}, empts=[]):
     gs1 = gridspec.GridSpec(*gridd)
 
     # Get list of axis objects
-    if not mults:
+    if mults is None:
         ax = [f.add_subplot(gs1[x]) for x in range(gridd[0] * gridd[1])]
     else:
         ax = [f.add_subplot(gs1[x]) if x not in mults else f.add_subplot(gs1[x:x + multz[x]]) for x in range(
@@ -100,12 +100,12 @@ def Legend(fcgrs, colorsDict, iglist, shapes):
 
     patches = list()
 
-    for key, val in zip(fcgrs, [colorsDict[fcgr] for fcgr in fcgrs]):
-        patches.append(matplotlib.patches.Patch(color=val, label=key))
-    for key, val in zip(iglist, [shapes[ig] for ig in iglist]):
+    for kkey, val in zip(fcgrs, [colorsDict[fcgr] for fcgr in fcgrs]):
+        patches.append(matplotlib.patches.Patch(color=val, label=kkey))
+    for kkey, val in zip(iglist, [shapes[ig] for ig in iglist]):
         patches.append(matplotlib.lines.Line2D([], [], markeredgecolor='black', markeredgewidth=1.0,
                                                markerfacecolor='black', marker=val, markersize=7,
-                                               label=key, linestyle='None'))
+                                               label=kkey, linestyle='None'))
 
     return patches
 
