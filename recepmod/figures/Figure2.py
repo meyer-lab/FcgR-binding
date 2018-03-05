@@ -115,7 +115,7 @@ def histSubplots(dset, axes):
     # Make x-axes appear logarithmic
     for ii, axx in enumerate(axes):
         if ii != 2:
-            axx.set_xticklabels(["r'$10^{" + str(num) + "}$'" for num in axx.get_xticks()])
+            axx.set_xticklabels(['$10^{' + str(num) + '}$' for num in axx.get_xticks()])
 
     axes[1].set_ylim(0, 3000)
 
