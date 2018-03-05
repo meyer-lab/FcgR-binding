@@ -113,10 +113,9 @@ def histSubplots(dset, axes):
     axes[3].set_xlabel(r'Deviation Parameters ($\sigma^*$)')
 
     # Make x-axes appear logarithmic
-    for ii in range(len(axes)):
+    for ii, axx in enumerate(axes):
         if ii != 2:
-            axes[ii].set_xticklabels([eval("r'$10^{" + str(num) + "}$'")
-                                      for num in axes[ii].get_xticks()])
+            axx.set_xticklabels(["r'$10^{" + str(num) + "}$'" for num in axx.get_xticks()])
 
     axes[1].set_ylim(0, 3000)
 

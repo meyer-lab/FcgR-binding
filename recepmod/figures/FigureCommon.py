@@ -71,7 +71,12 @@ def subplotLabel(ax, letter, hstretch=1):
 def getSetup(figsize, gridd, mults=[], multz={}, empts=[]):
     from matplotlib import gridspec, pyplot as plt
 
-    sns.set(style="whitegrid", font_scale=0.7, color_codes=True, palette="colorblind")
+    sns.set(style="whitegrid",
+            font_scale=0.7,
+            color_codes=True,
+            palette="colorblind",
+            rc={'grid.linestyle':'dotted',
+                'axes.linewidth':0.6})
 
     # Setup plotting space
     f = plt.figure(figsize=figsize)
