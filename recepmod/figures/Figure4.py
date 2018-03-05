@@ -1,14 +1,15 @@
+"""
+Predict in vivo response
+"""
 import logging
+from itertools import product
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from itertools import product
+from matplotlib.patches import Patch
 from .FigureCommon import Legend
 from ..StoneModMouse import StoneModelMouse
 from ..StoneModMouseFit import InVivoPredict, cellpops, CALCapply
-from matplotlib.patches import Patch
-
-# Predict in vivo response
 
 
 def makeFigure():
@@ -101,7 +102,6 @@ def ClassAvidityPCA(ax):
 
 def InVivoPredictVsActual(ax):
     """ Plot predicted vs actual for regression of conditions in vivo. """
-    from ..StoneModMouseFit import InVivoPredict
 
     # Run the in vivo regression model
     devar, cevar, tbN, _ = InVivoPredict()
@@ -122,7 +122,6 @@ def InVivoPredictVsActual(ax):
 
 def ComponentContrib(ax):
     """ Plot the predicted contribution of NK cells. """
-    from ..StoneModMouseFit import InVivoPredict
 
     # Run the in vivo regression model
     _, _, tbN, _ = InVivoPredict()
@@ -137,7 +136,6 @@ def ComponentContrib(ax):
 
 def InVivoPredictComponents(ax):
     """ Plot model components. """
-    from ..StoneModMouseFit import InVivoPredict
     from .FigureCommon import alternatingRects
 
     # Run the in vivo regression model
@@ -156,7 +154,7 @@ def InVivoPredictComponents(ax):
     tbN = pd.melt(tbN, id_vars=['condition'])
 
     # Remove eff from cell line labels
-    tbN['variable'] = list(map(lambda x: x.replace('eff', ''), tbN.variable))
+    tbN['variable'] = [x.replace('eff', '') for x in tbN.variable]
 
     colors = sns.crayon_palette(["Shamrock", 'Navy Blue', 'Beaver',
                                  'Goldenrod', 'Radical Red'])
