@@ -1,6 +1,28 @@
 import numpy as np
 from sklearn.base import BaseEstimator
 from scipy.optimize import least_squares, differential_evolution
+from numba import jit
+
+
+@jit(nopython=True)
+def jac(p, X, logg):
+    """ Jacobian for fitting. """
+    if logg is True:
+        p = np.power(10, p)
+
+    # Find inner term.
+    yy = np.reciprocal(np.square(np.cosh(np.dot(X, p))))
+
+    return np.outer(yy, p)
+
+
+@jit(nopython=True)
+def predict(p, X, logg):
+    """ Core prediction function. """
+    if logg is True:
+            p = np.power(10, p)
+
+    return np.tanh(np.dot(X, p))
 
 
 class regFunc(BaseEstimator):
@@ -12,17 +34,17 @@ class regFunc(BaseEstimator):
 
     def fit(self, X, y):
         """ Fit the X-y relationship. Return nothing. """
-        self.trainX, self.trainy = X, y
+        self.trainX, self.trainy = np.array(X), np.array(y)
 
         ub = np.full((X.shape[1], ), 12.0)
 
-        res = differential_evolution(lambda p: np.sum(np.square(self.trainy - self.predict(p=p))),
+        res = differential_evolution(lambda p: np.sum(np.square(self.trainy - predict(p, self.trainX, self.logg))),
                                      bounds=list(zip(-ub, ub)), disp=False)
 
-        self.res = least_squares(self.diffF, x0=res.x, jac='cs', bounds=(-ub, ub))
+        self.res = least_squares(self.diffF, x0=res.x, jac=jac, bounds=(-ub, ub), args=(self.trainX, self.logg))
 
-    def diffF(self, p):
-        return self.trainy - self.predict(p=p)
+    def diffF(self, p, X, logg):
+        return self.trainy - predict(p, X, logg)
 
     def predict(self, X=None, p=None):
         """
@@ -32,10 +54,7 @@ class regFunc(BaseEstimator):
         if p is None:
             p = self.res.x
 
-        if self.logg is True:
-            p = np.power(10, p)
-
         if X is None:
             X = self.trainX
 
-        return np.tanh(np.dot(X, p))
+        return predict(p, np.array(X), self.logg)
