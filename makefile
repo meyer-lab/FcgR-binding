@@ -6,7 +6,7 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filte
 
 .PHONY: clean upload test profile testcover open rebuild sample sampleprofile
 
-all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx
+all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
 
 $(fdir)/Figure%.svg: genFigures.py recepmod/recepmod.so
 	mkdir -p ./Manuscript/Figures
@@ -33,6 +33,12 @@ Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Fig
 	pandoc -s $(pan_common) -o $@
 	rm -r ./Figures
 
+Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
+	pandoc -s -f markdown -o $@
+
+Manuscript/ReviewResponse.pdf: Manuscript/ReviewResponse.md
+	pandoc -s -f markdown -o $@
+
 Manuscript/Manuscript.tex: Manuscript/Text/*.md Manuscript/index.html
 	pandoc -s $(pan_common) --template=$(tdir)/default.latex --latex-engine=xelatex -o $@
 
@@ -45,6 +51,7 @@ Manuscript/CoverLetter.pdf: Manuscript/CoverLetter.md
 clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/Figures/ModelData.md Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
 	rm -f $(fdir)/Figure* recepmod/recepmod.so Manuscript/Text/07_ModelData.md profile.p* stats.dat .coverage nosetests.xml
+	rm -f Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
 
 open: Manuscript/index.html
 	open ./Manuscript/index.html
