@@ -1,3 +1,8 @@
+---
+geometry: margin=0.75in
+fontsize: 11pt
+mainfont: Helvetica Neue
+---
 Reviewers' comments:
 ## Reviewer #1
 
