@@ -34,10 +34,10 @@ Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Fig
 	rm -r ./Figures
 
 Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
-	pandoc -s -f markdown -o $@
+	pandoc -s -f markdown $< -o $@
 
 Manuscript/ReviewResponse.pdf: Manuscript/ReviewResponse.md
-	pandoc -s -f markdown -o $@
+	pandoc -s -f markdown $< -o $@
 
 Manuscript/Manuscript.tex: Manuscript/Text/*.md Manuscript/index.html
 	pandoc -s $(pan_common) --template=$(tdir)/default.latex --latex-engine=xelatex -o $@

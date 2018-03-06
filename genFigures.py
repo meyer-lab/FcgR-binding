@@ -31,7 +31,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == '4':
         # Overlay Figure 4 cartoon
         overlayCartoon(fdir + 'Figure4.svg',
-                       './recepmod/figures/Figure4_regression_approach.svg', 10, 30, 0.66)
+                       './recepmod/figures/Figure4_regression_approach.svg', 10, 30, 0.022)
 
         # Output data table
         StoneModelMouse().writeModelData('./Manuscript/Text/07_ModelData.md')
