@@ -25,6 +25,11 @@ def predict(p, X, logg):
     return np.tanh(np.dot(X, p))
 
 
+@jit(nopython=True)
+def diffEvo(p, X, logg, y):
+    return np.sum(np.square(predict(p, X, logg) - y))
+
+
 class regFunc(BaseEstimator):
     """ Class to handle regression with saturating effect. """
 
@@ -38,8 +43,7 @@ class regFunc(BaseEstimator):
 
         ub = np.full((X.shape[1], ), 12.0)
 
-        res = differential_evolution(lambda p: np.sum(np.square(self.trainy - predict(p, self.trainX, self.logg))),
-                                     bounds=list(zip(-ub, ub)), disp=False)
+        res = differential_evolution(diffEvo, bounds=list(zip(-ub, ub)), disp=False, args=(self.trainX, self.logg, self.trainy))
 
         self.res = least_squares(self.diffF, x0=res.x, jac=jac, bounds=(-ub, ub), args=(self.trainX, self.logg))
 
