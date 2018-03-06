@@ -52,7 +52,7 @@ def plotAutoC(ax, dset, coll):
     dd = dset.pivot(index='Step', columns='walker', values=coll)
 
     # Calculate the autocorrelation
-    outt = dd.apply(lambda x: acf(x, nlags=x.size))
+    outt = dd.apply(lambda x: acf(x, nlags=100))
 
     # Plot the values
     outt.plot(ax=ax, legend=False, linewidth=0.5)
