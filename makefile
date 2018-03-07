@@ -13,10 +13,10 @@ $(fdir)/Figure%.svg: genFigures.py recepmod/recepmod.so
 	python3 genFigures.py $*
 
 $(fdir)/Figure%pdf: $(fdir)/Figure%svg
-	rsvg-convert -f pdf $< -o $@
+	rsvg-convert --background-color=white -f pdf $< -o $@
 
 $(fdir)/Figure%eps: $(fdir)/Figure%svg
-	rsvg-convert -f eps $< -o $@
+	rsvg-convert --background-color=white -f eps $< -o $@
 
 recepmod/recepmod.so: recepmod/solverC.cpp
 	g++ -std=c++11 -mavx -march=native $< -O3 --shared -fPIC -lm -o $@
