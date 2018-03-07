@@ -5,7 +5,7 @@ from numba import jit, f8, b1
 
 
 @jit(f8[:,:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
-def jac(p, X, logg, y):
+def jac(p, X, logg, _):
     """ Jacobian for fitting. """
     if logg is True:
         p = np.power(10, p)
@@ -20,7 +20,7 @@ def jac(p, X, logg, y):
 def predict(p, X, logg):
     """ Core prediction function. """
     if logg is True:
-            p = np.power(10, p)
+        p = np.power(10, p)
 
     return np.tanh(np.dot(X, p))
 
