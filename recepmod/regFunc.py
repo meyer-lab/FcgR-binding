@@ -1,11 +1,11 @@
 import numpy as np
 from sklearn.base import BaseEstimator
 from scipy.optimize import least_squares, differential_evolution
-from numba import jit
+from numba import jit, f8, b1
 
 
-@jit(nopython=True)
-def jac(p, X, logg):
+@jit(f8[:,:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
+def jac(p, X, logg, y):
     """ Jacobian for fitting. """
     if logg is True:
         p = np.power(10, p)
@@ -16,7 +16,7 @@ def jac(p, X, logg):
     return np.outer(yy, p)
 
 
-@jit(nopython=True)
+@jit(f8[:](f8[:], f8[:,:], b1), nopython=True, cache=True, nogil=True)
 def predict(p, X, logg):
     """ Core prediction function. """
     if logg is True:
@@ -25,9 +25,14 @@ def predict(p, X, logg):
     return np.tanh(np.dot(X, p))
 
 
-@jit(nopython=True)
+@jit(f8(f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
 def diffEvo(p, X, logg, y):
     return np.sum(np.square(predict(p, X, logg) - y))
+
+
+@jit(f8[:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
+def residDiff(p, X, logg, y):
+    return predict(p, X, logg) - y
 
 
 class regFunc(BaseEstimator):
@@ -43,12 +48,15 @@ class regFunc(BaseEstimator):
 
         ub = np.full((X.shape[1], ), 12.0)
 
-        res = differential_evolution(diffEvo, bounds=list(zip(-ub, ub)), disp=False, args=(self.trainX, self.logg, self.trainy))
+        args = (self.trainX, self.logg, self.trainy)
 
-        self.res = least_squares(self.diffF, x0=res.x, jac=jac, bounds=(-ub, ub), args=(self.trainX, self.logg))
+        res = differential_evolution(diffEvo,
+                                     popsize=30,
+                                     bounds=list(zip(-ub, ub)),
+                                     disp=False,
+                                     args=args)
 
-    def diffF(self, p, X, logg):
-        return self.trainy - predict(p, X, logg)
+        self.res = least_squares(residDiff, x0=res.x, jac=jac, bounds=(-ub, ub), args=args)
 
     def predict(self, X=None, p=None):
         """
