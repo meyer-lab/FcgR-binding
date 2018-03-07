@@ -56,7 +56,9 @@ class regFunc(BaseEstimator):
                                      disp=False,
                                      args=args)
 
-        self.res = least_squares(residDiff, x0=res.x, jac=jac, bounds=(-ub, ub), args=args)
+        self.res = least_squares(residDiff, x0=res.x, jac=jac,
+                                 tr_solver='exact', method='dogbox',
+                                 bounds=(-ub, ub), args=args)
 
     def predict(self, X=None, p=None):
         """
