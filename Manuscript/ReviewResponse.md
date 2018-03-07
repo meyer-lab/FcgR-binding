@@ -37,10 +37,7 @@ We have added this reference, as this is indeed very relevant.
 
 We have adjusted the text within the methods to clarify the units of these quantities, and fix the use of ligand versus ligands.
 
-
-
-TODO: Fix all ligand/ligands
-
+Many thanks for pointing out this monograph. While we calculate the probability of all states in this generalized model, we're very interested in building on this work to explore polyclonal antibody mixtures. In this case it will be necessary to apply the methods here.
 
 *7) In defining the activity index the authors assume all activating (inhibitory) receptors have the same activity and that activities are additive. Is there any biological support for these assumptions?*
 
