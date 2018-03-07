@@ -33,6 +33,9 @@ Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Fig
 	pandoc -s $(pan_common) -o $@
 	rm -r ./Figures
 
+Manuscript/Figures/ModelData.md:
+	python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('./Manuscript/Text/07_ModelData.md')"
+
 Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
 	pandoc -s -f markdown $< -o $@
 
