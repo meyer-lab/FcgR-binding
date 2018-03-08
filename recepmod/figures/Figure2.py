@@ -86,7 +86,7 @@ def violinPlot(dset, ax):
 def lighter(color, percent):
     '''assumes color is rgb between (0, 0, 0) and (255, 255, 255)'''
     color = np.array(color)
-    return color + (np.array([255, 255, 255]) - color) * percent
+    return color + (np.array([1.0, 1.0, 1.0]) - color) * percent
 
 
 def histSubplots(dset, axes):
