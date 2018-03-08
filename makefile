@@ -21,19 +21,19 @@ $(fdir)/Figure%eps: $(fdir)/Figure%svg
 recepmod/recepmod.so: recepmod/solverC.cpp
 	g++ -std=c++11 -mavx -march=native $< -O3 --shared -fPIC -lm -o $@
 
-Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf Manuscript/Figures/ModelData.md
+Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf Manuscript/Text/07_ModelData.md
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
 	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
 
-Manuscript/index.html: Manuscript/Text/*.md $(fdir)/Figure1.svg $(fdir)/Figure2.svg $(fdir)/Figure3.svg $(fdir)/Figure4.svg $(fdir)/FigureS2.svg $(fdir)/FigureAA.svg Manuscript/Figures/ModelData.md
+Manuscript/index.html: Manuscript/Text/*.md $(fdir)/Figure1.svg $(fdir)/Figure2.svg $(fdir)/Figure3.svg $(fdir)/Figure4.svg $(fdir)/FigureS2.svg $(fdir)/FigureAA.svg Manuscript/Text/07_ModelData.md
 	pandoc -s $(pan_common) -t html5 --mathjax -c ./Templates/kultiad.css --template=$(tdir)/html.template -o $@
 
-Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Figure2.eps $(fdir)/Figure3.eps $(fdir)/Figure4.eps $(fdir)/FigureS2.eps $(fdir)/FigureAA.eps Manuscript/Figures/ModelData.md
+Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Figure2.eps $(fdir)/Figure3.eps $(fdir)/Figure4.eps $(fdir)/FigureS2.eps $(fdir)/FigureAA.eps Manuscript/Text/07_ModelData.md
 	cp -R $(fdir) ./
 	pandoc -s $(pan_common) -o $@
 	rm -r ./Figures
 
-Manuscript/Figures/ModelData.md: recepmod/recepmod.so
+Manuscript/Text/07_ModelData.md: recepmod/recepmod.so
 	python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('./Manuscript/Text/07_ModelData.md')"
 
 Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
@@ -52,7 +52,7 @@ Manuscript/CoverLetter.pdf: Manuscript/CoverLetter.md
 	pandoc --pdf-engine=xelatex --template=/Users/asm/.pandoc/letter-templ.tex $< -o $@
 
 clean:
-	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/Figures/ModelData.md Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
+	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
 	rm -f $(fdir)/Figure* recepmod/recepmod.so Manuscript/Text/07_ModelData.md profile.p* stats.dat .coverage nosetests.xml
 	rm -f Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
 

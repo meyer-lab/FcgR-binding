@@ -211,26 +211,13 @@ class StoneModelMouse(object):
             return [sci(val) for val in series]
 
         def renameIgg(name):
-            name = 'm' + name
-            name = 'mIgG1-FcγRIIB-/-' if name == 'mIgG1-FcgRIIB-/-' else name
-            name = 'mIgG2a-FcγRIIB-/-' if name == 'mIgG2a-FcgRIIB-/-' else name
-            name = 'mIgG2b-FcγRIIB-/-' if name == 'mIgG2b-FcgRIIB-/-' else name
-            name = 'mIgG3-FcγRIIB-/-' if name == 'mIgG3-FcgRIIB-/-' else name
-            name = 'mIgG2a-FcγRI-/-' if name == 'mIgG2a-FcgRI-/-' else name
-            name = 'mIgG2a-FcγRIII-/-' if name == 'mIgG2a-FcgRIII-/-' else name
-            name = 'mIgG2a-FcγRI,IV-/-' if name == 'mIgG2a-FcgRI,IV-/-' else name
-            name = 'mIgG2b-Fucose-/-' if name == 'mIgG2b-Fucose-/-' else name
-            return name
-
-        # Convert percents into strings depicting percents
-        def percent(val):
-            return str(val)
+            return ('m' + name).replace('FcgR', 'FcγR')
 
         # Rename columns of DataFrame
         tbN.columns = renameList(tbN.columns)
         tbN[[col for col in tbN.columns if col != 'Effectiveness']] = tbN[[col for col in tbN.columns if col != 'Effectiveness']].apply(sciSeries)
         tbN['Condition'] = tbN['Condition'].apply(renameIgg)
-        tbN['Effectiveness'] = tbN['Effectiveness'].apply(percent)
+        tbN['Effectiveness'] = tbN['Effectiveness'].apply(str)
 
         writer = ptw.MarkdownTableWriter()
         writer.from_dataframe(tbN)
