@@ -96,8 +96,8 @@ def histSubplots(dset, axes):
 
     # Plot valency prior
     xx = np.arange(1, 48)
-    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=4), color=lighter(sns.color_palette()[0], 0.4))
-    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=26), color=lighter(sns.color_palette()[1], 0.4))
+    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=4), color=lighter(sns.color_palette()[0], 0.6), zorder=-1)
+    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=26), color=lighter(sns.color_palette()[1], 0.6), zorder=-1)
 
     dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins=100,
                                        color=[sns.color_palette()[0]], legend=False)
