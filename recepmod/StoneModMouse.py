@@ -178,7 +178,7 @@ class StoneModelMouse(object):
         return output.reshape(2, 16)
 
     def writeModelData(self, filename):
-        import pytablewriter as ptw
+        from pytablewriter import MarkdownTableWriter
 
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
@@ -192,20 +192,17 @@ class StoneModelMouse(object):
                 return '0.0'
             else:
                 try:
-                    return '{:.1E}'.format(val).replace('E+0', '*10^')
+                    return '{:.1E}'.format(val)#.replace('E+0', '*10^')
                 except OverflowError:
-                    return r'0.0'
-
-        def sciSeries(series):
-            return [sci(val) for val in series]
+                    return '0.0'
 
         # Rename columns of DataFrame
         tbN.columns = [name.replace('FcgR', 'mFcγR') for name in tbN.columns]
-        tbN[[col for col in tbN.columns if col != 'Effectiveness']] = tbN[[col for col in tbN.columns if col != 'Effectiveness']].apply(sciSeries)
+        tbN.loc[:, tbN.columns != 'Effectiveness'] = tbN.loc[:, tbN.columns != 'Effectiveness'].applymap(sci)
         tbN['Condition'] = tbN['Condition'].apply(lambda x: ('m' + x).replace('FcgR', 'FcγR'))
         tbN['Effectiveness'] = tbN['Effectiveness'].apply(str)
 
-        writer = ptw.MarkdownTableWriter()
+        writer = MarkdownTableWriter()
         writer.from_dataframe(tbN)
 
         # Change writer stream to filename
