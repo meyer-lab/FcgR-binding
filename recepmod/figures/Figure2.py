@@ -83,10 +83,21 @@ def violinPlot(dset, ax):
             child.set_edgecolor(FcgRidx[FcgRlist[int(ii / 2)]])
 
 
+def lighter(color, percent):
+    '''assumes color is rgb between (0, 0, 0) and (255, 255, 255)'''
+    color = np.array(color)
+    return color + (np.array([255, 255, 255]) - color) * percent
+
+
 def histSubplots(dset, axes):
     from scipy.stats import poisson
 
     dset.columns = texRenameList(dset.columns)
+
+    # Plot valency prior
+    xx = np.arange(1, 48)
+    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=4), color=lighter(sns.color_palette()[0], 0.4))
+    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=26), color=lighter(sns.color_palette()[1], 0.4))
 
     dset[[texRename('Kx1')]].plot.hist(ax=axes[0], bins=100,
                                        color=[sns.color_palette()[0]], legend=False)
@@ -96,12 +107,6 @@ def histSubplots(dset, axes):
                                                            bins=np.arange(-0.5, 48.5, 1.0),
                                                            color=sns.color_palette()[0:2],
                                                            xlim=(-0.1, 48.1))
-
-    # Plot valency prior
-    xx = np.arange(1, 48)
-
-    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=4), color=sns.color_palette()[0], alpha=0.4)
-    axes[2].step(xx, dset.shape[0]*poisson.pmf(xx, mu=26), color=sns.color_palette()[1], alpha=0.4)
 
     dset[[texRename('sigma'), texRename('sigma2')]].plot.hist(
         ax=axes[3], bins=100, color=sns.color_palette()[2:4])
