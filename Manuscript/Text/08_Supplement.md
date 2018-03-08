@@ -3,20 +3,20 @@
 
 # Supplement
 
-|  **Condition**         | mFcγRI  |mFcγRIIB|mFcγRIII| mFcγRIV |Effectiveness|
-| ---------------------- |--------:|-------:|-------:|--------:|------------:|
-| **mIgG1**              |        0| 3000000|  300000|        0|         0.00|
-| **mIgG2a**             |100000000|  400000|  700000| 30000000|         0.95|
-| **mIgG2b**             |   100000| 2000000|  600000| 20000000|         0.20|
-| **mIgG3**              | 20000000|       0|       0|        0|         0.00|
-| **mIgG1-FcγRIIB-/-**   |        0|       0|  300000|        0|         0.70|
-| **mIgG2a-FcγRIIB-/-**  |100000000|       0|  700000| 30000000|         1.00|
-| **mIgG2b-FcγRIIB-/-**  |   100000|       0|  600000| 20000000|         0.75|
-| **mIgG3-FcγRIIB-/-**   | 20000000|       0|       0|        0|         0.00|
-| **mIgG2a-FcγRI-/-**    |        0|  400000|  700000| 30000000|         0.80|
-| **mIgG2a-FcγRIII-/-**  |100000000|  400000|       0| 30000000|         0.93|
-| **mIgG2a-FcγRI,IV-/-** |        0|  400000|  700000|        0|         0.35|
-| **mIgG2b-Fucose-/-**   |   100000|10000000| 1100000|200000000|         0.70|
+|  **Condition**         | **mFcγRI**     | **mFcγRIIB**   | **mFcγRIII** | **mFcγRIV** | **Effectiveness** |
+| ---------------------- | -------------- | -------------- | ------------ |--------:|------------:|
+| **mIgG1**              | $0$            | 3000000        |  300000|        0|         0.00|
+| **mIgG2a**             | $1\times 10^8$ | $4\times 10^5$ |  700000| 30000000|         0.95|
+| **mIgG2b**             | $1\times 10^5$ | 2000000        |  600000| 20000000|         0.20|
+| **mIgG3**              | $2\times 10^7$ | $0$            |       0|        0|         0.00|
+| **mIgG1-FcγRIIB-/-**   | $0$            | $0$            |  300000|        0|         0.70|
+| **mIgG2a-FcγRIIB-/-**  | 100000000      | $0$            |  700000| 30000000|         1.00|
+| **mIgG2b-FcγRIIB-/-**  | 100000         | $0$            |  600000| 20000000|         0.75|
+| **mIgG3-FcγRIIB-/-**   | 20000000       | $0$            |       0|        0|         0.00|
+| **mIgG2a-FcγRI-/-**    | $0$            | $4\times 10^5$ |  700000| 30000000|         0.80|
+| **mIgG2a-FcγRIII-/-**  | 100000000      | $4\times 10^5$ |       0| 30000000|         0.93|
+| **mIgG2a-FcγRI,IV-/-** | $0$            | $4\times 10^5$ |  700000|        0|         0.35|
+| **mIgG2b-Fucose-/-**   | 100000         |10000000        | 1100000|200000000|         0.70|
 
 **Murine knockout conditions and mFcγR-mIgG affinities.** Murine knockout conditions and mFcγR-mIgG affinities used in principal component analysis shown in [@Fig:InVivoResults]. Values in columns labeled with mFcγRs are affinities with M\textsuperscript{-1} units [@Gavin20; @Guilliams:2014cm]. Values in the effectiveness column represent proportional reduction in lung metastases observed with treatment [@Nimmerjahn:2005hu].
 
