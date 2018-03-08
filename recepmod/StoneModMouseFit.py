@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import pandas as pd
 import numpy as np
 from memoize import memoize
@@ -53,7 +54,6 @@ def caller(**kwargs):
     from .StoneNRecep import StoneN
     return StoneN(**kwargs).getActivity([1, -1, 1, 1])
 
-from collections import OrderedDict
 exprDict = OrderedDict(zip(['ncMO', 'NE', 'cMO', 'NKs', 'EO'],
                            [[3.28, 4.17, 3.81, 4.84],
                             [1.96, 3.08, 3.88, 4.07],
@@ -145,7 +145,7 @@ def InVivoPredict(inn=[5, 1E-9]):
 
 
 def InVivoPredictMinusComponents():
-    ''' '''
+    ''' Predict in vivo conditions with one cell type left out. '''
     def crossValF(table):
         return LOOpredict(regFunc(),
                           table.drop('Effectiveness', axis=1),

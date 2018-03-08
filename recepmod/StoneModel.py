@@ -1,10 +1,20 @@
+import os
+import ctypes as ct
 from memoize import memoize
 from scipy.special import binom
+from scipy.stats import poisson
 import numpy as np
+from numba import jit
 
 np.seterr(over='raise')
 
+filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./recepmod.so")
+libb = ct.cdll.LoadLibrary(filename)
+libb.ReqFuncSolver.argtypes = (ct.c_double, ct.c_double, ct.c_double, ct.c_int, ct.c_double)
+libb.ReqFuncSolver.restype = ct.c_double
 
+
+@jit(nopython=True, nogil=True)
 def logpdf_sum(x, loc, scale):
     """
     Normal distribution function. Sums over the likelihoods of points in x
@@ -53,25 +63,12 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     by performing the bisction algorithm on Eq 2 from Stone. The bisection
     algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
     """
-    from scipy.optimize import brentq
+    global libb
 
-    # a is the lower bound for log10(Req) bisecion. By Equation 2, log10(Req)
-    # is necessarily lower than log10(R).
-    a, b = -40, np.log10(R)
-
-    # Mass balance for receptor species, to identify the amount of free receptor
-    diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*ka*(1+kx*(10**x))**(vi-1))
-
-    try:
-        if diffFunAnon(a) * diffFunAnon(b) > 0:
-            return np.nan
-    except FloatingPointError:
-        return np.nan
-
-    # Implement the bisection algorithm using SciPy's brentq.
-    return brentq(diffFunAnon, a, b, disp=False)
+    return libb.ReqFuncSolver(R, ka, Li, vi, kx)
 
 
+@jit
 def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     '''
     Returns the number of mutlivalent ligand bound to a cell with 10^logR
@@ -85,7 +82,7 @@ def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     v = np.int_(v)
 
     # Vector of binomial coefficients
-    Req = 10**ReqFuncSolver(10**logR, Ka, L0, v, Kx)
+    Req = ReqFuncSolver(10.**logR, Ka, L0, v, Kx)
     if np.isnan(Req):
         return (np.nan, np.nan, np.nan, np.nan)
 
@@ -110,7 +107,8 @@ def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
 
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
 
-class StoneModel:
+
+class StoneModel(object):
     # This function returns the log likelihood of a point in an MCMC against the ORIGINAL set of data.
     # This function takes in a NumPy array of shape (12) for x, the array KaMat from loadData, the array mfiAdjMean from loadData, the array
     # tnpbsa from loadData, the array meanPerCond from loadData, and the array biCoefMat from loadData. The first six elements are the common
@@ -141,11 +139,14 @@ class StoneModel:
         # Iterate over each kind of TNP-BSA (4 or 26)
         for j in range(2):
             # Set the effective avidity for the kind of TNP-BSA in question
-            v = x[self.uvIDX[j]]
+            v = np.int_(x[self.uvIDX[j]])
             # Set the MFI-per-TNP-BSA conversion ratio for the kind of TNP-BSA in question
             c = 10**x[self.cIDX[j]]
             # Set the ligand (TNP-BSA) concentration for the kind of TNP-BSA in question
             L0 = self.tnpbsa[j]
+
+            # Prior distribution on the ligand valency
+            logSqrErr = logSqrErr + poisson.logpmf(v, mu=(4 + j*22))
 
             # Iterate over each kind of FcgR
             for k in range(6):
@@ -211,7 +212,7 @@ class StoneModel:
 
     def NormalErrorCoef(self, x, fullOutput=False):
         # Return -inf for parameters out of bounds
-        if np.any(np.isinf(x)) or np.any(np.isnan(x)) or np.any(np.less(x, self.lb)) or np.any(np.greater(x, self.ub)):
+        if not np.all(np.isfinite(x)):
             return -np.inf
 
         # Set avidities to integers
@@ -220,8 +221,6 @@ class StoneModel:
         return self.NormalErrorCoefcalc(x, fullOutput)
 
     def __init__(self, newData=True):
-        import os
-
         ## Find path for csv files, on any machine wherein the repository recepnum1 exists.
         path = os.path.dirname(os.path.abspath(__file__))
         self.TNPs = ['TNP-4', 'TNP-26']
@@ -251,18 +250,10 @@ class StoneModel:
         ## These are put into the numpy array "tnpbsa"
         self.tnpbsa = np.array([1/67122,1/70928])*1e-3*5
 
-        # Set upper and lower bounds
-        ## Upper and lower bounds of the 12 parameters
-        lbR, ubR = 3, 8
-        lbKx, ubKx = -25, 3
-        lbc, ubc = -10, 5
-        lbsigma, ubsigma = -4, 1
-
         ## Create vectors for upper and lower bounds
         ## Only allow sampling of TNP-4 up to double its expected avidity.
         ## Lower and upper bounds for avidity are specified here
-        self.lb = np.array([lbR,lbR,lbR,lbR,lbR,lbR,lbKx,lbc,lbc, 1 , 20,lbsigma], dtype = np.float64)
-        self.ub = np.array([ubR,ubR,ubR,ubR,ubR,ubR,ubKx,ubc,ubc, 12, 32,ubsigma], dtype = np.float64)
+        self.start = np.array([6., 6., 6., 6., 6., 6., -12.2, -5.6, -5.6, 4, 26, -0.4], dtype=np.float64)
 
         # Indices for the various elements. Remember that for the new data the receptor
         # expression is concatted
@@ -293,11 +284,10 @@ class StoneModel:
 
             # We only include a second sigma if new data
             self.sig2IDX = 12
-            self.lb = np.insert(self.lb, self.sig2IDX, lbsigma)
-            self.ub = np.insert(self.ub, self.sig2IDX, ubsigma)
+            self.start = np.insert(self.start, self.sig2IDX, -1.2)
             self.pNames.insert(self.sig2IDX, 'sigma2')
         else:
             # Load and normalize dataset one
             self.mfiAdjMean = normalizeData(os.path.join(path,'./data/lux/Luxetal2013-Fig2B.csv'))
 
-        self.Nparams = len(self.lb)
+        self.Nparams = len(self.start)

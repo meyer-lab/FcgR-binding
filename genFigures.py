@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 
 import sys
-import warnings
 import matplotlib
 matplotlib.use('AGG')
-from recepmod.StoneModMouse import StoneModelMouse
 from recepmod.figures.FigureCommon import overlayCartoon
-warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 
 fdir = './Manuscript/Figures/'
 
@@ -31,9 +28,6 @@ if __name__ == '__main__':
     elif sys.argv[1] == '4':
         # Overlay Figure 4 cartoon
         overlayCartoon(fdir + 'Figure4.svg',
-                       './recepmod/figures/Figure4_regression_approach.svg', 10, 30, 0.66)
-
-        # Output data table
-        StoneModelMouse().writeModelData('./Manuscript/Text/07_ModelData.md')
+                       './recepmod/figures/Figure4_regression_approach.svg', 10, 30, 0.022)
 
     print(nameOut + ' is done.')

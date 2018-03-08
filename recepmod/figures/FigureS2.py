@@ -61,7 +61,7 @@ def FcgRexpression(ax):
 def robustnessPlot(ax):
     """ Vary IC concentration and avidity and show the prediction still stands. """
     # Setup the range of avidity and ligand concentration we'll look at
-    gnus = np.logspace(1, 4, 4, base=2, dtype=np.int)
+    gnus = np.logspace(1, 3, 3, base=2, dtype=np.int)
     Los = np.logspace(start=-11, stop=-7, num=30, dtype=np.float)
 
     pp = pd.DataFrame(np.array(np.meshgrid(gnus, Los)).T.reshape(-1, 2),

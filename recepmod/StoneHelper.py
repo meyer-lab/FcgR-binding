@@ -7,16 +7,12 @@ import numpy as np
 import pandas as pd
 from memoize import memoize
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 
 def read_chain(filename=None, ffilter=True):
     """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
     import os
     import h5py
+    import pickle
 
     if filename is None:
         filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./data/test_chain.h5")
@@ -41,7 +37,7 @@ def read_chain(filename=None, ffilter=True):
     # Read in dataset to Pandas frame
     # Optionally use burn in
     if ffilter is True:
-        pdset = pd.DataFrame(dset.value[11000:, :], columns=cNames)
+        pdset = pd.DataFrame(dset.value[13000:, :], columns=cNames)
     else:
         pdset = pd.DataFrame(dset.value, columns=cNames)
 
@@ -55,7 +51,7 @@ def read_chain(filename=None, ffilter=True):
 
 def rep(x, N):
     """ Returns a range with repeated elements. """
-    return [item for item in x for i in range(N)]
+    return [item for item in x for _ in range(N)]
 
 
 @memoize
@@ -77,7 +73,7 @@ def getMeasuredDataFrame(self):
                 .assign(FcgR=rep(self.FcgRs, 4) * 8)
                 .assign(Expression=rep(self.Rquant, 4) * 8)
                 .assign(Ka=np.tile(np.reshape(self.kaBruhns, (-1, 1)), (8, 1)))
-                )
+               )
 
     return normData
 
@@ -103,26 +99,9 @@ def getFitPrediction(self, x):
           .assign(nXlinkPred=np.reshape(np.transpose(onXlink), (-1, 1)))
           .assign(LbndPred=np.reshape(np.transpose(oLbnd), (-1, 1)))
           .assign(Req=np.reshape(np.transpose(oReq), (-1, 1)))
-          )
+         )
 
     return dd
-
-
-def mapMCMC(dFunction, pSet, quiet=False):
-    """
-    This function takes (1) a function that takes a parameter set and
-    returns a dataframe and (2) a list of parameter sets. It returns a dataframe
-    with all the individual dataframe outputs stacked, and a number identifier for
-    which parameter set each set of quantities came from
-    """
-    from tqdm import trange
-
-    # Iterate over each parameter set, output to a list
-    retVals = map(lambda ii: dFunction(pSet.iloc[ii, :]).assign(pSetNum=ii),
-                  trange(pSet.shape[0], disable=quiet))
-
-    # Concatenate all the dataframes vertically and return
-    return pd.concat(retVals)
 
 
 def getFitMeasMerged(M, x):

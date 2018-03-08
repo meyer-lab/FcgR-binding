@@ -1,8 +1,10 @@
 import numpy as np
+from numba import jit, float64
 from memoize import memoize
 from .StoneModel import nchoosek
 
 
+@jit(float64[:,:](float64[:], float64[:], float64, float64, float64))
 def StoneVgrid(Req, Ka, gnu, Kx, L0):
     """
     This function takes in the relevant parameters and creates the v_ij grid
@@ -170,7 +172,7 @@ def reqSolver(logR, Ka, gnu, Kx, L0):
     raise RuntimeError("The reqSolver couldn't find Req in a reasonable number of iterations.")
 
 
-class StoneN:
+class StoneN(object):
     """ Use a class to keep track of the various parameters. """
 
     def getRbnd(self):

@@ -32,7 +32,7 @@ class TestStoneMethods(unittest.TestCase):
 
         output = ReqFuncSolver(R, kai, Li, vi, kx)
 
-        self.assertTrue(abs(diffFunAnon(output)) < 1E-8)
+        self.assertTrue(abs(diffFunAnon(np.log10(output))) < 1E-8)
 
         self.assertTrue(np.isnan(ReqFuncSolver(R, kai, Li, -10, kx)))
 
@@ -41,7 +41,7 @@ class TestStoneMethods(unittest.TestCase):
         kai, kx, vi, R, Li = get_random_vars()
 
         StoneRet = StoneMod(np.log10(R),kai,vi,kx,Li,fullOutput = True)
-        Req = 10**ReqFuncSolver(R,kai,Li,vi,kx)
+        Req = ReqFuncSolver(R,kai,Li,vi,kx)
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
 
@@ -67,15 +67,15 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(len(self.M.Rquant) == 6)
 
     def test_Stone_names(self):
-        self.assertEqual(len(self.M.pNames), self.M.lb.shape[0])
-        self.assertEqual(len(self.Mold.pNames), self.Mold.lb.shape[0])
+        self.assertEqual(len(self.M.pNames), self.M.start.shape[0])
+        self.assertEqual(len(self.Mold.pNames), self.Mold.start.shape[0])
 
     def test_dataImport_mfiAdjMean(self):
         self.assertTrue(self.M.mfiAdjMean.shape == (24, 8))
         self.assertTrue(self.Mold.mfiAdjMean.shape == (24, 8))
 
     def test_NormalErrorCoef(self):
-        retVal = self.M.NormalErrorCoef(self.M.lb)
+        retVal = self.M.NormalErrorCoef(self.M.start)
 
         self.assertFalse(np.isnan(retVal))
         self.assertFalse(np.isinf(retVal))

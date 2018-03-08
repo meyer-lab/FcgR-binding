@@ -8,7 +8,7 @@ def makeFigure():
     from .FigureCommon import getSetup
 
     # Get list of axis objects
-    ax, f = getSetup((7, 6), (3, 5))
+    ax, f = getSetup((7, 6), (4, 4))
 
     # Retrieve model and fit from hdf5 file
     _, dset = read_chain()
@@ -32,12 +32,16 @@ def makeFigure():
     # Run the autocorrelation plotting on each variable
     for ii, item in enumerate(params):
         plotAutoC(ax[ii], dset, item)
-        ax[ii].set_ylabel('Autocorrelation')
+
+        if ii % 4 == 0:
+            ax[ii].set_ylabel('Autocorrelation')
+
     ax[13].set_axis_off()
     ax[14].set_axis_off()
+    ax[15].set_axis_off()
 
     # Tweak layout
-    f.tight_layout()
+    f.tight_layout(w_pad=0.4)
 
     return f
 
@@ -51,21 +55,27 @@ def plotAutoC(ax, dset, coll):
     # Pivot to separate out all the walkers
     dd = dset.pivot(index='Step', columns='walker', values=coll)
 
+    nlags = dd[0].size
+
     # Calculate the autocorrelation
-    outt = dd.apply(lambda x: acf(x, nlags=x.size))
+    outt = dd.apply(lambda x: acf(x, nlags=nlags))
+
+    # Cutoff view at 50 steps
+    outt = outt.loc[outt.index < 50, :]
 
     # Plot the values
     outt.plot(ax=ax, legend=False, linewidth=0.5)
 
     # Rename columns for plotting
-    coll = texRename(coll)
-    ax.set_title(coll)
+    ax.set_title(texRename(coll))
 
     # Indicate the confidence intervals for failure
-    z95 = 1.959963984540054 / np.sqrt(outt.shape[0])
-    z99 = 2.5758293035489004 / np.sqrt(outt.shape[0])
+    z95 = 1.959963984540054 / np.sqrt(nlags)
+    z99 = 2.5758293035489004 / np.sqrt(nlags)
     ax.axhline(y=z99, linestyle='--', color='grey', linewidth=0.5)
     ax.axhline(y=z95, color='grey', linewidth=0.5)
     ax.axhline(y=0.0, color='black', linewidth=0.5)
     ax.axhline(y=-z95, color='grey', linewidth=0.5)
     ax.axhline(y=-z99, linestyle='--', color='grey', linewidth=0.5)
+
+    ax.set_xlim(0, 50)

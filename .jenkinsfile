@@ -7,18 +7,19 @@ pipeline {
         sh 'make clean'
       }
     }
-    stage('Build') {
-      steps { sh 'make -j 16' }
-    }
-    stage('Test'){
-      steps {
-        sh 'make testcover'
-        sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
+    stage('Build/Test') {
+      parallel {
+        stage('Build') { steps { sh 'make -j 16' } }
+        stage('Test')  { steps { sh 'make testcover' } }
+        stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
       }
     }
     stage('Report') {
       steps {
         archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
+        archiveArtifacts artifacts: 'Manuscript/ReviewResponse.pdf', onlyIfSuccessful: true
+        archiveArtifacts artifacts: 'Manuscript/ReviewResponse.docx', onlyIfSuccessful: true
+        archiveArtifacts artifacts: 'Manuscript/Manuscript.log', onlyIfSuccessful: false
 
         publishHTML([
           allowMissing: false,

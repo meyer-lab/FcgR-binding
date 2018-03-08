@@ -12,7 +12,7 @@ def funcAppend(indexList, nameApp):
     return idx
 
 
-class StoneModelMouse:
+class StoneModelMouse(object):
     # Takes in a list of shape (9) for x: Rexp for FcgRs logR, the kind of Ig,
     # avidity Kx, valency uv, Immune Complex Concentration L0
     def __init__(self):
@@ -178,20 +178,10 @@ class StoneModelMouse:
         return output.reshape(2, 16)
 
     def writeModelData(self, filename):
-        import pytablewriter as ptw
+        from pytablewriter import MarkdownTableWriter
 
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
-
-        def rename(name):
-            name = 'mFcγRI' if name == 'FcgRI' else name
-            name = 'mFcγRIIB' if name == 'FcgRIIB' else name
-            name = 'mFcγRIII' if name == 'FcgRIII' else name
-            name = 'mFcγRIV' if name == 'FcgRIV' else name
-            return name
-
-        def renameList(names):
-            return [rename(name) for name in names]
 
         # Convert numbers representing affinities into strings in
         # scientific notation, using Markdown formatting
@@ -199,40 +189,20 @@ class StoneModelMouse:
             if isinstance(val, str):
                 return val
             elif val == 0:
-                return r'$$0.0$$'
+                return '0.0'
             else:
                 try:
-                    return r'$$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
-                           '*10^' + str(int(np.floor(np.log10(val)))) + '$$'
+                    return '{:.1E}'.format(val)#.replace('E+0', '*10^')
                 except OverflowError:
-                    return r'$$0.0$$'
-
-        def sciSeries(series):
-            return [sci(val) for val in series]
-
-        def renameIgg(name):
-            name = 'm' + name
-            name = 'mIgG1-FcγRIIB-/-' if name == 'mIgG1-FcgRIIB-/-' else name
-            name = 'mIgG2a-FcγRIIB-/-' if name == 'mIgG2a-FcgRIIB-/-' else name
-            name = 'mIgG2b-FcγRIIB-/-' if name == 'mIgG2b-FcgRIIB-/-' else name
-            name = 'mIgG3-FcγRIIB-/-' if name == 'mIgG3-FcgRIIB-/-' else name
-            name = 'mIgG2a-FcγRI-/-' if name == 'mIgG2a-FcgRI-/-' else name
-            name = 'mIgG2a-FcγRIII-/-' if name == 'mIgG2a-FcgRIII-/-' else name
-            name = 'mIgG2a-FcγRI,IV-/-' if name == 'mIgG2a-FcgRI,IV-/-' else name
-            name = 'mIgG2b-Fucose-/-' if name == 'mIgG2b-Fucose-/-' else name
-            return name
-
-        # Convert percents into strings depicting percents
-        def percent(val):
-            return str(val)
+                    return '0.0'
 
         # Rename columns of DataFrame
-        tbN.columns = renameList(tbN.columns)
-        tbN[[col for col in tbN.columns if col != 'Effectiveness']] = tbN[[col for col in tbN.columns if col != 'Effectiveness']].apply(sciSeries)
-        tbN['Condition'] = tbN['Condition'].apply(renameIgg)
-        tbN['Effectiveness'] = tbN['Effectiveness'].apply(percent)
+        tbN.columns = [name.replace('FcgR', 'mFcγR') for name in tbN.columns]
+        tbN.loc[:, tbN.columns != 'Effectiveness'] = tbN.loc[:, tbN.columns != 'Effectiveness'].applymap(sci)
+        tbN['Condition'] = tbN['Condition'].apply(lambda x: ('m' + x).replace('FcgR', 'FcγR'))
+        tbN['Effectiveness'] = tbN['Effectiveness'].apply(str)
 
-        writer = ptw.MarkdownTableWriter()
+        writer = MarkdownTableWriter()
         writer.from_dataframe(tbN)
 
         # Change writer stream to filename

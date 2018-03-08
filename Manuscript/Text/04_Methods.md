@@ -1,6 +1,6 @@
 # Methods
 
-All analysis was implemented in Python, and can be found at [https://github.com/meyer-lab/FcgR-binding](https://github.com/meyer-lab/FcgR-binding), release 1.0 (doi: [00.0000/arc0000000](https://doi.org/doi-url)).
+All analysis was implemented in Python, and can be found at [https://github.com/meyer-lab/FcgR-binding](https://github.com/meyer-lab/FcgR-binding).
 
 ## Immune complex binding measurement
 
@@ -20,12 +20,8 @@ All anti-FcγR antibodies used for Fc quantification were used as conjugates wit
 
 ## *In vivo* regression
 
-Regression against *in vivo* effectiveness of mIgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Association constants for all combinations of mIgG and mFcγR were obtained from previous experimental measurements [@Gavin20; @Robinette:2015tp]. Each effectiveness was presented as the percent reduction in the number of lung metastases quantified [@Nimmerjahn:2005hu]. To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was transformed by tanh such that:
-
-$$ y = tanh (X \cdot p) $$ {#eq:lsq}
-
-so that $\lim_{x\to\infty} y(x) = 1$. $X$ is the predicted mFcγR activity for each cell line according to our model, and $p$ is the regression weights.
+Regression against *in vivo* effectiveness of mIgG treatments was performed by least-squares (`scipy.optimize.least_squares`). Association constants for all combinations of mIgG and mFcγR were obtained from previous experimental measurements [@Gavin20; @Robinette:2015tp]. Each effectiveness was presented as the percent reduction in the number of lung metastases quantified [@Nimmerjahn:2005hu]. To account for the limited range of this quantity (e.g. one cannot have a reduction of 200%), the regression was transformed by tanh such that: $y = tanh (X \cdot p)$ so that $\lim_{x\to\infty} y(x) = 1$. $X$ is the predicted mFcγR activity for each cell line according to our model, and $p$ is the regression weights.
 
 ### PCA of mIgG-mFcγR affinities
 
-Principle component analysis was performed using `scikit-learn` and the affinities of the four mIgGs (mIgG1, mIgG2a, mIgG2b, mIgG3), with or without knockout treatments, for each of four receptors (mFcγRI, mFcγRIIB, mFcγRIII, mFcγRIV). Association constants for all combinations of mIgG and mFcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. The affinity for a knocked-out or blocked mFcγR was assumed to be zero. The affinities were not normalized before PCA transformation. 
+Principle component analysis was performed using `scikit-learn` and the affinities of the four mIgGs (mIgG1, mIgG2a, mIgG2b, mIgG3), with or without knockout treatments, for each of four receptors (mFcγRI, mFcγRIIB, mFcγRIII, mFcγRIV). Association constants for all combinations of mIgG and mFcγR were obtained from previous experimental measurements [@Bruhns:2009kg]. The affinity for a knocked-out or blocked mFcγR was assumed to be zero. The affinities were not centered or variance-scaled before PCA transformation. 
