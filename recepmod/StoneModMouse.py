@@ -183,40 +183,26 @@ class StoneModelMouse(object):
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
 
-        def rename(name):
-            name = 'mFcγRI' if name == 'FcgRI' else name
-            name = 'mFcγRIIB' if name == 'FcgRIIB' else name
-            name = 'mFcγRIII' if name == 'FcgRIII' else name
-            name = 'mFcγRIV' if name == 'FcgRIV' else name
-            return name
-
-        def renameList(names):
-            return [rename(name) for name in names]
-
         # Convert numbers representing affinities into strings in
         # scientific notation, using Markdown formatting
         def sci(val):
             if isinstance(val, str):
                 return val
             elif val == 0:
-                return r'$$0.0$$'
+                return r'$0.0$'
             else:
                 try:
-                    return r'$$' + str(val / (10**np.floor(np.log10(val))))[0:3] + \
-                           '*10^' + str(int(np.floor(np.log10(val)))) + '$$'
+                    return r'$' + '{:.1E}'.format(val).replace('E+0', '\\times 10^') + '$'
                 except OverflowError:
-                    return r'$$0.0$$'
+                    return r'$0.0$'
 
         def sciSeries(series):
             return [sci(val) for val in series]
 
-        def renameIgg(name):
-            return ('m' + name).replace('FcgR', 'FcγR')
-
         # Rename columns of DataFrame
-        tbN.columns = renameList(tbN.columns)
+        tbN.columns = [name.replace('FcgR', 'mFcγR') for name in tbN.columns]
         tbN[[col for col in tbN.columns if col != 'Effectiveness']] = tbN[[col for col in tbN.columns if col != 'Effectiveness']].apply(sciSeries)
-        tbN['Condition'] = tbN['Condition'].apply(renameIgg)
+        tbN['Condition'] = tbN['Condition'].apply(lambda x: ('m' + x).replace('FcgR', 'FcγR'))
         tbN['Effectiveness'] = tbN['Effectiveness'].apply(str)
 
         writer = ptw.MarkdownTableWriter()
