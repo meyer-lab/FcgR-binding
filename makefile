@@ -42,7 +42,7 @@ Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
 Manuscript/ReviewResponse.pdf: Manuscript/ReviewResponse.md
 	pandoc -s --pdf-engine=xelatex -f markdown $< -o $@
 
-Manuscript/Manuscript.tex: Manuscript/Text/*.md Manuscript/index.html
+Manuscript/Manuscript.tex: Manuscript/Text/*.md Manuscript/Text/07_ModelData.md
 	pandoc -s $(pan_common) --template=$(tdir)/default.latex --pdf-engine=xelatex -o $@
 
 Manuscript/CoverLetter.docx: Manuscript/CoverLetter.md

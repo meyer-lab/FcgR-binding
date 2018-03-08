@@ -189,12 +189,12 @@ class StoneModelMouse(object):
             if isinstance(val, str):
                 return val
             elif val == 0:
-                return r'$0.0$'
+                return '0.0'
             else:
                 try:
-                    return r'$' + '{:.1E}'.format(val).replace('E+0', '\\times 10^') + '$'
+                    return '{:.1E}'.format(val).replace('E+0', '*10^')
                 except OverflowError:
-                    return r'$0.0$'
+                    return r'0.0'
 
         def sciSeries(series):
             return [sci(val) for val in series]
