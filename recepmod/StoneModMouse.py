@@ -178,7 +178,7 @@ class StoneModelMouse(object):
         return output.reshape(2, 16)
 
     def writeModelData(self, filename):
-        from pytablewriter import LatexTableWriter
+        from pytablewriter import MarkdownTableWriter
 
         tbN = self.NimmerjahnEffectTableAffinities()
         tbN.insert(0, 'Condition', tbN.index)
@@ -202,7 +202,7 @@ class StoneModelMouse(object):
         tbN['Condition'] = tbN['Condition'].apply(lambda x: ('m' + x).replace('FcgR', 'FcγR'))
         tbN['Effectiveness'] = tbN['Effectiveness'].apply(str)
 
-        writer = LatexTableWriter()
+        writer = MarkdownTableWriter()
         writer.from_dataframe(tbN)
 
         # Change writer stream to filename

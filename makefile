@@ -21,7 +21,7 @@ $(fdir)/Figure%eps: $(fdir)/Figure%svg
 recepmod/recepmod.so: recepmod/solverC.cpp
 	g++ -std=c++11 -mavx -march=native $< -O3 --shared -fPIC -lm -o $@
 
-Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf  Manuscript/Text/ModelData.tex
+Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
 	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
 
@@ -33,8 +33,8 @@ Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Fig
 	pandoc -s $(pan_common) -o $@
 	rm -r ./Figures
 
-Manuscript/Text/ModelData.tex: recepmod/recepmod.so
-	python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('./Manuscript/Text/ModelData.tex')"
+ModelData.md: recepmod/recepmod.so
+	python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('ModelData.md')"
 
 Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
 	pandoc -s -f markdown $< -o $@
@@ -53,7 +53,7 @@ Manuscript/CoverLetter.pdf: Manuscript/CoverLetter.md
 
 clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
-	rm -f $(fdir)/Figure* recepmod/recepmod.so Manuscript/Text/ModelData.tex profile.p* stats.dat .coverage nosetests.xml
+	rm -f $(fdir)/Figure* recepmod/recepmod.so ModelData.md profile.p* stats.dat .coverage nosetests.xml
 	rm -f Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
 
 open: Manuscript/index.html
