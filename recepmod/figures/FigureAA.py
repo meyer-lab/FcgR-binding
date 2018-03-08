@@ -32,13 +32,16 @@ def makeFigure():
     # Run the autocorrelation plotting on each variable
     for ii, item in enumerate(params):
         plotAutoC(ax[ii], dset, item)
-        ax[ii].set_ylabel('Autocorrelation')
+
+        if ii % 4 == 0:
+            ax[ii].set_ylabel('Autocorrelation')
+
     ax[13].set_axis_off()
     ax[14].set_axis_off()
     ax[15].set_axis_off()
 
     # Tweak layout
-    f.tight_layout()
+    f.tight_layout(w_pad=0.4)
 
     return f
 
@@ -64,8 +67,7 @@ def plotAutoC(ax, dset, coll):
     outt.plot(ax=ax, legend=False, linewidth=0.5)
 
     # Rename columns for plotting
-    coll = texRename(coll)
-    ax.set_title(coll)
+    ax.set_title(texRename(coll))
 
     # Indicate the confidence intervals for failure
     z95 = 1.959963984540054 / np.sqrt(nlags)
