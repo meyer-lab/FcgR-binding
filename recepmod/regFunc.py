@@ -31,12 +31,9 @@ def diffEvo(p, X, logg, y):
     return np.sum(np.square(predict(p, X, logg) - y))/2.0
 
 
-@jit(f8(f8[:], f8[:,:], b1, f8[:]), cache=True)
+@jit(f8[:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
 def diffEvoJac(p, X, logg, y):
-    r = predict(p, X, logg) - y
-    J = jac(p, X, logg, y)
-
-    return np.dot(np.transpose(J), r)
+    return np.dot(jac(p, X, logg, y).transpose(), predict(p, X, logg) - y)
 
 
 @jit(f8[:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
