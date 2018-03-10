@@ -53,17 +53,17 @@ class regFunc(BaseEstimator):
         """ Fit the X-y relationship. Return nothing. """
         self.trainX, self.trainy = self.scale.fit_transform(np.array(X)), np.array(y)
 
-        ub = np.full((X.shape[1], ), 12.0)
-
+        # Package up data
         args = (self.trainX, self.logg, self.trainy)
 
-        minimizer_kwargs = {"method": "BFGS", "jac":diffEvoJac, "args":args}
+        # Run initial global search
+        res = basinhopping(diffEvo, niter=100, x0=np.zeros(X.shape[1]),
+                           minimizer_kwargs={"jac":diffEvoJac, "args":args})
 
-        res = basinhopping(diffEvo, x0=ub-ub, minimizer_kwargs=minimizer_kwargs)
-
-        self.res = least_squares(residDiff, x0=np.minimum(np.maximum(res.x, -ub), ub), jac=jac,
+        # Run least_squares step
+        self.res = least_squares(residDiff, x0=np.clip(res.x, -12., 12.), jac=jac,
                                  tr_solver='exact', method='dogbox',
-                                 bounds=(-ub, ub), args=args)
+                                 bounds=(-12., 12.), args=args)
 
     def predict(self, X=None, p=None):
         """
