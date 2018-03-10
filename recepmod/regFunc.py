@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator
-from scipy.optimize import least_squares, differential_evolution
+from scipy.optimize import least_squares, basinhopping
+from sklearn.preprocessing import StandardScaler
 from numba import jit, f8, b1
 
 
@@ -27,7 +28,12 @@ def predict(p, X, logg):
 
 @jit(f8(f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
 def diffEvo(p, X, logg, y):
-    return np.sum(np.square(predict(p, X, logg) - y))
+    return np.sum(np.square(predict(p, X, logg) - y))/2.0
+
+
+@jit(f8[:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
+def diffEvoJac(p, X, logg, y):
+    return np.dot(jac(p, X, logg, y).transpose(), predict(p, X, logg) - y)
 
 
 @jit(f8[:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
@@ -41,24 +47,22 @@ class regFunc(BaseEstimator):
     def __init__(self, logg=True):
         self.logg = logg
         self.res, self.trainX, self.trainy = None, None, None
+        self.scale = StandardScaler(copy=True, with_mean=False, with_std=True)
 
     def fit(self, X, y):
         """ Fit the X-y relationship. Return nothing. """
-        self.trainX, self.trainy = np.array(X), np.array(y)
+        self.trainX, self.trainy = self.scale.fit_transform(np.array(X)), np.array(y)
 
-        ub = np.full((X.shape[1], ), 12.0)
-
+        # Package up data
         args = (self.trainX, self.logg, self.trainy)
 
-        res = differential_evolution(diffEvo,
-                                     popsize=30,
-                                     bounds=list(zip(-ub, ub)),
-                                     disp=False,
-                                     args=args)
+        # Run initial global search
+        res = basinhopping(diffEvo, niter=200, x0=np.zeros(X.shape[1]),
+                           minimizer_kwargs={"jac":diffEvoJac, "args":args})
 
+        # Run least_squares step
         self.res = least_squares(residDiff, x0=res.x, jac=jac,
-                                 tr_solver='exact', method='dogbox',
-                                 bounds=(-ub, ub), args=args)
+                                 tr_solver='exact', method='lm', args=args)
 
     def predict(self, X=None, p=None):
         """
@@ -70,5 +74,7 @@ class regFunc(BaseEstimator):
 
         if X is None:
             X = self.trainX
+        else:
+            X = self.scale.transform(np.array(X))
 
-        return predict(p, np.array(X), self.logg)
+        return predict(p, X, self.logg)
