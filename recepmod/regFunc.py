@@ -61,9 +61,8 @@ class regFunc(BaseEstimator):
                            minimizer_kwargs={"jac":diffEvoJac, "args":args})
 
         # Run least_squares step
-        self.res = least_squares(residDiff, x0=np.clip(res.x, -12., 12.), jac=jac,
-                                 tr_solver='exact', method='dogbox',
-                                 bounds=(-12., 12.), args=args)
+        self.res = least_squares(residDiff, x0=res.x, jac=jac,
+                                 tr_solver='exact', method='lm', args=args)
 
     def predict(self, X=None, p=None):
         """
