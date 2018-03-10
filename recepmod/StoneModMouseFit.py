@@ -139,7 +139,7 @@ def InVivoPredict(inn=[5, 1E-9]):
     # print('InVivoPredict crossval r2: ' + str(round(cperf, 3)))
 
     for ii, item in enumerate(cellpops):
-        tbl[item + 'eff'] = tbl[item] * np.power(10, model.res.x[ii])
+        tbl[item + 'eff'] = tbl[item] * np.power(10, model.res.x[ii]) / model.scale.scale_[ii]
 
     return (dperf, cperf, tbl, model)
 
