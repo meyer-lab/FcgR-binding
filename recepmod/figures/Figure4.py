@@ -58,17 +58,9 @@ def makeFigure():
     return f
 
 
-def iggRename(x):
-    """ Make names refer to murine form. """
-    return x.replace('IgG', 'mIgG')
-
-
-IgList = ['IgG1', 'IgG2a', 'IgG2b', 'IgG3', 'None']
-Igs = {'IgG1': 'o', 'IgG2a': 'd', 'IgG2b': '^', 'IgG3': 's', 'None': '.'}
-keys = [key for key in Igs.keys()]
-for key in keys:
-    Igs[iggRename(key)] = Igs[key]
-
+IgList = ['mIgG1', 'mIgG2a', 'mIgG2b', 'mIgG3', 'None']
+Igs = {'IgG1': 'o', 'IgG2a': 'd', 'IgG2b': '^', 'IgG3': 's', 'None': '.',
+       'mIgG1': 'o', 'mIgG2a': 'd', 'mIgG2b': '^', 'mIgG3': 's'}
 Knockdown = ['Wild-type', 'FcgRIIB-/-', 'FcgRI-/-', 'FcgRIII-/-', 'FcgRI,IV-/-', 'Fucose-/-']
 
 
@@ -255,7 +247,7 @@ def InVivoPredictVsActualAffinities(ax):
                   r'mFc$\gamma$RI,IV-/-', 'Fucose-']
 
     ax.legend(handles=Legend(KnockdownL, dict(zip(KnockdownL, sns.color_palette())),
-                             [iggRename(igg) for igg in IgList], Igs),
+                             IgList, Igs),
               bbox_to_anchor=(1.5, 1), loc=2)
 
 

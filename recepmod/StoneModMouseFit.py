@@ -122,11 +122,10 @@ def LOOpredict(lr, X, y):
 
 
 @memoize
-def InVivoPredict(inn=[5, 1E-9]):
+def InVivoPredict(inn=None):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
-    pd.set_option('expand_frame_repr', False)
-
-    inn = np.squeeze(inn)
+    if inn is None:
+        inn = [5, 1E-9]
 
     # Collect data
     X, y, tbl = modelPrepAffinity(v=inn[0], L0=inn[1])
@@ -134,9 +133,6 @@ def InVivoPredict(inn=[5, 1E-9]):
     tbl['DPredict'], dperf, tbl['CPredict'], cperf, model = LOOpredict(regFunc(), X, y)
 
     tbl['Error'] = np.square(tbl.CPredict - y)
-
-    # print('InVivoPredict direct r2: ' + str(round(dperf, 3)))
-    # print('InVivoPredict crossval r2: ' + str(round(cperf, 3)))
 
     for ii, item in enumerate(cellpops):
         tbl[item + 'eff'] = tbl[item] * np.power(10, model.res.x[ii]) / model.scale.scale_[ii]
