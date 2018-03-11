@@ -144,9 +144,7 @@ def InVivoPredictComponents(ax):
     # Only keep the effect columns
     tbN = tbN.filter(like='eff', axis=1)
 
-    tbN.index = map(lambda x: x.replace('Fcg', r'mFc$\gamma$'), tbN.index)
-    tbN.index = map(lambda x: x.replace('ose-/-', 'ose-'), tbN.index)
-    tbN.index = map(lambda x: x.replace('IgG', 'mIgG'), tbN.index)
+    tbN.index = [x.replace('Fcg', 'mFcγ').replace('ose-/-', 'ose-').replace('IgG', 'mIgG') for x in tbN.index]
 
     tbN.index.name = 'condition'
     tbN.reset_index(inplace=True)
