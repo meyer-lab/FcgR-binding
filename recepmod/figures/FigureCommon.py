@@ -10,10 +10,8 @@ def iggRename(name):
     return 'h' + name
 
 
-Igs = {'IgG1': 'o', 'IgG2': 'd', 'IgG3': 's', 'IgG4': '^'}
-keys = [key for key in Igs.keys()]
-for key in keys:
-    Igs[iggRename(key)] = Igs[key]
+Igs = {'IgG1': 'o', 'IgG2': 'd', 'IgG3': 's', 'IgG4': '^',
+       'hIgG1': 'o', 'hIgG2': 'd', 'hIgG3': 's', 'hIgG4': '^'}
 
 FcgRlist = ['FcgRI',
             'FcgRIIA-Arg',
