@@ -38,8 +38,6 @@ We have done this.
 
 *5) An analysis of the base model appears in Perelson (1981) and an explicit formula is given for what the authors call R_multi. Generalizations of the base model where all the crosslinking constants are different also appear in this paper, which should be cited here.*
 
-<!-- TODO: Check cite! -->
-
 We have added this reference, as this is indeed very relevant.
 
 *6) In the discussion of the base model the authors when they mention before Eq. (3) the number of unbound receptors or the total number of ligands (NOT LIGAND) bound at equilibrium they mean number per cell and they should be clearer about this. The same applies when the generalized multireceptor model is introduced. Also, the authors should note that Perelson and C.A. Macken wrote a monograph entitled "Branching Processes applied to Cell Surface Aggregation Phenomena". Lecture Notes in Biomathematics, vol 58, Springer 1985 that shows how one can use branching processes to solve these more complex models.*
