@@ -207,7 +207,7 @@ def AIplot(ax):
     ax.set_ylabel('Effectiveness')
     ax.set_xlabel('A/I Ratio')
     ax.set_xscale('log')
-    ax.set_title('No IIB KO')
+    ax.set_title('No FcγRIIB KO')
     ax.set_xlim(10**(-1.2), 10**(2.6))
     ax.set_ylim(-0.05, 1.05)
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
@@ -242,9 +242,9 @@ def InVivoPredictVsActualAffinities(ax):
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.75, cperf)
 
-    KnockdownL = ['Wild-type', r'mFc$\gamma$RIIB-/-',
-                  r'mFc$\gamma$RI-/-', r'mFc$\gamma$RIII-/-',
-                  r'mFc$\gamma$RI,IV-/-', 'Fucose-']
+    KnockdownL = ['Wild-type', 'mFcγRIIB-/-',
+                  'mFcγRI-/-', 'mFcγRIII-/-',
+                  'mFcγRI,IV-/-', 'Fucose-']
 
     ax.legend(handles=Legend(KnockdownL, dict(zip(KnockdownL, sns.color_palette())),
                              IgList, Igs),
@@ -277,14 +277,11 @@ def AffinityPredict(ax):
     # Run through regression model to get predictions
     edits['predict'] = model.predict(edits[cellpops].as_matrix())
 
-    # Make FcgRI visible
-    edits['predict'] = edits.apply(lambda row: row['predict'] + 0.02 if row['recep'] == 0.0 else row['predict'], axis=1)
-
     # FcgR labels
-    FcgRlabels = [r'mFc$\gamma$RI',
-                  r'mFc$\gamma$RIIB',
-                  r'mFc$\gamma$RIII',
-                  r'mFc$\gamma$RIV']
+    FcgRlabels = [r'mFcγRI',
+                  r'mFcγRIIB',
+                  r'mFcγRIII',
+                  r'mFcγRIV']
 
     colors = sns.color_palette("Paired")
     with colors:

@@ -18,7 +18,7 @@
 | **mIgG2a-FcγRI,IV-/-** | $0$            | $4\times 10^5$ | $7\times 10^5$   | $0$            | 0.35               |
 | **mIgG2b-Fucose-/-**   | $1\times 10^5$ | $1\times 10^7$ | $1.1\times 10^6$ | $2\times 10^8$ | 0.70               |
 
-**Murine knockout conditions and mFcγR-mIgG affinities.** Murine knockout conditions and mFcγR-mIgG affinities used in principal component analysis shown in [@Fig:InVivoResults]. Values in columns labeled with mFcγRs are affinities with M\textsuperscript{-1} units [@Gavin20; @Guilliams:2014cm]. Values in the effectiveness column represent proportional reduction in lung metastases observed with treatment [@Nimmerjahn:2005hu].
+**Murine knockout conditions and mFcγR-mIgG affinities.** Murine knockout conditions and mFcγR-mIgG affinities used in principal component analysis shown in [@Fig:InVivoResults]. Values in columns labeled with mFcγRs are affinities with M\textsuperscript{-1} units [@Gavin20; @Guilliams:2014cm]. Values in the effectiveness column represent proportional reduction in lung metastases observed with treatment [@Nimmerjahn:2005hu]. (E.g. A value of 0.0 means the number of lung metastases was unaffected, while 1.0 means they were all cleared.)
 
 
 | **Antigen** | **Isotype** | **Clone** | **Provider** |
