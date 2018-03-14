@@ -22,7 +22,7 @@ Indeed, the marginal distribution for effective valence in each case is centered
 
 Our decision to include an effective valency was motivated by Perelson Math Biosci 53: 1-39 (1981) mentioned, and we did expect that the effective valency would be lower due to the effects mentioned here. We have expended discussion of these factors in the text along with reference to this paper.
 
-> Both TNP-4-BSA and TNP-26-BSA showed a preference toward higher effective valency, TNP-4-BSA significantly so ([@Fig:Fit]G). The method for coupling TNP to BSA creates a (likely Poisson) distribution of valencies and so deviation from the average is not surprising. A preference toward higher effective valency than the average is perhaps consistent with our earlier measurements that valency has a potent effect on the level of binding ([@Fig:Binding]).
+> Both TNP-4-BSA and TNP-26-BSA showed a preference toward higher effective valency, TNP-4-BSA significantly so (Fig. 2G). The method for coupling TNP to BSA creates a (likely Poisson) distribution of valencies and so deviation from the average is not surprising. A preference toward higher effective valency than the average is perhaps consistent with our earlier measurements that valency has a potent effect on the level of binding (Fig. 1).
 
 *3) In the definition of the A/I ratio it was unclear if this is the ratio of the highest affinity activating receptor to the highest affinity inhibitory receptor as the wording is unclear.*
 
@@ -32,7 +32,7 @@ We have adjusted the wording for this in the text to hopefully clarify this defi
 
 *4) For Fig. 3A add a definition of the symbol f to the caption.*
 
-We have done this.
+We have done so.
 
 *5) An analysis of the base model appears in Perelson (1981) and an explicit formula is given for what the authors call R_multi. Generalizations of the base model where all the crosslinking constants are different also appear in this paper, which should be cited here.*
 
