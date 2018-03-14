@@ -1,0 +1,4 @@
+[submodule "ckine/tests/rapidcheck"]
+	path = ckine/tests/rapidcheck
+	url = https://github.com/emil-e/rapidcheck
+	branch = master
