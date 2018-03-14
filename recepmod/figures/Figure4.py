@@ -213,7 +213,7 @@ def AIplot(ax):
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
     cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
 
-    logging.info('AI crossval: ' + cperf)
+    logging.info("AI crossval: %d", cperf)
 
     ax.text(0.1, 0.9, dperf)
     ax.text(0.1, 0.75, cperf)
@@ -237,7 +237,7 @@ def InVivoPredictVsActualAffinities(ax):
     dperf = r'$R^2_d$ = ' + str(round(dperf, 3))
     cperf = r'$R^2_c$ = ' + str(round(cperf, 3))
 
-    logging.info('AI with KO crossval: ' + cperf)
+    logging.info("AI with KO crossval: %d", cperf)
 
     ax.text(0.05, 0.9, dperf)
     ax.text(0.05, 0.75, cperf)
