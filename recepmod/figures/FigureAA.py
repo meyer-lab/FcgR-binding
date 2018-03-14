@@ -60,8 +60,8 @@ def plotAutoC(ax, dset, coll):
     # Calculate the autocorrelation
     outt = dd.apply(lambda x: acf(x, nlags=nlags))
 
-    # Cutoff view at 50 steps
-    outt = outt.loc[outt.index < 50, :]
+    # Cutoff view at 25 steps
+    outt = outt.loc[outt.index < 25, :]
 
     # Plot the values
     outt.plot(ax=ax, legend=False, linewidth=0.5)
@@ -78,4 +78,4 @@ def plotAutoC(ax, dset, coll):
     ax.axhline(y=-z95, color='grey', linewidth=0.5)
     ax.axhline(y=-z99, linestyle='--', color='grey', linewidth=0.5)
 
-    ax.set_xlim(0, 50)
+    ax.set_xlim(0, 20)

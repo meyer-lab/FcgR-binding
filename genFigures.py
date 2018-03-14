@@ -28,6 +28,6 @@ if __name__ == '__main__':
     elif sys.argv[1] == '4':
         # Overlay Figure 4 cartoon
         overlayCartoon(fdir + 'Figure4.svg',
-                       './recepmod/figures/Figure4_regression_approach.svg', 10, 30, 0.022)
+                       './recepmod/figures/Figure4_regression_approach.svg', 6, 30, 0.022)
 
     print(nameOut + ' is done.')
