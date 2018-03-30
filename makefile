@@ -51,6 +51,9 @@ Manuscript/CoverLetter.docx: Manuscript/CoverLetter.md
 Manuscript/CoverLetter.pdf: Manuscript/CoverLetter.md
 	pandoc --pdf-engine=xelatex --template=/Users/asm/.pandoc/letter-templ.tex $< -o $@
 
+Manuscript/CoverLetterResponse.pdf: Manuscript/CoverLetterResponse.md
+	pandoc --pdf-engine=xelatex --template=/Users/asm/.pandoc/letter-templ.tex $< -o $@
+
 clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
 	rm -f $(fdir)/Figure* recepmod/recepmod.so ModelData.md profile.p* stats.dat .coverage nosetests.xml

@@ -15,6 +15,6 @@ cc:
 
 Dear Editors,
 
-Please find our response to reviewer's comments enclosed. Overall, we were delighted by the positive response both reviewers had to the manuscript, as well as the very helpful suggestions they provided. We have addressed each of the points brought up, both within the manuscript as well as in our attached direct response.
+Please find our response to reviewer's comments enclosed. Overall, we were delighted by the positive response both reviewers had to the manuscript and the very helpful suggestions they provided. We have addressed each of the points brought up, both within the manuscript as well as in our attached direct response.
 
-My coauthors and I are grateful for your time in considering our submission.
+My coauthors and I appreciate your time in considering our submission.
