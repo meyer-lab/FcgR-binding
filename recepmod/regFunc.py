@@ -62,7 +62,7 @@ class regFunc(BaseEstimator):
             x0 = np.zeros(X.shape[1])
 
         # Run initial global search
-        res = basinhopping(diffEvo, niter=1200, x0=x0,
+        res = basinhopping(diffEvo, niter=100, x0=x0, # TODO: Change this back to at least 1200
                            minimizer_kwargs={"jac":diffEvoJac, "args":args})
 
         # Run least_squares step
