@@ -18,7 +18,7 @@
 | **mIgG2a-FcγRI,IV-/-** | $0$            | $4\times 10^5$ | $7\times 10^5$   | $0$            | 0.35               |
 | **mIgG2b-Fucose-/-**   | $1\times 10^5$ | $1\times 10^7$ | $1.1\times 10^6$ | $2\times 10^8$ | 0.70               |
 
-**Murine knockout conditions and mFcγR-mIgG affinities.** Murine knockout conditions and mFcγR-mIgG affinities used in principal component analysis shown in [@Fig:InVivoResults]. Values in columns labeled with mFcγRs are affinities with M\textsuperscript{-1} units [@Gavin20; @Guilliams:2014cm]. Values in the effectiveness column represent proportional reduction in lung metastases observed with treatment [@Nimmerjahn:2005hu]. (E.g. A value of 0.0 means the number of lung metastases was unaffected, while 1.0 means they were all cleared.)
+Table S1. **Murine knockout conditions and mFcγR-mIgG affinities.** Murine knockout conditions and mFcγR-mIgG affinities used in principal component analysis shown in [@Fig:InVivoResults]. Values in columns labeled with mFcγRs are affinities with M\textsuperscript{-1} units [@Gavin20; @Guilliams:2014cm]. Values in the effectiveness column represent proportional reduction in lung metastases observed with treatment [@Nimmerjahn:2005hu]. (E.g. A value of 0.0 means the number of lung metastases was unaffected, while 1.0 means they were all cleared.)
 
 
 | **Antigen** | **Isotype** | **Clone** | **Provider** |
@@ -34,7 +34,7 @@
 | **FcγR3 (CD16)** | rat IgG2a | 275003 | R&amp;D Systems Europe |
 | **FcγR4**   | Arm. hamster | 9E9      | In-house; Biolegend |
 
-**Antibodies for cell identification and mFcγR quantitation.**
+Table S2. **Antibodies for cell identification and mFcγR quantitation.**
 
 
 ![**Parameter autocorrelation for each parameter and each walker.** Solid and dotted lines indicate the 95th and 99th percentile significance bounds.](./Figures/FigureAA.svg){#fig:Autocorrel}
