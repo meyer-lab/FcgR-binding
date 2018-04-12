@@ -21,6 +21,7 @@ pipeline {
         archiveArtifacts artifacts: 'Manuscript/ReviewResponse.pdf', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/ReviewResponse.docx', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/Manuscript.log', onlyIfSuccessful: false
+        archiveArtifacts artifacts: 'Manuscript/Figures/Figure*.pdf', onlyIfSuccessful: false
 
         publishHTML([
           allowMissing: false,
