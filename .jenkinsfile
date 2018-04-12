@@ -18,10 +18,8 @@ pipeline {
       steps {
         archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/Manuscript.docx', onlyIfSuccessful: true
-        archiveArtifacts artifacts: 'Manuscript/ReviewResponse.pdf', onlyIfSuccessful: true
-        archiveArtifacts artifacts: 'Manuscript/ReviewResponse.docx', onlyIfSuccessful: true
-        archiveArtifacts artifacts: 'Manuscript/Manuscript.log', onlyIfSuccessful: false
         archiveArtifacts artifacts: 'Manuscript/Figures/Figure*.pdf', onlyIfSuccessful: false
+        archiveArtifacts artifacts: 'Manuscript/Supplement.pdf', onlyIfSuccessful: true
 
         publishHTML([
           allowMissing: false,
