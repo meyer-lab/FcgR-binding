@@ -6,7 +6,7 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filte
 
 .PHONY: clean upload test profile testcover open rebuild sample sampleprofile
 
-all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx
+all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
 
 $(fdir)/Figure%.svg: genFigures.py recepmod/recepmod.so
 	mkdir -p ./Manuscript/Figures
@@ -41,9 +41,6 @@ Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
 
 Manuscript/ReviewResponse.pdf: Manuscript/ReviewResponse.md
 	pandoc -s --pdf-engine=xelatex -f markdown $< -o $@
-
-Manuscript/Supplement.pdf: Manuscript/Supplement.md
-	pandoc -s -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filter.py -f markdown $< -o $@
 
 Manuscript/Manuscript.tex: Manuscript/Text/*.md
 	pandoc -s $(pan_common) --template=$(tdir)/default.latex --pdf-engine=xelatex -o $@
