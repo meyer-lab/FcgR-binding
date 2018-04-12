@@ -17,6 +17,7 @@ pipeline {
     stage('Report') {
       steps {
         archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
+        archiveArtifacts artifacts: 'Manuscript/Manuscript.docx', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/ReviewResponse.pdf', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/ReviewResponse.docx', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/Manuscript.log', onlyIfSuccessful: false
