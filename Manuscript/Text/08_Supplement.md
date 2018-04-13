@@ -3,6 +3,11 @@
 
 # Supplement
 
+- Table S1. Murine knockout conditions and mFcγR-mIgG affinities. Related to [@Fig:InVivoResults].
+- [@fig:Autocorrel]. Parameter autocorrelation for each parameter and each walker. Related to [@Fig:Fit].
+- [@fig:SuppTwo]. Supplementary results to *in vivo* predictions. Related to [@Fig:InVivoResults].
+
+
 |  **Condition**         | **mFcγRI**     | **mFcγRIIB**   | **mFcγRIII**     | **mFcγRIV**     | **Effectiveness** |
 | ---------------------- | -------------- | -------------- | ---------------- | -------------- | ------------------ |
 | **mIgG1**              | $0$            | $3\times 10^6$ | $3\times 10^5$   | $0$            | 0.00               |
