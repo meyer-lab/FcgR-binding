@@ -7,6 +7,8 @@
 - [@fig:Autocorrel]. Parameter autocorrelation for each parameter and each walker. Related to [@Fig:Fit].
 - [@fig:SuppTwo]. Supplementary results to *in vivo* predictions. Related to [@Fig:InVivoResults].
 
+\vspace{30pt}
+
 
 |  **Condition**         | **mFcγRI**     | **mFcγRIIB**   | **mFcγRIII**     | **mFcγRIV**     | **Effectiveness** |
 | ---------------------- | -------------- | -------------- | ---------------- | -------------- | ------------------ |
