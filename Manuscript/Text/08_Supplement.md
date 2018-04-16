@@ -3,11 +3,21 @@
 
 # Supplement
 
-- Table S1. Murine knockout conditions and mFcγR-mIgG affinities. Related to [@Fig:InVivoResults].
-- [@fig:Autocorrel]. Parameter autocorrelation for each parameter and each walker. Related to [@Fig:Fit].
-- [@fig:SuppTwo]. Supplementary results to *in vivo* predictions. Related to [@Fig:InVivoResults].
+## Supplemental Information Inventory
 
-\vspace{30pt}
+### Table S1. Murine knockout conditions and mFcγR-mIgG affinities.
+
+Related to [@Fig:InVivoResults]. This table displays the individual affinity and output effectiveness values used in regression and principal components analysis.
+
+### [@fig:Autocorrel]. Parameter autocorrelation for each parameter and each walker.
+
+Related to [@Fig:Fit]. This plot shows the autocorrelation of each variable within the MCMC trace as an additional check that the sampling has converged.
+
+### [@fig:SuppTwo]. Supplementary results to *in vivo* predictions.
+
+Related to [@Fig:InVivoResults]. These data provide the receptor expression measurements used to calculate the response of each cell population. Crossvalidation for varying valency and IC concentration is presented to ensure robustness of the regression model.
+
+\cleardoublepage
 
 
 |  **Condition**         | **mFcγRI**     | **mFcγRIIB**   | **mFcγRIII**     | **mFcγRIV**     | **Effectiveness** |
@@ -30,4 +40,4 @@ Table S1. **Murine knockout conditions and mFcγR-mIgG affinities. Related to [@
 
 ![**Parameter autocorrelation for each parameter and each walker. Related to [@Fig:Fit].** Solid and dotted lines indicate the 95th and 99th percentile significance bounds.](./Figures/FigureAA.svg){#fig:Autocorrel}
 
-![**Supplementary results to *in vivo* predictions. Related to [@Fig:InVivoResults].** A) Receptor abundance quantified across different peripheral immune cell populations. Error bars indicate standard error of biological replicates (N >= 3). B) Prediction performance upon crossvalidation for the model predicting *in vivo* efficacy with differing assumed IC concentration and avidity.](./Figures/FigureS2.svg){#fig:SuppTwo}
+![**Supplementary results to *in vivo* predictions. Related to [@Fig:InVivoResults].** A) Receptor abundance quantified across different peripheral immune cell populations. Error bars indicate standard error of biological replicates (N >= 3). B) Prediction performance upon crossvalidation for the model predicting *in vivo* efficacy with differing assumed IC concentration and valency.](./Figures/FigureS2.svg){#fig:SuppTwo}
