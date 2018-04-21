@@ -41,6 +41,12 @@ def residDiff(p, X, logg, y):
     return predict(p, X, logg) - y
 
 
+def floatBounds(**kwargs):
+    """ Keep the parameter values bounded by 20, otherwise we encounter
+    floating point errors. """
+    return bool(np.all(kwargs["x_new"] <= 20))
+
+
 class regFunc(BaseEstimator):
     """ Class to handle regression with saturating effect. """
 
@@ -62,7 +68,7 @@ class regFunc(BaseEstimator):
             x0 = np.zeros(X.shape[1])
 
         # Run initial global search
-        res = basinhopping(diffEvo, niter=2000, x0=x0, stepsize=0.1,
+        res = basinhopping(diffEvo, niter=2000, x0=x0, accept_test=floatBounds,
                            minimizer_kwargs={"jac":diffEvoJac, "args":args})
 
         # Run least_squares step
