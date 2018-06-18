@@ -206,7 +206,7 @@ def AverageAvidity(ax):
     sns.FacetGrid(hue='logR', data=table, palette=col).map(ax.plot, 'Ka', 'AvAv')
 
     ax.set_xscale('log')
-    ax.set_ylabel('Average Binding Avidity')
+    ax.set_ylabel('Average Binding Valency')
     ax.set_xlabel(r'$K_a$')
 
     # Create the legend patches
