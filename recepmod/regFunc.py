@@ -32,8 +32,13 @@ class regFunc(BaseEstimator):
         # Package up data
         args = (self.trainX, self.logg, self.trainy)
 
+        if self.logg:
+            bnds = (-np.inf, 20)
+        else:
+            bnds = (0.0, np.inf)
+
         # Run least_squares step
-        self.res = least_squares(residDiff, x0=np.zeros(X.shape[1]), args=args)
+        self.res = least_squares(residDiff, x0=np.zeros(X.shape[1]), args=args, bounds=bnds)
 
     def predict(self, X=None, p=None):
         """
