@@ -1,50 +1,20 @@
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.preprocessing import StandardScaler
-from scipy.optimize import least_squares, basinhopping
-from numba import jit, f8, b1
+from scipy.optimize import least_squares
+from scipy.special import expm1
 
 
-@jit(f8[:,:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
-def jac(p, X, logg, _):
-    """ Jacobian for fitting. """
-    if logg is True:
-        p = np.power(10, p)
-
-    # Find inner term.
-    yy = np.reciprocal(np.square(np.cosh(np.dot(X, p))))
-
-    return np.outer(yy, p)
-
-
-@jit(f8[:](f8[:], f8[:,:], b1), nopython=True, cache=True, nogil=True)
 def predict(p, X, logg):
     """ Core prediction function. """
     if logg is True:
         p = np.power(10, p)
 
-    return np.tanh(np.dot(X, p))
+    return -expm1(-np.dot(X, p))
 
 
-@jit(f8(f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
-def diffEvo(p, X, logg, y):
-    return np.sum(np.square(predict(p, X, logg) - y))/2.0
-
-
-@jit(f8[:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
-def diffEvoJac(p, X, logg, y):
-    return np.dot(jac(p, X, logg, y).transpose(), predict(p, X, logg) - y)
-
-
-@jit(f8[:](f8[:], f8[:,:], b1, f8[:]), nopython=True, cache=True, nogil=True)
 def residDiff(p, X, logg, y):
     return predict(p, X, logg) - y
-
-
-def floatBounds(**kwargs):
-    """ Keep the parameter values bounded by 20, otherwise we encounter
-    floating point errors. """
-    return bool(np.all(kwargs["x_new"] <= 20))
 
 
 class regFunc(BaseEstimator):
@@ -62,18 +32,13 @@ class regFunc(BaseEstimator):
         # Package up data
         args = (self.trainX, self.logg, self.trainy)
 
-        if X.shape[1] == 5:
-            x0 = np.array([-0.4, -6.0, -0.4, -6.0, -0.4])
+        if self.logg:
+            bnds = (-np.inf, 20)
         else:
-            x0 = np.zeros(X.shape[1])
-
-        # Run initial global search
-        res = basinhopping(diffEvo, niter=2000, x0=x0, accept_test=floatBounds,
-                           minimizer_kwargs={"jac":diffEvoJac, "args":args})
+            bnds = (0.0, np.inf)
 
         # Run least_squares step
-        self.res = least_squares(residDiff, x0=res.x, jac=jac,
-                                 tr_solver='exact', method='lm', args=args)
+        self.res = least_squares(residDiff, x0=np.zeros(X.shape[1]), args=args, bounds=bnds)
 
     def predict(self, X=None, p=None):
         """
