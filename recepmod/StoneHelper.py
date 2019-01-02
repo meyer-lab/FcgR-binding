@@ -39,9 +39,9 @@ def read_chain(filename=None, ffilter=True):
     # Read in dataset to Pandas frame
     # Optionally use burn in
     if ffilter is True:
-        pdset = pd.DataFrame(dset.value[13000:, :], columns=cNames)
+        pdset = pd.DataFrame(dset[13000:, :], columns=cNames)
     else:
-        pdset = pd.DataFrame(dset.value, columns=cNames)
+        pdset = pd.DataFrame(dset, columns=cNames)
 
     f.close()
 
