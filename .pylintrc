@@ -18,7 +18,7 @@ ignore-patterns=
 init-hook='import sys; sys.path.append("/home/jenkins/.local/lib/python3.6/site-packages/")'
 
 # Use multiple processes to speed up Pylint.
-jobs=16
+jobs=32
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
