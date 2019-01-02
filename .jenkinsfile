@@ -1,3 +1,7 @@
+def virtualEnv(cmd) {
+  sh "virtualenv . && source ./bin/activate && ./bin/pip install -r requirements.txt && ${cmd}"
+}
+
 pipeline {
   agent any
   stages {
@@ -5,15 +9,12 @@ pipeline {
       steps {
         sh 'git clean -ffdx'
         sh 'make clean'
-        sh 'virtualenv .'
-        sh 'source ./bin/activate'
-        sh './bin/pip install -r requirements.txt'
       }
     }
     stage('Build/Test') {
       parallel {
-        stage('Build') { steps { sh 'make -j 16' } }
-        stage('Test')  { steps { sh 'make testcover' } }
+        stage('Build') { steps { virtualEnv('make -j 16') } }
+        stage('Test')  { steps { virtualEnv('make testcover') } }
         stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
       }
     }
