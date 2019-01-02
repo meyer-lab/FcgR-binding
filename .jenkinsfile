@@ -12,11 +12,9 @@ pipeline {
       }
     }
     stage('Build/Test') {
-      parallel {
-        stage('Build') { steps { virtualEnv('make -j 16') } }
-        stage('Test')  { steps { virtualEnv('make testcover') } }
-        stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
-      }
+      stage('Build') { steps { virtualEnv('make -j 16') } }
+      stage('Test')  { steps { virtualEnv('make testcover') } }
+      stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
     }
     stage('Report') {
       steps {
