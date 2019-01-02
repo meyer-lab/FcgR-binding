@@ -1,19 +1,19 @@
+def virtualEnv(cmd) {
+  sh "virtualenv . && source ./bin/activate && ./bin/pip install -r requirements.txt && ${cmd}"
+}
+
 pipeline {
   agent any
   stages {
-    stage('Clean') {
+    stage('Clean/Setup') {
       steps {
         sh 'git clean -ffdx'
         sh 'make clean'
       }
     }
-    stage('Build/Test') {
-      parallel {
-        stage('Build') { steps { sh 'make -j 16' } }
-        stage('Test')  { steps { sh 'make testcover' } }
-        stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
-      }
-    }
+    stage('Build') { steps { virtualEnv('make -j 16') } }
+    stage('Test')  { steps { virtualEnv('make testcover') } }
+    stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
     stage('Report') {
       steps {
         archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
@@ -57,7 +57,7 @@ pipeline {
           $class: 'TasksPublisher',
           canComputeNew: false,
           defaultEncoding: '', 
-          excludePattern: '',
+          excludePattern: 'lib/python3.6/**',
           healthy: '',
           high: 'TODO,FIXME,XXX',
           low: '',
