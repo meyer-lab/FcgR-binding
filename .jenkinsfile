@@ -57,7 +57,7 @@ pipeline {
           $class: 'TasksPublisher',
           canComputeNew: false,
           defaultEncoding: '', 
-          excludePattern: '',
+          excludePattern: 'lib/python3.6/**',
           healthy: '',
           high: 'TODO,FIXME,XXX',
           low: '',
