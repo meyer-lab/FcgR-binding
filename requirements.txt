@@ -20,3 +20,4 @@ nose-cprof
 gprof2dot
 statsmodels
 tables
+numba
