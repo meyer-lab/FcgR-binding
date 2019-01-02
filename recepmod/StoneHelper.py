@@ -11,8 +11,6 @@ from memoize import memoize
 def read_chain(filename=None, ffilter=True):
     """ Reads in hdf5 file and returns the instance of StoneModel and MCMC chain """
     import os
-    import warnings
-    warnings.simplefilter(action='ignore', category=FutureWarning)
     import h5py
     import pickle
 
