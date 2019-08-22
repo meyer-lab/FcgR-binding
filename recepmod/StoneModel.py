@@ -55,7 +55,7 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
     """
     Ka = np.array(ka, dtype=np.float).reshape((1, -1))
-    return Req_Regression(Li, kx * Ka, vi, R, np.array([1.0]), Ka)
+    return Req_Regression(Li, kx * Ka, vi, np.array(R), np.array([1.0]), Ka)
 
 
 def StoneMod(logR, Ka, v, Kx, L0):
