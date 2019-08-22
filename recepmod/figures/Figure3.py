@@ -23,13 +23,13 @@ def makeFigure():
     ax, f = getSetup((7, 6), (3, 3))
 
     # Plot subplot A
-    PredictionVersusAvidity(ax[0:4])
+    # PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
-    TwoRecep(ax=ax[5:7])
+    # TwoRecep(ax=ax[5:7])
 
     # Plot of activity index versus Ka ratio
-    varyAffinity(ax=ax[7])
+    # varyAffinity(ax=ax[7])
 
     # Plot to show that highest affinity activating receptor is most sensitive to adjustment
     maxAffinity(ax=ax[8])

@@ -15,7 +15,7 @@ class StoneN():
 
     def getRmultiAll(self):
         """ Return the amount of each receptor that is found in more than a monovalent complex. """
-        return np.squeeze(self.w["Rmulti"])
+        return np.squeeze(self.w["Rmulti_n"])
 
     def getActivity(self, actV):
         """ Return the activity index. """
