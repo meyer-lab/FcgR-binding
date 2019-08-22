@@ -244,7 +244,7 @@ class TestStoneNRecpMethods(unittest.TestCase):
 
             cc = StoneN(logR, Ka, Kx, gnu, L0)
             multi = (cc.getLbnd(), cc.getRbnd(), cc.getRmultiAll())
-            mono = StoneMod(logR[0], Ka[0], gnu, Ka[0] * Kx, L0, fullOutput=True)
+            mono = StoneMod(logR[0], Ka[0], gnu, Ka[0] * Kx, L0)
             for j in range(3):
                 if j == 0:
                     self.assertTrue(np.isclose(multi[j], mono[j]))

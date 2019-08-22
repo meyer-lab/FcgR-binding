@@ -1,16 +1,9 @@
 import os
-import ctypes as ct
-from memoize import memoize
-from scipy.special import binom
 from scipy.stats import poisson
 import numpy as np
+from fcBindingModel import polyfc, Req_Regression
 
 np.seterr(over='raise')
-
-filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./recepmod.so")
-libb = ct.cdll.LoadLibrary(filename)
-libb.ReqFuncSolver.argtypes = (ct.c_double, ct.c_double, ct.c_double, ct.c_int, ct.c_double)
-libb.ReqFuncSolver.restype = ct.c_double
 
 
 def logpdf_sum(x, loc, scale):
@@ -24,9 +17,9 @@ def logpdf_sum(x, loc, scale):
     return prefactor + np.nansum(summand)
 
 
-@memoize
 def nchoosek(n):
     """ A fast cached version of nchoosek. """
+    from scipy.special import binom
     return binom(n, np.arange(n + 1))
 
 
@@ -61,12 +54,10 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     by performing the bisction algorithm on Eq 2 from Stone. The bisection
     algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
     """
-    global libb
-
-    return libb.ReqFuncSolver(R, ka, Li, vi, kx)
+    return Req_Regression(Li, kx, vi, R, np.array([1.0]), np.array(ka, dtype=np.float).reshape((1, -1)))
 
 
-def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
+def StoneMod(logR, Ka, v, Kx, L0):
     '''
     Returns the number of mutlivalent ligand bound to a cell with 10^logR
     receptors, granted each epitope of the ligand binds to the receptor
@@ -79,28 +70,22 @@ def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     v = np.int_(v)
 
     # Vector of binomial coefficients
-    Req = ReqFuncSolver(10.**logR, Ka, L0, v, Kx)
+    w = polyfc(L0, Kx, v, 10.**logR, np.array([1.0]), np.array(Ka, dtype=np.float).reshape((1, -1)))
+    Req = np.squeeze(w["Req"])
     if np.isnan(Req):
         return (np.nan, np.nan, np.nan, np.nan)
 
-    # Calculate vieq from equation 1
-    vieq = L0*Ka*Req*(nchoosek(v)[1::]) * np.power(Kx*Req, np.arange(v))
-
     # Calculate L, according to equation 7
-    Lbound = np.sum(vieq)
-
-    # If we just need the amount of ligand bound, exit here.
-    if fullOutput is False:
-        return (Lbound, np.nan, np.nan, np.nan, Req)
+    Lbound = np.squeeze(w["Lbound"])
 
     # Calculate Rmulti from equation 5
-    Rmulti = np.sum(np.multiply(vieq[1:], np.arange(2, v + 1, dtype=np.float)))
+    Rmulti = np.squeeze(w["Rmulti"])
 
     # Calculate Rbound
-    Rbnd = np.sum(np.multiply(vieq, np.arange(1, v + 1, dtype=np.float)))
+    Rbnd = np.squeeze(w["Rbound"])
 
     # Calculate numXlinks from equation 4
-    nXlink = np.sum(np.multiply(vieq[1:], np.arange(1, v, dtype=np.float)))
+    nXlink = np.squeeze(w["nXlink"])
 
     return (Lbound, Rbnd, Rmulti, nXlink, Req)
 
@@ -166,7 +151,7 @@ class StoneModel(object):
                     Kx = np.power(10, x[self.kxIDX]) * Ka
 
                     # Calculate the MFI which should result from this condition according to the model
-                    stoneModOut = StoneMod(logR,Ka,v,Kx,L0, fullOutput=fullOutput)
+                    stoneModOut = StoneMod(logR,Ka,v,Kx,L0)
                     MFI = c * stoneModOut[0]
                     if np.isnan(MFI):
                         return -np.inf

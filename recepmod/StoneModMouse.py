@@ -57,8 +57,7 @@ class StoneModelMouse(object):
                 Ka = self.kaMouse[k][l]
 
                 # Calculate the MFI which should result from this condition according to the model
-                stoneModOut = StoneMod(self.logR[k], Ka, self.v,
-                                       self.Kx * Ka, self.L0, fullOutput=True)
+                stoneModOut = StoneMod(self.logR[k], Ka, self.v, self.Kx * Ka, self.L0)
                 output[l, :, k] = np.asarray(stoneModOut, dtype=np.float)
 
         return output

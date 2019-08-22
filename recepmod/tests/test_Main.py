@@ -2,7 +2,7 @@ import random
 import unittest
 import numpy as np
 from scipy.stats import norm
-from ..StoneModel import StoneModel, nchoosek, ReqFuncSolver, logpdf_sum, StoneMod
+from ..StoneModel import StoneModel, ReqFuncSolver, logpdf_sum, StoneMod
 
 def get_random_vars():
     kai = random.random()
@@ -18,29 +18,11 @@ class TestStoneMethods(unittest.TestCase):
         self.M = StoneModel()
         self.Mold = StoneModel(False)
 
-    def test_nchoosek(self):
-        self.assertTrue(nchoosek(5)[3] == 10)
-        self.assertTrue(nchoosek(6)[3] == 20)
-        self.assertTrue(nchoosek(7)[3] == 35)
-        self.assertTrue(nchoosek(8)[3] == 56)
-        self.assertTrue(nchoosek(9)[3] == 84)
-
-    def test_reqFuncSolver(self):
-        kai, kx, vi, R, Li = get_random_vars()
-
-        diffFunAnon = lambda x: R-(10**x)*(1+vi*Li*kai*(1+kx*(10**x))**(vi-1))
-
-        output = ReqFuncSolver(R, kai, Li, vi, kx)
-
-        self.assertTrue(abs(diffFunAnon(np.log10(output))) < 1E-8)
-
-        self.assertTrue(np.isnan(ReqFuncSolver(R, kai, Li, -10, kx)))
-
     def test_StoneMod(self):
         # This test should check that the model output satisfies Rbound = Rtot - Req
         kai, kx, vi, R, Li = get_random_vars()
 
-        StoneRet = StoneMod(np.log10(R),kai,vi,kx,Li,fullOutput = True)
+        StoneRet = StoneMod(np.log10(R),kai,vi,kx,Li)
         Req = ReqFuncSolver(R,kai,Li,vi,kx)
 
         self.assertAlmostEqual(R, Req + StoneRet[1], delta = R/1000)
