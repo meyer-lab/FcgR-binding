@@ -2,7 +2,7 @@ import random
 import unittest
 import numpy as np
 from scipy.stats import norm
-from ..StoneModel import StoneModel, nchoosek, ReqFuncSolver, logpdf_sum, StoneMod
+from ..StoneModel import StoneModel, ReqFuncSolver, logpdf_sum, StoneMod
 
 def get_random_vars():
     kai = random.random()
@@ -17,13 +17,6 @@ class TestStoneMethods(unittest.TestCase):
     def setUp(self):
         self.M = StoneModel()
         self.Mold = StoneModel(False)
-
-    def test_nchoosek(self):
-        self.assertTrue(nchoosek(5)[3] == 10)
-        self.assertTrue(nchoosek(6)[3] == 20)
-        self.assertTrue(nchoosek(7)[3] == 35)
-        self.assertTrue(nchoosek(8)[3] == 56)
-        self.assertTrue(nchoosek(9)[3] == 84)
 
     def test_reqFuncSolver(self):
         kai, kx, vi, R, Li = get_random_vars()
