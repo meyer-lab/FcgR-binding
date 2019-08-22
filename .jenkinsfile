@@ -1,18 +1,13 @@
-def virtualEnv(cmd) {
-  sh "virtualenv . && source ./bin/activate && ./bin/pip install -r requirements.txt && ${cmd}"
-}
-
 pipeline {
-  agent any
+  agent { label 'docker' }
+  options {
+    timeout(time: 1, unit: 'HOURS')
+    parallelsAlwaysFailFast()
+  }
   stages {
-    stage('Clean/Setup') {
-      steps {
-        sh 'git clean -ffdx'
-        sh 'make clean'
-      }
-    }
-    stage('Build') { steps { virtualEnv('make -j 16') } }
-    stage('Test')  { steps { virtualEnv('make testcover') } }
+    stage('Clean/Setup') { steps { sh 'git clean -ffdx && make clean' } }
+    stage('Test')  { steps { sh 'make testcover' } }
+    stage('Build') { steps { sh 'make -j 16' } }
     stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
     stage('Report') {
       steps {
