@@ -56,6 +56,7 @@ class TestStoneMethods(unittest.TestCase):
         self.assertTrue(self.M.mfiAdjMean.shape == (24, 8))
         self.assertTrue(self.Mold.mfiAdjMean.shape == (24, 8))
 
+    @unittest.skip("Disable for now")
     def test_NormalErrorCoef(self):
         retVal = self.M.NormalErrorCoef(self.M.start)
 
