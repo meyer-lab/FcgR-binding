@@ -1,9 +1,10 @@
 \documentclass[11pt]{article}
 
-\usepackage{libertine}
-\usepackage{amssymb,amsmath,mathtools}
-\usepackage{ifxetex,ifluatex}
-\usepackage{microtype}
+\usepackage{amssymb, amsmath, mathtools, color, fontspec, bm}
+\usepackage{ifxetex, ifluatex, microtype, setspace, lineno}
+
+\setsansfont{DejaVuSans}
+\setmainfont{DejaVuSans}
 
 % To allow Ryan to show alterations he has made to the manuscript using colored text:
 \usepackage{color}
