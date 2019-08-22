@@ -2,7 +2,7 @@ fdir = ./Manuscript/Figures
 tdir = ./Manuscript/Templates
 pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filter.py -f markdown ./Manuscript/Text/*.md
 
-.PHONY: clean upload test profile testcover open sample
+.PHONY: clean upload test testcover open sample
 
 all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
 
@@ -68,14 +68,10 @@ open: Manuscript/index.html
 	open ./Manuscript/index.html
 
 test: venv recepmod/recepmod.so
-	. venv/bin/activate && nosetests3 -s --with-timer --timer-top-n 5
-
-profile: venv recepmod/recepmod.so
-	. venv/bin/activate && nosetests3 -s --with-timer --timer-top-n 5 --with-cprofile
-	snakeviz stats.dat
+	. venv/bin/activate && pytest
 
 testcover: venv recepmod/recepmod.so
-	. venv/bin/activate && nosetests3 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
+	. venv/bin/activate && pytest --cov=./recepmod
 
 sample: venv recepmod/recepmod.so
 	. venv/bin/activate && python3 -c "from recepmod.fitFuncs import runSampler; runSampler()"
