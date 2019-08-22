@@ -1,16 +1,11 @@
 import os
-import ctypes as ct
 from memoize import memoize
 from scipy.special import binom
 from scipy.stats import poisson
+from scipy.optimize import newton
 import numpy as np
 
 np.seterr(over='raise')
-
-filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./recepmod.so")
-libb = ct.cdll.LoadLibrary(filename)
-libb.ReqFuncSolver.argtypes = (ct.c_double, ct.c_double, ct.c_double, ct.c_int, ct.c_double)
-libb.ReqFuncSolver.restype = ct.c_double
 
 
 def logpdf_sum(x, loc, scale):
@@ -61,9 +56,16 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     by performing the bisction algorithm on Eq 2 from Stone. The bisection
     algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
     """
-    global libb
+    viLika = vi*Li*ka
 
-    return libb.ReqFuncSolver(R, ka, Li, vi, kx)
+    func = lambda x: R-x*(1+(viLika*np.power((1+kx*x), vi-3))*(1+kx*x)*(1+kx*x))
+    fprime = lambda x: -(kx*vi*x+1)*(viLika*np.power((1+kx*x), vi-3))*(1+kx*x) - 1
+    fprime2 = lambda x: -kx*(vi-1)*(viLika*np.power((1+kx*x), vi-3))*(2+kx*vi*x)
+
+    if (func(0) * func(R) > 0):
+        return np.nan
+
+    return newton(func=func, fprime=fprime, fprime2=fprime2, maxiter=1000, x0=R/2.0, tol=1.0E-9)
 
 
 def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
