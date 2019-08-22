@@ -7,15 +7,15 @@ class StoneN():
 
     def getRbnd(self):
         """ Return the amount of each receptor that is bound. """
-        return self.w["Rbound"]
+        return np.squeeze(self.w["Rbound"])
 
     def getLbnd(self):
         """ Return the amount of ligand bound. """
-        return self.w["Lbound"]
+        return np.squeeze(self.w["Lbound"])
 
     def getRmultiAll(self):
         """ Return the amount of each receptor that is found in more than a monovalent complex. """
-        return self.w["Rmulti"]
+        return np.squeeze(self.w["Rmulti"])
 
     def getActivity(self, actV):
         """ Return the activity index. """
