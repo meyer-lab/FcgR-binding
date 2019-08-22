@@ -16,4 +16,4 @@ pylint>=2.3.1
 gprof2dot
 statsmodels
 tables
-git+https://github.com/meyer-lab/fcBindingModel.git
+git+https://github.com/meyer-lab/fcBindingModel.git@20311df4618c9e3b42c7c39718bd40c9c575d765
