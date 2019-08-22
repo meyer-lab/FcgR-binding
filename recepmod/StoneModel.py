@@ -54,7 +54,8 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     by performing the bisction algorithm on Eq 2 from Stone. The bisection
     algorithm is used to find log10(Req) which satisfies Eq 2 from Stone.
     """
-    return Req_Regression(Li, kx, vi, R, np.array([1.0]), np.array(ka, dtype=np.float).reshape((1, -1)))
+    Ka = np.array(ka, dtype=np.float).reshape((1, -1))
+    return Req_Regression(Li, kx * Ka, vi, R, np.array([1.0]), Ka)
 
 
 def StoneMod(logR, Ka, v, Kx, L0):
@@ -68,9 +69,10 @@ def StoneMod(logR, Ka, v, Kx, L0):
     for TNP-4-BSA in Lux et al. (2013).
     '''
     v = np.int_(v)
+    Ka = np.array(Ka, dtype=np.float).reshape((1, -1))
 
     # Vector of binomial coefficients
-    w = polyfc(L0, Kx, v, 10.**logR, np.array([1.0]), np.array(Ka, dtype=np.float).reshape((1, -1)))
+    w = polyfc(L0, Kx * Ka, v, 10.**logR, np.array([1.0]), Ka)
     Req = np.squeeze(w["Req"])
     if np.isnan(Req):
         return (np.nan, np.nan, np.nan, np.nan)
