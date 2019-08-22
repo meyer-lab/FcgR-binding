@@ -65,7 +65,7 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     if (func(0) * func(R) > 0):
         return np.nan
 
-    return newton(func=func, fprime=fprime, fprime2=fprime2, maxiter=1000, x0=R/2.0, tol=1.0E-9)
+    return newton(func=func, fprime=fprime, fprime2=fprime2, maxiter=2000, x0=R/1.1, tol=1.0E-9)
 
 
 def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
