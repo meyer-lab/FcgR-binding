@@ -6,9 +6,14 @@ pipeline {
   }
   stages {
     stage('Clean/Setup') { steps { sh 'git clean -ffdx && make clean' } }
+    stage('Lint')  {
+      steps {
+        sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
+        recordIssues qualityGates: [[threshold: 15, type: 'TOTAL', unstable: true]], tools: [pyLint(pattern: 'pylint.log')]
+      }
+    }
     stage('Test')  { steps { sh 'make testcover' } }
     stage('Build') { steps { sh 'make -j 16' } }
-    stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
     stage('Report') {
       steps {
         archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
@@ -25,16 +30,6 @@ pipeline {
           reportFiles: 'index.html',
           reportName: 'Manuscript',
           reportTitles: ''])
-
-        step([
-          $class                     : 'WarningsPublisher',
-          parserConfigurations       : [[
-          parserName: 'PYLint',
-          pattern   : 'pylint.log'
-          ]],
-          unstableTotalAll           : '1000',
-          usePreviousBuildAsReference: true
-          ])
 
         step([
           $class: 'CoberturaPublisher',
