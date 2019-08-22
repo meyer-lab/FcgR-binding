@@ -275,7 +275,7 @@ def AffinityPredict(ax):
     edits = edits.apply(CALCapply, axis=1)
 
     # Run through regression model to get predictions
-    edits['predict'] = model.predict(edits[cellpops].as_matrix())
+    edits['predict'] = model.predict(edits[cellpops].values)
 
     # FcgR labels
     FcgRlabels = [r'mFcγRI',
