@@ -19,7 +19,7 @@ class StoneN():
 
     def getActivity(self, actV):
         """ Return the activity index. """
-        actV = np.array(actV)
+        actV = np.array(actV).reshape(1, -1)
         return max(np.dot(self.w['Rmulti_n'], actV.T), 0)
 
     def __init__(self, logR, Ka, Kx, gnu, L0):
