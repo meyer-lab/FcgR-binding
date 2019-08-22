@@ -23,14 +23,14 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
 
         term = KKRK[ii]
 
-        vGrid[slicing] *= term
+        vGrid[tuple(slicing)] *= term
 
         for jj in range(2, gnu + 1):
             slicing[ii] = jj
 
             term *= KKRK[ii]
 
-            vGrid[slicing] *= term
+            vGrid[tuple(slicing)] *= term
 
     return vGrid
 
