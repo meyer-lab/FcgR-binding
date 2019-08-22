@@ -21,3 +21,4 @@ gprof2dot
 statsmodels
 tables
 numba
+git+https://github.com/meyer-lab/fcBindingModel.git
