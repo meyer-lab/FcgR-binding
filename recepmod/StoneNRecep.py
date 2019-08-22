@@ -1,10 +1,8 @@
 import numpy as np
-from numba import jit, float64
 from memoize import memoize
 from .StoneModel import nchoosek
 
 
-@jit(float64[:,:](float64[:], float64[:], float64, float64, float64))
 def StoneVgrid(Req, Ka, gnu, Kx, L0):
     """
     This function takes in the relevant parameters and creates the v_ij grid
