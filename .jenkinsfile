@@ -12,7 +12,13 @@ pipeline {
         recordIssues qualityGates: [[threshold: 15, type: 'TOTAL', unstable: true]], tools: [pyLint(pattern: 'pylint.log')]
       }
     }
-    stage('Test')  { steps { sh 'make testcover' } }
+    stage('Test')  {
+      steps {
+        sh 'make testcover'
+        junit allowEmptyResults: false, testResults: 'junit.xml'
+        cobertura coberturaReportFile: 'coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+      }
+    }
     stage('Build') { steps { sh 'make -j 16' } }
     stage('Report') {
       steps {
@@ -30,17 +36,6 @@ pipeline {
           reportFiles: 'index.html',
           reportName: 'Manuscript',
           reportTitles: ''])
-
-        step([
-          $class: 'CoberturaPublisher',
-          autoUpdateHealth: true,
-          autoUpdateStability: true,
-          coberturaReportFile: 'coverage.xml',
-          failNoReports: true,
-          failUnhealthy: true,
-          failUnstable: true,
-          sourceEncoding: 'UTF_8',
-          zoomCoverageChart: true])
 
         step([
           $class: 'TasksPublisher',
