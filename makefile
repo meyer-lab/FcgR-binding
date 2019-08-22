@@ -71,7 +71,7 @@ test: venv recepmod/recepmod.so
 	. venv/bin/activate && pytest
 
 testcover: venv recepmod/recepmod.so
-	. venv/bin/activate && pytest --cov=./recepmod
+	. venv/bin/activate && pytest --junitxml=junit.xml --cov-branch --cov=recepmod --cov-report xml:coverage.xml
 
 sample: venv recepmod/recepmod.so
 	. venv/bin/activate && python3 -c "from recepmod.fitFuncs import runSampler; runSampler()"
