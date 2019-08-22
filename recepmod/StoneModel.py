@@ -1,6 +1,5 @@
 import os
 import ctypes as ct
-from memoize import memoize
 from scipy.special import binom
 from scipy.stats import poisson
 import numpy as np
@@ -22,12 +21,6 @@ def logpdf_sum(x, loc, scale):
     prefactor = - x.size * np.log(scale * root2pi)
     summand = -np.square((x - loc) / (root2 * scale))
     return prefactor + np.nansum(summand)
-
-
-@memoize
-def nchoosek(n):
-    """ A fast cached version of nchoosek. """
-    return binom(n, np.arange(n + 1))
 
 
 def normalizeData(filepath):
@@ -84,7 +77,7 @@ def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
         return (np.nan, np.nan, np.nan, np.nan)
 
     # Calculate vieq from equation 1
-    vieq = L0*Ka*Req*(nchoosek(v)[1::]) * np.power(Kx*Req, np.arange(v))
+    vieq = L0*Ka*Req*(binom(v, np.arange(v + 1))[1::]) * np.power(Kx*Req, np.arange(v))
 
     # Calculate L, according to equation 7
     Lbound = np.sum(vieq)

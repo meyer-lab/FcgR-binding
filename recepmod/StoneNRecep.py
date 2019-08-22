@@ -30,7 +30,7 @@ class StoneN():
         self.L0 = np.array(L0, dtype=np.float, copy=True)
 
         assert len(self.logR) == len(self.Ka), "logR and Ka must be same length."
-        assert np.all(np.finite(self.logR)), "logR has nan value."
-        assert np.all(np.finite(self.Ka)), "Ka has nan value."
+        assert np.all(np.isfinite(self.logR)), "logR has nan value."
+        assert np.all(np.isfinite(self.Ka)), "Ka has nan value."
 
         self.w = polyfc(self.L0, self.Kx, self.gnu, 10 ** self.logR, np.array([1.0]), self.Ka.reshape((1, -1)))
