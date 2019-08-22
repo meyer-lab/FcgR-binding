@@ -195,7 +195,7 @@ def AverageAvidity(ax):
     table = pd.DataFrame(list(product(logRs, Kas)), columns=['logR', 'Ka'])
 
     def avAv(x):
-        outt = StoneMod(x.logR, x.Ka, gnus, getMedianKx() * x.Ka, L0, fullOutput=True)
+        outt = StoneMod(x.logR, x.Ka, gnus, getMedianKx() * x.Ka, L0)
 
         return outt[1] / outt[0]
 
