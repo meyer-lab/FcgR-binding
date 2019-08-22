@@ -1,24 +1,29 @@
-def virtualEnv(cmd) {
-  sh "virtualenv . && source ./bin/activate && ./bin/pip install -r requirements.txt && ${cmd}"
-}
-
 pipeline {
-  agent any
+  agent { label 'docker' }
+  options {
+    timeout(time: 1, unit: 'HOURS')
+    parallelsAlwaysFailFast()
+  }
   stages {
-    stage('Clean/Setup') {
+    stage('Clean/Setup') { steps { sh 'git clean -ffdx && make clean' } }
+    stage('Lint')  {
       steps {
-        sh 'git clean -ffdx'
-        sh 'make clean'
+        sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
+        recordIssues qualityGates: [[threshold: 15, type: 'TOTAL', unstable: true]], tools: [pyLint(pattern: 'pylint.log')]
       }
     }
-    stage('Build') { steps { virtualEnv('make -j 16') } }
-    stage('Test')  { steps { virtualEnv('make testcover') } }
-    stage('Lint')  { steps { sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")' } }
+    stage('Test')  {
+      steps {
+        sh 'make testcover'
+        junit allowEmptyResults: false, testResults: 'junit.xml'
+        cobertura coberturaReportFile: 'coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+      }
+    }
+    stage('Build') { steps { sh 'make -j 16' } }
     stage('Report') {
       steps {
         archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/Manuscript.docx', onlyIfSuccessful: true
-        archiveArtifacts artifacts: 'Manuscript/ReviewResponse.pdf', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/ReviewResponse.docx', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/Manuscript.log', onlyIfSuccessful: false
         archiveArtifacts artifacts: 'Manuscript/Figures/Figure*.pdf', onlyIfSuccessful: false
@@ -31,39 +36,6 @@ pipeline {
           reportFiles: 'index.html',
           reportName: 'Manuscript',
           reportTitles: ''])
-
-        step([
-          $class                     : 'WarningsPublisher',
-          parserConfigurations       : [[
-          parserName: 'PYLint',
-          pattern   : 'pylint.log'
-          ]],
-          unstableTotalAll           : '1000',
-          usePreviousBuildAsReference: true
-          ])
-
-        step([
-          $class: 'CoberturaPublisher',
-          autoUpdateHealth: true,
-          autoUpdateStability: true,
-          coberturaReportFile: 'coverage.xml',
-          failNoReports: true,
-          failUnhealthy: true,
-          failUnstable: true,
-          sourceEncoding: 'UTF_8',
-          zoomCoverageChart: true])
-
-        step([
-          $class: 'TasksPublisher',
-          canComputeNew: false,
-          defaultEncoding: '', 
-          excludePattern: 'lib/python3.6/**',
-          healthy: '',
-          high: 'TODO,FIXME,XXX',
-          low: '',
-          normal: 'CITE',
-          pattern: '**/*.py, **/*.md',
-          unHealthy: ''])
       }
     }
   }

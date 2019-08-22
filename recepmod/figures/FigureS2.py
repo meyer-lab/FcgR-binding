@@ -67,7 +67,7 @@ def robustnessPlot(ax):
     pp = pd.DataFrame(np.array(np.meshgrid(gnus, Los)).T.reshape(-1, 2),
                       columns=['gnus', 'Los'])
 
-    pp['CPredict'] = pp.apply(lambda x: InVivoPredict(x.as_matrix())[1], axis=1)
+    pp['CPredict'] = pp.apply(lambda x: InVivoPredict(x.values)[1], axis=1)
 
     # Change avidities to strings
     pp['gnus'] = pp['gnus'].apply(lambda gnu: r'$\nu=' + str(int(gnu)) + '$')

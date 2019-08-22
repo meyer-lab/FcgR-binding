@@ -177,7 +177,7 @@ def geweke_chain(dset, cut=0):
     """
     statistics = []
     pvalues = []
-    dsett = dset.drop(['LL', 'walker'], 1).as_matrix()
+    dsett = dset.drop(['LL', 'walker'], 1).values
     for j in range(dsett.shape[1]):
         statistic, pvalue = geweke(dsett[cut:-1, j])
         statistics.append(statistic)

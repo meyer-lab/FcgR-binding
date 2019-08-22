@@ -37,10 +37,10 @@ def NimmerjahnPredictByAffinities():
                                               x.FcgRIV), axis=1)
 
     X = data[['ActMax', 'FcgRIIB']]
-    y = data['Effectiveness'].as_matrix()
+    y = data['Effectiveness'].values
 
     # Log transform to keep ratios
-    X = X.apply(np.log10).replace(-np.inf, -3).as_matrix()
+    X = X.apply(np.log10).replace(-np.inf, -3).values
 
     # Run crossvalidation predictions at the same time
     data['DirectPredict'], dp, data['CrossPredict'], cp, _ = LOOpredict(regFunc(logg=False),
@@ -93,8 +93,8 @@ def modelPrepAffinity(v, L0):
     data.loc['None', :] = 0.0
 
     # Assign independent variables and dependent variable
-    X = data[cellpops].as_matrix()
-    y = data['Effectiveness'].as_matrix()
+    X = data[cellpops].values
+    y = data['Effectiveness'].values
 
     return (X, y, data)
 

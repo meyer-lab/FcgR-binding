@@ -4,7 +4,6 @@ from memoize import memoize
 from scipy.special import binom
 from scipy.stats import poisson
 import numpy as np
-from numba import jit
 
 np.seterr(over='raise')
 
@@ -14,7 +13,6 @@ libb.ReqFuncSolver.argtypes = (ct.c_double, ct.c_double, ct.c_double, ct.c_int, 
 libb.ReqFuncSolver.restype = ct.c_double
 
 
-@jit(nopython=True, nogil=True)
 def logpdf_sum(x, loc, scale):
     """
     Normal distribution function. Sums over the likelihoods of points in x
@@ -68,7 +66,6 @@ def ReqFuncSolver(R, ka, Li, vi, kx):
     return libb.ReqFuncSolver(R, ka, Li, vi, kx)
 
 
-@jit
 def StoneMod(logR, Ka, v, Kx, L0, fullOutput=True):
     '''
     Returns the number of mutlivalent ligand bound to a cell with 10^logR

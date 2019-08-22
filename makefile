@@ -1,16 +1,21 @@
-NPROCS := 8
-
 fdir = ./Manuscript/Figures
 tdir = ./Manuscript/Templates
 pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filter.py -f markdown ./Manuscript/Text/*.md
 
-.PHONY: clean upload test profile testcover open rebuild sample sampleprofile
+.PHONY: clean upload test testcover open sample
 
-all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
+all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx Manuscript/ReviewResponse.docx
 
-$(fdir)/Figure%.svg: genFigures.py recepmod/recepmod.so
+venv: venv/bin/activate
+
+venv/bin/activate: requirements.txt
+	test -d venv || virtualenv --system-site-packages venv
+	. venv/bin/activate && pip install -Ur requirements.txt
+	touch venv/bin/activate
+
+$(fdir)/Figure%.svg: genFigures.py venv recepmod/recepmod.so
 	mkdir -p ./Manuscript/Figures
-	python3 genFigures.py $*
+	. venv/bin/activate && python3 genFigures.py $*
 
 $(fdir)/Figure%pdf: $(fdir)/Figure%svg
 	rsvg-convert -f pdf $< -o $@
@@ -33,8 +38,8 @@ Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Fig
 	pandoc -s $(pan_common) -o $@
 	rm -r ./Figures
 
-ModelData.md: recepmod/recepmod.so
-	python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('ModelData.md')"
+ModelData.md: venv recepmod/recepmod.so
+	. venv/bin/activate && python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('ModelData.md')"
 
 Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
 	pandoc -s -f markdown $< -o $@
@@ -62,19 +67,11 @@ clean:
 open: Manuscript/index.html
 	open ./Manuscript/index.html
 
-test: recepmod/recepmod.so
-	nosetests3 -s --with-timer --timer-top-n 5
+test: venv recepmod/recepmod.so
+	. venv/bin/activate && pytest
 
-profile: recepmod/recepmod.so
-	nosetests3 -s --with-timer --timer-top-n 5 --with-cprofile
-	snakeviz stats.dat
+testcover: venv recepmod/recepmod.so
+	. venv/bin/activate && pytest --junitxml=junit.xml --cov-branch --cov=recepmod --cov-report xml:coverage.xml
 
-testcover: recepmod/recepmod.so
-	nosetests3 --with-xunit --with-xcoverage --cover-package=recepmod -s --with-timer --timer-top-n 5
-
-sample: recepmod/recepmod.so
-	python3 -c "from recepmod.fitFuncs import runSampler; runSampler()"
-
-sampleprofile: recepmod/recepmod.so
-	python3 -c "from recepmod.fitFuncs import runSampler; import cProfile; cProfile.run('runSampler(niters=200, npar=1)', 'stats.dat')"
-	snakeviz stats.dat
+sample: venv recepmod/recepmod.so
+	. venv/bin/activate && python3 -c "from recepmod.fitFuncs import runSampler; runSampler()"
