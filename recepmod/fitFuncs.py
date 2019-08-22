@@ -41,7 +41,6 @@ def runSampler(niters=400000, thin=400, newData=True, filename="./recepmod/data/
     """ Run the sampling. """
     from emcee import EnsembleSampler
     from .StoneModel import StoneModel
-    from tqdm import tqdm
 
     # Load model
     StoneM = StoneModel(newData)
@@ -58,7 +57,7 @@ def runSampler(niters=400000, thin=400, newData=True, filename="./recepmod/data/
     # Setup thinning tracking
     thinTrack = -thin
 
-    for p, lnprob, _ in tqdm(sampler.sample(p0, iterations=niters, storechain=False), total=niters):
+    for p, lnprob, _ in sampler.sample(p0, iterations=niters, storechain=False):
         if thinTrack < thin:
             thinTrack += 1
         else:
