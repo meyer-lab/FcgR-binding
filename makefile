@@ -13,7 +13,7 @@ venv/bin/activate: requirements.txt
 	. venv/bin/activate && pip install -Ur requirements.txt
 	touch venv/bin/activate
 
-$(fdir)/Figure%.svg: genFigures.py venv recepmod/recepmod.so
+$(fdir)/Figure%.svg: genFigures.py venv
 	mkdir -p ./Manuscript/Figures
 	. venv/bin/activate && python3 genFigures.py $*
 
@@ -22,9 +22,6 @@ $(fdir)/Figure%pdf: $(fdir)/Figure%svg
 
 $(fdir)/Figure%eps: $(fdir)/Figure%svg
 	rsvg-convert -f eps $< -o $@
-
-recepmod/recepmod.so: recepmod/solverC.cpp
-	g++ -std=c++11 -mavx -march=native $< -O3 --shared -fPIC -lm -o $@
 
 Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
@@ -38,7 +35,7 @@ Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Fig
 	pandoc -s $(pan_common) -o $@
 	rm -r ./Figures
 
-ModelData.md: venv recepmod/recepmod.so
+ModelData.md: venv
 	. venv/bin/activate && python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('ModelData.md')"
 
 Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
@@ -61,17 +58,17 @@ Manuscript/CoverLetterResponse.pdf: Manuscript/CoverLetterResponse.md
 
 clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
-	rm -f $(fdir)/Figure* recepmod/recepmod.so ModelData.md profile.p* stats.dat .coverage nosetests.xml
+	rm -f $(fdir)/Figure* ModelData.md profile.p* stats.dat .coverage nosetests.xml
 	rm -f Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
 
 open: Manuscript/index.html
 	open ./Manuscript/index.html
 
-test: venv recepmod/recepmod.so
+test: venv
 	. venv/bin/activate && pytest
 
-testcover: venv recepmod/recepmod.so
+testcover: venv
 	. venv/bin/activate && pytest --junitxml=junit.xml --cov-branch --cov=recepmod --cov-report xml:coverage.xml
 
-sample: venv recepmod/recepmod.so
+sample: venv
 	. venv/bin/activate && python3 -c "from recepmod.fitFuncs import runSampler; runSampler()"
