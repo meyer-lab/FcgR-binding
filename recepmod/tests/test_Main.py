@@ -46,7 +46,7 @@ class TestStoneMethods(unittest.TestCase):
         for i in range(100):
             L = i / 100.0
 
-            StoneRet = StoneMod(0.0,1,1,3,L)
+            StoneRet = StoneMod(0.0, 1.0, 1, 3.0, L)
 
             self.assertAlmostEqual(StoneRet[0], L / (1 + L), delta = 0.0001)
 
