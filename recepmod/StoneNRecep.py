@@ -149,6 +149,6 @@ class StoneN(object):
             raise ValueError("Ka has nan value.")
 
         self.Req = Req_Regression(self.L0, self.Kx, self.gnu, np.power(10, self.logR), np.array([1.0]), self.Ka.reshape(1, -1))
-        self.Req = np.log10(np.squeeze(self.Req))
+        self.Req = np.squeeze(self.Req)
 
-        self.vgridOut = StoneVgrid(np.power(10, self.Req), self.Ka, self.gnu, self.Kx, self.L0)
+        self.vgridOut = StoneVgrid(self.Req, self.Ka, self.gnu, self.Kx, self.L0)
