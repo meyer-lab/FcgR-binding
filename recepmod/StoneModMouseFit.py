@@ -42,8 +42,7 @@ def NimmerjahnPredictByAffinities():
     X = X.apply(np.log10).replace(-np.inf, -3).values
 
     # Run crossvalidation predictions at the same time
-    data['DirectPredict'], dp, data['CrossPredict'], cp, _ = LOOpredict(regFunc(logg=False),
-                                                                        X, y)
+    data['DirectPredict'], dp, data['CrossPredict'], cp, _ = LOOpredict(regFunc(), X, y)
 
     return (dp, cp, data)
 
