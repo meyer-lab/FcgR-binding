@@ -138,8 +138,7 @@ class StoneN:
         self.logR = np.array(logR, dtype=np.float, copy=True)
         self.Ka = np.array(Ka, dtype=np.float, copy=True)
         self.Kx = np.array(Kx * Ka[0], dtype=np.float, copy=True)
-        assert isinstance(gnu, int)
-        self.gnu = gnu
+        self.gnu = int(gnu)
         self.L0 = np.array(L0, dtype=np.float, copy=True)
 
         if len(self.logR) != len(self.Ka):
