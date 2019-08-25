@@ -8,7 +8,7 @@ pipeline {
     stage('Clean/Setup') { steps { sh 'git clean -ffdx && make clean' } }
     stage('Lint')  {
       steps {
-        sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
+        sh '(pylint3 --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
         recordIssues qualityGates: [[threshold: 15, type: 'TOTAL', unstable: true]], tools: [pyLint(pattern: 'pylint.log')]
       }
     }
