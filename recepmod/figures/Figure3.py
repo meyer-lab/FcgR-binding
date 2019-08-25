@@ -26,7 +26,7 @@ def makeFigure():
     PredictionVersusAvidity(ax[0:4])
 
     # Plot from two receptor model
-    # TwoRecep(ax=ax[5:7])
+    TwoRecep(ax=ax[5:7])
 
     # Plot of activity index versus Ka ratio
     # varyAffinity(ax=ax[7])

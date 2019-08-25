@@ -111,7 +111,7 @@ def StoneRmultiAll(vGrid):
     return StoneRbnd(vGrid)
 
 
-class StoneN(object):
+class StoneN:
     """ Use a class to keep track of the various parameters. """
 
     def getRbnd(self):
