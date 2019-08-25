@@ -1,36 +1,9 @@
 import unittest
 import numpy as np
-from ..StoneNRecep import StoneVgrid, StoneRbnd, StoneN
+from ..StoneNRecep import StoneN
 
 
 class TestStoneNRecpMethods(unittest.TestCase):
-    def test_StoneVgrid(self):
-        Req = np.array([1000, 1000], dtype=np.float64)
-        Ka = np.array([1000, 2000], dtype=np.float64)
-        L0 = 1.000E-7
-        Kx = 1.0E-5
-        gnu = 4
-
-        output = StoneVgrid(Req, Ka, gnu, Kx, L0)
-
-        # Check that the grid is setup appropriately
-        for ii in range(gnu + 1):
-            for jj in range(gnu + 1):
-                if ii + jj > gnu:
-                    self.assertEqual(output[ii, jj], 0)
-                elif ii == 0 and jj == 0:
-                    self.assertEqual(output[ii, jj], 0)
-                else:
-                    self.assertNotEqual(output[ii, jj], 0)
-
-        # Kx is specified in the reference of the first receptor
-        Kx = Ka[1] / Ka[0] * Kx
-
-        # Assemble the grid for the mirror case
-        output2 = StoneVgrid(np.flipud(Req), np.flipud(Ka), gnu, Kx, L0)
-
-        # Check that detailed balance holds
-        self.assertTrue(np.all(np.isclose(output, np.transpose(output2))))
 
     def test_boundMult(self):
         from itertools import permutations
@@ -53,89 +26,6 @@ class TestStoneNRecpMethods(unittest.TestCase):
         a = [3, 1, 1, 0, 0, 0]
         for perm in permutations(a):
             self.assertEqual(boundMult(perm), 20, "Testing vector: " + str(perm))
-
-    def test_vGridVar(self):
-        """ Test that varying Req and Ka provides the expected results. """
-        Req = np.array([1E4, 1E3], dtype=np.float64)
-        Ka = np.array([1E3, 1E3], dtype=np.float64)
-        L0 = 1.000E-7
-        Kx = 1.0E-5
-        gnu = 4
-
-        output = StoneVgrid(Req, Ka, gnu, Kx, L0)
-        self.assertGreater(output[3, 0], output[0, 3])
-
-        Req = np.flipud(Req)
-        output = StoneVgrid(Req, Ka, gnu, Kx, L0)
-        self.assertLess(output[3, 0], output[0, 3])
-
-        Req[0:2] = [1E3, 1E3]
-        Ka[0:2] = [1E4, 1E3]
-
-        output = StoneVgrid(Req, Ka, gnu, Kx, L0)
-        self.assertGreater(output[3, 0], output[0, 3])
-
-        Ka = np.flipud(Ka)
-        output = StoneVgrid(Req, Ka, gnu, Kx, L0)
-        self.assertLess(output[3, 0], output[0, 3])
-
-    def test_StoneRbnd(self):
-        from ..StoneNRecep import StoneRmultiAll
-
-        gnu = 4
-
-        vGrid = np.ones([gnu + 1, gnu + 1], dtype=np.float64)
-        vGrid[0, 0] = 0
-
-        for ii in range(vGrid.shape[0]):
-            for jj in range(vGrid.shape[0]):
-                if ii + jj > gnu:
-                    vGrid[ii, jj] = 0
-
-        output = StoneRbnd(vGrid)
-        outputmulti = StoneRmultiAll(vGrid)
-
-        self.assertEqual(output[0], 20)
-        self.assertEqual(output[1], 20)
-        self.assertEqual(outputmulti[0], 19)
-        self.assertEqual(outputmulti[1], 19)
-
-        vGrid[2, 0] = 2
-
-        output = StoneRbnd(vGrid)
-        outputmulti = StoneRmultiAll(vGrid)
-
-        self.assertEqual(output[0], 22)
-        self.assertEqual(output[1], 20)
-        self.assertEqual(outputmulti[0], 21)
-        self.assertEqual(outputmulti[1], 19)
-
-    # This processes checks that the relationships with Rbnd make sense when
-    # considering variation in Req and Ka
-    def test_Rbnd_vGrid(self):
-        logR = np.array([3, 2], dtype=np.float64)
-        Ka = np.array([1E4, 1E4], dtype=np.float64)
-        gnu = 10
-        Kx = 1E-5
-        L0 = 1E-5
-
-        Rbnd = StoneRbnd(StoneVgrid(np.power(10, logR), Ka, gnu, Kx, L0))
-
-        self.assertGreater(Rbnd[0], Rbnd[1])
-
-        logR = np.flipud(logR)
-
-        Rbnd = StoneRbnd(StoneVgrid(np.power(10, logR), Ka, gnu, Kx, L0))
-
-        self.assertGreater(Rbnd[1], Rbnd[0])
-
-        logR[0:2] = 2.0
-
-        Ka[0:2] = [1E4, 1E5]
-
-        Rbnd = StoneRbnd(StoneVgrid(np.power(10, logR), Ka, gnu, Kx, L0))
-
-        self.assertGreater(Rbnd[1], Rbnd[0])
 
 
     def test_all(self):
