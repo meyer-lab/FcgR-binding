@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from ..StoneNRecep import StoneVgrid, reqSolver, StoneRbnd, StoneN
+from ..StoneNRecep import StoneVgrid, StoneRbnd, StoneN
 
 
 class TestStoneNRecpMethods(unittest.TestCase):
@@ -137,49 +137,6 @@ class TestStoneNRecpMethods(unittest.TestCase):
 
         self.assertGreater(Rbnd[1], Rbnd[0])
 
-    def retReqDebug(self, logR, Ka):
-        gnu = 10
-        Kx = 1E-5
-        L0 = 1E-5
-
-        output = reqSolver(logR, Ka, gnu, Kx, L0)
-
-        vGrid = StoneVgrid(np.power(10, output), Ka, gnu, Kx, L0)
-
-        Rbnd = StoneRbnd(vGrid)
-
-        Rtot = np.power(10, output) + Rbnd
-
-        deltaR = np.linalg.norm(Rtot - np.power(10, logR))
-
-        self.assertAlmostEqual(deltaR, 0.0, delta=0.1, msg="Mass balance failed on reqSolver")
-
-        return (output, vGrid, Rbnd)
-
-    def test_reqSolver(self):
-        """ Run various tests to verify reqSolver function. """
-
-        logR = np.array([5, 5], dtype=np.float64)
-        Ka = np.array([1E5, 1E4], dtype=np.float64)
-
-        output, _, _ = self.retReqDebug(logR, Ka)
-        self.assertGreater(output[1], output[0])
-
-        # Flip Ka around and see the relationship still applies
-        Ka[0:2] = [1.0E2, 1.0E6]
-        output, _, _ = self.retReqDebug(logR, Ka)
-        self.assertGreater(output[0], output[1])
-
-        # Now keep Ka equal but have asymmetric expression
-        Ka[0:2] = 1.0E5
-        logR[0:2] = [4.0, 5.0]
-        output, _, _ = self.retReqDebug(logR, Ka)
-        self.assertGreater(output[1], output[0])
-
-        # And perform same with expression switched
-        logR[0:2] = [5.0, 4.0]
-        output, _, _ = self.retReqDebug(logR, Ka)
-        self.assertGreater(output[0], output[1])
 
     def test_all(self):
         logR = np.array([5, 5, 5, 5], dtype=np.float64)
