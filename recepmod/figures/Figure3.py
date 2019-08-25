@@ -32,7 +32,7 @@ def makeFigure():
     # varyAffinity(ax=ax[7])
 
     # Plot to show that highest affinity activating receptor is most sensitive to adjustment
-    # maxAffinity(ax=ax[8])
+    maxAffinity(ax=ax[8])
 
     for ii, item in enumerate(ax):
         subplotLabel(item, string.ascii_uppercase[ii])
