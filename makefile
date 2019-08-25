@@ -55,7 +55,7 @@ open: Manuscript/index.html
 	open ./Manuscript/index.html
 
 pylint.log: venv .pylintrc
-	. venv/bin/activate && (pylint --rcfile=./common/pylintrc ckine > pylint.log || echo "pylint3 exited with $?")
+	. venv/bin/activate && (pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint3 exited with $?")
 
 test: venv
 	. venv/bin/activate && pytest
