@@ -1,5 +1,6 @@
 import numpy as np
 from memoize import memoize
+from fcBindingModel import Req_Regression
 from .StoneModel import nchoosek
 
 
@@ -12,7 +13,7 @@ def StoneVgrid(Req, Ka, gnu, Kx, L0):
     """
 
     # Get vGrid with the combinatorics all worked out
-    vGrid = vGridInit(gnu, len(Req)) * (L0 * Ka[0] / Kx)
+    vGrid = vGridInit(gnu, Req.size) * (L0 * Ka[0] / Kx)
 
     # Precalculate outside terms
     KKRK = np.multiply(Ka, Req) / Ka[0] * Kx
@@ -207,6 +208,7 @@ class StoneN(object):
         elif np.any(np.isnan(self.Ka)):
             raise ValueError("Ka has nan value.")
 
-        self.Req = reqSolver(self.logR, self.Ka, self.gnu, self.Kx, self.L0)
+        self.Req = Req_Regression(self.L0, self.Kx, self.gnu, np.power(10, self.logR), np.array([1.0]), self.Ka.reshape(1, -1))
+        self.Req = np.log10(np.squeeze(self.Req))
 
         self.vgridOut = StoneVgrid(np.power(10, self.Req), self.Ka, self.gnu, self.Kx, self.L0)
