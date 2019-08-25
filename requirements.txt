@@ -6,7 +6,6 @@ seaborn==0.8.1
 numpy==1.17.0
 emcee==2.2.1
 h5py==2.9.0
-memoize2==0.1.1
 pytablewriter
 pytest
 pytest-cov
