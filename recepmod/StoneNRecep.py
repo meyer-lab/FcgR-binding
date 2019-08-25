@@ -148,7 +148,7 @@ class StoneN:
         elif np.any(np.isnan(self.Ka)):
             raise ValueError("Ka has nan value.")
 
-        self.Req = Req_Regression(self.L0, self.Kx, self.gnu, np.power(10, self.logR), np.array([1.0]), self.Ka.reshape(1, -1))
+        self.Req = Req_Regression(self.L0.copy(), self.Kx.copy(), self.gnu, np.power(10, self.logR), np.array([1.0]), self.Ka.reshape(1, -1))
         self.Req = np.squeeze(self.Req)
         
         assert self.Req.size == self.Ka.size
