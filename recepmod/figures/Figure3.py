@@ -29,7 +29,7 @@ def makeFigure():
     TwoRecep(ax=ax[5:7])
 
     # Plot of activity index versus Ka ratio
-    # varyAffinity(ax=ax[7])
+    varyAffinity(ax=ax[7])
 
     # Plot to show that highest affinity activating receptor is most sensitive to adjustment
     maxAffinity(ax=ax[8])
@@ -52,7 +52,7 @@ def makeFigure():
 
 
 def plotRanges():
-    avidity = np.logspace(0, 5, 6, base=2, dtype=np.int)
+    avidity = np.logspace(0, 4, 5, base=2, dtype=np.int)
     ligand = np.logspace(start=-12, stop=-5, num=subsplits)
     Ka = [1.2E6, 1.2E5]  # FcgRIIIA-Phe - IgG1, FcgRIIB - IgG1
     logR = [4.0, 4.5]
