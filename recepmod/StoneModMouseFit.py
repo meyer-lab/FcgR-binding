@@ -131,7 +131,7 @@ def InVivoPredict(inn=None):
     tbl['Error'] = np.square(tbl.CPredict - y)
 
     for ii, item in enumerate(cellpops):
-        tbl[item + 'eff'] = tbl[item] * np.power(10, model.res.x[ii]) / model.scale.scale_[ii]
+        tbl[item + 'eff'] = tbl[item] * model.res.x[ii] / model.scale.scale_[ii]
 
     return (dperf, cperf, tbl, model)
 
