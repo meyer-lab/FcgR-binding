@@ -4,7 +4,7 @@ pan_common = -F pandoc-crossref -F pandoc-citeproc --filter=$(tdir)/figure-filte
 
 .PHONY: clean upload test testcover open sample
 
-all: Manuscript/index.html Manuscript/Manuscript.pdf Manuscript/Manuscript.docx Manuscript/CoverLetter.docx Manuscript/ReviewResponse.docx
+all: Manuscript/Manuscript.pdf Manuscript/CoverLetter.docx Manuscript/ReviewResponse.docx pylint.log
 
 venv: venv/bin/activate
 
@@ -26,14 +26,6 @@ $(fdir)/Figure%eps: $(fdir)/Figure%svg
 Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
 	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
-
-Manuscript/index.html: Manuscript/Text/*.md $(fdir)/Figure1.svg $(fdir)/Figure2.svg $(fdir)/Figure3.svg $(fdir)/Figure4.svg $(fdir)/FigureS2.svg $(fdir)/FigureAA.svg
-	pandoc -s $(pan_common) -t html5 --mathjax -c ./Templates/kultiad.css --template=$(tdir)/html.template -o $@
-
-Manuscript/Manuscript.docx: Manuscript/Text/*.md $(fdir)/Figure1.eps $(fdir)/Figure2.eps $(fdir)/Figure3.eps $(fdir)/Figure4.eps $(fdir)/FigureS2.eps $(fdir)/FigureAA.eps
-	cp -R $(fdir) ./
-	pandoc -s $(pan_common) -o $@
-	rm -r ./Figures
 
 ModelData.md: venv
 	. venv/bin/activate && python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('ModelData.md')"
@@ -57,13 +49,16 @@ Manuscript/CoverLetterResponse.pdf: Manuscript/CoverLetterResponse.md
 	pandoc --pdf-engine=xelatex --template=/Users/asm/.pandoc/letter-templ.tex $< -o $@
 
 clean:
-	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
+	rm -f ./Manuscript/Manuscript.* Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
 	rm -f $(fdir)/Figure* ModelData.md profile.p* stats.dat .coverage nosetests.xml
 	rm -f Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
 	rm -rf venv
 
 open: Manuscript/index.html
 	open ./Manuscript/index.html
+
+pylint.log: venv .pylintrc
+	. venv/bin/activate && (pylint --rcfile=./common/pylintrc ckine > pylint.log || echo "pylint3 exited with $?")
 
 test: venv
 	. venv/bin/activate && pytest
