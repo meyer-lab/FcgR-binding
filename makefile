@@ -60,6 +60,7 @@ clean:
 	rm -f ./Manuscript/Manuscript.* ./Manuscript/index.html Manuscript/CoverLetter.docx Manuscript/CoverLetter.pdf
 	rm -f $(fdir)/Figure* ModelData.md profile.p* stats.dat .coverage nosetests.xml
 	rm -f Manuscript/ReviewResponse.docx Manuscript/ReviewResponse.pdf
+	rm -rf venv
 
 open: Manuscript/index.html
 	open ./Manuscript/index.html

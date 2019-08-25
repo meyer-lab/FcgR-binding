@@ -1,7 +1,6 @@
 import unittest
-import itertools
 import numpy as np
-from ..StoneNRecep import StoneVgrid, reqSolver, StoneRbnd, StoneN
+from ..StoneNRecep import StoneVgrid, StoneRbnd, StoneN
 
 
 class TestStoneNRecpMethods(unittest.TestCase):
@@ -138,49 +137,6 @@ class TestStoneNRecpMethods(unittest.TestCase):
 
         self.assertGreater(Rbnd[1], Rbnd[0])
 
-    def retReqDebug(self, logR, Ka):
-        gnu = 10
-        Kx = 1E-5
-        L0 = 1E-5
-
-        output = reqSolver(logR, Ka, gnu, Kx, L0)
-
-        vGrid = StoneVgrid(np.power(10, output), Ka, gnu, Kx, L0)
-
-        Rbnd = StoneRbnd(vGrid)
-
-        Rtot = np.power(10, output) + Rbnd
-
-        deltaR = np.linalg.norm(Rtot - np.power(10, logR))
-
-        self.assertAlmostEqual(deltaR, 0.0, delta=0.1, msg="Mass balance failed on reqSolver")
-
-        return (output, vGrid, Rbnd)
-
-    def test_reqSolver(self):
-        """ Run various tests to verify reqSolver function. """
-
-        logR = np.array([5, 5], dtype=np.float64)
-        Ka = np.array([1E5, 1E4], dtype=np.float64)
-
-        output, _, _ = self.retReqDebug(logR, Ka)
-        self.assertGreater(output[1], output[0])
-
-        # Flip Ka around and see the relationship still applies
-        Ka[0:2] = [1.0E2, 1.0E6]
-        output, _, _ = self.retReqDebug(logR, Ka)
-        self.assertGreater(output[0], output[1])
-
-        # Now keep Ka equal but have asymmetric expression
-        Ka[0:2] = 1.0E5
-        logR[0:2] = [4.0, 5.0]
-        output, _, _ = self.retReqDebug(logR, Ka)
-        self.assertGreater(output[1], output[0])
-
-        # And perform same with expression switched
-        logR[0:2] = [5.0, 4.0]
-        output, _, _ = self.retReqDebug(logR, Ka)
-        self.assertGreater(output[0], output[1])
 
     def test_all(self):
         logR = np.array([5, 5, 5, 5], dtype=np.float64)
@@ -206,29 +162,6 @@ class TestStoneNRecpMethods(unittest.TestCase):
             self.assertTrue(np.isclose(rmulti[0], rmulti[ii]))
             self.assertTrue(np.isclose(rbnd[0], rbnd[ii]))
 
-    def test_activity(self):
-        """
-        This test reduces the affinity of a low abundance receptor and makes sure there aren't changes.
-        It sets all combinations of one and two receptors to low expression, then changes those receptor
-        affinities.
-        """
-
-        Kx = np.power(10, -12.5)
-        gnu = 4
-        L0 = 1E-9
-        activity = [1, -1, 1, 1]
-
-        for ii in list(itertools.combinations(range(4), 2)) + list(range(4)):
-            logR = np.full((4,), 3, dtype=np.float64)
-            logR[np.array(ii)] = -6
-            Ka = np.array([1E5, 1E4, 1E5, 1E5], dtype=np.float64)
-
-            one = StoneN(logR, Ka, Kx, gnu, L0).getActivity(activity)
-
-            Ka[np.array(ii)] = 1E-6
-
-            self.assertTrue(np.isclose(one,
-                                       StoneN(logR, Ka, Kx, gnu, L0).getActivity(activity)))
 
     def test_simplify_to_monovalent(self):
         """ Check that the generalized multi-receptor model simplifies to
