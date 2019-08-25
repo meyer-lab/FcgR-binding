@@ -138,7 +138,7 @@ class StoneN:
         self.logR = np.array(logR, dtype=np.float, copy=True)
         self.Ka = np.array(Ka, dtype=np.float, copy=True)
         self.Kx = np.array(Kx * Ka[0], dtype=np.float, copy=True)
-        self.gnu = int(gnu)
+        self.gnu = np.array(gnu, dtype=np.int, copy=True)
         self.L0 = np.array(L0, dtype=np.float, copy=True)
 
         if len(self.logR) != len(self.Ka):
@@ -150,7 +150,5 @@ class StoneN:
 
         self.Req = Req_Regression(self.L0, self.Kx / Ka[0], self.gnu, np.power(10, self.logR), np.array([1.0]), self.Ka.reshape(1, -1))
         self.Req = np.squeeze(self.Req)
-        
-        assert self.Req.size == self.Ka.size
 
         self.vgridOut = StoneVgrid(self.Req, self.Ka, self.gnu, self.Kx, self.L0)
