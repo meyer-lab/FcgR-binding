@@ -5,7 +5,6 @@ and processing predictions from the StoneMod classes.
 
 import numpy as np
 import pandas as pd
-from memoize import memoize
 
 
 def read_chain(filename=None, ffilter=True):
@@ -54,7 +53,6 @@ def rep(x, N):
     return [item for item in x for _ in range(N)]
 
 
-@memoize
 def getMedianKx():
     """ Read the MCMC chain and find the median Kx. Cached for sanity. """
     return np.power(10, np.median((read_chain()[1])['Kx1']))

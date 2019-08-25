@@ -1,7 +1,6 @@
 from collections import OrderedDict
 import pandas as pd
 import numpy as np
-from memoize import memoize
 from .regFunc import regFunc
 from .StoneModMouse import StoneModelMouse
 
@@ -49,7 +48,6 @@ def NimmerjahnPredictByAffinities():
     return (dp, cp, data)
 
 
-@memoize
 def caller(**kwargs):
     from .StoneNRecep import StoneN
     return StoneN(**kwargs).getActivity([1, -1, 1, 1])
@@ -121,7 +119,6 @@ def LOOpredict(lr, X, y):
     return (dirPred, direct_perf, crossPred, crossval_perf, lr)
 
 
-@memoize
 def InVivoPredict(inn=None):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     if inn is None:
