@@ -1,8 +1,6 @@
 import unittest
-import warnings
 import numpy
 from ..StoneModel import StoneModel
-warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 
 # pylint: disable=R0201
 

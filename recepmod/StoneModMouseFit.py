@@ -1,7 +1,6 @@
 from collections import OrderedDict
 import pandas as pd
 import numpy as np
-from memoize import memoize
 from .regFunc import regFunc
 from .StoneModMouse import StoneModelMouse
 
@@ -43,13 +42,11 @@ def NimmerjahnPredictByAffinities():
     X = X.apply(np.log10).replace(-np.inf, -3).values
 
     # Run crossvalidation predictions at the same time
-    data['DirectPredict'], dp, data['CrossPredict'], cp, _ = LOOpredict(regFunc(logg=False),
-                                                                        X, y)
+    data['DirectPredict'], dp, data['CrossPredict'], cp, _ = LOOpredict(regFunc(), X, y)
 
     return (dp, cp, data)
 
 
-@memoize
 def caller(**kwargs):
     from .StoneNRecep import StoneN
     return StoneN(**kwargs).getActivity([1, -1, 1, 1])
@@ -121,7 +118,6 @@ def LOOpredict(lr, X, y):
     return (dirPred, direct_perf, crossPred, crossval_perf, lr)
 
 
-@memoize
 def InVivoPredict(inn=None):
     """ Cross validate KnockdownLasso by using a pair of rows as test set """
     if inn is None:
@@ -135,7 +131,7 @@ def InVivoPredict(inn=None):
     tbl['Error'] = np.square(tbl.CPredict - y)
 
     for ii, item in enumerate(cellpops):
-        tbl[item + 'eff'] = tbl[item] * np.power(10, model.res.x[ii]) / model.scale.scale_[ii]
+        tbl[item + 'eff'] = tbl[item] * model.res.x[ii] / model.scale.scale_[ii]
 
     return (dperf, cperf, tbl, model)
 
