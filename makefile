@@ -20,9 +20,6 @@ $(fdir)/Figure%.svg: genFigures.py venv
 $(fdir)/Figure%pdf: $(fdir)/Figure%svg
 	rsvg-convert -f pdf $< -o $@
 
-$(fdir)/Figure%eps: $(fdir)/Figure%svg
-	rsvg-convert -f eps $< -o $@
-
 Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf
 	(cd ./Manuscript && latexmk -xelatex -f -quiet)
 	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
