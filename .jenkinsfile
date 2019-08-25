@@ -6,12 +6,6 @@ pipeline {
   }
   stages {
     stage('Clean/Setup') { steps { sh 'git clean -ffdx && make clean' } }
-    stage('Lint')  {
-      steps {
-        sh '(pylint --rcfile=.pylintrc recepmod > pylint.log || echo "pylint exited with $?")'
-        recordIssues qualityGates: [[threshold: 15, type: 'TOTAL', unstable: true]], tools: [pyLint(pattern: 'pylint.log')]
-      }
-    }
     stage('Test')  {
       steps {
         sh 'make testcover'
@@ -22,20 +16,10 @@ pipeline {
     stage('Build') { steps { sh 'make -j 16' } }
     stage('Report') {
       steps {
+        recordIssues qualityGates: [[threshold: 15, type: 'TOTAL', unstable: true]], tools: [pyLint(pattern: 'pylint.log')]
         archiveArtifacts artifacts: 'Manuscript/Manuscript.pdf', onlyIfSuccessful: true
-        archiveArtifacts artifacts: 'Manuscript/Manuscript.docx', onlyIfSuccessful: true
         archiveArtifacts artifacts: 'Manuscript/ReviewResponse.docx', onlyIfSuccessful: true
-        archiveArtifacts artifacts: 'Manuscript/Manuscript.log', onlyIfSuccessful: false
         archiveArtifacts artifacts: 'Manuscript/Figures/Figure*.pdf', onlyIfSuccessful: false
-
-        publishHTML([
-          allowMissing: false,
-          alwaysLinkToLastBuild: false,
-          keepAll: false,
-          reportDir: 'Manuscript',
-          reportFiles: 'index.html',
-          reportName: 'Manuscript',
-          reportTitles: ''])
       }
     }
   }
