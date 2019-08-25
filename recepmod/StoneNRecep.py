@@ -74,16 +74,11 @@ def vGridInit(gnu, Nrep):
 
 def sumNonDims(vGridIn, dimm):
     """ Collapse array along nonfocus dimensions. """
-    if dimm > len(vGridIn.shape):
-        raise IndexError("sumNonDims: Dimension to keep is out of range.")
+    assert dimm < vGridIn.ndim, "sumNonDims: Dimension to keep is out of range."
 
-    vGridIn = vGridIn.copy()
+    dimss = tuple([i for i in range(vGridIn.ndim) if i != dimm])
 
-    for ii in reversed(range(len(vGridIn.shape))):
-        if ii != dimm:
-            vGridIn = np.sum(vGridIn, axis=ii)
-
-    return vGridIn
+    return np.sum(vGridIn, axis=dimss)
 
 
 def StoneRbnd(vGrid):
