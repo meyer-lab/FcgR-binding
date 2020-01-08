@@ -21,9 +21,8 @@ $(fdir)/Figure%.svg: genFigures.py venv
 $(fdir)/Figure%pdf: $(fdir)/Figure%svg
 	rsvg-convert -f pdf $< -o $@
 
-Manuscript/Manuscript.pdf: Manuscript/Manuscript.tex $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf
-	(cd ./Manuscript && latexmk -xelatex -f -quiet)
-	rm -f ./Manuscript/Manuscript.b* ./Manuscript/Manuscript.aux ./Manuscript/Manuscript.fls
+Manuscript/Manuscript.pdf: Manuscript/Text/*.md $(fdir)/Figure1.pdf $(fdir)/Figure2.pdf $(fdir)/Figure3.pdf $(fdir)/Figure4.pdf $(fdir)/FigureS2.pdf $(fdir)/FigureAA.pdf
+	pandoc -s $(pan_common) --template=$(tdir)/default.latex --pdf-engine=xelatex -o $@
 
 ModelData.md: venv
 	. venv/bin/activate && python3 -c "from recepmod.StoneModMouse import StoneModelMouse; StoneModelMouse().writeModelData('ModelData.md')"
@@ -33,9 +32,6 @@ Manuscript/ReviewResponse.docx: Manuscript/ReviewResponse.md
 
 Manuscript/ReviewResponse.pdf: Manuscript/ReviewResponse.md
 	pandoc -s --pdf-engine=xelatex -f markdown $< -o $@
-
-Manuscript/Manuscript.tex: Manuscript/Text/*.md
-	pandoc -s $(pan_common) --template=$(tdir)/default.latex --pdf-engine=xelatex -o $@
 
 Manuscript/CoverLetter.docx: Manuscript/CoverLetter.md
 	pandoc -f markdown $< -o $@
