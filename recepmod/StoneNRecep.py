@@ -44,10 +44,7 @@ def polyfc(L0, KxStar, f, Rtot, IgGC, Kav, ActV=None):
     w = dict()
     w['Lbound'] = L0 / KxStar * ((1 + Phisum)**f - 1)
     w['Rbound'] = L0 / KxStar * f * Phisum * (1 + Phisum)**(f - 1)
-    w['Rbound_n'] = L0 / KxStar * f * Phisum_n * (1 + Phisum)**(f - 1)
-    w['Rmulti'] = L0 / KxStar * f * Phisum * ((1 + Phisum)**(f - 1) - 1)
     w['Rmulti_n'] = L0 / KxStar * f * Phisum_n * ((1 + Phisum)**(f - 1) - 1)
-    w['nXlink'] = L0 / KxStar * (1 + (1 + Phisum)**(f - 1) * ((f - 1) * Phisum - 1))
     w['Req'] = Req
 
     w['vtot'] = L0 / KxStar * (1 + Phisum)**f
