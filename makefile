@@ -10,7 +10,6 @@ venv: venv/bin/activate
 
 venv/bin/activate: requirements.txt
 	test -d venv || virtualenv --system-site-packages venv
-	tlmgr install cslreferences
 	. venv/bin/activate && pip install -Uqr requirements.txt
 	touch venv/bin/activate
 
