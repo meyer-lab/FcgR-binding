@@ -10,7 +10,8 @@ venv: venv/bin/activate
 
 venv/bin/activate: requirements.txt
 	test -d venv || virtualenv --system-site-packages venv
-	. venv/bin/activate && pip install -Ur requirements.txt
+	tlmgr install cslreferences
+	. venv/bin/activate && pip install -Uqr requirements.txt
 	touch venv/bin/activate
 
 $(fdir)/Figure%.svg: genFigures.py venv
