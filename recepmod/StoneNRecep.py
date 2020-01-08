@@ -50,9 +50,6 @@ def polyfc(L0, KxStar, f, Rtot, IgGC, Kav, ActV=None):
     w['nXlink'] = L0 / KxStar * (1 + (1 + Phisum)**(f - 1) * ((f - 1) * Phisum - 1))
     w['Req'] = Req
 
-    if isinstance(f, int):  # Allow float valencies, but then skip vieq
-        w['vieq'] = L0 / KxStar * sp.special.comb(f, range(f + 1)) * Phisum**range(f + 1)
-
     w['vtot'] = L0 / KxStar * (1 + Phisum)**f
     if ActV is not None:
         ActV = np.array(ActV).reshape(1, -1)
