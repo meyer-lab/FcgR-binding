@@ -81,9 +81,6 @@ def Req_Regression(L0, KxStar, f, Rtot, IgGC, Kav):
     return lsq['x'].reshape(1, -1)
 
 
-
-
-
 class StoneN:
     """ Use a class to keep track of the various parameters. """
 
